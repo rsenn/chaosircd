@@ -1,0 +1,16 @@
+# INI files for machine independent databases
+
+inis {
+  
+  load "@inidir@/kline.ini";      # INI file containing server bans 
+                                  # for the m_kline module
+  
+  load "@inidir@/gline.ini";      # INI file containing network bans
+                                  # for the m_kline module
+
+  load "@inidir@/spoof.ini";      # INI file containing spoof entries
+                                  # for the m_spoof module
+                                          
+  load "@inidir@/proxy.ini";      # INI file containing proxy checklist
+                                  # for the lc_sauth module
+};

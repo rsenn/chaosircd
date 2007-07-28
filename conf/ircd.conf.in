@@ -1,0 +1,95 @@
+# $Id: ircd.conf.in,v 1.3 2006/09/28 08:46:44 roman Exp $
+
+# Global settings
+global {
+  name   = "sabcat.blah.ch";    # Server name (doesn't need 
+                                # to match real hostname).
+  info   = "fuck society";      # Information about the server
+                                # shown in /links, /whois and others
+  detach = yes;                 # Detach from terminal after 
+                                # configfile coldstart
+  hub    = no;                  # Hub mode: server forwards messages
+                                # between two or more servers
+  pid    = "@pidfile@";
+};
+
+# Message files
+mfiles {
+  load "@sysconfdir@/ircd.motd";  # Message of the day 
+                                  # (used by the m_motd module) 
+};
+
+.include "@sysconfdir@/logs.conf"         # Log files
+.include "@sysconfdir@/inis.conf"         # INI databases
+.include "@sysconfdir@/modules.conf"      # Loadable modules
+.include "@sysconfdir@/children.conf"     # Child processes
+.include "@sysconfdir@/classes.conf"      # Connection classes
+.include "@sysconfdir@/opers.conf"        # IRC Operators
+.include "@sysconfdir@/ssl.conf"          # SSL contexts
+
+# Listen for incoming SSL connections on port 994
+listen {
+  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
+  port     = 994;                         # Port to listen to
+  protocol = "irc";                       # Protocol handler for this port
+  class    = "clients";                   # Class for client connects
+  ssl      = yes;                         # Use OpenSSL encryption?
+  context  = "listen";                    # SSL context to use 
+                                          # (must be of 'server' type)
+  backlog  = 5;                           # Backlog argument for listen(),
+                                          # this defines how many incoming
+                                          # connections can be buffered before
+                                          # accept() is called.
+};
+
+# Listen for incoming connections on port 6667
+listen {
+  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
+  port     = 6667;                        # Port to listen to
+  protocol = "irc";                       # Protocol handler for this port
+  class    = "clients";                   # Class for client connects
+  ssl      = no;                          # Use OpenSSL encryption?
+  backlog  = 5;                           # Backlog argument for listen(),
+                                          # this defines how many incoming
+                                          # connections can be buffered before
+                                          # accept() is called.
+};
+
+# Listen for incoming SSL connections on port 7007
+#listen {
+#  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
+#  port     = 7007;                        # Port to listen to
+#  protocol = "irc";                       # Protocol handler for this port
+#  class    = "clients";                   # Class for client connects
+#  ssl      = yes;                         # Use OpenSSL encryption?
+#  context  = "listen";                    # SSL context to use
+#                                          # (must be of 'server' type)
+#  backlog  = 5;                           # Backlog argument for listen(),
+#                                          # this defines how many incoming
+#                                          # connections can be buffered before
+#                                          # accept() is called.
+#};
+
+# Connect to a remote server
+#connect {
+#  name      = "dev-20.devshed-net.ch";    # Name of the server
+#  address   = "dev-20.devshed-net.ch";    # Address of the peer
+#  port      = 7007;                       # Port
+#  protocol  = "irc";                      # Protocol handler for this port
+#  class     = "servers";                  # Connection class for this server
+#  auto      = yes;                        # When not connected then connect
+#                                          # after the specified interval
+#  ssl       = yes;                        # Use OpenSSL encryption?
+#  context   = "connect";                  # SSL context to use
+#                                          # (must be of 'client' type)
+#  timeout   = 30000;                      # Timeout while waiting for
+#                                          # succeeded connection
+#  interval  = 60000;                      # Interval for auto-connect
+#  password  = "lala";                     # Link password
+#  encrypted = no;                         # For servlink encryption...
+#                                          # Do not enable when
+#                                          # using OpenSSL on this link!
+#  cipher    = "AES/256";                  # Cipher to use for servlink
+#                                          # (ciphers for SSL are in ssl{} block)
+#};
+

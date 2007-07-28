@@ -1,0 +1,50 @@
+# SSL context for incoming connections (SSLv23_server_method)
+
+ssl {
+
+  name    = "listen";                 # The name is used in listen{} and connect{} 
+                                      # blocks to reference this context.
+
+  context = server;                   # Using SSLv23_server_method
+    
+  cert    = "@sysconfdir@/ircd.crt";  # Location of the x509 certificate
+  
+  key     = "@sysconfdir@/ircd.key";  # Location of the RSA private key
+    
+    # Allowed ciphers for this context.
+    # RSA        - all ciphers used in conjuncation with RSA keyexchange
+    # HIGH       - all ciphers having a key size of more than 128bit.
+    # MEDIUM     - all ciphers having a key size of 128bit.
+    # @STRENGH   - sort them by strenght
+    # RSA+HIGH   - all ciphers which match RSA and HIGH
+    # RSA+MEDIUM - all ciphers which match RSA and HIGH
+    #
+    # The ':' separator simply adds ciphers
+
+  ciphers = "RSA+HIGH:RSA+MEDIUM:@STRENGTH";  
+};
+
+# SSL context for outgoing connections (SSLv3_client_method)
+
+ssl {
+  name    = "connect";                # The name is used in listen{} and connect{} blocks to 
+                                      # reference this context.
+  
+  context = client;                   # Using SSLv23_server_method
+  
+  cert    = "@sysconfdir@/ircd.crt";  # Location of the x509 certificate
+  
+  key     = "@sysconfdir@/ircd.key";  # Location of the RSA private key
+  
+    # Allowed ciphers for this context.
+    # RSA        - all ciphers used in conjuncation with RSA keyexchange
+    # HIGH       - all ciphers having a key size of more than 128bit.
+    # MEDIUM     - all ciphers having a key size of 128bit.
+    # @STRENGH   - sort them by strenght
+    # RSA+HIGH   - all ciphers which match RSA and HIGH
+    # RSA+MEDIUM - all ciphers which match RSA and HIGH
+    # 
+    # The ':' separator simply adds ciphers
+
+  ciphers = "RSA+HIGH:@STRENGTH";
+};

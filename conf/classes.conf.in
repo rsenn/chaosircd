@@ -1,0 +1,64 @@
+# Connection class for servers
+
+class {
+  name           = "servers";            # Class name
+
+  ping_freq      = 30000;                # Ping every <n> msecs 
+
+  max_clients    = 10;                   # Allow this many clients in 
+                                         # this class (unimplemented)
+
+  clients_per_ip = 2;                    # Only allow this many clients per IP
+                                         # Disconnect the client when the 
+
+  recvq          = 1048576;              # receive queue exceeds this many bytes 
+                                         # Disconnect the client when the send 
+
+  sendq          = 1048576;              # queue exceeds this many bytes 
+};
+
+
+# Connection class for clients  
+
+class {
+  name = "clients";                      # Class name
+  
+  ping_freq = 180000;                    # Ping every <n> msecs 
+                                         
+  max_clients = 500;                     # Allow this many clients in this class (unimplemented)
+  
+  clients_per_ip = 10;                   # Only allow this many clients per IP
+  
+  recvq = 65536;                         # Disconnect the client when the receive 
+                                         # queue exceeds this many bytes 
+  
+  sendq = 262144;                        # Disconnect the client when the send 
+                                         # queue exceeds this many bytes 
+  
+  flood_trigger = 25;                    # Exit the client if flood lines exceed this count
+  
+  flood_interval = 10000;                # Reset flood lines every <n> msecs
+  
+  throttle_trigger = 5;                  # Start flood throttling after this many lines
+  
+  throttle_interval = 500;               # Process a line every <n> msecs when throttling
+};
+  
+  
+# Connection class for operators
+class {
+  name           = "opers";              # Class name
+
+  ping_freq      = 360000;               # Ping every <n> msecs 
+  
+  max_clients    = 50;                   # Allow this many clients in this class (unimplemented)
+ 
+  clients_per_ip = 8;                    # Only allow this many clients per IP
+  
+  recvq          = 262144;               # Disconnect the client when the receive 
+                                         # queue exceeds this many bytes 
+  
+  sendq          = 1048576;              # Disconnect the client when the send 
+                                         # queue exceeds this many bytes 
+};
+

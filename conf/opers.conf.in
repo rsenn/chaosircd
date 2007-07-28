@@ -1,0 +1,50 @@
+# IRC operator
+
+oper {
+
+  name     = "smolie";           # Operator name
+   
+  password = "lala";             # Operator password
+  
+  class    = "opers";            # Connection class (see classes.conf)
+  
+  # Log sources the oper receives messages from
+  # From which sources should the log drain receive messages?
+  # 
+  # Valid sources:
+  #
+  # child            - children handling (servauth/servlink)
+  # connect          - connect{} stuff
+  # dlink            - double linked lists
+  # i/o              - I/O code (file and socket handling)
+  # listen           - listen{} stuff
+  # log              - the logger itself
+  # mem              - block allocator
+  # mfile            - message files
+  # module           - loadable modules
+  # net              - protocol stack
+  # queue            - queues
+  # sauth            - auth and dns resolving
+  # ssl              - OpenSSL encryption
+  # timer            - timer system
+  # chanmode         - channel mode engine
+  # chanuser         - channel user engine
+  # channel          - channel stuff
+  # class            - class{} stuff
+  # client           - client handling
+  # conf             - config file parser
+  # ircd             - ircd subsystem/daemon
+  # in               - incoming traffic (only on level = "debug")
+  # out              - outgoing traffic (only on level = "debug")
+  # lclient          - local client handling
+  # msg              - message parser
+  # oper             - oper{} stuff
+  # server           - server linking
+  # user             - user handling
+  # usermode         - usermode engine
+  # all              - log ALL of them
+ 
+  sources  = "all";             # log source
+  
+  level    = "status";          # Log level
+};
