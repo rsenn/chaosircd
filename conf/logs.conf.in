@@ -1,0 +1,72 @@
+# A log drain - redirecting logging to a file
+
+log {
+  path     = "@logdir@/ircd.log";
+  
+  # From which sources should the log drain receive messages?
+  # 
+  # Valid sources:
+  #
+  # child            - children handling (servauth/servlink)
+  # connect          - connect{} stuff
+  # dlink            - double linked lists
+  # i/o              - I/O code (file and socket handling)
+  # listen           - listen{} stuff
+  # log              - the logger itself
+  # mem              - block allocator
+  # mfile            - message files
+  # module           - loadable modules
+  # net              - protocol stack
+  # queue            - queues
+  # sauth            - auth and dns resolving
+  # ssl              - OpenSSL encryption
+  # timer            - timer system
+  # chanmode         - channel mode engine
+  # chanuser         - channel user engine
+  # channel          - channel stuff
+  # class            - class{} stuff
+  # client           - client handling
+  # conf             - config file parser
+  # ircd             - ircd subsystem/daemon
+  # in               - incoming traffic (only on level = "debug")
+  # out              - outgoing traffic (only on level = "debug")
+  # lclient          - local client handling
+  # msg              - message parser
+  # oper             - oper{} stuff
+  # server           - server linking
+  # user             - user handling
+  # usermode         - usermode engine
+  # all              - log ALL of them
+ 
+  sources  = "all";                  # set here source  
+  
+  level    = "verbose";              # Log all messages which have at least the following level
+  
+  prefix   = yes;                    # Prefix the message with the current date and log facility
+ 
+  truncate = yes;                    # Truncate the log file on creation (Setting file size to 0)
+};
+
+log {
+  path     = "@logdir@/chaosircd.log";
+  sources  = "all";
+  level    = "verbose";
+  prefix   = yes;
+  truncate = yes;
+};
+
+#log {
+#  path     = "@logdir@/debug.log";
+#  sources  = "all";
+#  level    = "debug";
+#  prefix   = yes;
+#  truncate = yes;
+#};
+
+#log {
+#  path     = "@logdir@/traffic.log";
+#  sources  = "in out";
+#  level    = "debug";
+#  prefix   = yes;
+#  truncate = yes;
+#};

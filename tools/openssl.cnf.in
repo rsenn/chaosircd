@@ -1,0 +1,93 @@
+# create RSA certs - Server
+
+RANDFILE = openssl.rnd
+
+[ ca ]
+default_ca	= CA_default
+
+[ CA_default ]
+dir		= @prefix@/ca
+certs		= $dir/certs		# Where the issued certs are kept
+#crl_dir	= $dir/crl		# Where the issued crl are kept
+database	= $dir/ca.txt		# database index file.
+new_certs_dir	= $dir/newcerts		# default place for new certs.
+
+certificate	= $dir/ca.crt		# The CA certificate
+serial		= $dir/ca.ser		# The current serial number
+crl		= $dir/ca.crl		# The current CRL
+private_key	= $dir/ca.key		# The private key
+RANDFILE	= $dir/ca.rnd		# private random number file
+
+x509_extensions = usr_cert		# The extentions to add to the cert
+
+default_days	= 365                   # how long to certify for
+default_crl_days= 30                    # how long before next CRL
+default_md	= rmd160                # which md to use.
+preserve	= no                    # keep passed DN ordering
+
+policy          = policy_match
+
+[ req ]
+default_bits		= 2048
+default_keyfile		= req.key
+encrypt_key		= yes
+distinguished_name	= req_dn
+x509_extensions		= v3_ca
+
+[ req_dn ]
+countryName			= Country Name (2 letter code)
+countryName_default		= CH
+countryName_min			= 2
+countryName_max			= 2
+
+stateOrProvinceName		= State or Province Name (full name)
+stateOrProvinceName_default	= 
+
+localityName                    = Locality Name (eg, city)
+localityName_default		= 
+
+0.organizationName              = Organization Name (eg, company)
+0.organizationName_default      = PiIRC
+
+organizationalUnitName          = Organizational Unit Name (eg, section)
+organizationalUnitName_default  = 
+
+0.commonName                    = Common Name (FQDN of your server)
+0.commonName_default            = 
+
+[ usr_cert ]
+basicConstraints=CA:FALSE
+nsCertType = client, server
+nsComment                       = "OpenSSL Generated Certificate"
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer:always
+basicConstraints = CA:true 
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always,issuer:always
+
+[ policy_match ]
+countryName             = match
+stateOrProvinceName     = match
+organizationName        = match
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ policy_anything ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+

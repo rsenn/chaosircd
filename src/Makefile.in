@@ -1,0 +1,130 @@
+srcdir               = @srcdir@
+top_srcdir           = @top_srcdir@
+builddir             = @builddir@
+top_builddir         = @top_builddir@
+thisdir              = src/
+plugindir            = @plugindir@
+
+EXEEXT               = @EXEEXT@
+PROGRAM              = chaosircd$(EXEEXT)
+LIBNAME              = ircd
+@WIN32_TRUE@PIE_LIBRARY          = ircd.dll
+@WIN32_FALSE@PIE_LIBRARY          =
+
+bin_EXEC = chaosircd$(EXEEXT)
+@WIN32_TRUE@bin_EXEC += ircd.dll
+
+
+all: Makefile $(lib_EXEC) $(bin_EXEC)
+install: install-exec 
+
+include $(top_builddir)/config.mk
+
+MODULES              = ircd \
+                       chanmode \
+                       chanuser \
+                       channel \
+                       chars \
+                       class \
+                       client \
+                       conf \
+                       lclient \
+                       msg \
+                       numeric \
+                       oper \
+                       server \
+                       service \
+                       user \
+                       usermode
+                       
+DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\"
+INCLUDES             = -I$(top_srcdir)/include \
+                       -I$(srcdir) \
+                       -I../include \
+                       -I. \
+                       -I../libchaos/include
+                       
+LEXERSRC             = $(srcdir)/lex.yy.c
+LEXEROBJ             = lex.yy.o
+PARSERSRC            = $(srcdir)/y.tab.c
+PARSERINC            = $(srcdir)/y.tab.h
+PARSEROBJ            = y.tab.o
+SOURCES              = $(MODULES:%=%.c) $(LEXERSRC) $(PARSERSRC)
+@WIN32_FALSE@OBJECTS              = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
+@WIN32_TRUE@OBJECTS              = main.o
+@WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
+@WIN32_TRUE@LIBNAME              = ircd
+PIE_DEF              = ircd.def
+OBJEXT               = o
+HEADERS              = y.tab.h
+DEPS                 = $(MODULES:%=%.d)
+@PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_EXEEXT@
+@NO_PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/libchaos.a \
+@NO_PIE_LIB@                       $(top_builddir)/modules/lclient/lclient.a \
+@NO_PIE_LIB@                       $(top_builddir)/modules/msg/msg.a \
+@NO_PIE_LIB@                       $(top_builddir)/modules/usermode/usermode.a \
+@NO_PIE_LIB@                       $(top_builddir)/modules/chanmode/chanmode.a \
+@NO_PIE_LIB@                       $(top_builddir)/modules/stats/stats.a \
+@NO_PIE_LIB@                       $(top_builddir)/modules/service/service.a
+
+ifeq ($(LINKFLAGS), -static)
+LDADD                = $(top_builddir)/libchaos/src/.libs/libchaos.a
+endif
+
+#@SHARED_TRUE@@STATIC_TRUE@LDADD += -L$(top_builddir)/libchaos/src -lchaos
+#@STATIC_TRUE@@SHARED_FALSE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
+#@SHARED_TRUE@@STATIC_FALSE@LDADD += $(top_builddir)/libchaos/src/chaos.dll
+
+CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
+                       $(OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
+DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
+MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+
+FILES                = Makefile.in $(MODULES:%=%.c) $(HEADERS) ircd.l ircd.y
+DISTFILES            = $(FILES) y.tab.c y.tab.h lex.yy.c main.c
+DEVFILES             = CVS $(FILES)
+
+$(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
+main.o: CPPFLAGS += -DBUILD_MAIN=1
+
+@WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
+
+@WIN32_FALSE@OBJECTS += main.o
+#@WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): ircd.dll
+#@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
+#@WIN32_TRUE@@SHARED_TRUE@chaosircd: ircd.dll
+#@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
+@WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
+@WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
+
+.y.c:
+
+.l.c:
+
+ircd.c:
+
+$(LEXERSRC): ircd.l y.tab.h
+	@$(ECHO_LEX)
+	@$(LEX) -o$@ ircd.l
+lex.yy.o: lex.yy.c y.tab.h
+y.tab.o: y.tab.c y.tab.h
+$(PARSERINC): ircd.y
+	@$(ECHO_YACC)
+	$(YACC) -d -o $(PARSERSRC) ircd.y
+#.y.c:
+#	@$(ECHO_YACC)
+#	@$(YACC) -d -o $(PARSERSRC) $(PARSER)
+$(PARSERSRC): $(srcdir)/ircd.y
+	@$(ECHO_YACC)
+	$(YACC) -d -o $(srcdir)/y.tab.c $(PARSER)
+
+$(PROGRAM): $(OBJECTS) $(LDADD)
+	@$(ECHO_LD)
+	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+        
+
+#dep: Makefile $(DEPS)
+
+include $(top_builddir)/build.mk
+
+#-include $(DEPS)

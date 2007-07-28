@@ -1,0 +1,88 @@
+srcdir               = @srcdir@
+top_srcdir           = @top_srcdir@
+builddir             = @builddir@
+top_builddir         = @top_builddir@
+thisdir              = contrib/
+
+#PROGRAM              = dumpcode sploit
+
+NASM                 = @NASM@
+NASMFLAGS            = -f elf -O3
+
+SUBDIRS = debian
+
+# Redirect to recursive targets
+all: makefiles all-recursive
+
+ifeq (@NASM@, no)
+all-local:
+else
+all-local: Makefile $(PROGRAM)
+endif
+install-local:
+
+clean: makefiles clean-recursive
+distclean: makefiles distclean-recursive
+maintainer-clean: makefiles maintainer-clean-recursive
+install: makefiles install-recursive
+dep: makefiles dep-recursive
+
+# Subdirectories
+RECURSIVE = 1
+
+RECURSIVE_TARGETS = all-recursive \
+                    install-recursive \
+                    dep-recursive
+
+RCLEAN_TARGETS = clean-recursive \
+                 distclean-recursive \
+                 maintainer-clean-recursive
+
+include $(top_builddir)/config.mk
+
+MODULES              = sploit
+                       
+DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\"
+INCLUDES             = -isystem $(top_srcdir)/libchaos/include -isystem $(top_srcdir)/include -I.
+SOURCES              = $(MODULES:%=%.c)
+OBJECTS              = $(MODULES:%=%.o) shellcode.o
+OBJEXT               = o
+HEADERS              = 
+DEPS                 = $(MODULES:%=%.d)
+@PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_EXEEXT@
+CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
+                       $(OBJECTS)
+DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
+MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+
+FILES                = Makefile.in $(SOURCES) shellcode.asm shellcode.h syscalls.inc dumpcode.c
+DISTFILES            = $(FILES)
+DEVFILES             = CVS $(DISTFILES)
+
+noinst_EXEC = dumpcode sploit
+
+sploit.c: shellcode.h
+
+#sploit: $(OBJECTS) $(LDADD)
+#	@$(ECHO_LD)
+#	@$(LINK) $(LDFLAGS) -o $@ $(OBJECTS) $(LDADD) $(LIBS) $(SSL_LIBS)
+
+dumpcode.o: dumpcode.c
+dumpcode: dumpcode.o
+	@$(ECHO_LD)
+	@$(CC) $(LDFLAGS) -o $@ $^ $(LIBS) 
+
+shellcode.o: shellcode.asm
+	@$(ECHO_NASM)
+	@$(NASM) $(NASMFLAGS) $(srcpfx)$<
+
+shellcode.h: shellcode.o dumpcode
+	./dumpcode $< > $@
+
+ifneq ($(NASM),)
+dep: Makefile $(DEPS)
+
+-include $(DEPS)
+endif
+
+include $(top_builddir)/build.mk

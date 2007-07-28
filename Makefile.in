@@ -1,0 +1,68 @@
+# $Id: Makefile.in,v 1.4 2006/09/28 08:37:39 roman Exp $
+#
+#
+
+# Set relative directories
+#@WIN32_FALSE@srcdir       = @srcdir@
+srcdir       = @srcdir@
+top_srcdir   = @top_srcdir@
+builddir     = @builddir@
+top_builddir = @top_builddir@
+thisdir      =
+
+# Redirect to recursive targets
+all: makefiles all-recursive
+clean: makefiles clean-recursive
+distclean: makefiles distclean-recursive
+maintainer-clean: makefiles maintainer-clean-recursive
+install: makefiles install-recursive
+dep: makefiles dep-recursive
+
+# Subdirectories
+ROOT = 1
+RECURSIVE = 1
+SUBDIRS = m4 libchaos include src modules tools conf doc contrib test
+
+RECURSIVE_TARGETS = all-recursive \
+                    install-recursive \
+                    dep-recursive
+
+RCLEAN_TARGETS = clean-recursive \
+                 distclean-recursive \
+                 maintainer-clean-recursive 
+                 
+# Include global make rules
+include config.mk
+
+# Files to be cleaned
+CLEANFILES = *~ core core.*
+DISTCLEANFILES = Makefile config.status config.log config.mak 
+MAINTAINERCLEANFILES = aclocal.m4 configure *.bz2 *.gz autom4te.cache 
+
+# Files that go into distribution tarball
+FILES =  autogen.sh \
+         Makefile.in \
+         configure.in \
+         config.guess \
+         config.sub \
+         build.mk.in \
+         config.h.in \
+         config.mk.in \
+         install-sh \
+         INSTALL
+
+DISTFILES = $(FILES) configure
+
+#config.mak: config.mak.in config.status
+#	@echo -e "  \033[31:1mCONFIG\033[0m  $(reldir)$@"
+#	@(./config.status config.mak) >& /dev/null
+
+# Files that go into development tarball
+DEVFILES = CVS $(FILES)
+
+# Local targets
+all-local: Makefile config.mk $(srcdir)/configure
+install-local:
+dep-local:
+
+include build.mk

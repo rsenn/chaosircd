@@ -1,0 +1,25 @@
+Configure and compile chaosircd from source:
+
+  ./configure --prefix=/usr/chaosircd
+  make
+
+Install chaosircd (probably you must be root):
+	
+  make install
+
+If you want support for SSL encrypted connections, then you
+can generate a self-signed certificate this way:
+
+  /usr/chaosircd/sbin/mkcrt
+
+On FreeBSD and linux there is support for socket filters, which
+enables socket-based firewalling and thus blocking of connections
+on the irc ports for specific addresses (those which are g-lined
+or k-lined).
+
+To enable support for socket filters on FreeBSD you have to enable
+the Berkeley Packet filter by adding the following line to /etc/rc.conf
+and rebooting:
+	
+  pf_enable="YES"
+

@@ -1,0 +1,32 @@
+                       [ test12 ]         [ test13 ] [ test14 ]
+                            \                 \        /
+                             \                 \      /
+             [ test11 ] ------[ test1 ]       [ test5 ]
+                             /        \           /
+                            /          \         /
+                        [ test3 ]       [ test4 ]
+                       /         \           \
+                      /           \           \
+             [ test2 ]         [ test15 ]      [ test6 ]
+            /    |    \                               /
+           /     |     \                             /
+          /      |      \                           /
+         /       |       \                         /
+[ test7 ]    [ test8 ]    [ test9 ]           [ test10 ]
+
+
+test1  -> hub (4 links)     (7001)
+test2  -> hub (4 links)     (7002)
+test3  -> hub (3 links)
+test4  -> hub (3 links)
+test5  -> hub (3 links)
+test6  -> hub (2 links)
+
+test7  -> leaf
+test8  -> leaf
+test9  -> leaf
+test10 -> leaf
+test11 -> leaf
+test12 -> leaf
+test13 -> leaf
+test14 -> leaf

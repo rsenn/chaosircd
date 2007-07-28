@@ -1,0 +1,57 @@
+srcdir               = @srcdir@
+top_srcdir           = @top_srcdir@
+builddir             = @builddir@
+top_builddir         = @top_builddir@
+thisdir              = modules/lclient/
+
+CATEGORY             = lclient
+MODULES              = lc_clones \
+                       lc_cookie \
+                       lc_mflood \
+                       lc_sauth
+
+INCLUDES             = -I$(top_srcdir)/libchaos/include \
+                       -I$(top_srcdir)/include \
+                       -I../../libchaos/include \
+                       -I../../include
+
+SOURCES              = $(MODULES:%=%.c)
+OBJECTS              = $(MODULES:%=%.o)
+OBJEXT               = so
+DEPS                 = $(MODULES:%=%.d)
+SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+DSO                  = @DSO@
+
+plugin_EXEC = $(SHOBJECTS)
+
+@PIE_LIB@lib_EXEC = $(SHOBJECTS)
+@PIE_LIB@all: shobjects
+@PIE_LIB@install: install-pluginEXEC
+
+@NO_PIE_LIB@all: $(CATEGORY).a
+@NO_PIE_LIB@install:
+
+$(CATEGORY).a: $(OBJECTS)
+	@$(ECHO_AR)
+	@$(RM) -f $@
+	@$(AR) cru $@ $^
+	@$(ECHO_RANLIB)
+	@$(RANLIB) $@
+
+shobjects: $(SHOBJECTS)
+
+include $(top_builddir)/config.mk
+
+#INSTALL = @INSTALL@
+
+CLEANFILES           = *~ core core.* \
+                       $(OBJECTS) $(SHOBJECTS)
+DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
+MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+DISTFILES            = Makefile.in $(SOURCES)
+DEVFILES             = CVS $(DISTFILES)
+
+@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
+@WIN32_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+
+include $(top_builddir)/build.mk

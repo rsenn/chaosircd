@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Signs a certificate request.
+#
+# $Id: sign.in,v 1.1.1.1 2006/09/27 10:08:58 roman Exp $
+
+# ircd install prefix
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+sbindir="@sbindir@"
+sysconfdir="@sysconfdir@"
+
+# how many bits the RSA private key will have
+bits=2048
+
+cadir="$sysconfdir/ca"
+
+# defaults for x509 and stuff
+cnf="$sbindir/openssl.cnf"
+
+# private key file
+key="$cadir/ca.key"
+
+# public key file
+pub="$cadir/ca.pub"
+
+# certificate file
+crt="$cadir/ca.crt"
+
+# serial file
+ser="$cadir/ca.ser"
+
+# database
+txt="$cadir/ca.txt"
+
+# random data
+rnd="$sysconfdir/openssl.rnd"
+
+# check for request
+if [ ! -f "$1" ]
+then
+  echo "Usage: $0 <request>"
+  exit 1
+fi
+
+# check for CA
+if [ ! -f "$crt" ]
+then
+  echo "No CA in $crt."
+  exit 1
+fi
+
+# sign certificate
+openssl ca -config "$cnf" -policy policy_anything  -infiles "$1"

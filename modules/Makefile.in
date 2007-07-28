@@ -1,0 +1,61 @@
+# $Id: Makefile.in,v 1.2 2006/09/27 10:40:19 roman Exp $
+#
+#
+
+# Set relative directories
+srcdir               = @srcdir@
+top_srcdir           = @top_srcdir@
+builddir             = @builddir@
+top_builddir         = @top_builddir@
+thisdir              = modules/
+
+# Redirect to recursive targets
+ifeq ($(DSO), yes)
+all: makefiles all-recursive
+else
+all: makefiles all-recursive module_import.h
+endif
+
+clean: makefiles clean-recursive
+distclean: makefiles distclean-recursive
+maintainer-clean: makefiles maintainer-clean-recursive
+install: makefiles install-recursive
+dep: makefiles dep-recursive
+
+# Subdirectories
+RECURSIVE = 1
+SUBDIRS = msg lclient chanmode usermode service stats
+
+RECURSIVE_TARGETS = all-recursive \
+                    clean-recursive \
+                    distclean-recursive \
+                    maintainer-clean-recursive \
+                    install-recursive \
+                    dep-recursive
+
+include $(top_builddir)/config.mk
+
+# Files to be cleaned
+CLEANFILES           = *~ core core.*
+DISTCLEANFILES       = Makefile $(CLEANFILES)
+MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+DISTFILES            = Makefile.in import-modules.sh
+DEVFILES             = CVS $(DISTFILES)
+
+module_import.h: import-modules.sh $(SUBDIRS:%=%/Makefile)
+	@$(ECHO_CONFIG)
+	@sh import-modules.sh > $@
+
+all: all-recursive
+clean: clean-recursive
+distclean: distclean-recursive
+maintainerclean: maintainerclean-recursive
+install: install-recursive
+
+all-local:
+
+install-local:
+
+dep-local:
+
+include $(top_builddir)/build.mk

@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# Generates RSA private key if none available in @prefix@/ca/ca.key
+# Dumps RSA public key if none available to @prefix@/ca/ca.pub
+# Generates a CA certificate in @prefix@/ca/ca.crt
+#
+# $Id: mkca.in,v 1.1.1.1 2006/09/27 10:08:58 roman Exp $
+
+# ircd install prefix
+prefix="@prefix@"
+
+# how many bits the RSA private key will have
+bits=2048
+
+cadir="$prefix/ca"
+
+# defaults for x509 and stuff
+cnf="$prefix/sbin/openssl.cnf"
+
+# private key file
+key="$cadir/ca.key"
+
+# public key file
+pub="$cadir/ca.pub"
+
+# certificate file
+crt="$cadir/ca.crt"
+
+# serial file
+ser="$cadir/ca.ser"
+
+# database
+txt="$cadir/ca.txt"
+
+# random data
+rnd="$prefix/openssl.rnd"
+
+
+mkdir -p "$cadir"
+mkdir -p "$cadir/certs"
+mkdir -p "$cadir/newcerts"
+mkdir -p "$cadir/crl"
+
+# generate CA
+if [ -f "$crt" ]
+then
+  echo "There is already a CA certificate in $crt."
+else
+  openssl req -new -x509 -config "$cnf" -keyout "$key" -out "$crt" -days 1460
+  openssl rsa -in "$key" -out "$pub" -pubout
+  chmod 600 "$crt"
+  touch "$txt"
+  echo "01" > "$ser"
+  mkdir -p "$prefix/certs"
+fi

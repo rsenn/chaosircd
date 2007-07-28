@@ -1,0 +1,77 @@
+# $Id: Makefile.in,v 1.2 2006/09/28 09:38:20 roman Exp $
+# ===========================================================================
+#
+# Makefile for include/libchaos subdirectory
+#
+# relative directories
+# ---------------------------------------------------------------------------
+srcdir       = @srcdir@
+top_srcdir   = @top_srcdir@
+top_builddir = @top_builddir@
+thisdir      = include/libchaos/
+thisname     = @thisname@
+
+VPATH        = $(srcdir)
+
+# include global make configuration
+# ---------------------------------------------------------------------------
+include $(top_builddir)/config.mk
+
+# configuration for this directory
+# ---------------------------------------------------------------------------
+CONFIG_H_IN  = $(top_srcdir)/$(thisdir)config.h.in
+CONFIG_H     = config.h
+CONFIG_H_TOP = $(thisdir)config.h
+
+MODULES = cfg \
+          child \
+          connect \
+          db \
+          defs \
+          divdi3 \
+          dlink \
+          filter \
+          font_6x10 \
+          font_8x13 \
+          font_8x13b \
+          gif \
+          graph \
+          hook \
+          htmlp \
+          httpc \
+          image \
+          image_defpal \
+          ini \
+          io \
+          listen \
+          log \
+          mem \
+          mfile \
+          module \
+          net \
+          queue \
+          sauth \
+          ssl \
+          str \
+          syscall \
+          template \
+          timer \
+          ttf
+
+HEADERS = $(MODULES:%=%.h)
+DISTFILES += config.h.in
+
+# targets for this directory
+# ---------------------------------------------------------------------------
+all: Makefile $(CONFIG_H)
+install: install-data
+
+# install config
+# ---------------------------------------------------------------------------
+include_DATA = $(HEADERS)
+include_PREFIX = $(PREFIX)
+
+# include global make targets
+# ---------------------------------------------------------------------------
+include $(top_builddir)/build.mk
+#@WIN32_TRUE@include ../../build.mk
