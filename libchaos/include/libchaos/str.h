@@ -27,9 +27,9 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/mem.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -70,10 +70,10 @@ CHAOS_API(void )str_unregister (char           c);
 /* ------------------------------------------------------------------------ *
  * Get string length.                                                         *
  * ------------------------------------------------------------------------ */
-#ifdef USE_IA32_LINUX_INLINE
-CHAOS_API(size_t )strlen(const char *s);
+#if 1 //def USE_IA32_LINUX_INLINE
+CHAOS_API(size_t )str_len(const char *s);
 
-/*extern inline size_t strlen(const char *s)
+/*extern inline size_t str_len(const char *s)
 {
   size_t len = 0;
   
@@ -90,20 +90,20 @@ CHAOS_API(size_t )strlen(const char *s);
 /* ------------------------------------------------------------------------ *
  * Get first occurance of char <c> in string <s>                              *
  * ------------------------------------------------------------------------ */
-#if 0
-CHAOS_API(char *)strchr(const char *s, int c);
+#if 1
+CHAOS_API(char *)str_chr(const char *s, int c);
 
-extern inline char *strchr(const char *s, int c)
+extern inline char *str_chr(const char *s, int c)
 {
   size_t i = 0;
-  
+ 
   for(EVER)
   {
     /* 32-bit unroll for faster prefetch */
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
   }
   
   return NULL;
@@ -259,9 +259,9 @@ extern inline int str_cmp(const char *s1, const char *s2)
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int )stricmp(const char *s1, const char *s2);
+CHAOS_API(int )str_icmp(const char *s1, const char *s2);
 
-extern inline int stricmp(const char *s1, const char *s2)
+extern inline int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
   
@@ -280,34 +280,34 @@ extern inline int stricmp(const char *s1, const char *s2)
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                     *
  * ------------------------------------------------------------------------ */
-/*#undef strncmp
-CHAOS_API(int )strncmp(const char *s1, const char *s2, size_t n);
+//#undef str_ncmp
+CHAOS_API(int )str_ncmp(const char *s1, const char *s2, size_t n);
 
-CHAOS_API(inline int )strncmp(const char *s1, const char *s2, size_t n)
+CHAOS_API(extern inline int )str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
   
   if(n == 0)
     return 0;
-  
+
   for(EVER)
   {
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;    
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
   }
   
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
-}*/
+}
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int )strnicmp(const char *s1, const char *s2, size_t n);
+CHAOS_API(int )str_nicmp(const char *s1, const char *s2, size_t n);
 
-extern inline int strincmp(const char *s1, const char *s2, size_t n)
+extern inline int str_incmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
   
@@ -329,8 +329,8 @@ extern inline int strincmp(const char *s1, const char *s2, size_t n)
 /* ------------------------------------------------------------------------ *
  * Formatted vararg print to string                                           *
  * ------------------------------------------------------------------------ */
-#undef vsnprintf
-#define vsnprintf str_vsnprintf
+//#undef str_vsnprintf
+//#define str_vsnprintf str_vsnprintf
 CHAOS_API(int )str_vsnprintf(char *str, size_t n, const char *format, va_list args);
 
 /* ------------------------------------------------------------------------ *
@@ -341,8 +341,8 @@ CHAOS_API(int) str_toi(const char *s);
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                  *
  * ------------------------------------------------------------------------ */
-#undef snprintf
-#define snprintf str_snprintf
+//#undef snprintf
+//#define snprintf str_snprintf
 CHAOS_API(int) str_snprintf(char *str, size_t n, const char *format, ...);
 
 extern inline int str_snprintf(char *str, size_t n, const char *format, ...)
@@ -353,7 +353,7 @@ extern inline int str_snprintf(char *str, size_t n, const char *format, ...)
   
   va_start(args, format);
   
-  ret = vsnprintf(str, n, format, args);
+  ret = str_vsnprintf(str, n, format, args);
   
   va_end(args);
   
@@ -418,10 +418,10 @@ extern inline int str_toi(const char *s)
  *                                                                            *
  * return value will not be bigger than maxtok                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t )strtokenize(char *s, char **v, size_t maxtok);
+CHAOS_API(size_t )str_tokenize(char *s, char **v, size_t maxtok);
 
-#if 0
-inline size_t strtokenize(char *s, char **v, size_t maxtok)
+#if 1
+extern inline size_t str_tokenize(char *s, char **v, size_t maxtok)
 {
   size_t c = 0;
   
@@ -469,7 +469,7 @@ inline size_t strtokenize(char *s, char **v, size_t maxtok)
  *                                                                            *
  * Like the one above but allows to specify delimiters.                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t )strtokenize_d(char       *s,
+CHAOS_API(size_t )str_tokenize_d(char       *s,
                                 char      **v, 
                                 size_t      maxtok,
                                 const char *delim);
@@ -479,22 +479,22 @@ CHAOS_API(size_t )strtokenize_d(char       *s,
  *                                                                            *
  * Like the one above but allows to specify one delimiter.                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t )strtokenize_s(char       *s,
+CHAOS_API(size_t )str_tokenize_s(char       *s,
                             char      **v, 
                             size_t      maxtok,
                             char        delim);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#undef strdup
-#define strdup str_strdup
-CHAOS_API(char *)str_strdup(const char *s);
+//#undef str_dup
+//#define str_dup str_strdup
+CHAOS_API(char *)str_dup(const char *s);
 
-extern inline char *str_strdup(const char *s)
+extern inline char *str_dup(const char *s)
 {
   char *r;
   
-  r = malloc(strlen(s) + 1);
+  r = malloc(str_len(s) + 1);
   
   if(r != NULL)
     str_copy(r, s);
@@ -504,11 +504,11 @@ extern inline char *str_strdup(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t )strhash(const char *s);
+CHAOS_API(uint32_t )str_hash(const char *s);
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-extern inline uint32_t strhash(const char *s)
+extern inline uint32_t str_hash(const char *s)
 {
   uint32_t ret = 0xcafebabe;
   uint32_t temp;
@@ -533,11 +533,11 @@ extern inline uint32_t strhash(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t )strihash(const char *s);
+CHAOS_API(uint32_t )str_ihash(const char *s);
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-extern inline uint32_t strihash(const char *s)
+extern inline uint32_t str_ihash(const char *s)
 {
   uint32_t ret = 0xcafebabe;
   uint32_t temp;
@@ -563,25 +563,25 @@ extern inline uint32_t strihash(const char *s)
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(unsigned long int )strtoul(const char *nptr, char **endptr, int base);
+CHAOS_API(unsigned long int )str_toul(const char *nptr, char **endptr, int base);
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to a long.                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(long int )strtol(const char *nptr, char **endptr, int base);
+CHAOS_API(long int )str_tol(const char *nptr, char **endptr, int base);
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to a unsigned long long.                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(unsigned long long int )strtoull(const char *nptr, char **endptr, int base);
+CHAOS_API(unsigned long long int )str_toull(const char *nptr, char **endptr, int base);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int )strmatch(const char *str, const char *mask);
+CHAOS_API(int )str_match(const char *str, const char *mask);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int )strimatch(const char *str, const char *mask);
+CHAOS_API(int )str_imatch(const char *str, const char *mask);
   
 
 extern void *memcpy(void *dest, const void *src, size_t n);
@@ -589,7 +589,7 @@ extern void *memmove(void *dest, const void *src, size_t n);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void )strtrim(char *s);
+CHAOS_API(void )str_trim(char *s);
   
 
 #endif /* LIB_STR_H */

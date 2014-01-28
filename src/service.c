@@ -130,7 +130,7 @@ struct service *service_new(const char *name, const char *user,
   if(name)
     strlcpy(svptr->name, name, sizeof(svptr->name));
   
-  svptr->nhash = strhash(svptr->name);
+  svptr->nhash = str_hash(svptr->name);
   
   /* Inform about the new service */
   debug(service_log, "New service block: %s", name);
@@ -177,13 +177,13 @@ struct service *service_find_name(const char *name)
   struct service *svptr;
   uint32_t        hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&service_list, svptr)
   {
     if(svptr->nhash == hash)
     {
-      if(!stricmp(svptr->name, name))
+      if(!str_icmp(svptr->name, name))
         return svptr;
     }
   }
@@ -198,7 +198,7 @@ void service_set_name(struct service *svptr, const char *name)
   if(name && name[0])
   {
     strlcpy(svptr->name, name, sizeof(svptr->name));
-    svptr->nhash = strihash(svptr->name);
+    svptr->nhash = str_ihash(svptr->name);
   }
 }
 
@@ -212,7 +212,7 @@ struct service_handler *service_register(struct service *svptr, const char *msg,
   svhptr = mem_static_alloc(&service_handler_heap);
   
   strlcpy(svhptr->name, msg, sizeof(svhptr->name));
-  svhptr->hash = strihash(svhptr->name);
+  svhptr->hash = str_ihash(svhptr->name);
   svhptr->callback = callback;
   
   dlink_add_tail(&svptr->handlers, &svhptr->node, svhptr);
@@ -227,12 +227,12 @@ struct service_handler *service_handler_find(struct service *svptr, const char *
   struct service_handler *svhptr;
   uint32_t                hash;
   
-  hash = strihash(cmd);
+  hash = str_ihash(cmd);
   
   dlink_foreach(&svptr->handlers, svhptr)
     if(svhptr->hash == hash)
     {
-      if(!stricmp(svhptr->name, cmd))
+      if(!str_icmp(svhptr->name, cmd))
         return svhptr;
     }  
     
@@ -253,7 +253,7 @@ void service_vhandle(struct service *svptr, struct lclient *lcptr,
   if((svhptr = service_handler_find(svptr, cmd)) == NULL)
     return;  
   
-  vsnprintf(buffer, sizeof(buffer), format, args);
+  str_vsnprintf(buffer, sizeof(buffer), format, args);
     
   if(svhptr->callback)
     svhptr->callback(lcptr, cptr, chptr, buffer);

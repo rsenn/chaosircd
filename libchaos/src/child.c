@@ -244,7 +244,7 @@ struct child *child_find(const char *path)
   struct node   *node;
   struct child *child;
   
-  chash = strhash(path);
+  chash = str_hash(path);
   
   dlink_foreach(&child_list, node)
   {
@@ -252,7 +252,7 @@ struct child *child_find(const char *path)
     
     if(chash == child->chash)
     {
-      if(!strcmp(child->path, path))
+      if(!str_cmp(child->path, path))
         return child;
     }
   }
@@ -372,7 +372,7 @@ static int child_format(struct child *child)
 
   strlcpy(args, child->argv, sizeof(args));
   
-  n = strtokenize(args, argv, CHILD_MAX_CHANNEL * 4);
+  n = str_tokenize(args, argv, CHILD_MAX_CHANNEL * 4);
   
   for(i = 0; i < n; i++)
   {
@@ -561,8 +561,8 @@ void child_default(struct child *child)
     child->channels[i][CHILD_CHILD][CHILD_WRITE] = -1;
   }
   
-  child->chash = strihash(child->path);
-  child->nhash = strihash(child->name);
+  child->chash = str_ihash(child->path);
+  child->nhash = str_ihash(child->name);
 }
        
 /* ------------------------------------------------------------------------ *
@@ -651,7 +651,7 @@ void child_set_name(struct child *child, const char *name)
 {
   strlcpy(child->name, name, sizeof(child->name));
   
-  child->nhash = strihash(child->name);
+  child->nhash = str_ihash(child->name);
 }
 
 /* ------------------------------------------------------------------------ *
@@ -669,7 +669,7 @@ struct child *child_find_name(const char *name)
   struct node  *node;
   uint32_t      nhash;
   
-  nhash = strihash(name);
+  nhash = str_ihash(name);
   
   dlink_foreach(&child_list, node)
   {
@@ -677,7 +677,7 @@ struct child *child_find_name(const char *name)
     
     if(child->nhash == nhash)
     {
-      if(!stricmp(child->name, name))
+      if(!str_icmp(child->name, name))
         return child;
     }
   }

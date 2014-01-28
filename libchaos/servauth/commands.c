@@ -83,7 +83,7 @@ struct cmd_table *command_get(struct cmd_table *cmd_table, const char *name)
 
   for(cmdptr = cmd_table; cmdptr->name; cmdptr++)
   {
-    if(!strcmp(name, cmdptr->name))
+    if(!str_cmp(name, cmdptr->name))
       return cmdptr;
   }
   
@@ -264,7 +264,7 @@ static int cmd_proxy(control_t *cptr, int ac, char **av)
 
   strlcpy(remote, av[2], sizeof(remote));
   
-  if((ptr = strchr(remote, ':')) == NULL)
+  if((ptr = str_chr(remote, ':')) == NULL)
     return -1;
   
   *ptr++ = '\0';
@@ -272,7 +272,7 @@ static int cmd_proxy(control_t *cptr, int ac, char **av)
   if(net_aton(remote, &addr) == 0)
     return -1;
 
-  port = (uint16_t)strtoul(ptr, NULL, 10);
+  port = (uint16_t)str_toul(ptr, NULL, 10);
   type = proxy_parse_type(av[4]);
   
   /* check the cache */

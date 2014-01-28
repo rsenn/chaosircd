@@ -440,7 +440,7 @@ void chanmode_parse(struct lclient  *lcptr, struct client   *cptr,
   /* If we have args then tokenize them */
   if(args && args[0])
   {
-    strtokenize(args, argp, CHANMODE_PER_LINE);
+    str_tokenize(args, argp, CHANMODE_PER_LINE);
     argp[CHANMODE_PER_LINE] = NULL;
   }
   else
@@ -739,7 +739,7 @@ struct node *chanmode_assemble(char        *modebuf, char  *parabuf,
 
     if(cmcptr->mode->type != CHANMODE_TYPE_SINGLE && arg)
     {
-      len = strlen(arg);
+      len = str_len(arg);
       
       if(pi + len + 2 > n)
         break;
@@ -923,8 +923,8 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
   
   if(cmcptr->what == CHANMODE_ADD)
   {
-    sep1 = strchr(cmcptr->arg, '!');
-    sep2 = strchr(cmcptr->arg, '@');
+    sep1 = str_chr(cmcptr->arg, '!');
+    sep2 = str_chr(cmcptr->arg, '@');
     
     nick[0] = '*';
     user[0] = '*';
@@ -951,7 +951,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       if(cmcptr->arg[0])
         strlcpy(user, cmcptr->arg, sizeof(user));
       
-      if((sep1 = strchr(cmcptr->arg, '@')))
+      if((sep1 = str_chr(cmcptr->arg, '@')))
         *sep1 = '\0';    
       
       if(sep2[0])
@@ -964,7 +964,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       if(cmcptr->arg[0])
         strlcpy(nick, cmcptr->arg, sizeof(nick));
       
-      if((sep2 = strchr(cmcptr->arg, '!')))
+      if((sep2 = str_chr(cmcptr->arg, '!')))
         *sep2 = '\0';
       
       if(sep1[0])
@@ -981,16 +981,16 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       
       *sep2++ = '\0';
       
-      if((tmp = strchr(sep1, '!')))
+      if((tmp = str_chr(sep1, '!')))
         *tmp = '\0';
       
       if(sep1[0])
         strlcpy(user, sep1, sizeof(user));
       
-      if((tmp = strchr(sep2, '@')))
+      if((tmp = str_chr(sep2, '@')))
         *tmp = '\0';
       
-      if((tmp = strchr(sep2, '!')))
+      if((tmp = str_chr(sep2, '!')))
         *tmp = '\0';
       
       if(sep2[0])
@@ -1060,11 +1060,11 @@ int chanmode_bounce_mask(struct lclient *lcptr, struct client         *cptr,
     dlink_foreach_safe(&chptr->modelists[index], cmiptr, next)
     {
       /* new mask is matched by a mask in list, bounce it! */
-      if(strmatch(cmcptr->arg, cmiptr->mask))
+      if(str_match(cmcptr->arg, cmiptr->mask))
         return 1;
       
       /* a mask in list is matched by the new mask, drop old mask */
-      if(strmatch(cmiptr->mask, cmcptr->arg))
+      if(str_match(cmiptr->mask, cmcptr->arg))
       {
         chanmode_change_insert(lptr, cmcptr, CHANMODE_DEL,
                                cmcptr->mode->letter, cmiptr->mask);
@@ -1078,8 +1078,8 @@ int chanmode_bounce_mask(struct lclient *lcptr, struct client         *cptr,
   {
     dlink_foreach_safe(&chptr->modelists[index], cmiptr, next)
     {
-      if(strmatch(cmcptr->arg, cmiptr->mask) ||
-         strmatch(cmiptr->mask, cmcptr->arg))
+      if(str_match(cmcptr->arg, cmiptr->mask) ||
+         str_match(cmiptr->mask, cmcptr->arg))
       {
         chanmode_change_insert(lptr, cmcptr, CHANMODE_DEL,
                                cmcptr->mode->letter, cmiptr->mask);
@@ -1102,22 +1102,22 @@ int chanmode_match_ban(struct client *cptr, struct channel *chptr,
   
   dlink_foreach(mlptr, cmiptr)
   {
-    if(!strmatch(cptr->name, cmiptr->nmask))
+    if(!str_match(cptr->name, cmiptr->nmask))
       continue;
 
     if(cptr->user)
     {
-      if(!strmatch(cptr->user->name, cmiptr->umask))
+      if(!str_match(cptr->user->name, cmiptr->umask))
         continue;
     }
 
-    if(strmatch(cptr->host, cmiptr->hmask))
+    if(str_match(cptr->host, cmiptr->hmask))
       return 1;
     
-    if(strmatch(cptr->hostreal, cmiptr->hmask))
+    if(str_match(cptr->hostreal, cmiptr->hmask))
       return 1;
 
-    if(strmatch(cptr->hostip, cmiptr->hmask))
+    if(str_match(cptr->hostip, cmiptr->hmask))
       return 1;
   }
 
@@ -1133,19 +1133,19 @@ int chanmode_match_amode(struct client *cptr, struct channel *chptr,
   
   dlink_foreach(mlptr, cmiptr)
   {
-    if(!strmatch(cptr->name, cmiptr->nmask))
+    if(!str_match(cptr->name, cmiptr->nmask))
       continue;
     
     if(cptr->user)
     {
-      if(!strmatch(cptr->user->name, cmiptr->umask))
+      if(!str_match(cptr->user->name, cmiptr->umask))
         continue;
     }
 
-    if(strmatch(cptr->hostreal, cmiptr->hmask))
+    if(str_match(cptr->hostreal, cmiptr->hmask))
       return 1;
 
-    if(strmatch(cptr->hostip, cmiptr->hmask))
+    if(str_match(cptr->hostip, cmiptr->hmask))
       return 1;
   }
 
@@ -1161,7 +1161,7 @@ int chanmode_match_deny(struct client *cptr, struct channel *chptr,
   
   dlink_foreach(mlptr, cmiptr)
   {
-    if(strmatch(cptr->info, cmiptr->mask))
+    if(str_match(cptr->info, cmiptr->mask))
       return 1;
   }
 
@@ -1219,7 +1219,7 @@ int chanmode_mask_add(struct client         *cptr,   struct list *mlptr,
   else
     cmiptr->hmask[0] = '\0';
   
-  cmiptr->ihash = strhash(cmiptr->info);
+  cmiptr->ihash = str_hash(cmiptr->info);
   
   dlink_foreach(mlptr, acmiptr)
   {
@@ -1443,7 +1443,7 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     if(lasthash && cmcptr->info && lasthash == cmcptr->ihash)
     {
       if(flen + ilen + tlen + mlen + 2 + 
-         1 + 2 + 12 + strlen(cmcptr->arg) + 2 + 1 > len ||
+         1 + 2 + 12 + str_len(cmcptr->arg) + 2 + 1 > len ||
          flen == CHANMODE_PER_LINE)
         break;
 
@@ -1453,8 +1453,8 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     else
     {
       if(flen + ilen + tlen + mlen + 2 +
-         (cmcptr->info ? strlen(cmcptr->info) : 1)
-         + 2 + 12 + strlen(cmcptr->arg) + 2 + 1 > len ||
+         (cmcptr->info ? str_len(cmcptr->info) : 1)
+         + 2 + 12 + str_len(cmcptr->arg) + 2 + 1 > len ||
          flen == CHANMODE_PER_LINE)
         break;
       

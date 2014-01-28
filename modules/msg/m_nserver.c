@@ -96,7 +96,7 @@ static void ms_nserver(struct lclient *lcptr, struct client *cptr,
   struct server *asptr;
   int            hops;
   
-  hops = strtoul(argv[3], NULL, 10);
+  hops = str_toul(argv[3], NULL, 10);
 
   sptr = server_find_name(argv[2]);
   asptr = server_find_name(argv[3]);

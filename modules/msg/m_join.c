@@ -99,16 +99,16 @@ static void m_join(struct lclient *lcptr, struct client *cptr,
   uint32_t n;
   uint32_t i;
 
-  n = strtokenize_s(argv[2], chanv, IRCD_MAXCHANNELS, ',');
+  n = str_tokenize_s(argv[2], chanv, IRCD_MAXCHANNELS, ',');
   memset(keyv, 0, sizeof(keyv));
   
   if(argv[3])
-    strtokenize_s(argv[3], keyv, IRCD_MAXCHANNELS, ',');
+    str_tokenize_s(argv[3], keyv, IRCD_MAXCHANNELS, ',');
   
   for(i = 0; i < n; i++)
   {
     /* Check for valid channel name */
-    if(!chars_valid_chan(chanv[i]) || strlen(chanv[i]) > IRCD_CHANNELLEN)
+    if(!chars_valid_chan(chanv[i]) || str_len(chanv[i]) > IRCD_CHANNELLEN)
     {
       numeric_send(cptr, ERR_BADCHANNAME, chanv[i]);
       return;

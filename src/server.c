@@ -191,7 +191,7 @@ struct server *server_new(const char *name, int location)
     
   strlcpy(sptr->name, name, sizeof(sptr->name));
   
-  sptr->hash = strihash(sptr->name);
+  sptr->hash = str_ihash(sptr->name);
   sptr->id = server_id++;
   sptr->refcount = 1;
   sptr->location = location & 0x01;
@@ -263,7 +263,7 @@ void server_set_name(struct server *sptr, const char *name)
 {
   strlcpy(sptr->name, name, sizeof(sptr->name));
   
-  sptr->hash = strihash(sptr->name);
+  sptr->hash = str_ihash(sptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -286,12 +286,12 @@ struct server *server_find_name(const char *name)
   struct server *sptr;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&server_list, sptr)
   {
     if(sptr->hash == hash)
-      if(!stricmp(sptr->name, name))
+      if(!str_icmp(sptr->name, name))
         return sptr;
   }
   
@@ -305,12 +305,12 @@ struct server *server_find_namew(struct client *cptr, const char *name)
   struct server *sptr;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&server_list, sptr)
   {
     if(sptr->hash == hash)
-      if(!stricmp(sptr->name, name))
+      if(!str_icmp(sptr->name, name))
         return sptr;
   }
   
@@ -340,7 +340,7 @@ void server_vsend(struct lclient *one,    struct channel *chptr,
   char             buf[IRCD_LINELEN + 1];
 
   /* Formatted print */
-  n = vsnprintf(buf, sizeof(buf) - 2, format, args);
+  n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
   
   /* Add line separator */
   buf[n++] = '\r';
@@ -505,7 +505,7 @@ int server_find_capab(const char *capstr)
   
   for(i = 0; server_caps[i].name; i++)
   {
-    if(!stricmp(server_caps[i].name, capstr))
+    if(!str_icmp(server_caps[i].name, capstr))
       return i;
   }
  
@@ -520,7 +520,7 @@ int server_find_cipher(const char *cipher)
   
   for(i = 0; server_ciphers[i].name; i++)
   {
-    if(!stricmp(server_ciphers[i].name, cipher))
+    if(!str_icmp(server_ciphers[i].name, cipher))
       return i + 1;
   }
   
@@ -677,7 +677,7 @@ void server_login(struct lclient *lcptr)
   }
   
   /* Check the password */
-  if(strcmp(ccptr->passwd, lcptr->pass))
+  if(str_cmp(ccptr->passwd, lcptr->pass))
   {
     log(server_log, L_warning, "Password mismatch for %s.",
         lcptr->name);

@@ -181,12 +181,12 @@ void sploit_read_irc(int fd)
   {
     if((n = io_gets(fd, buf, sizeof(buf))) > 0)
     {
-      if(!strncmp(buf, "PING", 4))
+      if(!str_ncmp(buf, "PING", 4))
       {
         buf[1] = 'O';
         io_write(fd, buf, n);
       }
-      else if(!strncmp(buf, ":sploit", 7))
+      else if(!str_ncmp(buf, ":sploit", 7))
       {
         log(sploit_log, L_status, "Logged in!", buf);
         sploit_send(fd);

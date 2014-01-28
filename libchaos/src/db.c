@@ -50,7 +50,7 @@ static inline char *db_trim(char *s)
   uint32_t i;
   uint32_t len;
   
-  len = strlen(s);
+  len = str_len(s);
   
   for(i = len; i > 0; i--) 
   {
@@ -74,13 +74,13 @@ static void db_format_str(char   **pptr, size_t  *bptr,
   char *escaped;
   int i;
   
-  len = strlen(arg) + 1024;
+  len = str_len(arg) + 1024;
   
   if(arg)
   {
-    escaped = mem_dynamic_alloc(&db_dheap, strlen(arg) + 1024);
+    escaped = mem_dynamic_alloc(&db_dheap, str_len(arg) + 1024);
     
-    len = db_escape_string(db_current, escaped, arg, strlen(arg));
+    len = db_escape_string(db_current, escaped, arg, str_len(arg));
   }
   else
   {
@@ -426,7 +426,7 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
       tuples = PQcmdTuples(res);
       
       if(tuples && tuples[0])
-        db->affected_rows = strtoull(tuples, NULL, 10);
+        db->affected_rows = str_toull(tuples, NULL, 10);
       else
         db->affected_rows = 0LLU;
       

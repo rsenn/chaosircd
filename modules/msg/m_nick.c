@@ -100,7 +100,7 @@ static void mr_nick(struct lclient *lcptr, struct client *cptr,
   /* Truncate nick */
   strlcpy(nick, argv[2], IRCD_NICKLEN + 1);
   
-  if((s = strchr(nick, '~')))
+  if((s = str_chr(nick, '~')))
     *s = '\0';
 
   if(lcptr->name[0] == '\0')
@@ -145,7 +145,7 @@ static void m_nick(struct lclient *lcptr, struct client *cptr,
   {
     if(acptr == cptr)
     {
-      if(strcmp(acptr->name, nick))
+      if(str_cmp(acptr->name, nick))
       {
         client_nick(lcptr, cptr, nick);
         return;
@@ -178,7 +178,7 @@ static void ms_nick(struct lclient *lcptr, struct client *cptr,
   if(argc < 4)
     return;
   
-  ts = strtoul(argv[3], NULL, 10);
+  ts = str_toul(argv[3], NULL, 10);
   
   client_nick(lcptr, cptr, argv[2]);
   

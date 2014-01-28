@@ -108,7 +108,7 @@ struct htmlp *htmlp_new(const char *name)
   hpptr->id = htmlp_id++;
   strlcpy(hpptr->name, name, sizeof(hpptr->name));
   
-  hpptr->nhash = strhash(hpptr->name);
+  hpptr->nhash = str_hash(hpptr->name);
   
   dlink_add_tail(&htmlp_list, &hpptr->node, hpptr);
   
@@ -148,14 +148,14 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
   
   for(;;)
   {
-    if((p1 = strchr(p1, '<')) == NULL)
+    if((p1 = str_chr(p1, '<')) == NULL)
       break;
 
     *p1++ = '\0';
     
     if(*p1 == '!')
     {
-      if((p1 = strchr(p1, '>')) == NULL)
+      if((p1 = str_chr(p1, '>')) == NULL)
         break;
       
       continue;
@@ -171,13 +171,13 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
       closing = 0;
     }
 
-    p2 = strchr(p1, ' ');
+    p2 = str_chr(p1, ' ');
     
     p4 = p1;
     
     do
     {
-      p3 = strchr(p4, '>');
+      p3 = str_chr(p4, '>');
       
       /* incomplete tag -> parse error */
       if(p3 == NULL)
@@ -231,7 +231,7 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
           {
             *value++ = '\0';
 
-            p4 = strchr(value, '"');
+            p4 = str_chr(value, '"');
 
             if(p4 == NULL)
               return -1;
@@ -240,7 +240,7 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
           }
           else
           {
-            p4 = strchr(value, ' ');
+            p4 = str_chr(value, ' ');
 
             if(p4 == NULL || p4 > p3)
               p4 = p3;
@@ -271,7 +271,7 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
           
           strlcpy(hvptr->name, name, sizeof(hvptr->name));
           
-          hvptr->hash = strihash(hvptr->name);
+          hvptr->hash = str_ihash(hvptr->name);
           
           strlcpy(hvptr->value, value, sizeof(hvptr->value));
         }
@@ -287,7 +287,7 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
     
     strlcpy(htptr->name, p2, sizeof(htptr->name));
     
-    htptr->hash = strihash(htptr->name);
+    htptr->hash = str_ihash(htptr->name);
     htptr->closing = closing;
     htptr->text = p1;
     
@@ -354,13 +354,13 @@ struct htmlp *htmlp_find_name(const char *name)
   struct htmlp *hpptr;
   uint32_t       hash;
     
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&htmlp_list, hpptr)
   {
     if(hpptr->nhash == hash)
     {
-      if(!strcmp(hpptr->name, name))
+      if(!str_cmp(hpptr->name, name))
         return hpptr;
     }
   }
@@ -468,7 +468,7 @@ struct htmlp_tag *htmlp_tag_next(struct htmlp *htptr)
 struct htmlp_tag *htmlp_tag_find(struct htmlp *htptr, const char *name)
 {
   struct htmlp_tag *tag;
-  uint32_t          hash = strihash(name);
+  uint32_t          hash = str_ihash(name);
 
   if(htptr->current)
   {
@@ -476,7 +476,7 @@ struct htmlp_tag *htmlp_tag_find(struct htmlp *htptr, const char *name)
     {
       if(tag->hash == hash)
       {
-        if(!stricmp(tag->name, name))
+        if(!str_icmp(tag->name, name))
         {
           htptr->current = tag;
           return tag;
@@ -534,9 +534,9 @@ struct htmlp_var *htmlp_var_set(struct htmlp *htptr, const char *name, const cha
     dlink_add_tail(&htptr->current->vars, &hvptr->node, hvptr);
     
     strlcpy(hvptr->name, name, sizeof(hvptr->name));
-    hvptr->hash = strihash(hvptr->name);
+    hvptr->hash = str_ihash(hvptr->name);
     
-    hash = strihash(name);
+    hash = str_ihash(name);
   }
   
   strlcpy(hvptr->value, value, sizeof(hvptr->value));
@@ -549,7 +549,7 @@ struct htmlp_var *htmlp_var_set(struct htmlp *htptr, const char *name, const cha
 struct htmlp_var *htmlp_var_find(struct htmlp *htptr, const char *name)
 {
   struct htmlp_var *hvptr;
-  uint32_t          hash = strihash(name);
+  uint32_t          hash = str_ihash(name);
   
   if(htptr->current == NULL)
     return NULL;
@@ -558,7 +558,7 @@ struct htmlp_var *htmlp_var_find(struct htmlp *htptr, const char *name)
   {
     if(hvptr->hash == hash)
     {
-      if(!stricmp(hvptr->name, name))
+      if(!str_icmp(hvptr->name, name))
         return hvptr;
     }
   }
@@ -594,9 +594,9 @@ char *htmlp_decode(const char *s)
       {
         char *p;
         
-        text[di++] = strtoul(&s[++i], &p, 10);
+        text[di++] = str_toul(&s[++i], &p, 10);
         
-        p = strchr(&s[i], ';');
+        p = str_chr(&s[i], ';');
         p -= (size_t)&s[i];
         
         i += (size_t)p;
@@ -606,9 +606,9 @@ char *htmlp_decode(const char *s)
       
       for(ti = 0; htmlp_table[ti].key; ti++)
       {
-        len = strlen(htmlp_table[ti].key);
+        len = str_len(htmlp_table[ti].key);
         
-        if(!strnicmp(htmlp_table[ti].key, &s[i], len))
+        if(!str_nicmp(htmlp_table[ti].key, &s[i], len))
         {
           text[di++] = htmlp_table[ti].c;
           i += len;

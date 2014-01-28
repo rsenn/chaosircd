@@ -109,7 +109,7 @@ static void m_oper(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  if(strcmp(argv[3], oper->passwd))
+  if(str_cmp(argv[3], oper->passwd))
   {    
     client_send(cptr, numeric_format(ERR_PASSWDMISMATCH), 
                 client_me->name, cptr->name);    

@@ -273,7 +273,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
   listen->fd = fd;
   listen->backlog = backlog;
   listen->proto = net_pop(p);
-  listen->lhash = strihash(address) ^ port;
+  listen->lhash = str_ihash(address) ^ port;
   strlcpy(listen->address, address, sizeof(listen->address));
   listen->port = port;
   listen->id = listen_id++;
@@ -308,7 +308,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
   
   snprintf(listen->name, sizeof(listen->name), "%s:%u", address, port);
   
-  listen->nhash = strihash(listen->name);
+  listen->nhash = str_ihash(listen->name);
 
   io_note(fd, "listener on %s", listen->name);
   
@@ -427,13 +427,13 @@ struct listen *listen_find(const char *address, uint16_t port)
   struct listen *lptr;
   uint32_t       lhash;
   
-  lhash = strihash(address) ^ port;
+  lhash = str_ihash(address) ^ port;
   
   dlink_foreach(&listen_list, lptr)
   {
     if(lptr->lhash == lhash)
     {
-      if(lptr->port == port && !stricmp(lptr->address, address))
+      if(lptr->port == port && !str_icmp(lptr->address, address))
         return lptr;
     }
   }
@@ -465,7 +465,7 @@ void listen_set_name(struct listen *listen, const char *name)
 {
   strlcpy(listen->name, name, sizeof(listen->name));
   
-  listen->nhash = strihash(listen->name);
+  listen->nhash = str_ihash(listen->name);
 }
   
 /* ------------------------------------------------------------------------ *
@@ -483,7 +483,7 @@ struct listen *listen_find_name(const char *name)
   struct listen *listen;
   uint32_t       nhash;
   
-  nhash = strihash(name);
+  nhash = str_ihash(name);
   
   dlink_foreach(&listen_list, node)
   {
@@ -491,7 +491,7 @@ struct listen *listen_find_name(const char *name)
     
     if(listen->nhash == nhash)
     {
-      if(!stricmp(listen->name, name))
+      if(!str_icmp(listen->name, name))
         return listen;
     }
   }

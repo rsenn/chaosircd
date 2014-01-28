@@ -107,7 +107,7 @@ static void m_kick(struct lclient *lcptr, struct client *cptr,
     return;
   }
    
-  n = strtokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
+  n = str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
   
   if(argv[4] == NULL)
     argv[4] = cptr->name;

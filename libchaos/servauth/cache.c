@@ -393,7 +393,7 @@ net_addr_t cache_dns_pick_forward(struct cache_dns *cache,
     if(cache->entries[i].status != CACHE_DNS_FORWARD)
       continue;
 
-    if(!strcmp(cache->entries[i].name, name))
+    if(!str_cmp(cache->entries[i].name, name))
     {
       cache->entries[i].created = t;
       return cache->entries[i].addr;

@@ -98,7 +98,7 @@ void class_default(struct class *clptr)
   clptr->throttle_trigger = 0;
   clptr->throttle_interval = 0;
   
-  clptr->hash = strihash(clptr->name);
+  clptr->hash = str_ihash(clptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -119,7 +119,7 @@ struct class *class_add(const char *name,             uint64_t ping_freq,
   dlink_add_tail(&class_list, &clptr->node, clptr);
 
   strlcpy(clptr->name, name, sizeof(clptr->name));  
-  clptr->hash = strihash(clptr->name);
+  clptr->hash = str_ihash(clptr->name);
 
   clptr->ping_freq = ping_freq;
   clptr->max_clients = max_clients;
@@ -218,7 +218,7 @@ struct class *class_find_name(const char *name)
   struct node  *node;
   uint32_t      hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&class_list, node)
   {
@@ -226,7 +226,7 @@ struct class *class_find_name(const char *name)
     
     if(hash == clptr->hash)
     {
-      if(!stricmp(clptr->name, name))
+      if(!str_icmp(clptr->name, name))
         return clptr;
     }
   }

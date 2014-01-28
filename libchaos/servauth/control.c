@@ -67,7 +67,7 @@ static int control_parse(control_t *cptr, char *line)
   int ac;
   char *av[16];
 
-  ac = strtokenize(line, av, 16);
+  ac = str_tokenize(line, av, 16);
 
   if(ac == 0)
     return 0;

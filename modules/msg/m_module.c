@@ -114,7 +114,7 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
     }
   }
   
-  if(!stricmp(argv[2], "list"))
+  if(!str_icmp(argv[2], "list"))
   {
     client_send(cptr, ":%C NOTICE %C : ======= module list ======== ",
                 client_me, cptr);
@@ -133,7 +133,7 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
     client_send(cptr, ":%C NOTICE %C : ==== end of module list ==== ",
                 client_me, cptr);
   }
-  else if(!stricmp(argv[2], "load"))
+  else if(!str_icmp(argv[2], "load"))
   {
     if(argv[3] == NULL)
     {
@@ -150,7 +150,7 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
                   client_me, cptr, module->name);
     }
   }
-  else if(!stricmp(argv[2], "unload"))
+  else if(!str_icmp(argv[2], "unload"))
   {
     if(argv[3] == NULL)
     {
@@ -183,7 +183,7 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
 
     module_delete(module);
   }
-  else if(!stricmp(argv[2], "reload"))
+  else if(!str_icmp(argv[2], "reload"))
   {
     if(argv[3] == NULL)
     {

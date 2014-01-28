@@ -65,7 +65,7 @@ void str_register(char c, str_format_cb *cb)
 {
   if(str_isalpha(c))
   {
-    str_table[((uint32_t)c) - 0x40] = cb;
+    str_table[((uint32_t)(uint8_t)c) - 0x40] = cb;
   }
 }
 
@@ -75,7 +75,7 @@ void str_unregister(char c)
 {
   if(str_isalpha(c))
   {
-    str_table[((uint32_t)c) - 0x40] = NULL;
+    str_table[((uint32_t)(uint8_t)c) - 0x40] = NULL;
   }
 }
 
@@ -237,7 +237,7 @@ static inline unsigned int str_ptoa(char *buf, void *i)
 int str_vsnprintf(char *str, size_t n, const char *format, va_list args) 
 {  
   register const char *f     = format;
-  int                  bytes = 0;
+  size_t                  bytes = 0;
   char                *p     = str;
   register char        c;
   register int         longlev = 0;
@@ -292,7 +292,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 's') 
       {
         register const char *p1  = va_arg(args, const char *);
-        register size_t      len = (p1 ? strlen(p1) : 6);
+        register size_t      len = (p1 ? str_len(p1) : 6);
         
         /* if left aligned, do padding now */
         if(!left && len < padding) 
@@ -569,9 +569,9 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
         continue;
       }
       
-      if(str_isalpha(c) && str_table[((uint32_t)c) - 0x40])
+      if(str_isalpha(c) && str_table[((uint32_t)(uint8_t)c) - 0x40])
       {
-        str_table[((uint32_t)c) - 0x40](&p, (size_t *)&bytes, n, padding, left, va_arg(args, void *));
+        str_table[((uint32_t)(uint8_t)c) - 0x40](&p, (size_t *)&bytes, n, padding, left, va_arg(args, void *));
         continue;
       }
     }
@@ -593,8 +593,8 @@ int str_vsprintf(char *str, const char *format, va_list args)
 /* ------------------------------------------------------------------------ *
  * Get string length.                                                       *
  * ------------------------------------------------------------------------ */
-#ifdef __i386__
-size_t strlen(const char *s)
+#if 1 //def __i386__
+size_t str_len(const char *s)
 {
   size_t len = 0;
 
@@ -611,18 +611,18 @@ size_t strlen(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#if 0
-char *strchr(const char *s, int c)
+#if 1
+char *str_chr(const char *s, int c)
 {
   size_t i = 0;
 
   for(EVER)
   {
     /* 32-bit unroll for faster prefetch */
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(!s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
+    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
   }
   
   return NULL;
@@ -632,7 +632,7 @@ char *strchr(const char *s, int c)
 /* ------------------------------------------------------------------------ *
  * Get first occurance of char <c> in string <s>                            *
  * ------------------------------------------------------------------------ */
-#if 1 //def __i386__
+#if 1 // 1 //def __i386__
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -755,8 +755,8 @@ size_t strlcat(char *d, const char *s, size_t n)
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-#ifdef __i386__
-int strcmp(const char *s1, const char *s2)
+#if 1 //def __i386__
+int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
   
@@ -776,7 +776,7 @@ int strcmp(const char *s1, const char *s2)
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-int stricmp(const char *s1, const char *s2)
+int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
   
@@ -795,30 +795,31 @@ int stricmp(const char *s1, const char *s2)
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-#ifdef __i386__
-/*int strncmp(const char *s1, const char *s2, size_t n)
+#if 1 //def __i386__
+int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
-  
+
   if(n == 0)
     return 0;
-  
+
   for(EVER)
   {
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
-    if(s1[i] != s2[i]) break; if(i == n) return 0; if(!s1[i]) break; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
+    if(s1[i] != s2[i]) break; if(--n == 0 || !s1[i]) return 0; i++;
   }
-  
+
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
-}*/
+}
 #endif /* __i386__ */
+
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-int strnicmp(const char *s1, const char *s2, size_t n)
+int str_nicmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
   
@@ -848,7 +849,7 @@ int str_snprintf(char *str, size_t n, const char *format, ...)
   
   va_start(args, format);
   
-  ret = vsnprintf(str, n, format, args);
+  ret = str_vsnprintf(str, n, format, args);
   
   va_end(args);
   
@@ -863,7 +864,7 @@ int str_sprintf(char *str, const char *format, ...)
   
   va_start(args, format);
   
-  ret = vsnprintf(str, (uint32_t)(int32_t)-1, format, args);
+  ret = str_vsnprintf(str, (uint32_t)(int32_t)-1, format, args);
   
   va_end(args);
   
@@ -878,7 +879,7 @@ int str_sprintf(char *str, const char *format, ...)
   
   va_start(args, format);
   
-  ret = vsnprintf(str, (uint32_t)(int32_t)-1, format, args);
+  ret = str_vsnprintf(str, (uint32_t)(int32_t)-1, format, args);
   
   va_end(args);
   
@@ -941,7 +942,7 @@ int str_toi(const char *s)
  *                                                                          *
  * return value will not be bigger than maxtok                              *
  * ------------------------------------------------------------------------ */
-size_t strtokenize(char *s, char **v, size_t maxtok)
+size_t str_tokenize(char *s, char **v, size_t maxtok)
 {
   size_t c = 0;
   
@@ -1011,14 +1012,14 @@ size_t strtokenize(char *s, char **v, size_t maxtok)
  *                                                                          *
  * Like the one above but allows to specify delimiters.                     *
  * ------------------------------------------------------------------------ */
-size_t strtokenize_d(char *s, char **v, size_t maxtok, const char *delim)
+size_t str_tokenize_d(char *s, char **v, size_t maxtok, const char *delim)
 {
   size_t c = 0;
   
   for(EVER)
   {
     /* Skip and zero whitespace */
-    while(strchr(delim, *s))
+    while(str_chr(delim, *s))
       *s++ = '\0';
     
     /* We finished */
@@ -1035,7 +1036,7 @@ size_t strtokenize_d(char *s, char **v, size_t maxtok, const char *delim)
       break;
     
     /* Scan for end or whitespace */
-    while(*s && strchr(delim, *s) == NULL)
+    while(*s && str_chr(delim, *s) == NULL)
       s++;    
   }
   
@@ -1043,7 +1044,7 @@ size_t strtokenize_d(char *s, char **v, size_t maxtok, const char *delim)
   {
     while(*s)
     {
-      if(strchr(delim, *s))
+      if(str_chr(delim, *s))
       {
         *s = '\0';
         break;
@@ -1054,7 +1055,7 @@ size_t strtokenize_d(char *s, char **v, size_t maxtok, const char *delim)
     
     do
       s--;
-    while(strchr(delim, *s));
+    while(str_chr(delim, *s));
     
     *++s = '\0';
   }
@@ -1069,7 +1070,7 @@ size_t strtokenize_d(char *s, char **v, size_t maxtok, const char *delim)
  *                                                                          *
  * Like the one above but allows to specify one delimiter.                  *
  * ------------------------------------------------------------------------ */
-size_t strtokenize_s(char *s, char **v, size_t maxtok, char delim)
+size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim)
 {
   size_t c = 0;
   
@@ -1124,11 +1125,11 @@ size_t strtokenize_s(char *s, char **v, size_t maxtok, char delim)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-char *str_strdup(const char *s)
+char *str_dup(const char *s)
 {
   char *r;
   
-  r = malloc(strlen(s) + 1);
+  r = malloc(str_len(s) + 1);
   
   if(r != NULL)
     str_copy(r, s);
@@ -1141,7 +1142,7 @@ char *str_strdup(const char *s)
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-uint32_t strhash(const char *s)
+uint32_t str_hash(const char *s)
 {  
   uint32_t ret = 0xcafebabe;
   uint32_t temp;
@@ -1165,7 +1166,7 @@ uint32_t strhash(const char *s)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 
-uint32_t strihash(const char *s)
+uint32_t str_ihash(const char *s)
 {  
   uint32_t ret = 0xcafebabe;
   uint32_t temp;
@@ -1191,8 +1192,8 @@ uint32_t strihash(const char *s)
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                    *
  * ------------------------------------------------------------------------ */
-#ifdef __i386__
-unsigned long int strtoul(const char *nptr, char **endptr, int base)
+#if 1 //def __i386__
+unsigned long int str_toul(const char *nptr, char **endptr, int base)
 {
   int neg = 0;
   unsigned long int v = 0;
@@ -1263,8 +1264,8 @@ skip0x:
  * ------------------------------------------------------------------------ */
 #define ABS_LONG_MIN 2147483648UL
 
-#ifdef __i386__
-long int strtol(const char *nptr, char **endptr, int base)
+#if 1 //def __i386__
+long int str_tol(const char *nptr, char **endptr, int base)
 {
   int neg = 0;
   unsigned long int v;
@@ -1278,7 +1279,7 @@ long int strtol(const char *nptr, char **endptr, int base)
     nptr++;
   }
 
-  v = strtoul(nptr, endptr, base);
+  v = str_toul(nptr, endptr, base);
   
   if(v >= ABS_LONG_MIN)
   {
@@ -1304,7 +1305,7 @@ long int strtol(const char *nptr, char **endptr, int base)
 #define __likely(foo) expect((foo),1)
 #define __unlikely(foo) expect((foo),0)
 
-unsigned long long int strtoull(const char *nptr, char **endptr, int base)
+unsigned long long int str_toull(const char *nptr, char **endptr, int base)
 {
   long long int v = 0;
   
@@ -1354,7 +1355,7 @@ unsigned long long int strtoull(const char *nptr, char **endptr, int base)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #define MATCH_MAX_CALLS 512
-int strmatch(const char *str, const char *mask)
+int str_match(const char *str, const char *mask)
 {
   const uint8_t *m = (const uint8_t *)mask;
   const uint8_t *n = (const uint8_t *)str;
@@ -1424,7 +1425,7 @@ int strmatch(const char *str, const char *mask)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int strimatch(const char *str, const char *mask)
+int str_imatch(const char *str, const char *mask)
 {
   const uint8_t *m = (const uint8_t *)mask;
   const uint8_t *n = (const uint8_t *)str;
@@ -1495,7 +1496,7 @@ int strimatch(const char *str, const char *mask)
 /* ------------------------------------------------------------------------ *
  * FIXME: this is a whole cruft                                             *
  * ------------------------------------------------------------------------ */
-void strtrim(char *s)
+void str_trim(char *s)
 {
   int  i;
   char buf[1024];

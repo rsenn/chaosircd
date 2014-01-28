@@ -60,13 +60,13 @@ static const char *error(int setget, const char *str, ...)
 	{
 		va_start(arg, str);
 		strncpy(errstr, "dlsimple: ", ERR_STR_LEN);
-		vsnprintf(errstr + 10, ERR_STR_LEN - 10, str, arg);
+		str_vsnprintf(errstr + 10, ERR_STR_LEN - 10, str, arg);
 		va_end(arg);
 	/* We prefer to use the dyld error string if setget is 0 */
 		if (setget == 0) {
 			NSLinkEditError(&ler, &lerno, &file, &dylderrstr);
 			fprintf(stderr,"dyld: %s\n",dylderrstr);
-			if (dylderrstr && strlen(dylderrstr))
+			if (dylderrstr && str_len(dylderrstr))
 				strncpy(errstr,dylderrstr,ERR_STR_LEN);
 		}		
 		err_filled = 1;
@@ -167,7 +167,7 @@ int dlclose(void *handle)
 
 void *dlsym(void *handle, const char *symbol)
 {
-	int sym_len = strlen(symbol);
+	int sym_len = str_len(symbol);
 	void *value = NULL;
 	char *malloc_sym = NULL;
 	NSSymbol *nssym = 0;

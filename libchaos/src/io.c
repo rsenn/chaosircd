@@ -915,7 +915,7 @@ void io_note(int fd, const char *format, ...)
   
   va_start(args, format);
   
-  vsnprintf(io_list[fd].note, 64, format, args);
+  str_vsnprintf(io_list[fd].note, 64, format, args);
   
   va_end(args);
 }
@@ -1142,7 +1142,7 @@ int io_puts(int fd, const char *s, ...)
   
   va_start(args, s);
 
-  len = vsnprintf(buf, IO_LINE_SIZE - 1, s, args);
+  len = str_vsnprintf(buf, IO_LINE_SIZE - 1, s, args);
   
   va_end(args);
   
@@ -1163,7 +1163,7 @@ int io_vputs(int fd, const char *s, va_list args)
   if(fd < 0)
     return -1;
   
-  len = vsnprintf(buf, IO_LINE_SIZE - 1, s, args);
+  len = str_vsnprintf(buf, IO_LINE_SIZE - 1, s, args);
   
   buf[len++] = '\n';
     

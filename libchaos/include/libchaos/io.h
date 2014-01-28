@@ -33,16 +33,16 @@ struct io;
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include <libchaos/defs.h>
-#include <libchaos/syscall.h>
-#include <libchaos/queue.h>
+#include "libchaos/defs.h"
+#include "libchaos/syscall.h"
+#include "libchaos/queue.h"
 
 #ifdef WIN32
 #include <winsock.h>
 #endif /* WIN32 */
 
 #ifdef HAVE_SSL
-#include <libchaos/ssl.h>
+#include "libchaos/ssl.h"
 #endif /* HAVE_SSL */
 
 #ifdef USE_POLL
@@ -175,10 +175,10 @@ struct io
 //  struct sockaddr_in a_local;  /* local address we bound to */
   io_callback_t     *callbacks[IO_CB_MAX];
 
-  struct ssl_st     *ssl;
-  int                sslstate;
-  int                sslerror;
-  int                sslwhere; /* where ssl error happened */
+  struct ssl_st       *ssl;
+  int                  sslstate;
+  int                  sslerror;
+  int                  sslwhere; /* where ssl error happened */
 };
 
 

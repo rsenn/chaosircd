@@ -118,7 +118,7 @@ static void cm_key_hook(struct client *cptr, struct channel *chptr,
       return;
     }
     
-    if(strcmp(chptr->key, key))
+    if(str_cmp(chptr->key, key))
     {
       *reply = ERR_BADCHANNELKEY;
       return;
@@ -149,7 +149,7 @@ int cm_key_bounce(struct lclient *lcptr, struct client         *cptr,
     
     if((chptr->modes & cmcptr->mode->flag))
     {
-      if(!strcmp(chptr->key, cmcptr->arg))
+      if(!str_cmp(chptr->key, cmcptr->arg))
         chptr->modes &= ~cmcptr->mode->flag;
     }
 

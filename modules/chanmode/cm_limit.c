@@ -137,7 +137,7 @@ int cm_limit_bounce(struct lclient *lcptr, struct client         *cptr,
   {
     unsigned long limit;
     
-    limit = strtoul(cmcptr->arg, NULL, 10);
+    limit = str_toul(cmcptr->arg, NULL, 10);
     
     if(limit == ULONG_MAX || limit == 0)
       return 1;

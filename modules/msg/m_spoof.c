@@ -321,13 +321,13 @@ static struct m_spoof_entry *m_spoof_find_host(const char *host)
   struct m_spoof_entry *mseptr;
   uint32_t              hash;
   
-  hash = strihash(host);
+  hash = str_ihash(host);
   
   dlink_foreach(&m_spoof_list, mseptr)
   {
     if(mseptr->hash == hash)
     {
-      if(!stricmp(mseptr->host, host))
+      if(!str_icmp(mseptr->host, host))
         return mseptr;
     }
   }
@@ -439,7 +439,7 @@ static int m_spoof_loaddb(void)
         if((mseptr = m_spoof_find_ip(ip)))
         {
           strlcpy(mseptr->host, host, sizeof(mseptr->host));
-          mseptr->hash = strihash(mseptr->host);
+          mseptr->hash = str_ihash(mseptr->host);
         }
         else
         {
@@ -489,10 +489,10 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
   }
   
   /* Hash the argument, used later when it is actually spoofed */
-  hash = strihash(host);  
+  hash = str_ihash(host);  
 
   /* Return if the argument is exactly the same as the hostname */
-  if(cptr->hhash == hash && !strcmp(cptr->host, host))
+  if(cptr->hhash == hash && !str_cmp(cptr->host, host))
     return;
   
   /* Find spoof entry for this client */
@@ -508,8 +508,8 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
     if(mseptr->ts + M_SPOOF_SPOOFTIME > timer_mtime)
     {    
       if(hash != cptr->ihash && hash != cptr->rhash && hash != mseptr->hash &&
-         strcmp(host, cptr->hostip) && strcmp(host, cptr->hostreal) &&
-         strcmp(host, mseptr->host))
+         str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal) &&
+         str_cmp(host, mseptr->host))
       {
         if(!mseptr->waslame)
         {
@@ -539,8 +539,8 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
     }
     
     if(hash != cptr->ihash && hash != cptr->rhash && hash != mseptr->hash &&
-       strcmp(host, cptr->hostip) && strcmp(host, cptr->hostreal) &&
-       strcmp(host, mseptr->host))
+       str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal) &&
+       str_cmp(host, mseptr->host))
     {
       mseptr->hash = hash;
       strlcpy(mseptr->host, host, sizeof(mseptr->host));
@@ -550,7 +550,7 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
   {
     /* First time spoofer */
     if(hash != cptr->ihash && hash != cptr->rhash && 
-       strcmp(host, cptr->hostip) && strcmp(host, cptr->hostreal))
+       str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal))
     {
       struct client *acptr;
       
@@ -611,9 +611,9 @@ static void ms_spoof(struct lclient *lcptr, struct client *cptr,
   }
   
   strlcpy(acptr->host, argv[4], sizeof(acptr->host));
-  acptr->hhash = strihash(acptr->host);
+  acptr->hhash = str_ihash(acptr->host);
   
-  ts = strtoull(argv[3], NULL, 10);
+  ts = str_toull(argv[3], NULL, 10);
 
   server_send(lcptr, NULL, CAP_UID, CAP_NONE,
               ":%C SPOOF %s %llu :%s",

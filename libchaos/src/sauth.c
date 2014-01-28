@@ -108,7 +108,7 @@ int sauth_proxy_reply(const char *reply)
 
   for(i = 0; sauth_replies[i]; i++)
   {
-    if(!stricmp(sauth_replies[i], reply))
+    if(!str_icmp(sauth_replies[i], reply))
       return i;
   }
 
@@ -123,7 +123,7 @@ int sauth_proxy_type(const char *type)
 
   for(i = 0; sauth_types[i]; i++)
   {
-    if(!stricmp(sauth_types[i], type))
+    if(!str_icmp(sauth_types[i], type))
       return i;
   }
 
@@ -224,7 +224,7 @@ static int sauth_parse(char **argv)
   int      serial;
   struct sauth *sauth;
   
-  if(!stricmp(argv[0], "dns"))
+  if(!str_icmp(argv[0], "dns"))
   {
     serial = str_toi(argv[2]);
     
@@ -234,7 +234,7 @@ static int sauth_parse(char **argv)
     {
       if(sauth->type == SAUTH_TYPE_DNSF)
       {
-        if(!stricmp(argv[1], "forward"))
+        if(!str_icmp(argv[1], "forward"))
         {
           if(argv[3])
             net_aton(argv[3], &sauth->addr);
@@ -249,7 +249,7 @@ static int sauth_parse(char **argv)
       
       if(sauth->type == SAUTH_TYPE_DNSR)
       {
-        if(!stricmp(argv[1], "reverse"))
+        if(!str_icmp(argv[1], "reverse"))
         {
           if(argv[3])
             strlcpy(sauth->host, argv[3], sizeof(sauth->host));
@@ -269,7 +269,7 @@ static int sauth_parse(char **argv)
     
     return 0;
   }
-  else if(!stricmp(argv[0], "auth"))
+  else if(!str_icmp(argv[0], "auth"))
   {
     serial = str_toi(argv[1]);
 
@@ -287,7 +287,7 @@ static int sauth_parse(char **argv)
     
     return 0;
   }
-  else if(!stricmp(argv[0], "proxy"))
+  else if(!str_icmp(argv[0], "proxy"))
   {
     serial = str_toi(argv[1]);
 
@@ -346,7 +346,7 @@ static void sauth_read(int fd, void *ptr)
     if((len = io_gets(fd, sauth_readbuf, BUFSIZE)) == 0)
       break;
 
-    strtokenize(sauth_readbuf, argv, 5);
+    str_tokenize(sauth_readbuf, argv, 5);
     
     if(sauth_parse(argv))
     {

@@ -97,7 +97,7 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
   if(!client_is_user(cptr))
     return;
   
-  if(argv[2] == NULL || !stricmp(argv[2], M_HELP_INDEX))
+  if(argv[2] == NULL || !str_icmp(argv[2], M_HELP_INDEX))
   {
     numeric_send(cptr, RPL_HELPSTART, M_HELP_INDEX, 
                  "---------------- Help topics ----------------");
@@ -113,13 +113,13 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-/*  if(!stricmp(argv[2], "usermodes") || !stricmp(argv[2], "umodes"))
+/*  if(!str_icmp(argv[2], "usermodes") || !str_icmp(argv[2], "umodes"))
   {
     m_help_usermodes(cptr);
     return;
   }*/
 
-  if(!stricmp(argv[2], "channelmodes") || !stricmp(argv[2], "chanmodes"))
+  if(!str_icmp(argv[2], "channelmodes") || !str_icmp(argv[2], "chanmodes"))
   {
     m_help_chanmodes(cptr);
     return;

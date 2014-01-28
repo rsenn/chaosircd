@@ -91,12 +91,12 @@ void mfile_read(int fd, struct mfile *mfptr)
   
   while(io_gets(fd, buf, MFILE_LINELEN - 1))
   {
-    if((eol = strchr(buf, '\r')))
+    if((eol = str_chr(buf, '\r')))
       *eol = '\0';
-    if((eol = strchr(buf, '\n')))
+    if((eol = str_chr(buf, '\n')))
       *eol = '\0';
     if(eol == NULL)
-      eol = buf + strlen(buf);
+      eol = buf + str_len(buf);
       
     line = mem_dynamic_alloc(&mfile_dheap, eol - buf + 1);
     nptr = dlink_node_new();
@@ -164,8 +164,8 @@ struct mfile *mfile_load(const char *path)
   else
     strlcpy(mfptr->name, path, sizeof(mfptr->name));
   
-  mfptr->phash = strhash(mfptr->path);
-  mfptr->nhash = strihash(mfptr->name);
+  mfptr->phash = str_hash(mfptr->path);
+  mfptr->nhash = str_ihash(mfptr->name);
   
   io_queue_control(mfptr->fd, ON, OFF, ON);
   io_register(mfptr->fd, IO_CB_READ, mfile_read, mfptr);
@@ -231,13 +231,13 @@ struct mfile *mfile_find_path(const char *path)
   struct mfile *mfptr;
   uint32_t      hash;
     
-  hash = strhash(path);
+  hash = str_hash(path);
   
   dlink_foreach(&mfile_list, mfptr)
   {
     if(mfptr->phash == hash)
     {
-      if(!strcmp(mfptr->path, path))
+      if(!str_cmp(mfptr->path, path))
         return mfptr;
     }
   }
@@ -252,13 +252,13 @@ struct mfile *mfile_find_name(const char *name)
   struct mfile *mfptr;
   uint32_t       hash;
     
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&mfile_list, mfptr)
   {
     if(mfptr->nhash == hash)
     {
-      if(!strcmp(mfptr->name, name))
+      if(!str_cmp(mfptr->name, name))
         return mfptr;
     }
   }

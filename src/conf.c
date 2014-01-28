@@ -93,18 +93,18 @@ again:
   if(argv[conf_optind][1] == '-')
   {
     char *arg = &argv[conf_optind][2];      /* Option name */
-    char *max = strchr(arg, '=');      /* Points to end of name */
+    char *max = str_chr(arg, '=');      /* Points to end of name */
     const struct option *o;            /* Points to switch in option struct */
 
     /* We haven't found a '=', set end of name */
     if(!max)
-      max = &arg[strlen(arg)];
+      max = &arg[str_len(arg)];
 
     /* Walk through the option list */
     for(o = longopts; o->name; o++)
     {
       /* Compare option name */
-      if(!strncmp(o->name, arg, (size_t)(max - arg)))
+      if(!str_ncmp(o->name, arg, (size_t)(max - arg)))
       {
         conf_longindex = (size_t)(o - longopts);
 
@@ -168,7 +168,7 @@ again:
   
   conf_optopt = argv[conf_optind][lastofs + 1];
   
-  if((tmp = strchr(optstring, conf_optopt)))
+  if((tmp = str_chr(optstring, conf_optopt)))
   {
     /* Apparently, we looked for \0, i.e. end of argument */
     if(*tmp == 0)
@@ -217,7 +217,7 @@ found:
     return conf_optopt;
   }
   /* not found */
-  else
+  else 
   {
     log(conf_log, L_fatal, "unknown option -%c.", conf_optopt);
     conf_optind++;

@@ -118,7 +118,7 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  clk = strtoull(argv[2], NULL, 10);
+  clk = str_toull(argv[2], NULL, 10);
   
   if(argc == 3)
   {
@@ -140,7 +140,7 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
     uint64_t tm;
     int64_t  delta;
     
-    tm = strtoull(argv[4], NULL, 10);
+    tm = str_toull(argv[4], NULL, 10);
     
     delta = tm - timer_mtime - timer_offset;
     

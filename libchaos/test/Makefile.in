@@ -23,13 +23,16 @@ TESTS = cfgtest \
         giftest \
         graphtest \
         imagetest \
-        ttftest 
+        ttftest \
+				strtest
 
 SOURCES = $(TESTS:%=%.c)
+OBJECTS = $(TESTS:%=%.o)
+PROGRAMS = $(TESTS)
 
 # targets for this directory
 # ---------------------------------------------------------------------------
-all: Makefile
+all: Makefile $(TESTS)
 install: install-exec
 
 # build config
@@ -37,35 +40,11 @@ install: install-exec
 LDADD    += $(top_builddir)/src/libchaos.a
 LIB      += $(SSL_LIBS) $(PSQL_LIBS) $(MYSQL_LIBS) $(FT2_LIBS) $(LIBS)
 CFLAGS   += $(SSL_CFLAGS) $(PSQL_CFLAGS) $(MYSQL_CFLAGS) $(FT2_CFLAGS)
-INCLUDES += -isystem $(top_srcdir)/include -isystem $(top_builddir)/include
+INCLUDES += -I$(top_srcdir)/include -I$(top_builddir)/include
 
 # local make targets
 # ---------------------------------------------------------------------------
-cfgtest: $(srcdir)cfgtest.c $(LDADD)
-	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
-
-dbtest: $(srcdir)dbtest.c $(LDADD)
-	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
-
-giftest: $(srcdir)giftest.c $(LDADD)
-	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
-
-graphtest: $(srcdir)graphtest.c $(LDADD)
-	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
-
-imagetest: $(srcdir)imagetest.c $(LDADD)
-	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
-
-ttftest: $(srcdir)ttftest.c $(LDADD)
-	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
-
-wavtest: $(srcdir)wavtest.c $(LDADD)
+%: %.c $(LDADD)
 	@$(ECHO_CCLD)
 	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
 

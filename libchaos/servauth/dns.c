@@ -874,7 +874,7 @@ static void dns_read_line(int fd, void *arg)
     while(str_isspace(buf[i]))
       i++;
     
-    if(!strncmp("nameserver", &buf[i], 10))
+    if(!str_ncmp("nameserver", &buf[i], 10))
     {
       i += 10;
       
@@ -884,7 +884,7 @@ static void dns_read_line(int fd, void *arg)
       if(!str_isdigit(buf[i]))
         return;
 
-      p = strchr(&buf[i], '\n');
+      p = str_chr(&buf[i], '\n');
       
       if(p)
         *p = '\0';
@@ -2127,7 +2127,7 @@ char *dns_dup_name(struct dns_resolver *res)
   char *ret = NULL;
 
   if(dns_extract_name(res, name, 256) == 1)
-    ret = strdup(name);
+    ret = str_dup(name);
 
   return ret;
 }

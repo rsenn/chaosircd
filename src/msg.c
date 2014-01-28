@@ -86,13 +86,13 @@ struct msg *msg_find(const char *name)
   struct msg  *m;
   uint32_t     hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&msg_table[hash % MSG_HASH_SIZE], node)
   {
     m = node->data;
     
-    if(m->hash == hash && !stricmp(m->cmd, name))
+    if(m->hash == hash && !str_icmp(m->cmd, name))
       return m;
   }
   
@@ -128,7 +128,7 @@ struct msg *msg_register(struct msg *msg)
     return NULL;
   }
   
-  msg->hash = strihash(msg->cmd);
+  msg->hash = str_ihash(msg->cmd);
   msg->id = msg_id++;
   
   dlink_add_tail(&msg_table[msg->hash % MSG_HASH_SIZE], &msg->node, msg);

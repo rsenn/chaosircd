@@ -108,7 +108,7 @@ static void m_away(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  if(!strcmp(cptr->user->away, argv[2]))
+  if(!str_cmp(cptr->user->away, argv[2]))
     return;
   
   strlcpy(cptr->user->away, argv[2], sizeof(cptr->user->away));

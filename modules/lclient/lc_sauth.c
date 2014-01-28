@@ -603,7 +603,7 @@ static int m_proxy_load(void)
   {
     do
     {
-      port = strtoul(isptr->name, NULL, 10);
+      port = str_toul(isptr->name, NULL, 10);
       
       if(!ini_get_str(isptr, "type", typestr, 32))
       {
@@ -688,7 +688,7 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
   
   if(argv[3])
   {
-    port = (uint16_t)strtoul(argv[3], NULL, 10);
+    port = (uint16_t)str_toul(argv[3], NULL, 10);
     
     if(argv[4])
     {
@@ -703,7 +703,7 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
     }
   }
   
-  if(!stricmp(argv[2], "list"))
+  if(!str_icmp(argv[2], "list"))
   {
     struct node *node;
     
@@ -734,7 +734,7 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
     return;
   }
   
-  if(!stricmp(argv[2], "add")) {
+  if(!str_icmp(argv[2], "add")) {
 
     if(m_proxy_find(port, type))
       return;
@@ -745,7 +745,7 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
                 client_me, cptr,
                 (uint32_t)port, sauth_types[type]);
     
-  } else if(!strnicmp(argv[2], "del", 3)) {
+  } else if(!str_nicmp(argv[2], "del", 3)) {
     
     if(argc < 5)
     {

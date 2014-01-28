@@ -378,7 +378,7 @@ struct filter *filter_add(const char *name)
   filter = mem_static_alloc(&filter_heap);
   
   strlcpy(filter->name, name, sizeof(filter->name));
-  filter->hash = strihash(filter->name);
+  filter->hash = str_ihash(filter->name);
   filter->id = filter_id++;
   filter->refcount = 1;
   filter->prog = (fprog_type *)&filter[1];
@@ -460,7 +460,7 @@ void filter_set_name(struct filter *filter, const char *name)
 {
   strlcpy(filter->name, name, sizeof(filter->name));
   
-  filter->hash = strihash(filter->name);
+  filter->hash = str_ihash(filter->name);
 }
   
 /* ------------------------------------------------------------------------ *
@@ -478,7 +478,7 @@ struct filter *filter_find_name(const char *name)
   struct filter *filter;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&filter_list, node)
   {
@@ -486,7 +486,7 @@ struct filter *filter_find_name(const char *name)
     
     if(filter->hash == hash)
     {
-      if(!stricmp(filter->name, name))
+      if(!str_icmp(filter->name, name))
         return filter;
     }
   }

@@ -224,10 +224,10 @@ static void sv_sbb_parse_error(struct sv_sbb_request *query)
   if((name = htmlp_var_find(sv_sbb_htmlp, "name")))
   {
     /* If the origin is invalid then its this way */
-    if(!stricmp(name->value, "REQ0JourneyStopsSK1"))
+    if(!str_icmp(name->value, "REQ0JourneyStopsSK1"))
       unknown = "origin";
     /* If the destination is invalid then its this way */
-    if(!stricmp(name->value, "REQ0JourneyStopsZK1"))
+    if(!str_icmp(name->value, "REQ0JourneyStopsZK1"))
       unknown = "destination";
   }
    
@@ -248,7 +248,7 @@ static void sv_sbb_parse_error(struct sv_sbb_request *query)
         continue;
       
       /* It's not an <option> ag, abort */
-      if(stricmp(htptr->name, "option"))
+      if(str_icmp(htptr->name, "option"))
         break;
 
       /* Allocate a record */
@@ -497,7 +497,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     }
     
     /* check connection */
-    if(strnicmp(hvptr->value, "Details", 7))
+    if(str_nicmp(hvptr->value, "Details", 7))
     {
       htmlp_tag_next(sv_sbb_htmlp);
       continue;
@@ -516,7 +516,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
         continue;
       }
       
-      if(!stricmp(hvptr->value, "stops"))
+      if(!str_icmp(hvptr->value, "stops"))
         break;
       
       htmlp_tag_next(sv_sbb_htmlp);
@@ -546,7 +546,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
         continue;
       }
       
-      if(!stricmp(hvptr->value, "left"))
+      if(!str_icmp(hvptr->value, "left"))
         break;
       
       htmlp_tag_next(sv_sbb_htmlp);
@@ -569,7 +569,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
         continue;
       }
       
-      if(!stricmp(hvptr->value, "left"))
+      if(!str_icmp(hvptr->value, "left"))
         break;
       
       htmlp_tag_next(sv_sbb_htmlp);
@@ -587,10 +587,10 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     
     while((htptr = htmlp_tag_next(sv_sbb_htmlp)))
     {
-      if(!stricmp(htptr->name, "tr") && htptr->closing)
+      if(!str_icmp(htptr->name, "tr") && htptr->closing)
         break;
       
-      if(htptr->text[0] && strlen(htptr->text) > 1)
+      if(htptr->text[0] && str_len(htptr->text) > 1)
         product = htptr->text;
     }
     
@@ -613,7 +613,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
         continue;
       }
       
-      if(!stricmp(hvptr->value, "top"))
+      if(!str_icmp(hvptr->value, "top"))
         break;
       
       htmlp_tag_next(sv_sbb_htmlp);
@@ -634,7 +634,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
         continue;
       }
       
-      if(!stricmp(hvptr->value, "stops"))
+      if(!str_icmp(hvptr->value, "stops"))
         break;
       
       htmlp_tag_next(sv_sbb_htmlp);
@@ -664,7 +664,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
         continue;
       }
       
-      if(!stricmp(hvptr->value, "left"))
+      if(!str_icmp(hvptr->value, "left"))
         break;
       
       htmlp_tag_next(sv_sbb_htmlp);
@@ -712,12 +712,12 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     
     dlink_add_tail(&resp.records, &rptr->node, rptr);
     
-    strtrim(rptr->origin);
-    strtrim(rptr->destination);
-    strtrim(rptr->train);
-    strtrim(rptr->remarks);
+    str_trim(rptr->origin);
+    str_trim(rptr->destination);
+    str_trim(rptr->train);
+    str_trim(rptr->remarks);
     
-    if(!stricmp(htptr->name, "td") && htmlp_var_find(sv_sbb_htmlp, "headers"))
+    if(!str_icmp(htptr->name, "td") && htmlp_var_find(sv_sbb_htmlp, "headers"))
       goto nextrec;
     
     /* add response */
@@ -748,7 +748,7 @@ static void sv_sbb_parse(void)
   {    
     if((hvptr = htmlp_var_find(sv_sbb_htmlp, "src")))
     {
-      if(!stricmp(hvptr->value, "/img/vs_sbb/error_arrow.gif"))
+      if(!str_icmp(hvptr->value, "/img/vs_sbb/error_arrow.gif"))
       {
         sv_sbb_parse_error(sv_sbb_requests.head ? sv_sbb_requests.head->data : NULL);
         return;
@@ -765,7 +765,7 @@ static void sv_sbb_parse(void)
   {    
     if((hvptr = htmlp_var_find(sv_sbb_htmlp, "name")))
     {
-      if(!stricmp(hvptr->value, "tp_results_form"))
+      if(!str_icmp(hvptr->value, "tp_results_form"))
       {
         sv_sbb_parse_response(sv_sbb_requests.head ? sv_sbb_requests.head->data : NULL);
         sv_sbb_send_response(sv_sbb_requests.head ? sv_sbb_requests.head->data : NULL);
@@ -931,7 +931,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
   uint64_t q_time = timer_mtime - timer_today;
   uint64_t q_date = timer_today;
   
-  if(!strnicmp(msg, "help", 4))
+  if(!str_nicmp(msg, "help", 4))
   {
     uint32_t i;
     
@@ -959,7 +959,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
     *p++ = '\0';
     *p++ = '\0';
     
-    if((timestr = strchr(p, ':')))
+    if((timestr = str_chr(p, ':')))
     {
       while(*timestr != ' ' && timestr > p)
         timestr--;
@@ -975,7 +975,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
         if((q_time = timer_parse_time(timestr)) == (uint64_t)-1LL)
           q_time = timer_mtime - timer_today;
         
-        if((datestr = strchr(timestr, ' ')))
+        if((datestr = str_chr(timestr, ' ')))
         {
           *datestr++ = '\0';
           
@@ -997,8 +997,8 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
     strlcpy(rqst->rsrc, msg, sizeof(rqst->rsrc));
     strlcpy(rqst->rdst, p, sizeof(rqst->rdst));
     
-    strtrim(rqst->rsrc);
-    strtrim(rqst->rdst);
+    str_trim(rqst->rsrc);
+    str_trim(rqst->rdst);
     
     rqst->rtime = q_time;
     rqst->rdate = q_date;
@@ -1039,7 +1039,7 @@ static void mo_sbb(struct lclient *lcptr, struct client *cptr,
     }
   }
   
-  if(!stricmp(argv[2], "list"))
+  if(!str_icmp(argv[2], "list"))
   {
     struct sv_sbb_request *rqst;
     
@@ -1061,7 +1061,7 @@ static void mo_sbb(struct lclient *lcptr, struct client *cptr,
     client_send(cptr, ":%C NOTICE %C : ================ end of "SV_SBB_AGENT_NAME" request list ================ ",
                 client_me, cptr);
   }
-  else if(!strnicmp(argv[2], "del", 3))
+  else if(!str_nicmp(argv[2], "del", 3))
   {
   }
 }

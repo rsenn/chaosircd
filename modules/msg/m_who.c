@@ -125,7 +125,7 @@ static void ms_who (struct lclient *lcptr, struct client *cptr,
 static void m_who(struct lclient *lcptr, struct client *cptr,
                   int             argc,  char         **argv)
 {
-  if(argc > 3 && !stricmp(argv[2], "-server"))
+  if(argc > 3 && !str_icmp(argv[2], "-server"))
   {
     struct server *asptr;
     char          *av[6];

@@ -1,7 +1,7 @@
-#include <libchaos/io.h>
-#include <libchaos/mem.h>
-#include <libchaos/log.h>
-#include <libchaos/gif.h>
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
+#include "libchaos/gif.h"
 
 int giftest_write(void)
 {

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   
   for(index = 0; codebuf[index]; index++)
     {
-      if(!strncmp(&codebuf[index], "/bin/sh", 7))
+      if(!str_ncmp(&codebuf[index], "/bin/sh", 7))
         {
           printf("/bin/sh");
           index += 7;

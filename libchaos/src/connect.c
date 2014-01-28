@@ -168,8 +168,8 @@ void connect_default(struct connect *cnptr)
   /* Initialise block info */
   cnptr->refcount = 0;
   cnptr->id = 0;
-  cnptr->chash = strihash(CONNECT_DEFAULT_ADDR) ^ CONNECT_DEFAULT_PORT;
-  cnptr->nhash = strihash(CONNECT_DEFAULT_NAME);
+  cnptr->chash = str_ihash(CONNECT_DEFAULT_ADDR) ^ CONNECT_DEFAULT_PORT;
+  cnptr->nhash = str_ihash(CONNECT_DEFAULT_NAME);
   cnptr->status = CONNECT_IDLE;
   
   /* Zero references */
@@ -632,7 +632,7 @@ void connect_set_name(struct connect *cnptr, const char *name)
 {
   strlcpy(cnptr->name, name, sizeof(cnptr->name));
   
-  cnptr->nhash = strihash(cnptr->name);
+  cnptr->nhash = str_ihash(cnptr->name);
 }
 
 /* ------------------------------------------------------------------------ *
@@ -649,13 +649,13 @@ struct connect *connect_find_name(const char *name)
   struct connect *cnptr;
   uint32_t        nhash;
   
-  nhash = strihash(name);
+  nhash = str_ihash(name);
   
   dlink_foreach(&connect_list, cnptr)
   {
     if(cnptr->nhash == nhash)
     {
-      if(!stricmp(cnptr->name, name))
+      if(!str_icmp(cnptr->name, name))
         return cnptr;
     }
   }

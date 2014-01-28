@@ -124,7 +124,7 @@ struct graph *graph_new(const char *name, uint16_t width, uint16_t height, int t
   
   strlcpy(graph->name, name, sizeof(graph->name));
   
-  graph->hash = strhash(graph->name);
+  graph->hash = str_hash(graph->name);
   
   dlink_add_tail(&graph_list, &graph->node, graph);
 
@@ -333,10 +333,10 @@ void graph_calc(struct graph *graph)
     timer_strftime(m, sizeof(m), graph->format, &tm);
 //    str_snprintf(m, sizeof(m), "%u", tm.tm_sec);
 //    
-    graph->measure[i] = mem_dynamic_alloc(&graph_data_heap, strlen(m) + 1);
+    graph->measure[i] = mem_dynamic_alloc(&graph_data_heap, str_len(m) + 1);
     
     if(str_isdigit(m[0]))
-      graph->mval[i] = (uint32_t)strtoul(m, NULL, 10);
+      graph->mval[i] = (uint32_t)str_toul(m, NULL, 10);
     else
       graph->mval[i] = ((t + diff) % graph->unit) / graph->mdiv;
     
@@ -360,7 +360,7 @@ void graph_calc(struct graph *graph)
     
     log(graph_log, L_status, "umeasure: %s", m);
     
-    graph->umeasure[i] = mem_dynamic_alloc(&graph_data_heap, strlen(m) + 1);
+    graph->umeasure[i] = mem_dynamic_alloc(&graph_data_heap, str_len(m) + 1);
     
     strcpy(graph->umeasure[i], m);
     
@@ -580,7 +580,7 @@ void graph_set_name(struct graph *graph, const char *name)
 {
   strlcpy(graph->name, name, sizeof(graph->name));
   
-  graph->hash = strihash(graph->name);
+  graph->hash = str_ihash(graph->name);
 }
   
 /* ------------------------------------------------------------------------ *
@@ -598,7 +598,7 @@ struct graph *graph_find_name(const char *name)
   struct graph *graph;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&graph_list, node)
   {
@@ -606,7 +606,7 @@ struct graph *graph_find_name(const char *name)
     
     if(graph->hash == hash)
     {
-      if(!stricmp(graph->name, name))
+      if(!str_icmp(graph->name, name))
         return graph;
     }
   }

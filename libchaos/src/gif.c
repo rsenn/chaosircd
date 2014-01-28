@@ -246,7 +246,7 @@ static int gif_verify(struct gif *gif)
     
     buf[3] = '\0';
 
-    if(strcmp(buf, "GIF")) 
+    if(str_cmp(buf, "GIF")) 
     {
       log(gif_log, L_warning, "Invalid GIF signature on file '%s'.",
           gif->name);
@@ -805,7 +805,7 @@ struct gif *gif_new(const char *name, int state)
   dlink_add_tail(&gif_list, &gif->node, gif);
   
   strlcpy(gif->name, name, sizeof(gif->name));
-  gif->nhash = strhash(gif->name);
+  gif->nhash = str_hash(gif->name);
   
   gif->status = state;
   gif->mem = mem_dynamic_alloc(&gif_data_heap, 0);
@@ -1340,7 +1340,7 @@ int gif_extension_put(struct gif *gif, uint8_t  extcode,
  * ------------------------------------------------------------------------ */
 int gif_comment_put(struct gif *gif, char *comment)
 {
-  return gif_extension_put(gif, GIF_EXT_COMMENT, comment, strlen(comment));
+  return gif_extension_put(gif, GIF_EXT_COMMENT, comment, str_len(comment));
 }
 
 /* ------------------------------------------------------------------------ *

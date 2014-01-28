@@ -763,7 +763,7 @@ void mem_static_note(struct sheap *shptr, const char *format, ...)
   
   va_start(args, format);
   
-  vsnprintf(shptr->note, sizeof(shptr->note), format, args);
+  str_vsnprintf(shptr->note, sizeof(shptr->note), format, args);
   
   va_end(args);
 }
@@ -985,7 +985,7 @@ void mem_dynamic_note(struct dheap *dhptr, const char *format, ...)
   
   va_start(args, format);
   
-  vsnprintf(dhptr->note, sizeof(dhptr->note), format, args);
+  str_vsnprintf(dhptr->note, sizeof(dhptr->note), format, args);
   
   va_end(args);
 }

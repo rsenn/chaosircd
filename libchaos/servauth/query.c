@@ -98,7 +98,7 @@ static void query_auth_done(struct auth_client *auth)
   q = auth_get_userarg(auth);
   
   if(auth->reply[0])
-    q->ident = strdup(auth->reply);
+    q->ident = str_dup(auth->reply);
   else
     q->ident = NULL;
   
@@ -173,11 +173,11 @@ int query_set_auth(struct servauth_query *q, const char *id,
   if(net_aton(ip, &q->remote_addr) <= 0)
     return -1;
 
-  q->id = strdup(id);
+  q->id = str_dup(id);
 
   /* set the ports */
-  q->local_port = (uint16_t)strtol(l, NULL, 10);
-  q->remote_port = (uint16_t)strtol(r, NULL, 10);
+  q->local_port = (uint16_t)str_tol(l, NULL, 10);
+  q->remote_port = (uint16_t)str_tol(r, NULL, 10);
 
   return 0;
 }
@@ -191,29 +191,29 @@ int query_set_proxy(struct servauth_query *q, const char *id,
   char *ptr;
   char  addrbuf[32];
   
-  q->id = strdup(id);
+  q->id = str_dup(id);
 
   /* parse remote address:port */
   strlcpy(addrbuf, r, sizeof(addrbuf));
   
-  if((ptr = strchr(addrbuf, ':')))
+  if((ptr = str_chr(addrbuf, ':')))
     *ptr++ = '\0';
   
   if(net_aton(addrbuf, &q->remote_addr) <= 0)
     return -1;
 
-  q->remote_port = strtoul(ptr, NULL, 10);
+  q->remote_port = str_toul(ptr, NULL, 10);
   
   /* parse local address:port */
   strlcpy(addrbuf, l, sizeof(addrbuf));
   
-  if((ptr = strchr(addrbuf, ':')))
+  if((ptr = str_chr(addrbuf, ':')))
     *ptr++ = '\0';
   
   if(net_aton(addrbuf, &q->local_addr) <= 0)
     return -1;
   
-  q->local_port = strtoul(ptr, NULL, 10);
+  q->local_port = str_toul(ptr, NULL, 10);
     
   q->ptype = proxy_parse_type(t);
   
@@ -228,8 +228,8 @@ int query_set_proxy(struct servauth_query *q, const char *id,
  * -------------------------------------------------------------------------- */
 int query_set_host(struct servauth_query *q, const char *id, const char *host)
 {
-  q->id = strdup(id);
-  q->host = strdup(host);
+  q->id = str_dup(id);
+  q->host = str_dup(host);
 
   return 0;
 }
@@ -239,7 +239,7 @@ int query_set_host(struct servauth_query *q, const char *id, const char *host)
  * -------------------------------------------------------------------------- */
 int query_set_addr(struct servauth_query *q, const char *id, const char *addr)
 {
-  q->id = strdup(id);
+  q->id = str_dup(id);
 
   return net_aton(addr, &q->remote_addr) <= 0;
 }

@@ -353,15 +353,15 @@ struct client *client_new_local(int type, struct lclient *lcptr)
   strcpy(cptr->hostip, lcptr->hostip);
   strcpy(cptr->info, lcptr->info);
   
-  cptr->hhash = strihash(cptr->host);
+  cptr->hhash = str_ihash(cptr->host);
   cptr->rhash = cptr->hhash;
-  cptr->ihash = strihash(cptr->hostip);
+  cptr->ihash = str_ihash(cptr->hostip);
   cptr->ip = lcptr->addr_remote;
   
   lclient_set_type(lcptr, type + 1);
 
   strlcpy(cptr->name, lcptr->name, sizeof(cptr->name));
-  cptr->hash = strihash(cptr->name);
+  cptr->hash = str_ihash(cptr->name);
   cptr->ts = timer_systime;
   
   if(type == CLIENT_SERVER)
@@ -413,7 +413,7 @@ struct client *client_new_remote(int            type,   struct lclient *lcptr,
   if(name)
   {
     strlcpy(cptr->name, name, sizeof(cptr->name));
-    cptr->hash = strihash(cptr->name);
+    cptr->hash = str_ihash(cptr->name);
     
     if(type == CLIENT_USER)
     {
@@ -431,7 +431,7 @@ struct client *client_new_remote(int            type,   struct lclient *lcptr,
   {
     strlcpy(cptr->host, host, sizeof(cptr->host));
     strlcpy(cptr->hostreal, host, sizeof(cptr->host));
-    cptr->hhash = strihash(cptr->host);
+    cptr->hhash = str_ihash(cptr->host);
     cptr->rhash = cptr->hhash;
   }
   
@@ -439,7 +439,7 @@ struct client *client_new_remote(int            type,   struct lclient *lcptr,
   {
     strlcpy(cptr->hostip, hostip, sizeof(cptr->hostip));
     net_aton(cptr->hostip, &cptr->ip);
-    cptr->ihash = strihash(cptr->host);
+    cptr->ihash = str_ihash(cptr->host);
   }
   
   if(info)
@@ -474,10 +474,10 @@ struct client *client_new_service(struct user *uptr, const char *name,
   strlcpy(cptr->host, host, sizeof(cptr->host));
   strlcpy(cptr->hostip, hostip, sizeof(cptr->hostip));
 
-  cptr->hhash = strihash(cptr->host);
+  cptr->hhash = str_ihash(cptr->host);
   cptr->rhash = cptr->hhash;
-  cptr->ihash = strihash(cptr->hostip);
-  cptr->hash = strihash(cptr->name);
+  cptr->ihash = str_ihash(cptr->hostip);
+  cptr->hash = str_ihash(cptr->name);
   cptr->ip = net_addr_any;
 
   dlink_add_head(&client_listsn[cptr->hash % CLIENT_HASH_SIZE],
@@ -586,12 +586,12 @@ struct client *client_find_name(const char *name)
   struct client *cptr;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&client_list, cptr)
   {
     if(cptr->hash == hash)
-      if(!stricmp(cptr->name, name))
+      if(!str_icmp(cptr->name, name))
         return cptr;
   }
   
@@ -606,13 +606,13 @@ struct client *client_find_nick(const char *nick)
   struct node   *node;
   uint32_t       hash;
   
-  hash = strihash(nick);
+  hash = str_ihash(nick);
   
   dlink_foreach_data(&client_listsn[hash % CLIENT_HASH_SIZE], node, cptr)
   {
     if(cptr->name[0] && hash == cptr->hash)
     {
-      if(!stricmp(cptr->name, nick))
+      if(!str_icmp(cptr->name, nick))
         return cptr;
     }
   }
@@ -628,13 +628,13 @@ struct history *client_history_find(const char *nick)
   struct node    *node;
   uint32_t        hash;
   
-  hash = strihash(nick);
+  hash = str_ihash(nick);
   
   dlink_foreach_data(&client_history[hash % CLIENT_HASH_SIZE], node, hptr)
   {
     if(hptr->nick[0] && hash == hptr->hash)
     {
-      if(!stricmp(hptr->nick, nick))
+      if(!str_icmp(hptr->nick, nick))
         return hptr;
     }
   }
@@ -651,7 +651,7 @@ struct history *client_history_add(struct client *cptr, const char *nick)
   if((hptr = client_history_find(nick)) == NULL)
   {
     hptr = mem_static_alloc(&client_history_heap);
-    hptr->hash = strihash(nick);
+    hptr->hash = str_ihash(nick);
     
     if(client_history[hptr->hash % CLIENT_HASH_SIZE].size == CLIENT_HISTORY_SIZE)
       client_history_delete(client_history[hptr->hash % CLIENT_HASH_SIZE].tail->data);
@@ -696,14 +696,14 @@ struct client *client_find_host(const char *host)
   struct node   *node;
   uint32_t       hash;
   
-  hash = strihash(host);
+  hash = str_ihash(host);
   
   dlink_foreach_data(&client_lists[CLIENT_GLOBAL][CLIENT_USER], node, cptr)
   {
     if(hash == cptr->hhash || hash == cptr->ihash || hash == cptr->rhash)
     {
-      if(!stricmp(cptr->host, host) || !stricmp(cptr->hostreal, host) ||
-         !stricmp(cptr->hostip, host))
+      if(!str_icmp(cptr->host, host) || !str_icmp(cptr->hostreal, host) ||
+         !str_icmp(cptr->hostip, host))
         return cptr;
     }
   }
@@ -796,7 +796,7 @@ void client_set_name(struct client *cptr, const char *name)
   
   strlcpy(cptr->name, name, sizeof(cptr->name));
   
-  cptr->hash = strihash(cptr->name);
+  cptr->hash = str_ihash(cptr->name);
   cptr->ts = timer_systime;
   
   if(cptr->lclient)
@@ -874,7 +874,7 @@ void client_vexit(struct lclient *lcptr,   struct client *cptr,
   char             cstr[IRCD_TOPICLEN + 1];
   
   if(comment != NULL)
-    vsnprintf(cstr, sizeof(cstr), comment, args);
+    str_vsnprintf(cstr, sizeof(cstr), comment, args);
   else if(comment)
     strcpy(cstr, comment);
   else
@@ -989,7 +989,7 @@ void client_kill(struct client *cptr, struct client *acptr, char *format, ...)
   va_list args;
   
   va_start(args, format);
-  vsnprintf(comment, sizeof(comment), format, args);
+  str_vsnprintf(comment, sizeof(comment), format, args);
   va_end (args);
 
 /*  if(HasID(acptr) && cptr->lclient && IsCapable(cptr, CAP_UID))
@@ -1033,7 +1033,7 @@ int client_nick_rotate(const char *name, char *buf)
   uint32_t       len;
   struct client *acptr = NULL;
   
-  len = strlen(name);
+  len = str_len(name);
   
   if(len < 2)
     return -1;

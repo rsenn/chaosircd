@@ -179,7 +179,7 @@ int net_aton(const char *cp, net_addr_t *inp)
   {
     long j;
 
-    j = strtoul(tmp, &tmp, 0);
+    j = str_toul(tmp, &tmp, 0);
 
     if(*tmp == 0)
     {
@@ -258,7 +258,7 @@ struct protocol *net_find(int type, const char *name)
   struct node     *node;
   uint32_t         hash;
   
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&net_list, node)
   {
@@ -302,7 +302,7 @@ struct protocol *net_register(int type, const char *name,
   
   strlcpy(p->name, name, sizeof(p->name));
   
-  p->hash = strihash(p->name);
+  p->hash = str_ihash(p->name);
   p->type = type;
   p->refcount = 1;
   p->id = net_id++;

@@ -104,14 +104,14 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  ts = strtoul(argv[3], NULL, 10);
+  ts = str_toul(argv[3], NULL, 10);
   
   if(ts > chptr->ts)
   {
     log(server_log, L_warning, "Dropping NMODE for %s with too recent TS",
         chptr->name);
     
-    cptr->server->in.chanmodes += strlen(argv[4]);
+    cptr->server->in.chanmodes += str_len(argv[4]);
     
     return;
   }
@@ -124,11 +124,11 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
     chptr->ts = ts;
   }
   
-  len = strlen(argv[4]);
+  len = str_len(argv[4]);
   
-  if(strtokenize_s(argv[5], infos, CHANMODE_PER_LINE, ';') != len ||
-     strtokenize_s(argv[6], timestamps, CHANMODE_PER_LINE, ';') != len ||
-     strtokenize_s(argv[7], args, CHANMODE_PER_LINE, ';') != len)
+  if(str_tokenize_s(argv[5], infos, CHANMODE_PER_LINE, ';') != len ||
+     str_tokenize_s(argv[6], timestamps, CHANMODE_PER_LINE, ';') != len ||
+     str_tokenize_s(argv[7], args, CHANMODE_PER_LINE, ';') != len)
   {
     log(chanmode_log, L_warning, 
         "Argument count does not match on NMODE for %s.", chptr->name);
@@ -157,15 +157,15 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
     if(infos[i][0] != '-')
     {
       strlcpy(cmcptr->info, (infos[i][0] != '*' ? infos[i] : lastinfo), sizeof(cmcptr->info));
-      cmcptr->ihash = (infos[i][0] != '*' ? strihash(cmcptr->info) : lasthash);
+      cmcptr->ihash = (infos[i][0] != '*' ? str_ihash(cmcptr->info) : lasthash);
       lastinfo = cmcptr->info;
       lasthash = cmcptr->ihash;
     }
     
     if(i)
-      ts += strtol(timestamps[i], NULL, 10);
+      ts += str_tol(timestamps[i], NULL, 10);
     else
-      ts = strtoul(timestamps[0], NULL, 10);
+      ts = str_toul(timestamps[0], NULL, 10);
 
     cmcptr->ts = ts;
   }

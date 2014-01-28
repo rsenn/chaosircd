@@ -189,7 +189,7 @@ struct ssl_context *ssl_add(const char *name, int         context,
 #ifdef HAVE_SSL
   struct ssl_context *scptr;
   SSL_CTX            *ctxt;
-  SSL_METHOD         *meth;
+  const SSL_METHOD   *meth;
   
   /* Setup SSL method */
   meth = NULL;
@@ -259,7 +259,7 @@ struct ssl_context *ssl_add(const char *name, int         context,
   scptr = mem_static_alloc(&ssl_heap);
 
   strlcpy(scptr->name, name, sizeof(scptr->name));
-  scptr->hash = strihash(scptr->name);
+  scptr->hash = str_ihash(scptr->name);
   scptr->context = context;
   scptr->id = ssl_id++;
   scptr->refcount = 1;
@@ -304,7 +304,7 @@ int ssl_update(struct ssl_context *scptr,   const char *name,
 void ssl_delete(struct ssl_context *scptr)
 {
 #ifdef HAVE_SSL
-  SSL_CTX_free(scptr->ctxt);
+  SSL_CTX_free((SSL_CTX *)scptr->ctxt);
 #endif /* HAVE_SSL */
   dlink_delete(&ssl_list, &scptr->node);
 
@@ -318,13 +318,13 @@ struct ssl_context *ssl_find_name(const char *name)
   struct ssl_context *scptr;
   uint32_t            hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&ssl_list, scptr)
   {
     if(scptr->hash == hash)
     {
-      if(!stricmp(scptr->name, name))
+      if(!str_icmp(scptr->name, name))
         return scptr;
     }
   }
@@ -352,7 +352,7 @@ struct ssl_context *ssl_find_id(uint32_t id)
 int ssl_new(int fd, struct ssl_context *scptr)
 {
 #ifdef HAVE_SSL
-  io_list[fd].ssl = SSL_new(scptr->ctxt);
+  io_list[fd].ssl = SSL_new((SSL_CTX *)scptr->ctxt);
   
   if(io_list[fd].ssl == NULL)
     return -1;
@@ -867,9 +867,9 @@ int ssl_handshake(int fd, struct io *iofd)
 void ssl_cipher(int fd, char *ciphbuf, size_t n)
 {
 #ifdef HAVE_SSL
-  SSL_CIPHER *cipher;
-  int         bits;
-  char        ciphername[64];
+  const SSL_CIPHER *cipher;
+  int               bits;
+  char              ciphername[64];
   
   if(io_list[fd].ssl == NULL)
   {
@@ -885,36 +885,36 @@ void ssl_cipher(int fd, char *ciphbuf, size_t n)
   
   strlcpy(ciphername, SSL_CIPHER_get_name(cipher), sizeof(ciphername));
   
-  if(!strncmp(ciphername, "AES", 3))
+  if(!str_ncmp(ciphername, "AES", 3))
   {
     ciphername[3] = '\0';
   }
-  else if(!strncmp(ciphername, "IDEA", 4))
+  else if(!str_ncmp(ciphername, "IDEA", 4))
   {
     ciphername[4] = '\0';
   }
-  else if(!strncmp(ciphername, "EXP1024", 7))
+  else if(!str_ncmp(ciphername, "EXP1024", 7))
   {
     char *p;
     strlcpy(ciphername, &SSL_CIPHER_get_name(cipher)[8], sizeof(ciphername));
-    if((p = strchr(ciphername, '-')))
+    if((p = str_chr(ciphername, '-')))
       *p = '\0';
   }
-  else if(!strncmp(ciphername, "EXP", 3))
+  else if(!str_ncmp(ciphername, "EXP", 3))
   {
     char *p;
     strlcpy(ciphername, &SSL_CIPHER_get_name(cipher)[4], sizeof(ciphername));
-    if((p = strchr(ciphername, '-')))
+    if((p = str_chr(ciphername, '-')))
       *p = '\0';
   }
   else
   {
     char *p;
-    if((p = strchr(ciphername, '-')))
+    if((p = str_chr(ciphername, '-')))
       *p = '\0';
   }
         
-  if(!strcmp(ciphername, "DES") && bits == 168)
+  if(!str_cmp(ciphername, "DES") && bits == 168)
     strcpy(ciphername, "3DES");
   
   snprintf(ciphbuf, n, "%s/%u", ciphername, bits);

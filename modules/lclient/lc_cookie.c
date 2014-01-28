@@ -255,7 +255,7 @@ static void mr_pong (struct lclient *lcptr, struct client *cptr,
   
   if(cookie)
   {
-    if(!strcmp(cookie->data, argv[2]))
+    if(!str_cmp(cookie->data, argv[2]))
       lc_cookie_done(cookie);
   }
 }
