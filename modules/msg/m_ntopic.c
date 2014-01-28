@@ -127,7 +127,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
       size_t nlen;
       size_t olen;
       
-      nlen = topic ? str_len(topic) : 0;
+      nlen = topic[0] ? str_len(topic) : 0;
       olen = str_len(chptr->topic);
       
       if(nlen < olen)
@@ -142,7 +142,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
         if((topic == NULL && chptr->topic[0] == '\0'))
           return;
         
-        if(topic && !str_cmp(topic, chptr->topic))
+        if(!str_cmp(topic, chptr->topic))
           return;
       }
     }
@@ -161,7 +161,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
   
   if(changed)
   {
-    if(topic)
+    if(topic[0])
       strlcpy(chptr->topic, topic, sizeof(chptr->topic));
     else
       chptr->topic[0] = '\0';

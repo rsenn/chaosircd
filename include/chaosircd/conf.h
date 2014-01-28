@@ -115,9 +115,9 @@ extern void          yy_fatal_error(const char *);
 #undef stdin
 #undef stdout
 #undef stderr
-#define stdin  (void *)conf_fd
-#define stdout (void *)0
-#define stderr (void *)0
+#define stdin  (void *)(size_t)conf_fd
+#define stdout (void *)0lu
+#define stderr (void *)0lu
 
 //#define isatty(x) 0
 
