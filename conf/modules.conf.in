@@ -1,6 +1,7 @@
 modules {
   load "m_away";            # /AWAY commands for clients
   load "m_burst";           # Burst synchronisation
+  load "m_cap";             # Capabilities extension for clients
   load "m_capab";           # Capability handshake 
   load "m_connect";         # Oper command for connecting servers
   load "m_die";             # Oper command for shutting down servers
