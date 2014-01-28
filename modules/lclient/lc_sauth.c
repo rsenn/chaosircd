@@ -361,8 +361,9 @@ static int lc_sauth_check_proxy(struct lc_sauth *arg)
   
   dlink_foreach(&m_proxy_list, nptr)
   {
-    port = ((uint32_t)nptr->data) >> 16;
-    type = ((uint32_t)nptr->data) & 0xffff;
+    size_t val = (size_t)nptr->data & 0xfffffffflu;
+    port = val >> 16;
+    type = val & 0xffff;
     
     node = dlink_node_new();
     
@@ -523,8 +524,9 @@ static struct node *m_proxy_find(uint16_t port, int service)
   
   dlink_foreach(&m_proxy_list, node)
   {
-    if(((((uint32_t)node->data) >> 16) == port) &&
-       ((((uint32_t)node->data) & 0xffff) == service))
+    size_t val = (size_t)node->data & 0xfffffffflu;
+
+    if((val > 16) == port && (val & 0xffff) == service)
       return node;
   }
   
@@ -544,15 +546,16 @@ static struct node *m_proxy_add(uint16_t port, int service)
       
   dlink_foreach(&m_proxy_list, node)
   {
-    if((uint32_t)node->data > data)
+    if((size_t)node->data > (size_t)data)
     {
-      dlink_add_before(&m_proxy_list, nptr, node, (void *)data);
+      dlink_add_before(&m_proxy_list, nptr, node, (void *)(size_t)data);
+
 
       return nptr;
     }
   }
   
-  dlink_add_tail(&m_proxy_list, nptr, (void *)data);
+  dlink_add_tail(&m_proxy_list, nptr, (void *)(size_t)data);
   
   return NULL;
 }
@@ -571,8 +574,9 @@ static int m_proxy_save(void)
   
   dlink_foreach(&m_proxy_list, nptr)
   {
-    port = ((uint32_t)nptr->data) >> 16;
-    type = ((uint32_t)nptr->data) & 0xffff;
+    size_t val = (size_t)nptr->data & 0xfffffffflu;
+    port = val >> 16;
+    type = val & 0xffff;
     
     snprintf(namebuf, sizeof(namebuf), "%u", (uint32_t)port);
     
@@ -718,8 +722,8 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
     {
       client_send(cptr, ":%C NOTICE %C : %5u %s",
                   client_me, cptr, 
-                  ((uint32_t)node->data) >> 16,
-                  sauth_types[((uint32_t)node->data) & 0xffff]);
+                  ((uint32_t)(size_t)node->data) >> 16,
+                  sauth_types[((uint32_t)(size_t)node->data) & 0xffff]);
     }
     
     client_send(cptr, ":%C NOTICE %C : ==== end of proxy checklist ==== ",

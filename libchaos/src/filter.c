@@ -618,7 +618,7 @@ int filter_attach_socket(struct filter *fptr, int fd)
 {
 #ifdef LINUX_SOCKET_FILTER
   int error = 0;
-  size_t errsize = sizeof(error);
+  socklen_t errsize = sizeof(error);
 
   syscall_setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, fptr->prog,
                       sizeof(fprog_type));
