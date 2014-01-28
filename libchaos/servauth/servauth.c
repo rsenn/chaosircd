@@ -187,10 +187,10 @@ int main(int argc, char *argv[])
 
   /* get control connection */
   if(argc >= 2)
-    recvfd = strtol(argv[1], NULL, 10);
+    recvfd = str_tol(argv[1], NULL, 10);
   
   if(argc >= 3)
-    sendfd = strtol(argv[2], NULL, 10);
+    sendfd = str_tol(argv[2], NULL, 10);
     
   io_init_except(recvfd, sendfd, -1);
     
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
   servauth_init();
 
   /* Make sure we are running under hybrid.. */
-/*  if(strncmp(argv[0], "-sauth", 6))
+/*  if(str_ncmp(argv[0], "-sauth", 6))
     sauth_usage();*/
 
   /* clear argv */

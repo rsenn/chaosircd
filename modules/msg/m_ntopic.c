@@ -102,7 +102,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  ts = strtoul(argv[3], NULL, 10);
+  ts = str_toul(argv[3], NULL, 10);
   
   if(ts > chptr->ts || chptr->topic[0])
   {
@@ -111,7 +111,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-  topic_ts = strtoul(argv[5], NULL, 10);
+  topic_ts = str_toul(argv[5], NULL, 10);
   
   if(chptr->ts == ts)
   {
@@ -127,8 +127,8 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
       size_t nlen;
       size_t olen;
       
-      nlen = topic ? strlen(topic) : 0;
-      olen = strlen(chptr->topic);
+      nlen = topic ? str_len(topic) : 0;
+      olen = str_len(chptr->topic);
       
       if(nlen < olen)
       {
@@ -142,7 +142,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
         if((topic == NULL && chptr->topic[0] == '\0'))
           return;
         
-        if(topic && !strcmp(topic, chptr->topic))
+        if(topic && !str_cmp(topic, chptr->topic))
           return;
       }
     }
@@ -156,7 +156,7 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
     chptr->ts = ts;
   }
 
-  if(strcmp(chptr->topic, topic))
+  if(str_cmp(chptr->topic, topic))
     changed = 1;
   
   if(changed)

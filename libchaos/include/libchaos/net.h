@@ -26,8 +26,8 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                *
@@ -199,13 +199,13 @@ CHAOS_API(int         )net_pton     (int             af,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#ifdef __GNUC__
+#if 1 //def __GNUC__
 
-extern inline char *net_ntoa    (net_addr_t in)
-{
+CHAOS_API(char       *)net_ntoa    (net_addr_t in);
+/*{
   static char buf[16];
   return net_ntoa_r(in, buf);
-}
+}*/
 
 #endif /* __GNUC__ */
 

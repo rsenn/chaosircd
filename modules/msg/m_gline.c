@@ -259,10 +259,10 @@ static void m_gline_mask(const char *host, net_addr_t *addr,
   /* Parse CIDR netmask */
   strlcpy(netmask, host, sizeof(netmask));
 
-  if((s = strchr(netmask, '/')))
+  if((s = str_chr(netmask, '/')))
   {
     *s++ = '\0';
-    mbc = strtoul(s, NULL, 10);
+    mbc = str_toul(s, NULL, 10);
 
     while(mbc > 32)
       mbc -= 32;
@@ -451,7 +451,7 @@ static struct m_gline_entry *m_gline_find(const char *user, const char *host,
   dlink_foreach(&m_gline_list, mkeptr)
   {
     /* When matching return the entry */
-    if(strmatch(user, mkeptr->user))
+    if(str_match(user, mkeptr->user))
     {
       if(mkeptr->addr != NET_ADDR_ANY)
       {
@@ -460,7 +460,7 @@ static struct m_gline_entry *m_gline_find(const char *user, const char *host,
       }
       else
       {
-        if(strimatch(host, mkeptr->host))
+        if(str_imatch(host, mkeptr->host))
           return mkeptr;
       }
     }
@@ -496,7 +496,7 @@ static int m_gline_loaddb(void)
     strlcpy(mask, isptr->name, sizeof(mask));
     
     /* Invalid section name, skip it */
-    if((host = strchr(mask, '@')) == NULL)
+    if((host = str_chr(mask, '@')) == NULL)
       continue;
     
     /* Null-terminate user mask */
@@ -573,7 +573,7 @@ static int m_gline_split(char  user[IRCD_USERLEN],
   host[1] = '\0';
   
   /* Split up the mask */
-  if((p = strchr(mask, '@')))
+  if((p = str_chr(mask, '@')))
   {
     *p++ = '\0';
     
@@ -703,11 +703,11 @@ static void m_gline_match(struct m_gline_entry *mgeptr)
       continue;
     
     /* Match the masks */
-    if(strmatch(lcptr->user->name, mgeptr->user)) 
+    if(str_match(lcptr->user->name, mgeptr->user)) 
     {
       if(((mgeptr->addr != net_addr_any) && 
           (mgeptr->addr & mgeptr->mask) == (lcptr->addr_remote & mgeptr->mask)) ||
-         strimatch(lcptr->host, mgeptr->host) || strimatch(lcptr->hostip, mgeptr->host))
+         str_imatch(lcptr->host, mgeptr->host) || str_imatch(lcptr->hostip, mgeptr->host))
       {
         /* G-line seems active, so we exit the client */
         if(mgeptr->reason[0])
@@ -829,7 +829,7 @@ static void ms_gline(struct lclient *lcptr, struct client *cptr,
     return;
   
   /* Parse the timestamp */
-  ts = strtoull(argv[5], NULL, 10);
+  ts = str_toull(argv[5], NULL, 10);
 
   m_gline_mask(argv[3], &addr, &netmask);
   

@@ -106,7 +106,7 @@ static void ms_nbounce(struct lclient *lcptr, struct client *cptr,
                 server_me, acptr, cptr);
   }
   
-  acptr->ts = strtoul(argv[4], NULL, 10);
+  acptr->ts = str_toul(argv[4], NULL, 10);
   
   chanuser_send(NULL, acptr, ":%N!%U@%H NICK :%s",
                 acptr, acptr, acptr, argv[3]);

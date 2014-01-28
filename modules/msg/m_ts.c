@@ -95,7 +95,7 @@ static void mo_ts(struct lclient *lcptr, struct client *cptr,
     return;
   
   if(argv[3])
-    ts = strtoul(argv[3], NULL, 10);
+    ts = str_toul(argv[3], NULL, 10);
   else
     ts = timer_systime;
   
@@ -120,7 +120,7 @@ static void ms_ts(struct lclient *lcptr, struct client *cptr,
   if((chptr = channel_find_name(argv[2])) == NULL)
     return;
   
-  ts = strtoul(argv[3], NULL, 10);
+  ts = str_toul(argv[3], NULL, 10);
   
   if(client_is_server(cptr))
     log(channel_log, L_status, "%s changed channel TS for %s from %u to %u.",

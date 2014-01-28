@@ -135,7 +135,7 @@ struct channel *channel_new(const char *name)
   strlcpy(chptr->name, name, sizeof(chptr->name));
   
   chptr->ts = timer_systime;
-  chptr->hash = strihash(chptr->name);
+  chptr->hash = str_ihash(chptr->name);
   chptr->refcount = 1;
   chptr->id = channel_id++;
   chptr->serial = channel_serial;
@@ -194,7 +194,7 @@ struct channel *channel_find_name(const char *name)
   struct node    *node;
   uint32_t        hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   /* Walk through a hashed list */
   dlink_foreach(&channel_lists[hash % CHANNEL_HASH_SIZE], node)
@@ -205,7 +205,7 @@ struct channel *channel_find_name(const char *name)
     if(hash == chptr->hash)
     {
       /* Name matches */
-      if(!stricmp(chptr->name, name))
+      if(!str_icmp(chptr->name, name))
         return chptr;
     }
   }
@@ -256,7 +256,7 @@ void channel_topic(struct lclient *lcptr, struct client   *cptr,
     return;
   
   /* Did the topic change? */
-  if(strncmp(chptr->topic, topic, sizeof(chptr->topic) - 1))
+  if(str_ncmp(chptr->topic, topic, sizeof(chptr->topic) - 1))
   {
     /* Yes it did, actualise it */
     strlcpy(chptr->topic, topic, sizeof(chptr->topic));
@@ -307,7 +307,7 @@ void channel_vsend(struct lclient *lcptr,  struct channel *chptr,
   char             buf[IRCD_LINELEN + 1];
   
   /* Formatted print */
-  n = vsnprintf(buf, sizeof(buf) - 2, format, args);
+  n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
   
 /*  debug(channel_log, "Sending to channel %s: %s", chptr->name, buf);*/
   

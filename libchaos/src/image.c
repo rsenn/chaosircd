@@ -945,7 +945,7 @@ void image_putstr(struct image *iptr, struct font *ifptr, uint16_t x,
                   uint16_t      y,    uint32_t     c,     int align,
                   char         *s)
 {
-  size_t len = strlen(s);
+  size_t len = str_len(s);
   size_t width = len * ifptr->w;
   
   switch(align)
@@ -1134,7 +1134,7 @@ void image_set_name(struct image *image, const char *name)
 {
   strlcpy(image->name, name, sizeof(image->name));
   
-  image->hash = strihash(image->name);
+  image->hash = str_ihash(image->name);
 }
   
 /* ------------------------------------------------------------------------ *
@@ -1152,7 +1152,7 @@ struct image *image_find_name(const char *name)
   struct image *image;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&image_list, node)
   {
@@ -1160,7 +1160,7 @@ struct image *image_find_name(const char *name)
     
     if(image->hash == hash)
     {
-      if(!stricmp(image->name, name))
+      if(!str_icmp(image->name, name))
         return image;
     }
   }
@@ -1261,15 +1261,15 @@ void image_color_parse(struct color *color, const char *str)
   color->b = 0;
   
   strlcpy(digits, str, sizeof(digits));
-  color->r = strtoul(digits, NULL, 16);
+  color->r = str_toul(digits, NULL, 16);
   if(!*str++) return; if(!*str++) return;
   
   strlcpy(digits, str, sizeof(digits));
-  color->g = strtoul(digits, NULL, 16);
+  color->g = str_toul(digits, NULL, 16);
   if(!*str++) return; if(!*str++) return; 
 
   strlcpy(digits, str, sizeof(digits));
-  color->b = strtoul(digits, NULL, 16);
+  color->b = str_toul(digits, NULL, 16);
   if(!*str++) return; if(!*str++) return; 
 }
 

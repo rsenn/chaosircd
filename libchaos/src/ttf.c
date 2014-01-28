@@ -227,7 +227,7 @@ struct ttf *ttf_new(const char *name)
   
   strlcpy(ttf->name, name, sizeof(ttf->name));
   
-  ttf->hash = strhash(ttf->name);
+  ttf->hash = str_hash(ttf->name);
   
   dlink_add_tail(&ttf_list, &ttf->node, ttf);
 
@@ -976,7 +976,7 @@ struct image *ttf_text_solid(struct ttf *ttf, const char *text, struct color *c)
   uint16_t     *unicode_text;
   int           unicode_len;
   
-  unicode_len = strlen(text);
+  unicode_len = str_len(text);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   if(unicode_text == NULL)
   {
@@ -1001,7 +1001,7 @@ struct image *ttf_utf8_solid(struct ttf *ttf, const char *utf8, struct color *c)
   uint16_t     *unicode_text;
   int           unicode_len;
   
-  unicode_len = strlen(utf8);
+  unicode_len = str_len(utf8);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   
   if(unicode_text == NULL)
@@ -1234,7 +1234,7 @@ struct image *ttf_text_shaded(struct ttf *ttf, const char *text, struct color *b
   uint16_t     *unicode_text;
   int           unicode_len;
   
-  unicode_len = strlen(text);
+  unicode_len = str_len(text);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   if(unicode_text == NULL)
   {
@@ -1259,7 +1259,7 @@ struct image *ttf_utf8_shaded(struct ttf *ttf, const char *utf8, struct color *b
   uint16_t     *unicode_text;
   int           unicode_len;
   
-  unicode_len = strlen(utf8);
+  unicode_len = str_len(utf8);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   
   if(unicode_text == NULL)
@@ -1468,7 +1468,7 @@ struct image *ttf_text_blended(struct ttf *ttf, const char *text, struct color *
   uint16_t     *unicode_text;
   int           unicode_len;
   
-  unicode_len = strlen(text);
+  unicode_len = str_len(text);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   if(unicode_text == NULL)
   {
@@ -1493,7 +1493,7 @@ struct image *ttf_utf8_blended(struct ttf *ttf, const char *utf8, struct color *
   uint16_t     *unicode_text;
   int           unicode_len;
   
-  unicode_len = strlen(utf8);
+  unicode_len = str_len(utf8);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   
   if(unicode_text == NULL)
@@ -1536,7 +1536,7 @@ void ttf_set_name(struct ttf *ttf, const char *name)
 {
   strlcpy(ttf->name, name, sizeof(ttf->name));
   
-  ttf->hash = strihash(ttf->name);
+  ttf->hash = str_ihash(ttf->name);
 }
   
 /* ------------------------------------------------------------------------ *
@@ -1554,7 +1554,7 @@ struct ttf *ttf_find_name(const char *name)
   struct ttf *ttf;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&ttf_list, node)
   {
@@ -1562,7 +1562,7 @@ struct ttf *ttf_find_name(const char *name)
     
     if(ttf->hash == hash)
     {
-      if(!stricmp(ttf->name, name))
+      if(!str_icmp(ttf->name, name))
         return ttf;
     }
   }

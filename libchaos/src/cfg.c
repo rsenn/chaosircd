@@ -156,7 +156,7 @@ struct cfg *cfg_new(const char *name)
   
   strlcpy(cfptr->name, name, sizeof(cfptr->name));
   
-  cfptr->hash = strhash(cfptr->name);
+  cfptr->hash = str_hash(cfptr->name);
   
   dlink_add_tail(&cfg_list, &cfptr->node, cfptr);
 
@@ -201,7 +201,7 @@ void cfg_set_name(struct cfg *cfptr, const char *name)
 {
   strlcpy(cfptr->name, name, sizeof(cfptr->name));
   
-  cfptr->hash = strihash(cfptr->name);
+  cfptr->hash = str_ihash(cfptr->name);
 }
   
 /* ------------------------------------------------------------------------ *
@@ -219,7 +219,7 @@ struct cfg *cfg_find_name(const char *name)
   struct cfg *cfptr;
   uint32_t       hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&cfg_list, node)
   {
@@ -227,7 +227,7 @@ struct cfg *cfg_find_name(const char *name)
     
     if(cfptr->hash == hash)
     {
-      if(!stricmp(cfptr->name, name))
+      if(!str_icmp(cfptr->name, name))
         return cfptr;
     }
   }

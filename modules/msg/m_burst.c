@@ -116,15 +116,15 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
   else
   {
     uint64_t burst_time = (uint64_t)(timer_mtime - cptr->server->bstart);
-    uint32_t burst_sendq = (uint32_t)strtoul(argv[2], NULL, 10);
+    uint32_t burst_sendq = (uint32_t)str_toul(argv[2], NULL, 10);
 
     if(burst_time == 0LLU)
       burst_time = 1LLU;
     
-    burst_servers = (uint32_t)strtoul(argv[3], NULL, 10);
-    burst_clients = (uint32_t)strtoul(argv[4], NULL, 10);
-    burst_channels = (uint32_t)strtoul(argv[5], NULL, 10);
-    burst_chanmodes = (uint32_t)strtoul(argv[6], NULL, 10);
+    burst_servers = (uint32_t)str_toul(argv[3], NULL, 10);
+    burst_clients = (uint32_t)str_toul(argv[4], NULL, 10);
+    burst_channels = (uint32_t)str_toul(argv[5], NULL, 10);
+    burst_chanmodes = (uint32_t)str_toul(argv[6], NULL, 10);
 
     if(cptr->server->in.servers != burst_servers)
       log(server_log, L_warning, 

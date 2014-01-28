@@ -1109,7 +1109,7 @@ void numeric_vsend(struct client *cptr, int numeric, va_list args)
   
   buf[n++] = ' ';
   
-  vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
+  str_vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
             
   client_send(cptr, "%s", buf);
 }
@@ -1151,7 +1151,7 @@ void numeric_vlsend(struct lclient *lcptr, int numeric, va_list args)
   
   buf[n++] = ' ';
   
-  vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
+  str_vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
             
   lclient_send(lcptr, "%s", buf);
 }

@@ -94,7 +94,7 @@ static void m_userip(struct lclient *lcptr, struct client *cptr,
   len = snprintf(result, sizeof(result), ":%s 302 %s :",
                  client_me->name, cptr->name);
   
-  n = strtokenize(argv[2], av, 63);
+  n = str_tokenize(argv[2], av, 63);
   
   for(i = 0; i < n; i++)
   {
@@ -103,7 +103,7 @@ static void m_userip(struct lclient *lcptr, struct client *cptr,
     if(acptr == NULL)
       continue;
     
-    if(len + 1 + strlen(acptr->name) > IRCD_LINELEN - 2)
+    if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
     
     if(!first)

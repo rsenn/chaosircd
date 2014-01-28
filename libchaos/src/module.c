@@ -114,7 +114,7 @@ static struct module *module_new(const char *path)
   strlcpy(name, (p ? p + 1 : path), sizeof(name));
 
   /* cut the .so */
-  p = strchr(name, '.');
+  p = str_chr(name, '.');
   
   if(p)
     *p = '\0';
@@ -127,7 +127,7 @@ static struct module *module_new(const char *path)
   
   for(i = 0; i < sizeof(module_imports) / sizeof(module_imports[0]); i++)
   {
-    if(!strcmp(module_imports[i].name, name))
+    if(!str_cmp(module_imports[i].name, name))
     {
       load = module_imports[i].load;
       unload = module_imports[i].unload;
@@ -173,8 +173,8 @@ static struct module *module_new(const char *path)
   strlcpy(ret->path, path, sizeof(ret->path));
   strlcpy(ret->name, name, sizeof(ret->name));
   
-  ret->phash = strhash(ret->path);
-  ret->nhash = strihash(ret->name);
+  ret->phash = str_hash(ret->path);
+  ret->nhash = str_ihash(ret->name);
     
   ret->handle = handle;
   ret->load = load;
@@ -263,17 +263,17 @@ const char *module_expand(const char *name)
   
   strlcpy(ret, name, sizeof(ret));
   
-  if(strchr(ret, '/') == NULL && (p = strchr(ret, '_')));
+  if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_')));
   {
     for(i = 0; module_table[i][0]; i++)
     {
-      if(!strncmp(ret, module_table[i][0], (size_t)p - (size_t)ret))
+      if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret))
       {
         *p++ = '\0';
         
         strlcpy(lala, p, sizeof(lala));
         
-        if((p = strchr(lala, '.')))
+        if((p = str_chr(lala, '.')))
           *p = '\0';
         
         strlcpy(ret, module_path, sizeof(lala));
@@ -386,13 +386,13 @@ struct module *module_find_path(const char *path)
   struct module *module;
   uint32_t       hash;
     
-  hash = strhash(path);
+  hash = str_hash(path);
   
   dlink_foreach(&module_list, module)
   {
     if(module->phash == hash)
     {
-      if(!strcmp(module->path, path))
+      if(!str_cmp(module->path, path))
         return module;
     }
   }
@@ -407,13 +407,13 @@ struct module *module_find_name(const char *name)
   struct module *module;
   uint32_t       hash;
     
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&module_list, module)
   {
     if(module->nhash == hash)
     {
-      if(!strcmp(module->name, name))
+      if(!str_cmp(module->name, name))
         return module;
     }
   }

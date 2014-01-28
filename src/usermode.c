@@ -234,7 +234,7 @@ void usermode_change_add(struct usermode *umptr, int change, char *arg)
     
     if(umcptr->arg != NULL && arg != NULL)
     {
-      if(stricmp(umcptr->arg, arg))
+      if(str_icmp(umcptr->arg, arg))
         continue;
     }
     else if(umcptr->arg != arg)
@@ -584,7 +584,7 @@ usermode_change_send(struct lclient *lcptr,
     {
       *pa++ = ' ';
       
-      arglen = strlen(umcptr->arg);
+      arglen = str_len(umcptr->arg);
       memcpy(pa, umcptr->arg, arglen);
       pa += arglen;
     }

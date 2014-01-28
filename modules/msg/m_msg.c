@@ -161,7 +161,7 @@ static void m_multimsg(int            type, const char *cmd,  struct lclient *lc
     return;
   }
   
-  n = strtokenize_s(argv[2], recipients, IRCD_MAXTARGETS, ',');
+  n = str_tokenize_s(argv[2], recipients, IRCD_MAXTARGETS, ',');
   
   for(i = 0; i < n; i++)
     m_msg(type, cmd, lcptr, cptr, recipients[i], argv[3]);

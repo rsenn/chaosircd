@@ -74,7 +74,7 @@ static inline void ini_strip(char *s)
   uint32_t i;
   uint32_t len;
   
-  len = strlen(s);
+  len = str_len(s);
   
   for(i = 0; str_isspace(s[i]); i++);
   
@@ -126,7 +126,7 @@ static inline struct ini_key *ini_key_get(struct ini_section *section, const cha
   if(section == NULL)
     return NULL;
   
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&section->keys, node)
   {
@@ -134,7 +134,7 @@ static inline struct ini_key *ini_key_get(struct ini_section *section, const cha
     
     if(key->name && key->hash == hash)
     {
-      if(!strcmp(key->name, name))
+      if(!str_cmp(key->name, name))
         return key;
     }
   }
@@ -160,8 +160,8 @@ static inline struct ini_key *ini_key_new(struct ini_section *section, const cha
   
   if(name)
   {
-    key->name = strdup(name);
-    key->hash = strhash(name);
+    key->name = str_dup(name);
+    key->hash = str_hash(name);
   }
   
   dlink_add_tail(&section->keys, &key->node, key);
@@ -301,8 +301,8 @@ struct ini *ini_add(const char *path)
   else
     strlcpy(ini->name, path, sizeof(ini->name));
   
-  ini->nhash = strihash(ini->name);
-  ini->phash = strhash(ini->path);
+  ini->nhash = str_ihash(ini->name);
+  ini->phash = str_hash(ini->path);
   ini->id = ini_id++;
   ini->refcount = 1;
   ini->changed = 1;
@@ -345,13 +345,13 @@ struct ini *ini_find_name(const char *name)
   struct ini  *ini;
   uint32_t     hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
     
   dlink_foreach(&ini_list, ini)
   {
     if(ini->nhash == hash)
     {
-      if(!strcmp(ini->name, name))
+      if(!str_cmp(ini->name, name))
         return ini;
     }
   }
@@ -367,13 +367,13 @@ struct ini *ini_find_path(const char *path)
   struct ini  *ini;
   uint32_t     hash;
   
-  hash = strhash(path);
+  hash = str_hash(path);
     
   dlink_foreach(&ini_list, ini)
   {
     if(ini->phash == hash)
     {
-      if(!strcmp(ini->path, path))
+      if(!str_cmp(ini->path, path))
         return ini;
     }
   }
@@ -451,7 +451,7 @@ int ini_load(struct ini *ini)
     /* Remove leading & trailing whitespace */
     ini_strip(buf); 
 
-    len = strlen(buf);
+    len = str_len(buf);
         
     if(buf[0] == ';' || len == 0) 
     {
@@ -473,7 +473,7 @@ int ini_load(struct ini *ini)
       if(key)
       {
         if(len)
-          key->value = strdup(&buf[1]);
+          key->value = str_dup(&buf[1]);
       }
       
       continue;
@@ -499,7 +499,7 @@ int ini_load(struct ini *ini)
     }
     
     /* Split up into key & value */
-    p = strchr(buf, '=');
+    p = str_chr(buf, '=');
       
     if(p == NULL) { 
       log(ini_log, L_warning, "%s:%i: missing '='", ini->name, line);
@@ -577,7 +577,7 @@ struct ini_section *ini_section_find(struct ini *ini, const char *name)
   if(name == NULL)
     return NULL;
   
-  hash = strhash(name);
+  hash = str_hash(name);
   
   ini->current = NULL;
   
@@ -585,7 +585,7 @@ struct ini_section *ini_section_find(struct ini *ini, const char *name)
   {
     if(section->name && section->hash == hash)
     {
-      if(!strcmp(section->name, name))
+      if(!str_cmp(section->name, name))
       {
         ini->current = section;
         
@@ -620,7 +620,7 @@ struct ini_section *ini_section_find_next(struct ini *ini, const char *name)
     
     if(section->name && section->hash == hash)
     {
-      if(!strcmp(section->name, name))
+      if(!str_cmp(section->name, name))
       {
         ini->current = section;
         
@@ -641,8 +641,8 @@ struct ini_section *ini_section_new(struct ini *ini, const char *name)
 
   section = mem_static_alloc(&ini_sec_heap);
     
-  section->name = strdup(name);
-  section->hash = strhash(name);
+  section->name = str_dup(name);
+  section->hash = str_hash(name);
   section->ini = ini;
   
   ini->current = section;
@@ -785,7 +785,7 @@ int ini_write_str(struct ini_section *section, const char *key, const char *str)
     if(k->value)
       free(k->value);
     
-    k->value = strdup(str);
+    k->value = str_dup(str);
     
     return 0;
   }
@@ -794,7 +794,7 @@ int ini_write_str(struct ini_section *section, const char *key, const char *str)
   
   if(k) 
   {
-    k->value = strdup(str); 
+    k->value = str_dup(str); 
 
     section->ini->changed = 1;
     
@@ -817,7 +817,7 @@ int ini_write_ulong_long(struct ini_section *section, const char *key, uint64_t 
 {  
   char buf[64];
   
-  snprintf(buf, 64, "%llu", u);
+  snprintf(buf, 64, "%"SCNu64, u);
   
   return ini_write_str(section, key, buf);  
 }
@@ -896,7 +896,7 @@ int ini_read_ulong_long(struct ini_section *section, const char *key, uint64_t *
     if(u == NULL) 
       return 0;
     
-    *u = strtoull(s, NULL, 10);
+    *u = str_toull(s, NULL, 10);
 
     return 0;
   }

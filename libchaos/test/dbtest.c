@@ -1,7 +1,7 @@
-#include <libchaos/io.h>
-#include <libchaos/mem.h>
-#include <libchaos/log.h>
-#include <libchaos/db.h>
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
+#include "libchaos/db.h"
 
 int dbtest_type = DB_TYPE_MYSQL;
 char *dbtest_host = "localhost";

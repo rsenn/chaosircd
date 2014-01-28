@@ -183,7 +183,7 @@ static void user_uid(struct user *uptr)
   while(user_find_uid(uptr->uid));
   
   /* Hash it */
-  uptr->uhash = strhash(uptr->uid);
+  uptr->uhash = str_hash(uptr->uid);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -217,13 +217,13 @@ struct user *user_new(const char *name, const char *uid)
   if(name)
     strlcpy(uptr->name, name, sizeof(uptr->name));
   
-  uptr->nhash = strhash(uptr->name);
+  uptr->nhash = str_hash(uptr->name);
   
   if(uid)
   {
     strlcpy(uptr->uid, uid, sizeof(uptr->uid));
     
-    uptr->uhash = strhash(uptr->uid);
+    uptr->uhash = str_hash(uptr->uid);
   }
   else
   {
@@ -282,13 +282,13 @@ struct user *user_find_uid(const char *uid)
   
   strlcpy(uidbuf, uid, sizeof(uidbuf));
   
-  hash = strhash(uidbuf);
+  hash = str_hash(uidbuf);
 
   dlink_foreach_data(&user_lists[hash % USER_HASH_SIZE], node, uptr)
   {
     if(uptr->uhash == hash)
     {
-      if(!strcmp(uptr->uid, uidbuf))
+      if(!str_cmp(uptr->uid, uidbuf))
         return uptr;
     }
   }
@@ -303,13 +303,13 @@ struct user *user_find_name(const char *name)
   struct user *uptr;
   uint32_t     hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&user_list, uptr)
   {
     if(uptr->nhash == hash)
     {
-      if(!stricmp(uptr->name, name))
+      if(!str_icmp(uptr->name, name))
         return uptr;
     }
   }
@@ -324,7 +324,7 @@ void user_set_name(struct user *uptr, const char *name)
   if(name && name[0])
   {
     strlcpy(uptr->name, name, sizeof(uptr->name));
-    uptr->nhash = strihash(uptr->name);
+    uptr->nhash = str_ihash(uptr->name);
   }
 }
 

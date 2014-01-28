@@ -23,14 +23,15 @@
 #ifndef CHAOS_DEFS_H
 #define CHAOS_DEFS_H
 
-#include <libchaos/config.h>
+#include "libchaos/config.h"
 
 #ifndef NULL
 #define NULL (void *)0
 #endif /* NULL */
 
-#include <stdint.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <sys/stat.h>
 
 /*

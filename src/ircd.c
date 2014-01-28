@@ -281,7 +281,7 @@ static pid_t ircd_check(struct config *config)
   
   if(io_read(fd, buf, sizeof(buf)) > 0)
   {
-    pid = strtoul(buf, NULL, 10);
+    pid = str_toul(buf, NULL, 10);
     
     snprintf(proc, sizeof(proc), "/proc/%u", pid);
     
@@ -610,7 +610,7 @@ struct support *ircd_support_find(const char *name)
   
   dlink_foreach(&ircd_support, suptr)
   {
-    if(!stricmp(suptr->name, name))
+    if(!str_icmp(suptr->name, name))
       return suptr;
   }
 
@@ -646,7 +646,7 @@ struct support *ircd_support_set(const char *name, const char *value, ...)
   }
   
   if(value)
-    vsnprintf(suptr->value, sizeof(suptr->value), value, args);
+    str_vsnprintf(suptr->value, sizeof(suptr->value), value, args);
   else
     suptr->value[0] = '\0';
   
@@ -670,8 +670,8 @@ struct node *ircd_support_assemble(char *buf, struct node *nptr, size_t n)
   {
     suptr = nptr->data;
     
-    len = strlen(suptr->name) + 1 +
-      (suptr->value[0] ? strlen(suptr->value) + 1 : 0);
+    len = str_len(suptr->name) + 1 +
+      (suptr->value[0] ? str_len(suptr->value) + 1 : 0);
     
     if(len + 2 > n - i)
       break;

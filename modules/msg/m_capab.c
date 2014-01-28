@@ -107,13 +107,13 @@ static void mr_capab(struct lclient *lcptr, struct client *cptr,
       (lcptr->name[0] ? lcptr->name : lcptr->host), argv[2]);
   
   /* Parse capabilities */
-  capc = strtokenize(argv[2], capv, 63);
+  capc = str_tokenize(argv[2], capv, 63);
   
   /* Loop through tokens */
   for(i = 0; i < capc; i++)
   {
     /* Encryption capability needs special care */
-    if(!strnicmp(capv[i], "enc:", 4))
+    if(!str_nicmp(capv[i], "enc:", 4))
     {
       /* TODO */
     }

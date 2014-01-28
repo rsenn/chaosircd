@@ -106,7 +106,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
     return;        
   }
   
-  ts = strtoul(argv[3], NULL, 10);
+  ts = str_toul(argv[3], NULL, 10);
   
   /* Try to find the channel */
   chptr = channel_find_name(argv[2]);

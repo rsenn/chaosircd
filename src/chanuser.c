@@ -288,7 +288,7 @@ uint32_t chanuser_parse(struct lclient *lcptr,  struct list *lptr,
   
   dlink_list_zero(lptr);
   
-  n = strtokenize(args, uv, CHANUSER_PER_LINE);
+  n = str_tokenize(args, uv, CHANUSER_PER_LINE);
   
   for(i = 0; i < n; i++)
   {
@@ -371,8 +371,8 @@ struct node *chanuser_assemble(char  *buf, struct node *nptr,
   {
     cuptr = nptr->data;
     name = (uid ? cuptr->client->user->uid : cuptr->client->name);
-    nlen = strlen(name);
-    plen = (of ? 1 : strlen(cuptr->prefix));
+    nlen = str_len(name);
+    plen = (of ? 1 : str_len(cuptr->prefix));
     len = nlen + (cuptr->flags ? plen : 0);
     
     if(i + 2 + len > n)
@@ -479,7 +479,7 @@ size_t chanuser_burst(struct lclient *lcptr, struct channel *chptr)
 
     lclient_send(lcptr, "%s", buf);
     
-    ret += strlen(cuptr->prefix);
+    ret += str_len(cuptr->prefix);
   }
 
   return ret;
@@ -593,7 +593,7 @@ void chanuser_vsend(struct lclient *lcptr,  struct client *cptr,
   client_serial++;
   
   /* Formatted print */
-  n = vsnprintf(buf, sizeof(buf) - 2, format, args);
+  n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
   
   /* Add line separator */
   buf[n++] = '\r';
@@ -764,7 +764,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
     
     if(acuptr)
     { 
-      len = strlen(acuptr->channel->name) + strlen(acuptr->prefix);
+      len = str_len(acuptr->channel->name) + str_len(acuptr->prefix);
       
       if(len + rpllen + rplidx + 1 > IRCD_LINELEN - 2)
       {
@@ -793,7 +793,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
     if(hooks_call(chanuser_whois, HOOK_DEFAULT, cptr, auptr->client, acuptr))
       continue;
     
-    len = strlen(acuptr->channel->name) + strlen(acuptr->prefix);
+    len = str_len(acuptr->channel->name) + str_len(acuptr->prefix);
     
     if(len + rpllen + rplidx + 1 > IRCD_LINELEN - 2)
     {

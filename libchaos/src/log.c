@@ -172,7 +172,7 @@ int log_source_register(const char *name)
   if(source)
   {
     strlcpy(source->name, name, sizeof(source->name));
-    source->hash = strihash(source->name);
+    source->hash = str_ihash(source->name);
 
 /*    log(log_log, L_verbose, "Registered log source: %s", source->name);*/
   
@@ -207,7 +207,7 @@ int log_source_find(const char *name)
   {
     if(log_sources[i].name[0])
     {
-      if(!stricmp(log_sources[i].name, name))
+      if(!str_icmp(log_sources[i].name, name))
         return i;
     }
   }
@@ -255,7 +255,7 @@ int log_level_parse(const char *levstr)
   size_t i;
   
   for(i = 0; i <= L_debug; i++)
-    if(!stricmp(log_levels[i][1], levstr))
+    if(!str_icmp(log_levels[i][1], levstr))
       return i;
   
   return -1;
@@ -276,14 +276,14 @@ uint64_t log_source_parse(const char *sources)
   
   strlcpy(buf, sources, sizeof(buf));
   
-  srcc = strtokenize(buf, srcv, LOG_SOURCE_COUNT);
+  srcc = str_tokenize(buf, srcv, LOG_SOURCE_COUNT);
   
   for(i = 0; i < srcc; i++)
   {
-    if(!stricmp(srcv[i], "all"))
+    if(!str_icmp(srcv[i], "all"))
       return LOG_ALL;
     
-    hash = strihash(srcv[i]);
+    hash = str_ihash(srcv[i]);
   
     for(j = 0; j < LOG_SOURCE_COUNT; j++)
     {
@@ -291,7 +291,7 @@ uint64_t log_source_parse(const char *sources)
       
       if(source->name[0] && source->hash == hash)
       {
-        if(!stricmp(source->name, srcv[i]))
+        if(!str_icmp(source->name, srcv[i]))
           ret |= source->flag;
       }      
     }
@@ -340,7 +340,7 @@ log_drain_open(const char *path, uint64_t sources, int level, int prefix,
   drain->callback = NULL;
   strlcpy(drain->path, path, sizeof(drain->path));
   
-  drain->hash = strhash(drain->path);
+  drain->hash = str_hash(drain->path);
   drain->refcount = 1;
   drain->id = log_id++;
   
@@ -376,7 +376,7 @@ struct dlog *log_drain_setfd(int fd, uint64_t sources, int level, int prefix)
   else
     snprintf(drain->path, sizeof(drain->path), "fd: %i", fd);
   
-  drain->hash = strhash(drain->path);
+  drain->hash = str_hash(drain->path);
   drain->refcount = 1;
   drain->id = log_id++;
   
@@ -430,13 +430,13 @@ struct dlog *log_drain_find_path(const char *path)
   struct dlog *dlptr;
   uint32_t     hash = 0;
   
-  hash = strhash(path);
+  hash = str_hash(path);
   
   dlink_foreach(&log_list, dlptr)
   {
     if(path && dlptr->hash == hash)
     {
-      if(!strcmp(dlptr->path, path))
+      if(!str_cmp(dlptr->path, path))
         return dlptr;
     }
   }
@@ -551,7 +551,7 @@ void log_voutput(int src, int level, const char *format, va_list ap)
            log_levels[level][0], log_months[timer_dtime.tm_mon], timer_dtime.tm_mday,
            timer_dtime.tm_hour, timer_dtime.tm_min, timer_dtime.tm_sec, source->name);
            
-  vsnprintf(logmsg, 2048, format, ap);
+  str_vsnprintf(logmsg, 2048, format, ap);
   
   dlink_foreach(&log_list, drain)
   {
@@ -591,7 +591,7 @@ void log_voutput(int src, int level, const char *format, va_list ap)
     {
       if(level == L_startup)
       {
-        syscall_write(1, logmsg, strlen(logmsg));
+        syscall_write(1, logmsg, str_len(logmsg));
         syscall_write(1, "\n", 1);
       }
     }
@@ -655,7 +655,7 @@ void log_debug(const char *file,  int line,
   snprintf(date, 64, "[%s] (%s) %s:%u -- ",
            log_levels[level][0], source->name, file, line);
            
-  vsnprintf(logmsg, 2048, format, ap);
+  str_vsnprintf(logmsg, 2048, format, ap);
   
   va_end(ap);
 
@@ -697,7 +697,7 @@ void log_debug(const char *file,  int line,
     {
       if(level == L_startup)
       {
-        syscall_write(1, logmsg, strlen(logmsg));
+        syscall_write(1, logmsg, str_len(logmsg));
         syscall_write(1, "\n", 1);
       }
     }

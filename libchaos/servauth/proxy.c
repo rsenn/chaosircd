@@ -139,7 +139,7 @@ int proxy_parse_type(const char *type)
   
   for(i = 0; proxy_types[i]; i++)
   {
-    if(!stricmp(proxy_types[i], type))
+    if(!str_icmp(proxy_types[i], type))
       return i;
   }
   
@@ -154,7 +154,7 @@ int proxy_parse_reply(const char *reply)
   
   for(i = 0; proxy_replies[i]; i++)
   {
-    if(!stricmp(proxy_replies[i], reply))
+    if(!str_icmp(proxy_replies[i], reply))
       return i;
   }
   
@@ -182,9 +182,9 @@ static void proxy_event_rd(int fd, struct proxy_check *proxy)
         
         ptr += 9;
         
-        num = strtoul(ptr, &ptr, 10);
+        num = str_toul(ptr, &ptr, 10);
         
-        if((num == 200 || num / 100 == 5) && num != 501 && strnicmp(&ptr[1], "ok", 2))
+        if((num == 200 || num / 100 == 5) && num != 501 && str_nicmp(&ptr[1], "ok", 2))
           proxy->reply = PROXY_RP_OPEN;
         else
           proxy->reply = PROXY_RP_DENIED;
@@ -247,7 +247,7 @@ static void proxy_event_rd(int fd, struct proxy_check *proxy)
         if(n <= 0)
           break;
     
-        if(!strncmp(buf, "PING", 4))
+        if(!str_ncmp(buf, "PING", 4))
         {
           proxy->reply = PROXY_RP_OPEN;
           break;

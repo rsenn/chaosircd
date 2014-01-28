@@ -144,7 +144,7 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  ts = strtoul(argv[4], NULL, 10);
+  ts = str_toul(argv[4], NULL, 10);
   
   /* Check nick collision */
   if((acptr = client_find_nick(argv[2])))

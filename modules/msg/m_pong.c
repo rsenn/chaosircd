@@ -90,7 +90,7 @@ static void m_pong(struct lclient *lcptr, struct client *cptr,
   if(client_is_server(cptr) && client_is_local(cptr) && 
      argv[2] && chars_isdigit(argv[2][0]))
   {
-    lcptr->ping = strtoull(argv[2], NULL, 10);
+    lcptr->ping = str_toull(argv[2], NULL, 10);
     lcptr->lag = timer_mtime - lcptr->ping;
 
     return;

@@ -27,9 +27,9 @@
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
 
-#include <libchaos/log.h>
-#include <libchaos/dlink.h>
-#include <libchaos/io.h>
+#include "libchaos/log.h"
+#include "libchaos/dlink.h"
+#include "libchaos/io.h"
 
 /* ------------------------------------------------------------------------ * 
  * Constants                                                                *
@@ -58,17 +58,17 @@
  * ------------------------------------------------------------------------ */
 struct ssl_context 
 {
-  struct node           node;
-  uint32_t              id;
-  uint32_t              refcount;
-  struct ssl_ctx_st    *ctxt;
-  struct ssl_method_st *meth;
-  uint32_t              hash;
-  int                   context;
-  char                  name[64];
-  char                  cert[PATHLEN];
-  char                  key[PATHLEN];
-  char                  ciphers[64];
+  struct node                 node;
+  uint32_t                    id;
+  uint32_t                    refcount;
+  const struct ssl_ctx_st    *ctxt;
+  const struct ssl_method_st *meth;
+  uint32_t                    hash;
+  int                         context;
+  char                        name[64];
+  char                        cert[PATHLEN];
+  char                        key[PATHLEN];
+  char                        ciphers[64];
 };
 
 /* ------------------------------------------------------------------------ *

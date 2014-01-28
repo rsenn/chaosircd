@@ -98,11 +98,11 @@ static size_t httpc_parse_protocol(struct httpc *hcptr)
   if(hcptr->protocol[0] == '\0')
     strcpy(hcptr->protocol, "http");
 
-  if(!strcmp(hcptr->protocol, "http"))
+  if(!str_cmp(hcptr->protocol, "http"))
   {
     hcptr->port = 80;
   }
-  else if(!strcmp(hcptr->protocol, "https"))
+  else if(!str_cmp(hcptr->protocol, "https"))
   {
     hcptr->port = 443;
   }
@@ -158,7 +158,7 @@ static size_t httpc_parse_port(struct httpc *hcptr, size_t index)
     
     portnum[i] = '\0';
     
-    hcptr->port = strtoul(portnum, NULL, 10);
+    hcptr->port = str_toul(portnum, NULL, 10);
   }
   
   return index + i;
@@ -243,7 +243,7 @@ static struct httpc_var *httpc_var_find(struct httpc *hcptr, const char *name)
   struct httpc_var *hvptr;
   uint32_t          hash;
   
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&hcptr->vars, hvptr)
   {
@@ -268,14 +268,14 @@ void httpc_var_vset(struct httpc *hcptr, const char *name,
   {
     hvptr = mem_static_alloc(&httpc_vars_heap);
     
-    hvptr->hash = strhash(var);
+    hvptr->hash = str_hash(var);
     strcpy(hvptr->name, var);
     
     dlink_add_tail(&hcptr->vars, &hvptr->node, hvptr);
   }
   
   if(value)
-    vsnprintf(hvptr->value, sizeof(hvptr->value), value, args);
+    str_vsnprintf(hvptr->value, sizeof(hvptr->value), value, args);
   else
     hvptr->value[0] = '\0';
 }
@@ -351,7 +351,7 @@ struct httpc_var *httpc_header_find(struct httpc *hcptr, const char *name)
   struct httpc_var *hvptr;
   uint32_t          hash;
   
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&hcptr->header, hvptr)
   {
@@ -376,7 +376,7 @@ void httpc_header_set(struct httpc *hcptr, const char *name,
   {
     hvptr = mem_static_alloc(&httpc_vars_heap);
     
-    hvptr->hash = strhash(var);
+    hvptr->hash = str_hash(var);
     strcpy(hvptr->name, var);
     
     dlink_add_tail(&hcptr->header, &hvptr->node, hvptr);
@@ -645,20 +645,20 @@ void httpc_recv_header(struct httpc *hcptr, char *s)
   char             *hdv[3];
   char             *p;
   
-  n = strtokenize(s, hdv, 2);
+  n = str_tokenize(s, hdv, 2);
   
 /*  debug(httpc_log, "receiving header data: %s", s);*/
   
   if(n == 2)
   {
-    if(!strncmp(hdv[0], "HTTP", 4))
+    if(!str_ncmp(hdv[0], "HTTP", 4))
     {
-      hcptr->code = (int)strtoul(hdv[1], &p, 10);
+      hcptr->code = (int)str_toul(hdv[1], &p, 10);
       strlcpy(hcptr->error, &p[1], sizeof(hcptr->error));
       
       return;
     }
-    else if((p = strchr(hdv[0], ':')))
+    else if((p = str_chr(hdv[0], ':')))
     {
       *p = '\0';
       
@@ -678,7 +678,7 @@ void httpc_recv_header(struct httpc *hcptr, char *s)
   
   hvptr = httpc_header_find(hcptr, "Transfer-Encoding");
   
-  if(hvptr && !strcmp(hvptr->value, "chunked"))
+  if(hvptr && !str_cmp(hvptr->value, "chunked"))
   {
 /*    debug(httpc_log, "chunked transfer mode");*/
     hcptr->chunked = 1;
@@ -687,7 +687,7 @@ void httpc_recv_header(struct httpc *hcptr, char *s)
   {      
 /*    debug(httpc_log, "linear transfer mode");*/
     if((hvptr = httpc_header_find(hcptr, "Content-length")))
-      hcptr->data_length = strtoul(hvptr->value, NULL, 10);
+      hcptr->data_length = str_toul(hvptr->value, NULL, 10);
   }    
 }
 
@@ -705,7 +705,7 @@ void httpc_recv_body(struct httpc *hcptr)
       
       io_gets(hcptr->fd, lala, sizeof(lala));
       
-      hcptr->chunk_length = strtoul(lala, NULL, 16);
+      hcptr->chunk_length = str_toul(lala, NULL, 16);
       
 /*      debug(httpc_log, "junk length: %u", hcptr->chunk_length);*/
       
@@ -788,13 +788,13 @@ struct httpc *httpc_find_name(const char *name)
   struct httpc *hcptr;
   uint32_t       hash;
     
-  hash = strhash(name);
+  hash = str_hash(name);
   
   dlink_foreach(&httpc_list, hcptr)
   {
     if(hcptr->nhash == hash)
     {
-      if(!strcmp(hcptr->name, name))
+      if(!str_cmp(hcptr->name, name))
         return hcptr;
     }
   }
@@ -841,7 +841,7 @@ void httpc_set_args(struct httpc *httpc, ...)
 void httpc_set_name(struct httpc *hcptr, const char *name)
 {
   strlcpy(hcptr->name, name, sizeof(hcptr->name));
-  hcptr->nhash = strihash(hcptr->name);
+  hcptr->nhash = str_ihash(hcptr->name);
 }
 
 /* ------------------------------------------------------------------------ *
@@ -921,7 +921,7 @@ void httpc_dump(struct httpc *hcptr)
       
       do
       {
-        next = strchr(p, '\n');
+        next = str_chr(p, '\n');
       
         if(next) *next = '\0';
         

@@ -168,7 +168,7 @@ static void m_dump_dlog(char *arg)
     if(chars_isdigit(*arg))
     {
       if(arg[1] == 'x')
-        dlptr = log_drain_find_cb((void *)strtoul(arg, NULL, 0x10));
+        dlptr = log_drain_find_cb((void *)str_toul(arg, NULL, 0x10));
       else
         dlptr = log_drain_find_id(atoi(arg));
     }
@@ -618,7 +618,7 @@ static void mo_dump(struct lclient *lcptr, struct client *cptr,
   
   for(i = 0; m_dump_table[i].name; i++)
   {
-    if(!stricmp(m_dump_table[i].name, argv[2]))
+    if(!str_icmp(m_dump_table[i].name, argv[2]))
     {
       ldptr = log_drain_callback(m_dump_callback,
                                  log_sources[m_dump_table[i].sp()].flag,

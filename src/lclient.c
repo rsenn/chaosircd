@@ -392,7 +392,7 @@ void lclient_set_name(struct lclient *lcptr, const char *name)
   /* Update lclient->name/hash */ 
   strlcpy(lcptr->name, name, sizeof(lcptr->name));
   
-  lcptr->hash = strihash(lcptr->name);
+  lcptr->hash = str_ihash(lcptr->name);
   
   debug(lclient_log, "Set name for %s:%u to %s",
         net_ntoa(lcptr->addr_remote), lcptr->port_remote, lcptr->name);
@@ -655,14 +655,14 @@ void lclient_process(int fd, struct lclient *lcptr)
   
   lclient_update_recvb(lcptr, n);
 #ifdef DEBUG
-  p = strchr(lclient_recvbuf, '\r');
+  p = str_chr(lclient_recvbuf, '\r');
   if(p)
   {
     *p = '\0';
   }
   else
   {
-    p = strchr(lclient_recvbuf, '\n');
+    p = str_chr(lclient_recvbuf, '\n');
     if(p) *p = '\0';
   }
   debug(ircd_log_in, "From %s: %s", lcptr->name, lclient_recvbuf);
@@ -860,7 +860,7 @@ void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
   argv[1] = msg->cmd;
   
   /* tokenize remaining line appropriate to message struct */
-  ac = strtokenize(arg, &argv[2], msg->maxargs ? msg->maxargs : 253);
+  ac = str_tokenize(arg, &argv[2], msg->maxargs ? msg->maxargs : 253);
   
   /* check required args */
   if(msg->args && ac < msg->args)
@@ -957,7 +957,7 @@ void lclient_vexit(struct lclient *lcptr, char *format, va_list args)
   /* Format the exit message */
   char buf[IRCD_TOPICLEN + 1];
   
-  vsnprintf(buf, sizeof(buf), format, args);
+  str_vsnprintf(buf, sizeof(buf), format, args);
   
   hooks_call(lclient_exit, HOOK_DEFAULT, lcptr, format, args);
   
@@ -1104,7 +1104,7 @@ void lclient_vsend(struct lclient *lcptr, const char *format, va_list args)
   client_source = lcptr;
   
   /* Formatted print */
-  n = vsnprintf(buf, sizeof(buf) - 2, format, args);
+  n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
       
   debug(ircd_log_out, "To %s: %s", lcptr->name, buf);
   
@@ -1143,7 +1143,7 @@ void lclient_vsend_list(struct lclient *one,    struct list *list,
   char            buf[IRCD_LINELEN + 1];
   
   /* Formatted print */
-  n = vsnprintf(buf, sizeof(buf) - 2, format, args);
+  n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
       
   /* Add line separator */
   buf[n++] = '\r';
@@ -1385,13 +1385,13 @@ struct lclient *lclient_find_name(const char *name)
   struct lclient *lcptr;
   uint32_t        hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&lclient_list, lcptr)
   {
     if(lcptr->hash == hash)
     {
-      if(!stricmp(lcptr->name, name))
+      if(!str_icmp(lcptr->name, name))
         return lcptr;
     }
   }

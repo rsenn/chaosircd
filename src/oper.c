@@ -140,7 +140,7 @@ struct oper *oper_add(const char   *name,    const char *passwd,
 
   strlcpy(optr->name, name, sizeof(optr->name));
   
-  optr->hash = strihash(optr->name);
+  optr->hash = str_ihash(optr->name);
 
   if(passwd[0])
     strlcpy(optr->passwd, passwd, sizeof(optr->passwd));
@@ -198,7 +198,7 @@ struct oper *oper_find(const char *name)
   struct oper *optr;
   uint32_t     hash;
   
-  hash = strihash(name);
+  hash = str_ihash(name);
   
   dlink_foreach(&oper_list, node)
   {
@@ -206,7 +206,7 @@ struct oper *oper_find(const char *name)
     
     if(optr->name[0] && hash == optr->hash)
     {
-      if(!stricmp(optr->name, name))
+      if(!str_icmp(optr->name, name))
         return optr;
     }
   }

@@ -212,7 +212,7 @@ size_t timer_strftime(char *s, size_t max, const char *format,
       /* Day Sunday - Monday */
       case 'A':
       {
-        size_t len = strlen(timer_weekdays[tm->tm_wday]);
+        size_t len = str_len(timer_weekdays[tm->tm_wday]);
         
         if(i + len < max)
           i += strlcpy(&s[i], timer_weekdays[tm->tm_wday], len + 1);
@@ -235,7 +235,7 @@ size_t timer_strftime(char *s, size_t max, const char *format,
       /* Month January - December */
       case 'B':
       {
-        size_t len = strlen(timer_months[tm->tm_mon]);
+        size_t len = str_len(timer_months[tm->tm_mon]);
         
         if(i + len < max)
           i += strlcpy(&s[i], timer_months[tm->tm_mon], len + 1);
@@ -385,13 +385,13 @@ uint64_t timer_parse_time(const char *t)
   unsigned long second;
   char         *p;
   
-  if((hour = strtoul(t, &p, 10)) == ULONG_MAX)
+  if((hour = str_toul(t, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
   
   if(*p++ != ':')
     return (uint64_t)-1LL;
   
-  if((minute = strtoul(p, &p, 10)) == ULONG_MAX)
+  if((minute = str_toul(p, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
   
   ret.tm_hour = hour % 24;
@@ -402,7 +402,7 @@ uint64_t timer_parse_time(const char *t)
   {
     p++;
   
-    if((second = strtoul(p, NULL, 10)) != ULONG_MAX)
+    if((second = str_toul(p, NULL, 10)) != ULONG_MAX)
       ret.tm_sec = second % 60;
   }
     
@@ -420,13 +420,13 @@ uint64_t timer_parse_date(const char *d)
   unsigned long month;
   unsigned long year;
   
-  if((day = strtoul(d, &p, 10)) == ULONG_MAX)
+  if((day = str_toul(d, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
   
   if(*p++ != '.' || day == 0)
     return (uint64_t)-1LL;
   
-  if((month = strtoul(p, &p, 10)) == ULONG_MAX)
+  if((month = str_toul(p, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
   
   ret.tm_mday = ((day) % 32);
@@ -437,7 +437,7 @@ uint64_t timer_parse_date(const char *d)
   {
     p++;
   
-    if((year = strtoul(p, NULL, 10)) != ULONG_MAX)
+    if((year = str_toul(p, NULL, 10)) != ULONG_MAX)
     {
       if(year < 1000)
         ret.tm_year = year + 100;
@@ -1004,7 +1004,7 @@ void timer_vnote(struct timer *timer, const char *format, va_list args)
   /* Write the note */
   if(timer)
   {
-    vsnprintf(timer->note, sizeof(timer->note), format, args);
+    str_vsnprintf(timer->note, sizeof(timer->note), format, args);
 
     debug(timer_log, "Denoting timer #%u: %s",
           timer->id, timer->note);
