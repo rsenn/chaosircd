@@ -62,7 +62,7 @@ int main(int argc, char **argv, char **envp)
   
   /* Get argv0 */
 #ifndef WIN32
-  snprintf(link, sizeof(link), "/proc/%u/exe", syscall_getpid());
+  str_snprintf(link, sizeof(link), "/proc/%u/exe", syscall_getpid());
   
   if((n = syscall_readlink(link, ircd_path, sizeof(ircd_path) - 1)) > -1)
   {
