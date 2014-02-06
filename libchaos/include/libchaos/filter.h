@@ -90,7 +90,7 @@ CHAOS_DATA(uint32_t)      filter_id;
 CHAOS_DATA(int)           filter_dirty;
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) filter_get_log(void);
+CHAOS_API(int)            filter_get_log(void);
 
 /* ------------------------------------------------------------------------ *
  * Initialize filterer heap and add garbage collect timer.                    *
