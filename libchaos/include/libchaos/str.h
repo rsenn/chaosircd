@@ -469,7 +469,7 @@ extern inline size_t str_tokenize(char *s, char **v, size_t maxtok)
  *                                                                            *
  * Like the one above but allows to specify delimiters.                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t )str_tokenize_d(char       *s,
+CHAOS_API(size_t)str_tokenize_d(char       *s,
                                 char      **v, 
                                 size_t      maxtok,
                                 const char *delim);
@@ -479,10 +479,10 @@ CHAOS_API(size_t )str_tokenize_d(char       *s,
  *                                                                            *
  * Like the one above but allows to specify one delimiter.                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t )str_tokenize_s(char       *s,
-                            char      **v, 
-                            size_t      maxtok,
-                            char        delim);
+CHAOS_API(size_t)str_tokenize_s(char       *s,
+                                char      **v, 
+                                size_t      maxtok,
+                                char        delim);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -533,7 +533,7 @@ extern inline uint32_t str_hash(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t )str_ihash(const char *s);
+CHAOS_API(uint32_t)str_ihash(const char *s);
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))

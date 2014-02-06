@@ -35,13 +35,13 @@ class {
   sendq = 262144;                        # Disconnect the client when the send 
                                          # queue exceeds this many bytes 
   
-  flood_trigger = 25;                    # Exit the client if flood lines exceed this count
+#  flood_trigger = 25;                    # Exit the client if flood lines exceed this count
   
-  flood_interval = 10000;                # Reset flood lines every <n> msecs
+#  flood_interval = 10000;                # Reset flood lines every <n> msecs
   
-  throttle_trigger = 5;                  # Start flood throttling after this many lines
+#  throttle_trigger = 5;                  # Start flood throttling after this many lines
   
-  throttle_interval = 500;               # Process a line every <n> msecs when throttling
+#  throttle_interval = 500;               # Process a line every <n> msecs when throttling
 };
   
   
