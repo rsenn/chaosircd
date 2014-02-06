@@ -263,7 +263,7 @@ void channel_topic(struct lclient *lcptr, struct client   *cptr,
     
     /* Set topic info */
     if(client_is_user(cptr))
-      snprintf(chptr->topic_info, sizeof(chptr->topic_info), "%s!%s@%s",
+      str_snprintf(chptr->topic_info, sizeof(chptr->topic_info), "%s!%s@%s",
                cptr->name, cptr->user->name, cptr->host);
     else
       strlcpy(chptr->topic_info, cptr->name, sizeof(chptr->topic_info));

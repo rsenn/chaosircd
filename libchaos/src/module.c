@@ -151,9 +151,9 @@ static struct module *module_new(const char *path)
     return NULL;
   }
 
-  snprintf(fn, sizeof(fn), "%s_load", name);
+  str_snprintf(fn, sizeof(fn), "%s_load", name);
   load = dlsym(handle, fn);
-  snprintf(fn, sizeof(fn), "%s_unload", name);
+  str_snprintf(fn, sizeof(fn), "%s_unload", name);
   unload = dlsym(handle, fn);
   
 #endif  
@@ -222,9 +222,9 @@ int module_reload(struct module *mptr)
     return -1;
   }
 
-  snprintf(fn, sizeof(fn), "%s_load", mptr->name);
+  str_snprintf(fn, sizeof(fn), "%s_load", mptr->name);
   mptr->load = dlsym(mptr->handle, fn);
-  snprintf(fn, sizeof(fn), "%s_unload", mptr->name);
+  str_snprintf(fn, sizeof(fn), "%s_unload", mptr->name);
   mptr->unload = dlsym(mptr->handle, fn);
   
   if(mptr->load == NULL || mptr->unload == NULL)

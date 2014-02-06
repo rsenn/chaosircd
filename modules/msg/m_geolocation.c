@@ -59,7 +59,7 @@ static char *m_geolocation_help[] = {
 };
 
 static struct msg m_geolocation_msg = {
-  "GEOLOCATION", 2, 2, MFLG_CLIENT,
+  "GEOLOCATION", 1, 3, MFLG_CLIENT,
   { NULL, m_geolocation, ms_geolocation, m_geolocation },
   m_geolocation_help
 };
@@ -117,7 +117,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
     {
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
 
-
+      //log(user_log, L_debug, "Set geolocation for %s to %s", cptr->name, cptr->user->name);    
     }
    
     server_send(lcptr, NULL, CAP_NONE, CAP_NONE, ":%C GEOLOCATION SET :%s", argv[3]);
@@ -131,25 +131,61 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 static void m_geolocation(struct lclient *lcptr, struct client *cptr,
                           int             argc,  char         **argv)
 {
+  int minlen = 9;
+  int len;
+
+  if(!valid_base32(argv[3]))
+  {
+    client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': not base32", server_me, cptr, argv[3]);
+    return;
+  }
+
+  if(!str_icmp(argv[2], "SEARCH"))
+    minlen = 2;
+    
+  len = str_len(argv[3]);
+
+  if(len < minlen)
+  {
+    client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': too short", server_me, cptr, argv[3]);
+    return;
+  }
+
   if(!str_icmp(argv[2], "SET"))
   {
-    if(str_len(argv[3]) < 9)
-    {
-      client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': too short", server_me, cptr, argv[3]);
-      return;
-    }
-    if(!valid_base32(argv[3]))
-    {
-      client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': not base32", server_me, cptr, argv[3]);
-      return;
-    }
-
     ms_geolocation(lcptr, cptr, argc, argv);
   }
   else if(!str_icmp(argv[2], "SEARCH"))
   {
-     
-    
+     struct user *user;
+     struct node *node;
+     char buffer[IRCD_LINELEN+1];
+     size_t di, dlen = 0;
+     di = str_snprintf(buffer, sizeof(buffer), ":%S 600 %N", server_me, cptr);
+
+     dlink_foreach_data(&user_list, node, user)
+     {
+       if(!user->client) continue;
+       if(user->client == cptr) continue;
+       if(str_len(user->name) < len) continue;
+       if(!valid_base32(user->name)) continue;
+
+       if(!str_ncmp(user->name, argv[3], len))
+       {
+         size_t toklen = str_len(user->client->name) + 1 + str_len(user->name);
+
+         if(di+dlen+1+toklen > IRCD_LINELEN)
+         {
+           client_send(cptr, "%s", buffer);
+           dlen = 0;
+         }
+         dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), " %N!%U", user->client, user->client);
+       }
+     }
+     if(dlen)
+       client_send(cptr, "%s", buffer);
+
+     client_send(cptr, ":%S 601 %s :end of /GEOLOCATION query", server_me, argv[3]);
   }
 
 
