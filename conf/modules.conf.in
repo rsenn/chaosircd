@@ -7,6 +7,7 @@ modules {
   load "m_die";             # Oper command for shutting down servers
   load "m_dump";            # Oper command to dump state information
   load "m_error";           # Protocol error message
+  load "m_geolocation";     # GEOLOCATION command
   load "m_gline";           # Oper command for network bans
   load "m_help";            # Some user-friendly command
   load "m_info";            # Showing info about a server

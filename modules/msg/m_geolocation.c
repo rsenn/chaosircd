@@ -64,6 +64,26 @@ static struct msg m_geolocation_msg = {
   m_geolocation_help
 };
 
+static const char base32[] = { 
+  '0', '1', '2', '3', '4', '5', '6', '7', '8',
+  '9', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j',
+  'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u',
+  'v', 'w', 'x', 'y', 'z',
+  0
+};
+
+static int valid_base32(const char *s)
+{
+  while(*s)
+  {
+    if(!str_chr(base32, *s))
+      return 0;
+
+    s++;
+  }
+  return 1;
+}
+
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
@@ -91,6 +111,8 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 {
   if(!str_icmp(argv[2], "SET"))
   {
+     
+
     if(client_is_user(cptr))
     {
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
@@ -111,6 +133,17 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
 {
   if(!str_icmp(argv[2], "SET"))
   {
+    if(str_len(argv[3]) < 9)
+    {
+      client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': too short", server_me, cptr, argv[3]);
+      return;
+    }
+    if(!valid_base32(argv[3]))
+    {
+      client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': not base32", server_me, cptr, argv[3]);
+      return;
+    }
+
     ms_geolocation(lcptr, cptr, argc, argv);
   }
   else if(!str_icmp(argv[2], "SEARCH"))
