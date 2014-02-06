@@ -13,6 +13,7 @@ MODULES              = m_away \
                        m_die \
                        m_dump \
                        m_error \
+                       m_geolocation \
                        m_gline \
                        m_help \
                        m_info \
