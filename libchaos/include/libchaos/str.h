@@ -341,8 +341,8 @@ CHAOS_API(int) str_toi(const char *s);
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                  *
  * ------------------------------------------------------------------------ */
-//#undef snprintf
-//#define snprintf str_snprintf
+//#undef str_snprintf
+//#define str_snprintf str_snprintf
 CHAOS_API(int) str_snprintf(char *str, size_t n, const char *format, ...);
 
 extern inline int str_snprintf(char *str, size_t n, const char *format, ...)

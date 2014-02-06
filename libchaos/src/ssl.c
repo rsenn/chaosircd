@@ -917,7 +917,7 @@ void ssl_cipher(int fd, char *ciphbuf, size_t n)
   if(!str_cmp(ciphername, "DES") && bits == 168)
     strcpy(ciphername, "3DES");
   
-  snprintf(ciphbuf, n, "%s/%u", ciphername, bits);
+  str_snprintf(ciphbuf, n, "%s/%u", ciphername, bits);
 #endif /* HAVE_SSL */
 }
 

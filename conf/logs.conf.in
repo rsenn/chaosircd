@@ -38,9 +38,9 @@ log {
   # usermode         - usermode engine
   # all              - log ALL of them
  
-  sources  = "all";                  # set here source  
+  sources  = "all in out";                  # set here source  
   
-  level    = "verbose";              # Log all messages which have at least the following level
+  level    = "debug";              # Log all messages which have at least the following level
   
   prefix   = yes;                    # Prefix the message with the current date and log facility
  

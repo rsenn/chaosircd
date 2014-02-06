@@ -57,10 +57,10 @@ modules {
   load "m_version";         # Shows version of a server
   load "m_who";             # Shows channel members
   load "m_whois";           # Shows client info
-  load "lc_clones";         # Network clone detector
+  #load "lc_clones";         # Network clone detector
   load "lc_cookie";         # Client PING cookie
-  load "lc_mflood";         # Client message flood trigger
-#  load "lc_sauth";          # Client AUTH/DNS resolver
+  #load "lc_mflood";         # Client message flood trigger
+  #load "lc_sauth";          # Client AUTH/DNS resolver
   load "um_client";         # Usermode +c
   load "um_invisible";      # Usermode +i
   load "um_operator";       # Usermode +o

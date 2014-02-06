@@ -66,7 +66,7 @@
                         IRCD_USERLEN + 1 + \
                         IRCD_HOSTLEN
 
-#define IRCD_LINELEN    512
+#define IRCD_LINELEN    1024
 #define IRCD_BUFSIZE    1024
 
 #define IRCD_PATHLEN    64

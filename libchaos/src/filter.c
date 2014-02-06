@@ -1007,7 +1007,7 @@ void filter_dump(struct filter *fptr)
           break;
         }
         
-        snprintf(operand, sizeof(operand), fmt, v);
+        str_snprintf(operand, sizeof(operand), fmt, v);
         dump(filter_log, 
              (BPF_CLASS(p->code) == BPF_JMP &&
               BPF_OP(p->code) != BPF_JA) ?
