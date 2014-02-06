@@ -114,7 +114,7 @@ static struct timer *m_proxy_timer;
 static char *mo_proxy_help[] = {
   "PROXY [server] <list|add|delete> [port] [type]",
   "",
-  "Manages ports the proxy scanner tests.",
+  "Manages ports for the proxy scanner tests.",
   "",
   "list        Lists all scanned ports.",
   "add         Adds a port/service pair.",
@@ -526,7 +526,7 @@ static struct node *m_proxy_find(uint16_t port, int service)
   {
     size_t val = (size_t)node->data & 0xfffffffflu;
 
-    if((val > 16) == port && (val & 0xffff) == service)
+    if((val >> 16) == port && (val & 0xffff) == service)
       return node;
   }
   
