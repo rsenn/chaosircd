@@ -93,6 +93,8 @@ struct timer *filter_timer;
 uint32_t      filter_id;
 int           filter_dirty;
 
+int filter_get_log() { return filter_log; }
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #define IPHDR_PROTO  0x09 /* Byte-location of protocol type in IP header */
