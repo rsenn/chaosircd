@@ -300,7 +300,7 @@ install-data: install-includeDATA \
               install-sysconfDATA \
               install-sysconf-preserveDATA \
               install-sharedstateDATA \
-              install-sharedstate-preserveDATA \
+              install-ini-preserveDATA \
               install-sharedDATA \
               install-manDATA
 
@@ -535,20 +535,20 @@ install-sharedstateDATA: $(sharedstate_DATA)
 		$(INSTALL_DATA) $$d$$p $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX)/$$f $(REDIR); \
 	done
 
-# install data into sharedstatedir, but not overwrite them
+# install data into inidir, but not overwrite them
 # ---------------------------------------------------------------------------
-install-sharedstate-preserveDATA: $(sharedstate_preserve_DATA)
-	@-if test ! -d $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX) && \
-		test "$(sharedstate_preserve_DATA)"; then \
-		$(ECHO_MKDIR)$(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX) ; \
+install-ini-preserveDATA: $(ini_preserve_DATA)
+	@-if test ! -d $(DESTDIR)$(inidir)$(ini_PREFIX) && \
+		test "$(ini_preserve_DATA)"; then \
+		$(ECHO_MKDIR)$(DESTDIR)$(inidir)$(ini_PREFIX) ; \
+		$(INSTALL_DIR) $(DESTDIR)$(inidir)$(ini_PREFIX) ; \
 	fi
-	@list='$(sharedstate_preserve_DATA)'; for p in $$list; do \
+	@list='$(ini_preserve_DATA)'; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f="`echo $$p | sed -e 's|^.*/||'`"; \
-		$(ECHO_INSTALL)$(sharedstatedir)$(sharedstate_PREFIX)/$$f; \
-		if test ! -f  $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX)/$$f ; then \
-			$(INSTALL_DATA) $$d$$p $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX)/$$f $(REDIR); \
+		$(ECHO_INSTALL)$(inidir)$(ini_PREFIX)/$$f; \
+		if test ! -f  $(DESTDIR)$(inidir)$(ini_PREFIX)/$$f ; then \
+			$(INSTALL_DATA) $$d$$p $(DESTDIR)$(inidir)$(ini_PREFIX)/$$f $(REDIR); \
 		fi ; \
 	done
 #endif 

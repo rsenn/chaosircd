@@ -15,7 +15,7 @@ sysconf_preserve_DATA = ircd.conf \
                         ssl.conf \
                         ircd.motd
 
-sharedstate_preserve_DATA = proxy.ini
+ini_preserve_DATA = proxy.ini
 
 DATA = $(sysconf_DATA) $(sysconf_preserve_DATA) $(sharedstate_preserve_DATA)
 
