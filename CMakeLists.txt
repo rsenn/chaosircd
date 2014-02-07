@@ -53,16 +53,22 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/chaosircd/config.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/include/chaosircd/config.h)
 
 include_directories(
+   ${CMAKE_CURRENT_BINARY_DIR}/src
    ${CMAKE_CURRENT_BINARY_DIR}
-   ${CMAKE_CURRENT_BINARY_DIR}/include
    ${CMAKE_CURRENT_SOURCE_DIR}/include
    ${CMAKE_CURRENT_SOURCE_DIR}/libchaos/include
+   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
+bison_target(IRCD_PARSER src/ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/src/y.tab.h")
+flex_target(IRCD_SCANNER src/ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_lexer.c)
+add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
+
 add_executable(chaosircd 
-   ${LEXER_SOURCE} ${PARSER_SOURCE}
+   ${BISON_IRCD_PARSER_OUTPUTS}
+   ${FLEX_IRCD_SCANNER_OUTPUTS}
    src/chanmode.c src/channel.c src/chanuser.c src/chars.c
-   src/class.c src/client.c src/conf.c src/ircd.c 
+   src/class.c src/client.c src/conf.c src/ircd.c
    src/lclient.c src/main.c src/msg.c src/numeric.c src/oper.c
    src/server.c src/service.c src/user.c src/usermode.c)
    
