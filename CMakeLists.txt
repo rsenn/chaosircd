@@ -3,6 +3,8 @@ set(PACKAGE_VERSION 2.2.1)
 set(PACKAGE_RELEASE "peace, love & hippie edition")
 set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
 
+set(DEFAULT_SHARED_LIB FALSE)
+
 project(${PACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
@@ -45,6 +47,14 @@ set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin
 add_definitions(-DPREFIX=\"${PREFIX}\")
 add_definitions(-DSYSCONFDIR=\"${SYSCONFDIR}\")
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
+
+if(NOT DEFINED BUILD_SHARED_LIBS)
+  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
+endif(NOT DEFINED BUILD_SHARED_LIBS)
+
+if(NOT BUILD_SHARED_LIBS)
+  add_definitions(-DSTATIC_LIBCHAOS=1)
+endif(NOT BUILD_SHARED_LIBS)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
