@@ -1,3 +1,4 @@
+
 set(PACKAGE_NAME chaosircd)
 set(PACKAGE_VERSION 2.2.1)
 set(PACKAGE_RELEASE "peace, love & hippie edition")
@@ -69,6 +70,34 @@ include_directories(
    ${CMAKE_CURRENT_SOURCE_DIR}/libchaos/include
    ${CMAKE_CURRENT_BINARY_DIR}/include
 )
+
+set(CC "${CMAKE_C_COMPILER}")
+set(CFLAGS "${CMAKE_C_FLAGS}")
+set(INSTALL "")
+set(LIBS "${LINK_LIBRARIES}")
+set(prefix "${CMAKE_INSTALL_PREFIX}")
+set(bindir "${prefix}/bin")
+set(exec_prefix "${prefix}")
+set(includedir "${prefix}/include")
+set(inidir "${prefix}/var/lib/chaosircd")
+set(libexecdir "${prefix}/libexec")
+set(logdir "${prefix}/var/log/chaosircd")
+set(pidfile "${prefix}/var/run/chaosircd.pid")
+set(plugindir "${prefix}/lib/chaosircd")
+set(sbindir "${prefix}/sbin")
+set(sysconfdir "${prefix}/etc/chaosircd")
+
+set(SUBSTFILES conf/children.conf conf/classes.conf
+   conf/inis.conf conf/ircd.conf conf/logs.conf
+   conf/modules.conf conf/opers.conf conf/ssl.conf
+   tools/chaosircd-config tools/mkca tools/mkcrt tools/mkkeys
+   tools/mkreq tools/openssl.cnf tools/sign)
+
+foreach(SUBSTFILE ${SUBSTFILES})
+  message(STATUS "Substituting ${SUBSTFILE}.in")
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY)
+endforeach(SUBSTFILE)
 
 bison_target(IRCD_PARSER src/ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/src/y.tab.h")
 flex_target(IRCD_SCANNER src/ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_lexer.c)
