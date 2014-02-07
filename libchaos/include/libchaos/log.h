@@ -242,7 +242,6 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 CHAOS_API(void log_debug)(const char *file, int line,
                           int src, int level, const char *format, ...);
 # else
-#warning no debug mode
 
 /* 
  * when DEBUG is NOT defined, then 

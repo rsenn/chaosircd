@@ -283,7 +283,7 @@ extern inline int str_icmp(const char *s1, const char *s2)
 //#undef str_ncmp
 CHAOS_API(int )str_ncmp(const char *s1, const char *s2, size_t n);
 
-CHAOS_API(extern inline int )str_ncmp(const char *s1, const char *s2, size_t n)
+extern inline int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
   

@@ -1,4 +1,9 @@
-project(libchaos)
+set(PACKAGE_NAME libchaos)
+set(PACKAGE_VERSION 2.2.1)
+set(PACKAGE_RELEASE "peace, love & hippie edition")
+set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
+
+project(${PACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -21,6 +26,8 @@ check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
 check_include_file(sys/socket.h HAVE_SYS_SOCKET_H)
 check_include_file(sys/timeb.h HAVE_SYS_TIMEB_H)
 check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
+check_include_file(sys/select.h HAVE_SYS_SELECT_H)
+check_include_file(sys/poll.h HAVE_SYS_POLL_H)
 check_include_file(fcntl.h HAVE_FCNTL_H)
 check_include_file(io.h HAVE_IO_H)
 check_include_file(netinet/in.h HAVE_NETINET_IN_H)
@@ -39,6 +46,7 @@ check_include_file(inttypes.h HAVE_INTTYPES_H)
 check_library_exists(dl dlsym "" HAVE_DLFCN)
 
 if(CMAKE_HOST_WIN32)
+#  set(DLLEXT ".dll")
   check_library_exists(ws2_32 select "" HAVE_SELECT)
   if(NOT HAVE_SELECT)
     check_library_exists(wsock32 select "" HAVE_SELECT)
@@ -48,11 +56,21 @@ else(CMAKE_HOST_WIN32)
   check_function_exists(poll HAVE_POLL)
 endif(CMAKE_HOST_WIN32)
 
+set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
+
+if(NOT DEFINED BUILD_SHARED_LIBS)
+  set(BUILD_SHARED_LIBS TRUE)
+endif(NOT DEFINED BUILD_SHARED_LIBS)
+
 if(HAVE_POLL)
   set(USE_POLL 1)
 else(HAVE_POLL)
   set(USE_SELECT 1)
 endif(HAVE_POLL)
+
+set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
+
+add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -62,6 +80,11 @@ include_directories(
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/libchaos/config.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/include/libchaos/config.h)
+               
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+add_definitions(-DBUILD_LIBCHAOS=1)
 
 set(LIBCHAOS_HEADERS include/libchaos/cfg.h include/libchaos/child.h
    include/libchaos/connect.h include/libchaos/db.h include/libchaos/defs.h
@@ -83,3 +106,7 @@ set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c)
 
 add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+
+string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
+
+set_target_properties(libchaos PROPERTIES SOVERSION ${LIBRARY_VERSION})
