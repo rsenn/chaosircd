@@ -68,8 +68,6 @@
 # define CHAOS_DATA(type) extern type
 #endif
 
-#warning CHAOS_API
-
 /*#ifdef HAVE_SYS_TYPES_H
 #ifndef _BSD_SIZE_T_
 #define _BSD_SIZE_T_ unsigned int
