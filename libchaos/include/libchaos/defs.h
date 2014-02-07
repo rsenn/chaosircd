@@ -31,7 +31,11 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+
+#ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
+#endif // HAVE_INTTYPES_H
+
 #include <sys/stat.h>
 
 /*
@@ -63,6 +67,8 @@
 #ifndef CHAOS_DATA
 # define CHAOS_DATA(type) extern type
 #endif
+
+#warning CHAOS_API
 
 /*#ifdef HAVE_SYS_TYPES_H
 #ifndef _BSD_SIZE_T_
