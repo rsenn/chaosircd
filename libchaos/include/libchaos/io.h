@@ -37,9 +37,9 @@ struct io;
 #include "libchaos/syscall.h"
 #include "libchaos/queue.h"
 
-#ifdef WIN32
-#include <winsock.h>
-#endif /* WIN32 */
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif /* HAVE_WINSOCK2_H */
 
 #ifdef HAVE_SSL
 #include "libchaos/ssl.h"

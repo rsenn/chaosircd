@@ -56,12 +56,10 @@
 #include <elf.h>
 #endif /* HAVE_ELF_H */
 
-#ifdef WIN32
-#include "dlfcn_win32.h"
-#elif defined(DARWIN)
-#include "dlfcn_darwin.h"
-#elif defined(HAVE_DLFCN_H)
+#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
+#else
+#include "./dlfcn.h"
 #endif /* HAVE_DLFCN_H */
 
 #ifdef HAVE_SYS_MMAN_H

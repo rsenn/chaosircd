@@ -40,6 +40,14 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif /* HAVE_WINSOCK2_H */
+
+#ifdef HAVE_WS2TCPIP_H
+#include <ws2tcpip.h>
+#endif /* HAVE_WS2TCPIP_H */
+
 #ifdef HAVE_CYGWIN_IN_H
 #include <cygwin/in.h>
 #endif /* HAVE_CYGWIN_IN_H */

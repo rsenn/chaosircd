@@ -18,6 +18,7 @@ include(FindFreetype)
 include(FindPostgreSQL)
 include(CheckLibraryExists)
 include(CheckFunctionExists)
+include(CheckTypeSize)
 
 check_include_file(unistd.h HAVE_UNISTD_H)
 check_include_file(signal.h HAVE_SIGNAL_H)
@@ -41,23 +42,58 @@ check_include_file(cygwin/in.h HAVE_CYGWIN_IN_H)
 check_include_file(dlfcn.h HAVE_DLFCN_H)
 check_include_file(elf.h HAVE_ELF_H)
 
+if(CMAKE_HOST_WIN32)
+#  check_include_file(winsock.h HAVE_WINSOCK2_H)
+  check_include_file(winsock2.h HAVE_WINSOCK2_H)
+  check_include_file(ws2tcpip.h HAVE_WS2TCPIP_H)
+endif(CMAKE_HOST_WIN32)
+
 check_include_file(limits.h HAVE_LIMITS_H)
 check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(inttypes.h HAVE_INTTYPES_H)
 
 check_library_exists(dl dlsym "" HAVE_DLFCN)
 
+if(HAVE_SYS_SOCKET_H)
+  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} sys/socket.h)
+endif(HAVE_SYS_SOCKET_H)
+
+if(HAVE_WINSOCK2_H)
+  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} winsock2.h)
+endif(HAVE_WINSOCK2_H)
+
+if(HAVE_WS2TCPIP_H)
+  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} ws2tcpip.h)
+endif(HAVE_WS2TCPIP_H)
+
+check_type_size(socklen_t SOCKLEN_T)
+
+check_function_exists(select HAVE_SELECT)
+
+
 if(CMAKE_HOST_WIN32)
-#  set(DLLEXT ".dll")
-  check_library_exists(ws2_32 select "" HAVE_SELECT)
   if(NOT HAVE_SELECT)
-    check_library_exists(wsock32 select "" HAVE_SELECT)
+    if(HAVE_WINSOCK2_H)
+      set(SOCKET_LIBRARIES ws2_32)
+    else(HAVE_WINSOCK2_H)
+      set(SOCKET_LIBRARIES wsock32)
+    endif(HAVE_WINSOCK2_H)
   endif(NOT HAVE_SELECT)
+  set(USE_SELECT TRUE)
 else(CMAKE_HOST_WIN32)
-  check_function_exists(select HAVE_SELECT)
+
   check_function_exists(poll HAVE_POLL)
+
+  if(HAVE_POLL)
+    set(USE_POLL TRUE)
+  elseif(HAVE_SELECT)
+    set(USE_SELECT TRUE)
+  endif(HAVE_SELECT)
+
 endif(CMAKE_HOST_WIN32)
 
+
+ 
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
@@ -79,9 +115,9 @@ set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include/libchaos
-  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/libchaos/config.h.cmake
@@ -116,3 +152,5 @@ add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
 set_target_properties(libchaos PROPERTIES SOVERSION ${LIBRARY_VERSION})
+
+target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES})

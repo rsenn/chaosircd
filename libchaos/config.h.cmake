@@ -34,6 +34,12 @@
 /* Define to 1 if you have the <elf.h> header file. */
 #cmakedefine HAVE_ELF_H 1
 
+/* Define to 1 if you have the <ws2tcpip.h> header file. */
+#cmakedefine HAVE_WS2TCPIP_H 1
+
+/* Define to 1 if you have the socklen_t type. */
+#cmakedefine HAVE_SOCKLEN_T 1
+
 /* Define to the address where bug reports for this package should be sent. */
 #cmakedefine PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 

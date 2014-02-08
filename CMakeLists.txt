@@ -16,6 +16,8 @@ set(LEXER_SOURCE src/ircd.l)
 set(PARSER_SOURCE src/ircd.y)
 
 include(CheckIncludeFile)
+include(CheckFunctionExists)
+include(CheckLibraryExists)
 
 check_include_file(cygwin/in.h HAVE_CYGWIN_IN_H)
 check_include_file(dlfcn.h HAVE_DLFCN_H)
@@ -41,6 +43,36 @@ check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
 check_include_file(unistd.h HAVE_UNISTD_H)
 
+if(CMAKE_HOST_WIN32)
+#  check_include_file(winsock.h HAVE_WINSOCK2_H)
+  check_include_file(winsock2.h HAVE_WINSOCK2_H)
+  check_include_file(ws2tcpip.h HAVE_WS2TCPIP_H)
+endif(CMAKE_HOST_WIN32)
+
+
+check_function_exists(select, HAVE_SELECT)
+
+
+if(HAVE_SYS_SOCKET_H)
+  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} sys/socket.h)
+endif(HAVE_SYS_SOCKET_H)
+
+if(CMAKE_HOST_WIN32)
+  if(NOT HAVE_SELECT)
+    if(HAVE_WINSOCK2_H)
+      set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} winsock2.h)
+    endif(HAVE_WINSOCK2_H)
+    if(HAVE_WS2TCPIP_H)
+      set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} ws2tcpip.h)
+    endif(HAVE_WS2TCPIP_H)
+    if(HAVE_WINSOCK2_H)
+      set(SOCKET_LIBRARIES ws2_32)
+    else(HAVE_WINSOCK2_H)
+      set(SOCKET_LIBRARIES wsock32)
+    endif(HAVE_WINSOCK2_H)
+  endif(NOT HAVE_SELECT)
+endif(CMAKE_HOST_WIN32)
+
 set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")
 set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PACKAGE_NAME} CACHE FILEPATH "configuration directory")
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
@@ -56,6 +88,8 @@ endif(NOT DEFINED BUILD_SHARED_LIBS)
 if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
+
+add_definitions(-DBUILD_IRCD=1)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
@@ -111,4 +145,4 @@ add_executable(chaosircd
    src/lclient.c src/main.c src/msg.c src/numeric.c src/oper.c
    src/server.c src/service.c src/user.c src/usermode.c)
    
- target_link_libraries(chaosircd libchaos)
+target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})

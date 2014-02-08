@@ -26,7 +26,7 @@
 #include <limits.h>
 #include <windows.h>
 
-#include "dlfcn_win32.h"
+//#include "dlfcn_win32.h"
 
 static void dl_convert_path(char *buf, size_t n, const char *path)
 {
