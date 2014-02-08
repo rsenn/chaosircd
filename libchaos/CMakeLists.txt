@@ -54,6 +54,13 @@ check_include_file(inttypes.h HAVE_INTTYPES_H)
 
 check_library_exists(dl dlsym "" HAVE_DLFCN)
 
+if(NOT HAVE_DLFCN)
+  if(CMAKE_HOST_WIN32)
+    set(DLFCN_SOURCES src/dlfcn_win32.c)
+  endif(CMAKE_HOST_WIN32)  
+endif(NOT HAVE_DLFCN)
+
+
 if(HAVE_SYS_SOCKET_H)
   set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} sys/socket.h)
 endif(HAVE_SYS_SOCKET_H)
@@ -145,7 +152,7 @@ set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/divdi3.c src/dlink.c src/filter.c src/gif.c src/graph.c src/hook.c
    src/htmlp.c src/httpc.c src/image.c src/ini.c src/io.c src/listen.c
    src/log.c src/mem.c src/mfile.c src/module.c src/net.c src/queue.c
-   src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c)
+   src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c ${DLFCN_SOURCES})
 
 add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
