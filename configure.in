@@ -89,10 +89,10 @@ AC_SUBST([logdir])
 
 case $prefix in
   *ircd*)
-    inidir=${sharedstatedir}
+    eval "inidir=${localstatedir}/lib"
     ;;
   *)
-    inidir=${sharedstatedir}/chaosircd
+    eval "inidir=${localstatedir}/lib/chaosircd"
     ;;
 esac
 AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
