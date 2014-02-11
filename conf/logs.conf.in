@@ -1,4 +1,4 @@
-# A log drain - redirecting logging to a file
+ A log drain - redirecting logging to a file
 
 log {
   path     = "@logdir@/ircd.log";
@@ -55,18 +55,18 @@ log {
   truncate = yes;
 };
 
-#log {
-#  path     = "@logdir@/debug.log";
-#  sources  = "all";
-#  level    = "debug";
-#  prefix   = yes;
-#  truncate = yes;
-#};
+log {
+  path     = "@logdir@/debug.log";
+  sources  = "all";
+  level    = "debug";
+  prefix   = yes;
+  truncate = yes;
+};
 
-#log {
-#  path     = "@logdir@/traffic.log";
-#  sources  = "in out";
-#  level    = "debug";
-#  prefix   = yes;
-#  truncate = yes;
-#};
+log {
+  path     = "@logdir@/traffic.log";
+  sources  = "in out";
+  level    = "debug";
+  prefix   = yes;
+  truncate = yes;
+};
