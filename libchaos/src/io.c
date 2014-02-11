@@ -580,10 +580,17 @@ void io_handle_fd(int fd)
     {
       io_list[fd].ret = io_queued_read(fd);
       
+<<<<<<< rackspace/master
       if(io_list[fd].ret <= 0)
       {
         io_list[fd].status.closed = 1;
         io_list[fd].status.err = (io_list[fd].ret < 0);
+=======
+      if(io_list[fd].ret < 0 || io_list[fd].status.eof)
+      {
+        io_list[fd].status.closed = 1;
+        //io_list[fd].status.err = 1;
+>>>>>>> HEAD~8
         io_list[fd].status.onread = 1;
         
 //        io_queued_write(fd);
