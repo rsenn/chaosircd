@@ -10,7 +10,8 @@ plugindir="@plugindir@"
 CC="@CC@"
 INSTALL="@INSTALL@"
 CFLAGS="@CFLAGS@ -fPIC -DPIC -I$includedir"
-LIBS="-bundle -bundle_loader @bindir@/@PACKAGE_NAME@ @LIBS@"
+#LIBS="-bundle -bundle_loader @bindir@/@PACKAGE_NAME@ @LIBS@"
+LIBS="@LIBS@"
 
 usage="\
 Usage: $name-config [--prefix] [--exec-prefix] [--plugindir] 

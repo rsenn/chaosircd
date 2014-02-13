@@ -31,7 +31,11 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+
+#ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
+#endif // HAVE_INTTYPES_H
+
 #include <sys/stat.h>
 
 /*
