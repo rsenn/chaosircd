@@ -173,7 +173,7 @@ static void user_uid(struct user *uptr)
       if(!(i & 0x03))
         val = user_random();
       
-      uptr->uid[i] = user_base[(val & 0x7FLLU)];
+      uptr->uid[i] = user_base[(val & 0x7Full)];
       
       val >>= 7;
     }

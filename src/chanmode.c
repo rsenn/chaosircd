@@ -119,7 +119,7 @@ struct chanmode *chanmode_register(struct chanmode *cmptr)
     return NULL;
   }
   
-  mode->flag = 1LLU << (cmptr->letter - 0x40);
+  mode->flag = 1ull << (cmptr->letter - 0x40);
   mode->type = cmptr->type;
   mode->prefix = cmptr->prefix;
   mode->cb = cmptr->cb;
@@ -159,7 +159,7 @@ int chanmode_unregister(struct chanmode *cmptr)
   else
     chanmode_support();
   
-  mode->flag = 0LLU;
+  mode->flag = 0ull;
   mode->type = 0;
   mode->prefix = 0;
   
@@ -782,13 +782,13 @@ void chanmode_send_local(struct client *cptr, struct channel *chptr,
   
   if(client_is_user(cptr))
   {
-    len = snprintf(cmd, sizeof(cmd), ":%s!%s@%s MODE %s",
+    len = str_snprintf(cmd, sizeof(cmd), ":%s!%s@%s MODE %s",
                    cptr->name, cptr->user->name, cptr->host,
                    chptr->name);
   }
   else
   {
-    len = snprintf(cmd, sizeof(cmd), ":%s MODE %s",
+    len = str_snprintf(cmd, sizeof(cmd), ":%s MODE %s",
                    cptr->name, chptr->name);
   }
   
@@ -828,12 +828,12 @@ void chanmode_send_remote(struct lclient *lcptr, struct client *cptr,
   
   if(client_is_user(cptr))
   {
-    len = snprintf(cmd, sizeof(cmd), ":%s MODE %s",
+    len = str_snprintf(cmd, sizeof(cmd), ":%s MODE %s",
                    cptr->user->uid, chptr->name);
   }
   else
   {
-    len = snprintf(cmd, sizeof(cmd), ":%s MODE %s",
+    len = str_snprintf(cmd, sizeof(cmd), ":%s MODE %s",
                    cptr->name, chptr->name);
   }
   
@@ -856,7 +856,7 @@ void chanmode_send_remote(struct lclient *lcptr, struct client *cptr,
   
   if(client_is_user(cptr))
   {
-    len = snprintf(cmd, sizeof(cmd), ":%s MODE %s",
+    len = str_snprintf(cmd, sizeof(cmd), ":%s MODE %s",
                    cptr->name, chptr->name);
     arglen = (IRCD_LINELEN - 2) - len - ((CHANMODE_PER_LINE * 2) + 1) - 3;
   }
@@ -1033,7 +1033,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       }
     }
 
-    snprintf(cmcptr->arg, sizeof(cmcptr->arg), "%s!%s@%s", nick, user, host);
+    str_snprintf(cmcptr->arg, sizeof(cmcptr->arg), "%s!%s@%s", nick, user, host);
     
     cmcptr->nmask = nick;
     cmcptr->umask = user;
@@ -1183,7 +1183,7 @@ int chanmode_mask_add(struct client         *cptr,   struct list *mlptr,
   
   if(cptr->user)
   {
-    snprintf(cmiptr->info, sizeof(cmiptr->info), "%s!%s@%s",
+    str_snprintf(cmiptr->info, sizeof(cmiptr->info), "%s!%s@%s",
              cptr->name, cptr->user->name, cptr->host);
     cmiptr->ts = timer_systime;
   }
@@ -1336,7 +1336,7 @@ uint64_t chanmode_prefix_parse(const char *pfx)
 {
   size_t   i;
   size_t   j;
-  uint64_t ret = 0LLU;
+  uint64_t ret = 0ull;
   
   for(i = 0; pfx[i]; i++)
   {
@@ -1482,12 +1482,12 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     {
       if(lastts)
       {
-        tlen += snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1, 
+        tlen += str_snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1, 
                          "%li", (long)(cmcptr->ts - lastts));
       }
       else
       {
-        tlen += snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1, 
+        tlen += str_snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1, 
                          "%lu", (unsigned long)(cmcptr->ts));
         lastts = cmcptr->ts;
       }
@@ -1514,7 +1514,7 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     timebuf[tlen] = '\0';
     maskbuf[mlen] = '\0';
     
-    snprintf(buf, len, "%s %s %s %s", flagbuf, infobuf, timebuf, maskbuf);
+    str_snprintf(buf, len, "%s %s %s %s", flagbuf, infobuf, timebuf, maskbuf);
   }
   
   return nptr;
@@ -1528,7 +1528,7 @@ void chanmode_introduce(struct lclient *lcptr, struct client *cptr,
   char   buf[IRCD_LINELEN - 1];
   size_t len;
   
-  len = snprintf(buf, sizeof(buf), ":%s NMODE %s %lu ",
+  len = str_snprintf(buf, sizeof(buf), ":%s NMODE %s %lu ",
                  cptr->name, chptr->name, (unsigned long)(chptr->ts));
 
   for(; nptr;)
@@ -1583,7 +1583,7 @@ size_t chanmode_burst(struct lclient *lcptr, struct channel *chptr)
     }
   }
   
-  len = snprintf(buf, sizeof(buf), "NMODE %s %lu ",
+  len = str_snprintf(buf, sizeof(buf), "NMODE %s %lu ",
                   chptr->name, (unsigned long)(chptr->ts));
 
   for(nptr = modelist.head; nptr;)
@@ -1620,7 +1620,7 @@ void chanmode_drop(struct client *cptr, struct channel *chptr)
       chanmode_change_add(&modelist, CHANMODE_DEL, i + 0x40, NULL, NULL);
   }
   
-  chptr->modes = 0LLU;
+  chptr->modes = 0ull;
   
   for(i = 0; i < 0x40; i++)
   {

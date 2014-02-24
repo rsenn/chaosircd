@@ -382,11 +382,11 @@ static int child_format(struct child *child)
       
       if(argv[i][1] == 'r')
       {
-        snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_READ]);
+        str_snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_READ]);
       }
       else if(argv[i][1] == 'w')
       {
-        snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_WRITE]);
+        str_snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_WRITE]);
       }
     }
     else
@@ -543,7 +543,7 @@ void child_default(struct child *child)
   child->pid = 0;
   child->path[0] = '\0';
   child->name[0] = '\0';
-  child->interval = 0LLU;
+  child->interval = 0ull;
   child->autostart = 0;
   child->args[0] = NULL;
   child->args[1] = NULL;

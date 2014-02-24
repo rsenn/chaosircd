@@ -40,6 +40,15 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#ifdef WIN32
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#else 
+#include <winsock.h>
+#endif /* HAVE_WINSOCK2_H */
+#include <windows.h>
+#endif
+
 #ifdef HAVE_CYGWIN_IN_H
 #include <cygwin/in.h>
 #endif /* HAVE_CYGWIN_IN_H */

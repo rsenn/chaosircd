@@ -40,9 +40,14 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#ifdef WIN32
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
+#else 
+#include <winsock.h>
 #endif /* HAVE_WINSOCK2_H */
+#include <windows.h>
+#endif
 
 #ifdef HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
@@ -222,6 +227,10 @@ int net_aton(const char *cp, net_addr_t *inp)
  * ------------------------------------------------------------------------ */
 void net_init(void)
 {
+#ifdef WIN32
+  WSADATA wsa_data;
+  WORD wVersionRequested;
+#endif
   net_log = log_source_register("net");
   
   mem_static_create(&net_heap, sizeof(struct protocol), NET_BLOCK_SIZE);
@@ -232,9 +241,8 @@ void net_init(void)
 /*  net_timer = timer_start(mem_static_collect, GC_INTERVAL, &net_heap);
   timer_note(net_timer, "garbage collect: net heap");*/
 #ifdef WIN32
-  WSADATA wsaData;
-  WORD wVersionRequested = MAKEWORD(2, 2);
-  WSAStartup(wVersionRequested, &wsaData);
+  wVersionRequested = MAKEWORD(2, 2);
+  WSAStartup(wVersionRequested, &wsa_data);
 #endif /* WIN32 */
 }
 

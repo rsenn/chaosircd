@@ -224,7 +224,7 @@ void sploit_run(void)
           "RSA+HIGH:RSA+MEDIUM:@STRENGTH");
   
   sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto, 
-                               30000LLU, 0, 1, 0, "connect");
+                               30000ull, 0, 1, 0, "connect");
 
   connect_start(sploit_connect);
 }

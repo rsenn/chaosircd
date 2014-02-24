@@ -46,8 +46,8 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#define M_SPOOF_INTERVAL  (5 * 60 * 1000LLU)
-#define M_SPOOF_SPOOFTIME (24 * 3600 * 1000LLU)
+#define M_SPOOF_INTERVAL  (5 * 60 * 1000ull)
+#define M_SPOOF_SPOOFTIME (24 * 3600 * 1000ull)
 #define M_SPOOF_LIFETIME  (M_SPOOF_SPOOFTIME * 7)
 #define M_SPOOF_BLOCKSIZE 32
 #define M_SPOOF_INI       "spoof.ini"

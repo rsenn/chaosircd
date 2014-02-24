@@ -73,6 +73,18 @@ if(CMAKE_HOST_WIN32)
   endif(NOT HAVE_SELECT)
 endif(CMAKE_HOST_WIN32)
 
+
+if(MSVC)
+  include_directories(${CMAKE_SOURCE_DIR}/libchaos/include/msinttypes)
+  set(HAVE_STDINT_H 1)
+  set(HAVE_INTTYPES_H 1)
+#  add_definitions(-D_POSIX_)
+#  add_definitions( "/W0 /D_CRT_SECURE_NO_WARNINGS /wd4005 /wd4996 /nologo" )
+  add_definitions("/W0 /D_CRT_SECURE_NO_WARNINGS")
+  set(MSINTTYPES_HEADERS ${CMAKE_SOURCE_DIR}/libchaos/include/msinttypes/stdint.h  ${CMAKE_SOURCE_DIR}/libchaos/include/msinttypes/inttypes.h)
+endif()
+
+
 set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")
 set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PACKAGE_NAME} CACHE FILEPATH "configuration directory")
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
@@ -151,6 +163,16 @@ add_executable(chaosircd
    src/chanmode.c src/channel.c src/chanuser.c src/chars.c
    src/class.c src/client.c src/conf.c src/ircd.c
    src/lclient.c src/main.c src/msg.c src/numeric.c src/oper.c
-   src/server.c src/service.c src/user.c src/usermode.c)
+   src/server.c src/service.c src/user.c src/usermode.c
+   ${MSINTTYPES_HEADERS}
+   config.h contrib/shellcode.h include/chaosircd/chanmode.h
+   include/chaosircd/channel.h include/chaosircd/chanuser.h
+   include/chaosircd/chars.h include/chaosircd/class.h
+   include/chaosircd/client.h include/chaosircd/conf.h
+   include/chaosircd/config.h include/chaosircd/ircd.h
+   include/chaosircd/lclient.h include/chaosircd/msg.h
+   include/chaosircd/numeric.h include/chaosircd/oper.h
+   include/chaosircd/server.h include/chaosircd/service.h
+   include/chaosircd/user.h include/chaosircd/usermode.h src/y.tab.h)
    
 target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})

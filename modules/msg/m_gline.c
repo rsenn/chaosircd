@@ -47,7 +47,7 @@
  * Constants                                                                  *
  * -------------------------------------------------------------------------- */
 #define M_GLINE_BLOCKSIZE 32
-#define M_GLINE_INTERVAL  (5 * 60 * 1000LLU)
+#define M_GLINE_INTERVAL  (5 * 60 * 1000ull)
 #define M_GLINE_INI       "gline.ini"
 #define M_GLINE_FILTER    "listen"
 
@@ -318,7 +318,7 @@ static struct m_gline_entry *m_gline_new(const char *user, const char *host,
     filter_rule_insert(m_gline_filter,
                        FILTER_SRCNET, FILTER_DENY,
                        mgeptr->addr,
-                       mgeptr->mask, 0LLU);
+                       mgeptr->mask, 0ull);
     
     filter_rule_compile(m_gline_filter);
     
@@ -668,7 +668,7 @@ static int m_gline_hook(struct lclient *lcptr)
       filter_rule_insert(m_gline_filter,
                          FILTER_SRCNET, FILTER_DENY,
                          mgeptr->addr,
-                         mgeptr->mask, 0LLU);
+                         mgeptr->mask, 0ull);
     else
       filter_rule_insert(m_gline_filter,
                          FILTER_SRCIP, FILTER_DENY,

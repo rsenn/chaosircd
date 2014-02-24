@@ -89,7 +89,7 @@ static int cm_moderated_hook(struct lclient *lcptr, struct client   *cptr,
                              struct channel *chptr, struct chanuser *cuptr)
 {
   if(chptr->modes & CHFLG(m) &&
-     (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0LLU))
+     (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0ull))
   {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);
     return 1;

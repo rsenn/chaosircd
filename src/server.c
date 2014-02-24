@@ -46,19 +46,19 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int               server_log;
-struct sheap      server_heap;
-struct timer     *server_timer;
-struct list       server_list;
-struct list       server_lists[2];
-struct stats      server_stats[64];
-struct server    *server_me;
-uint32_t          server_id;
-int               server_default_caps   = CAP_DEFAULT;
-int               server_default_cipher = CAP_ENC_AES_256;
-uint32_t          server_serial;
+IRCD_DATA(int               server_log);
+IRCD_DATA(struct sheap      server_heap);
+IRCD_DATA(struct timer     *server_timer);
+IRCD_DATA(struct list       server_list);
+IRCD_DATA(struct list       server_lists[2]);
+IRCD_DATA(struct stats      server_stats[64]);
+IRCD_DATA(struct server    *server_me);
+IRCD_DATA(uint32_t          server_id);
+IRCD_DATA(int               server_default_caps   = CAP_DEFAULT);
+IRCD_DATA(int               server_default_cipher = CAP_ENC_AES_256);
+IRCD_DATA(uint32_t          server_serial);
 
-struct capab server_caps[] = {
+IRCD_DATA(struct capab server_caps[]) = {
   { "HUB", CAP_HUB },
   { "EOB", CAP_EOB },
   { "UID", CAP_UID },
@@ -83,7 +83,7 @@ int server_get_log() { return server_log; }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct cryptcap server_ciphers[] = {
+IRCD_DATA(struct cryptcap server_ciphers[]) = {
   { "AES/128",   CAP_ENC_AES_128,   16, CIPHER_AES_128 },
   { "AES/192",   CAP_ENC_AES_192,   24, CIPHER_AES_192 },
   { "AES/256",   CAP_ENC_AES_256,   32, CIPHER_AES_256 },
@@ -795,7 +795,7 @@ void server_register(struct lclient *lcptr, struct class *clptr)
  * -------------------------------------------------------------------------- */
 int server_ping(struct lclient *lcptr)
 {
-  if(lcptr->ping == 0LLU)
+  if(lcptr->ping == 0ull)
   {
 /*    int fds[2];
     
@@ -815,7 +815,7 @@ int server_ping(struct lclient *lcptr)
     return 0;
   }
   
-  lcptr->ping = 0LLU;
+  lcptr->ping = 0ull;
   lclient_send(lcptr, "PING :%llu", timer_mtime);
   
   return 0;

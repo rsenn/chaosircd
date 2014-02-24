@@ -20,11 +20,11 @@
  * $Id: dlfcn_win32.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#define _GNU_SOURCE
+#include "libchaos/defs.h"
 
-#include <stdlib.h>
-#include <limits.h>
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 //#include "dlfcn_win32.h"
 

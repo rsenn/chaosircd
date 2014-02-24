@@ -188,18 +188,18 @@ const char *ircd_uptime(void)
     if(hrs == 0)
     {
       if(mins == 0)
-        snprintf(upstr, sizeof(upstr), "%u seconds, %u msecs", secs, msecs);
+        str_snprintf(upstr, sizeof(upstr), "%u seconds, %u msecs", secs, msecs);
       else
-        snprintf(upstr, sizeof(upstr), "%u minutes, %u seconds", mins, secs);
+        str_snprintf(upstr, sizeof(upstr), "%u minutes, %u seconds", mins, secs);
     }
     else
     {
-      snprintf(upstr, sizeof(upstr), "%u hours, %u minutes", hrs, mins);
+      str_snprintf(upstr, sizeof(upstr), "%u hours, %u minutes", hrs, mins);
     }
   }
   else
   {
-    snprintf(upstr, sizeof(upstr), "%u days, %u hours", days, hrs);
+    str_snprintf(upstr, sizeof(upstr), "%u days, %u hours", days, hrs);
   }
   
   return upstr;
@@ -208,7 +208,7 @@ const char *ircd_uptime(void)
 /* -------------------------------------------------------------------------- *
  * Write the process ID to a file.                                            *
  * -------------------------------------------------------------------------- */
-static int ircd_writepid(struct config *config, pid_t pid)
+static int ircd_writepid(struct config *config, long pid)
 {
   int fd;
   
@@ -231,7 +231,7 @@ static int ircd_writepid(struct config *config, pid_t pid)
 static void ircd_detach(struct config *config)
 {
 #ifndef WIN32
-  pid_t pid;
+  long pid;
   
   pid = syscall_fork();
   
@@ -264,10 +264,10 @@ static void ircd_detach(struct config *config)
  * Read the file with the process ID and check if there is already a running  *
  * chaosircd...                                                               *
  * -------------------------------------------------------------------------- */
-static pid_t ircd_check(struct config *config)
+static long ircd_check(struct config *config)
 {
   struct stat st;
-  pid_t       pid;
+  long       pid;
   char        proc[32];
   char        buf[16];
   int         fd;
@@ -283,7 +283,7 @@ static pid_t ircd_check(struct config *config)
   {
     pid = str_toul(buf, NULL, 10);
     
-    snprintf(proc, sizeof(proc), "/proc/%u", pid);
+    str_snprintf(proc, sizeof(proc), "/proc/%u", pid);
     
     if(syscall_stat(proc, &st) == 0)
       return pid;
@@ -298,7 +298,7 @@ static pid_t ircd_check(struct config *config)
  * -------------------------------------------------------------------------- */
 static int ircd_coldstart(struct config *config)
 {
-  pid_t pid;
+  long pid;
   
   log(ircd_log, L_status, "*** Config file coldstart done ***");
   
@@ -500,7 +500,7 @@ void ircd_collect(void)
 int ircd_restart(void)
 {
 #ifndef WIN32
-  pid_t pid;
+  long pid;
   int status;
 
 #ifdef HAVE_SOCKET_FILTER  

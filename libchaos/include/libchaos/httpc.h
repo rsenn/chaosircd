@@ -32,8 +32,8 @@
  * ------------------------------------------------------------------------ */
 #define HTTPC_LINELEN  1024
 #define HTTPC_MAX_BUF  (256 * 1024)
-#define HTTPC_TIMEOUT  30000LLU
-#define HTTPC_INTERVAL 0LLU
+#define HTTPC_TIMEOUT  30000ull
+#define HTTPC_INTERVAL 0ull
 
 #define HTTPC_TYPE_GET  0
 #define HTTPC_TYPE_POST 1

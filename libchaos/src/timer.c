@@ -41,7 +41,12 @@
 #include <limits.h>
 
 #ifdef WIN32
+#ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
+#else
+#include <winsock.h>
+#endif
+#include <windows.h>
 #endif /* WIN32 */
 
 #ifdef HAVE_SYS_TIME_H
@@ -65,9 +70,9 @@ int            timer_dirty;
 uint32_t       timer_id;
 uint32_t       timer_systime = 0;        /* real unixtime */
 uint32_t       timer_loctime = 0;        /* system time after timezone conversion */
-uint64_t       timer_otime   = 0LLU;     /* old unixtime in miliseconds */
-uint64_t       timer_mtime   = 0LLU;     /* unixtime in miliseconds */
-int64_t        timer_offset  = 0LL;
+uint64_t       timer_otime   = 0ull;     /* old unixtime in miliseconds */
+uint64_t       timer_mtime   = 0ull;     /* unixtime in miliseconds */
+int64_t        timer_offset  = 0ll;
 struct timeval timer_utime   = { 0, 0 }; /* unixtime in microseconds */
 struct tm      timer_dtime;              /* daytime */
 struct list    timer_shifts;
@@ -119,7 +124,7 @@ static const char *timer_months[] = {
 struct tm *timer_gmtime(uint64_t mtime)
 {
   uint32_t i;
-  register uint32_t work = (mtime / 1000LLU) % SPD;
+  register uint32_t work = (mtime / 1000ull) % SPD;
   static struct tm ret;
   
   /* Calculate HH:MM:SS */
@@ -129,7 +134,7 @@ struct tm *timer_gmtime(uint64_t mtime)
   ret.tm_hour = work / 60;
   
   /* Now do the day stuff */
-  work = (mtime / 1000LLU) / SPD;
+  work = (mtime / 1000ull) / SPD;
   
   /* 
    * 01.01.1970 was a thursday, so the day 
@@ -370,8 +375,8 @@ uint64_t timer_mktime(struct tm *tm)
   
   day *= 24;
   
-/*  return (uint64_t)(((day + tm->tm_hour) * 3600) + (tm->tm_min * 60) + tm->tm_sec) * 1000LLU;*/
-  return (uint64_t)mktime(tm) * 1000LLU;
+/*  return (uint64_t)(((day + tm->tm_hour) * 3600) + (tm->tm_min * 60) + tm->tm_sec) * 1000ull;*/
+  return (uint64_t)mktime(tm) * 1000ull;
 }
 
 /* ------------------------------------------------------------------------ *
@@ -406,7 +411,7 @@ uint64_t timer_parse_time(const char *t)
       ret.tm_sec = second % 60;
   }
     
-  return ((ret.tm_hour * 3600) + (ret.tm_min * 60) + ret.tm_sec) * 1000LLU;
+  return ((ret.tm_hour * 3600) + (ret.tm_min * 60) + ret.tm_sec) * 1000ull;
 }
   
 /* ------------------------------------------------------------------------ *
@@ -631,6 +636,9 @@ static void timer_calc_offset(void)
  * ------------------------------------------------------------------------ */
 void timer_init(void)
 {
+#ifdef WIN32
+  LARGE_INTEGER freq;
+#endif
   timer_log = log_source_register("timer");
   
   /* Zero timer list */
@@ -650,7 +658,6 @@ void timer_init(void)
   str_register('D', timer_format_date);
   
 #ifdef WIN32
-  LARGE_INTEGER freq;
   QueryPerformanceFrequency(&freq);
   timer_freq = (((uint64_t)freq.HighPart << 32) + freq.LowPart) / 1000LL;
   log(timer_log, L_status, "Performance frequency: %lli", timer_freq);
@@ -719,8 +726,8 @@ int timer_collect(void)
  * ------------------------------------------------------------------------ */
 void timer_to_msec(uint64_t *dst, struct timeval *src)
 {
-  *dst = ((uint64_t)src->tv_sec * 1000LLU) +    
-         ((uint32_t)src->tv_usec / 1000LLU);  
+  *dst = ((uint64_t)src->tv_sec * 1000ull) +    
+         ((uint32_t)src->tv_usec / 1000ull);  
 }
 
 /* ------------------------------------------------------------------------ *
@@ -765,7 +772,7 @@ int timer_update(void)
   timer_mtime += timer_offset;
   
   /* Time since epoch in secs */
-  timer_systime = timer_mtime / 1000LLU;
+  timer_systime = timer_mtime / 1000ull;
   timer_loctime = timer_systime + (zone_offset * 60);
   
   /* Update calendar time */
@@ -1131,13 +1138,13 @@ int timer_run(void)
 
 /* ------------------------------------------------------------------------ *
  * Get the time at which the next timer will expire.                        *
- * Return 0LLU when there is no timer.                                      *
+ * Return 0ull when there is no timer.                                      *
  * ------------------------------------------------------------------------ */
 uint64_t timer_deadline(void)
 {
   struct timer *timer;
   struct node  *next;
-  uint64_t      deadline = 0LLU;
+  uint64_t      deadline = 0ull;
 
   dlink_foreach_safe(&timer_list, timer, next)
   {
@@ -1148,7 +1155,7 @@ uint64_t timer_deadline(void)
     }
     
     /* First or lower deadline, update final deadline */
-    if(deadline == 0LLU || timer->deadline < deadline)
+    if(deadline == 0ull || timer->deadline < deadline)
       deadline = timer->deadline;
   }
   

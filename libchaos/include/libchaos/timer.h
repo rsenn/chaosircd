@@ -33,7 +33,9 @@
  * System headers                                                             *
  * ------------------------------------------------------------------------ */
 #include <stdarg.h>
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *
@@ -284,7 +286,7 @@ CHAOS_API(int           )timer_run        (void);
 
 /* ------------------------------------------------------------------------ *
  * Get the time at which the next timer will expire.                          *
- * Return 0LLU when there is no timer.                                        *
+ * Return 0ull when there is no timer.                                        *
  * ------------------------------------------------------------------------ */
 CHAOS_API(uint64_t      )timer_deadline   (void);
 

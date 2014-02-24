@@ -119,7 +119,7 @@ void oper_default(struct oper *optr)
   strcpy(optr->name, "default");
   optr->passwd[0] = 0;
   optr->flags = 0;
-  optr->sources = 0LLU;
+  optr->sources = 0ull;
   optr->level = 0;
 }
 

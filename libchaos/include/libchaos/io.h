@@ -36,10 +36,10 @@ struct io;
 #include "libchaos/defs.h"
 #include "libchaos/syscall.h"
 #include "libchaos/queue.h"
-
+/*
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
-#endif /* HAVE_WINSOCK2_H */
+#endif*/ /* HAVE_WINSOCK2_H */
 
 #ifdef HAVE_SSL
 #include "libchaos/ssl.h"

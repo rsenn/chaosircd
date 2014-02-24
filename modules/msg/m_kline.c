@@ -48,7 +48,7 @@
  * Constants                                                                  *
  * -------------------------------------------------------------------------- */
 #define M_KLINE_BLOCKSIZE 32
-#define M_KLINE_INTERVAL  (5 * 60 * 1000LLU)
+#define M_KLINE_INTERVAL  (5 * 60 * 1000ull)
 #define M_KLINE_INI       "kline.ini"
 #define M_KLINE_FILTER    "listen"
 
@@ -310,7 +310,7 @@ static struct m_kline_entry *m_kline_new(const char *user, const char *host,
     filter_rule_insert(m_kline_filter, 
                        FILTER_SRCNET, FILTER_DENY, 
                        mkeptr->addr,
-                       mkeptr->mask, 0LLU);
+                       mkeptr->mask, 0ull);
     
     filter_rule_compile(m_kline_filter);
     
@@ -680,7 +680,7 @@ static int m_kline_hook(struct lclient *lcptr)
       filter_rule_insert(m_kline_filter,
                          FILTER_SRCNET, FILTER_DENY,
                          mkeptr->addr,
-                         mkeptr->mask, 0LLU);
+                         mkeptr->mask, 0ull);
     else
       filter_rule_insert(m_kline_filter,
                          FILTER_SRCIP, FILTER_DENY,

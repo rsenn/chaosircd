@@ -50,8 +50,8 @@
 #define CONNECT_DEFAULT_NAME     "127.0.0.1:1024"
 #define CONNECT_DEFAULT_LADDR    INADDR_ANY
 #define CONNECT_DEFAULT_RADDR    INADDR_LOOPBACK
-#define CONNECT_DEFAULT_TIMEOUT  (30 * 1000LLU)     /* 30 seconds */
-#define CONNECT_DEFAULT_INTERVAL (5 * 60 * 1000LLU) /* 5 minutes */
+#define CONNECT_DEFAULT_TIMEOUT  (30 * 1000ull)     /* 30 seconds */
+#define CONNECT_DEFAULT_INTERVAL (5 * 60 * 1000ull) /* 5 minutes */
 
 /* ------------------------------------------------------------------------ *
  * Connect block structure.                                                   *

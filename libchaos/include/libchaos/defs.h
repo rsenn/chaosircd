@@ -25,38 +25,43 @@
 
 #include "libchaos/config.h"
 
+#ifdef _MSC_VER
+#define inline __inline
+#endif
+
 #ifndef NULL
 #define NULL (void *)0
 #endif /* NULL */
 
 #include <stdlib.h>
 
-#ifdef HAVE_STDINT_H
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+
+/*#ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
-
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
-#endif
-
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
-#endif // HAVE_INTTYPES_H
-
+*/
 #include <sys/stat.h>
 
 /*
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdarg.h>
-#include <limits.h>
 #include <signal.h>
 #include <time.h>
 #include <sys/time.h>
 
  */
+#include <limits.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX MAX_PATH
+#endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__)
+
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
 #   define CHAOS_API(type) __attribute__((dllexport)) type
@@ -74,6 +79,8 @@
 #ifndef CHAOS_DATA
 # define CHAOS_DATA(type) extern type
 #endif
+
+#define CHAOS_INLINE(function) //extern __inline function
 
 /*#ifdef HAVE_SYS_TYPES_H
 #ifndef _BSD_SIZE_T_

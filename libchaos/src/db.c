@@ -122,7 +122,7 @@ static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t 
   
   result->db = db;
   result->res.common = NULL;
-  result->row = 0LLU;
+  result->row = 0ull;
   result->rows = rows;
   result->fields = fields;
   result->data = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
@@ -428,7 +428,7 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
       if(tuples && tuples[0])
         db->affected_rows = str_toull(tuples, NULL, 10);
       else
-        db->affected_rows = 0LLU;
+        db->affected_rows = 0ull;
       
       if(rows || fields)
       {

@@ -90,8 +90,10 @@
 #define IRCD_MODULE(type) extern __attribute__((dllexport)) type
 #endif
 #ifdef BUILD_IRCD
-#define IRCD_DATA(type) extern __attribute__((dllexport)) type
-#define IRCD_API(type)         __attribute__((dllexport)) type
+#define IRCD_DATA(type)  __declspec(dllexport) type
+//extern __declspec(dllexport)  //__attribute__((dllexport)) type
+#define IRCD_API(type)  type
+// __declspec(dllexport)  //   __attribute__((dllexport)) type
 #else
 #define IRCD_DATA(type) extern __attribute__((dllimport)) type
 #define IRCD_API(type)                                    type
@@ -166,11 +168,6 @@ extern void            ircd_collect      (void);
  * Restart the daemon.                                                        *
  * -------------------------------------------------------------------------- */
 extern int             ircd_restart      (void);
-
-/* -------------------------------------------------------------------------- *
- * Clean things up.                                                           *
- * -------------------------------------------------------------------------- */
-extern void            ircd_shutdown     (void);
 
 /* -------------------------------------------------------------------------- *
  * Add a new support value                                                    *

@@ -141,21 +141,21 @@ static uint32_t lc_cookie_random(void)
     
     lc_cookie_seed = ROR(lc_cookie_seed, ns >> 6);
     
-    if(lc_cookie_seed & 0x02LLU)
+    if(lc_cookie_seed & 0x02ull)
       lc_cookie_seed ^= ns;
     else
       ns ^= lc_cookie_seed;
     
     ns = ROL(ns, lc_cookie_seed >> 12);
     
-    if(ns & 0x04LLU)
+    if(ns & 0x04ull)
       lc_cookie_seed += 0xdeadbeef;
     else
       lc_cookie_seed -= 0xcafebabe;
     
     lc_cookie_seed = ROL(lc_cookie_seed, ns >> 16);
     
-    if(ns & 0x08LLU)
+    if(ns & 0x08ull)
       ns ^= lc_cookie_seed;
     else
       lc_cookie_seed ^= ns;

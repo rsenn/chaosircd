@@ -39,6 +39,15 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#ifdef WIN32
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#else 
+#include <winsock.h>
+#endif /* HAVE_WINSOCK2_H */
+#include <windows.h>
+#endif
+
 #ifdef HAVE_CYGWIN_IN_H
 #include <cygwin/in.h>
 #endif /* HAVE_CYGWIN_IN_H */
@@ -183,7 +192,7 @@ void connect_default(struct connect *cnptr)
   cnptr->addr_local = INADDR_ANY;
   cnptr->port_remote = 0;
   cnptr->port_local = 0;
-  cnptr->start = 0LLU;
+  cnptr->start = 0ull;
   cnptr->sauth = NULL;
   
   /* External stuff */
@@ -273,7 +282,7 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
   cnptr->addr_local = INADDR_ANY;
   cnptr->port_local = 0;
   
-  snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);  
+  str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);  
   
   /* Add to connect list */
   dlink_add_tail(&connect_list, &cnptr->node, connect);
@@ -365,7 +374,7 @@ int connect_update(struct connect *cnptr,    const char      *address,
   
   /* Update the name if none has been set */
   if(cnptr->name[0] == '\0')
-     snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);    
+     str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);    
   
   log(connect_log, L_status, "Updated connect block: %s", cnptr->name);
   

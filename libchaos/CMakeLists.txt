@@ -52,6 +52,16 @@ check_include_file(limits.h HAVE_LIMITS_H)
 check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(inttypes.h HAVE_INTTYPES_H)
 
+if(MSVC)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/msinttypes)
+  set(HAVE_STDINT_H 1)
+  set(HAVE_INTTYPES_H 1)
+#  add_definitions(-D_POSIX_)
+#  add_definitions( "/W0 /D_CRT_SECURE_NO_WARNINGS /wd4005 /wd4996 /nologo" )
+add_definitions("/W0 /D_CRT_SECURE_NO_WARNINGS")
+set(MSINTTYPES_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/msinttypes/stdint.h  ${CMAKE_CURRENT_SOURCE_DIR}/include/msinttypes/inttypes.h)
+endif()
+
 check_library_exists(dl dlsym "" HAVE_DLFCN)
 
 if(NOT HAVE_DLFCN)
@@ -146,7 +156,8 @@ set(LIBCHAOS_HEADERS include/libchaos/cfg.h include/libchaos/child.h
    include/libchaos/mem.h include/libchaos/mfile.h include/libchaos/module.h
    include/libchaos/net.h include/libchaos/queue.h include/libchaos/sauth.h
    include/libchaos/ssl.h include/libchaos/str.h include/libchaos/syscall.h
-   include/libchaos/template.h include/libchaos/timer.h include/libchaos/ttf.h)
+   include/libchaos/template.h include/libchaos/timer.h include/libchaos/ttf.h
+   ${MSINTTYPES_HEADERS})
 
 set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/divdi3.c src/dlink.c src/filter.c src/gif.c src/graph.c src/hook.c

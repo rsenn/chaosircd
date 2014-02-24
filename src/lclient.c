@@ -232,7 +232,7 @@ struct lclient *lclient_new(int fd, net_addr_t addr, net_port_t port)
   lcptr->shut = 0;
   lcptr->silent = 0;
   lcptr->name[0] = '\0';
-  lcptr->ping = 0LLU;
+  lcptr->ping = 0ull;
   lcptr->plugdata[LCLIENT_PLUGDATA_COOKIE] = NULL;
   lcptr->addr_remote = addr;
   lcptr->port_remote = port;

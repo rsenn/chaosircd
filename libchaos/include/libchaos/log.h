@@ -45,7 +45,7 @@
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 
-#define LOG_ALL 0xffffffffffffffffLLU
+#define LOG_ALL 0xffffffffffffffffull
 #define LOG_SOURCE_COUNT (sizeof(uint64_t) << 3)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -218,9 +218,13 @@ CHAOS_API(void         )log_output            (int           src,
 CHAOS_API(void)         log_source_dump       (int id);
 CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 
+#ifdef _MSC_VER
+#define fprintf(ios, ...) \
+  log(conf_log, L_warning, __VA_ARGS__)
+#else
 #define fprintf(ios, format...) \
   log(conf_log, L_warning, format)
-
+#endif
 /*#if 1*/
 
 # ifdef DEBUG
@@ -249,19 +253,26 @@ CHAOS_API(void log_debug)(const char *file, int line,
  * get compiled.
  */
 
-#  define debug(format...) ;
+#  define debug(...) ;
 
+#ifdef _MSC_VER
+#  define dump(src, ...) \
+            log_output((src), L_debug, __VA_ARGS__)
+#else
 #  define dump(src, format...) \
             log_output((src), L_debug, format)
-
+#endif
 
 /*#  define log(src, level, format...) \
             log_output((src), (level), format)*/
 #  define log log_output
 
 # endif //defined DEBUG
-
+#ifdef _MSC_VER
+# define puts(...) log(log_log, L_verbose, __VA_ARGS__)
+#else
 # define puts(s...) log(log_log, L_verbose, s)
+#endif
 /*#else
 
 #define log log_output

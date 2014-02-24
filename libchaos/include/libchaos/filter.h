@@ -42,8 +42,8 @@
 #define FILTER_DENY   0
 #define FILTER_ACCEPT 1
 
-#define FILTER_LIFETIME (60 * 1000LLU)
-#define FILTER_INTERVAL (120 * 1000LLU)
+#define FILTER_LIFETIME (60 * 1000ull)
+#define FILTER_INTERVAL (120 * 1000ull)
 
 #define FILTER_MAX_INSTRUCTIONS 4096
 #define FILTER_MAX_SIZE         (FILTER_MAX_INSTRUCTIONS * sizeof(struct bpf_insn))

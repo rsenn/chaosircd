@@ -90,7 +90,7 @@ void log_init(int fd, uint64_t sources, int level)
   
   for(i = 0; i < LOG_SOURCE_COUNT; i++)
   {
-    log_sources[i].flag = 1LLU << i;
+    log_sources[i].flag = 1ull << i;
     log_sources[i].name[0] = '\0';
   }
 
@@ -374,7 +374,7 @@ struct dlog *log_drain_setfd(int fd, uint64_t sources, int level, int prefix)
   else if(fd == 2)
     strcpy(drain->path, "stderr");
   else
-    snprintf(drain->path, sizeof(drain->path), "fd: %i", fd);
+    str_snprintf(drain->path, sizeof(drain->path), "fd: %i", fd);
   
   drain->hash = str_hash(drain->path);
   drain->refcount = 1;
@@ -547,7 +547,7 @@ void log_voutput(int src, int level, const char *format, va_list ap)
   
   source = &log_sources[src];
   
-  snprintf(date, 64, "(%s) [%s %2u %02u:%02u:%02u] <%s> ",
+  str_snprintf(date, 64, "(%s) [%s %2u %02u:%02u:%02u] <%s> ",
            log_levels[level][0], log_months[timer_dtime.tm_mon], timer_dtime.tm_mday,
            timer_dtime.tm_hour, timer_dtime.tm_min, timer_dtime.tm_sec, source->name);
            
@@ -652,7 +652,7 @@ void log_debug(const char *file,  int line,
   
   va_start(ap, format);
   
-  snprintf(date, 64, "[%s] (%s) %s:%u -- ",
+  str_snprintf(date, 64, "[%s] (%s) %s:%u -- ",
            log_levels[level][0], source->name, file, line);
            
   str_vsnprintf(logmsg, 2048, format, ap);

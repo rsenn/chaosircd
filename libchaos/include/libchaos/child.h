@@ -67,7 +67,7 @@ struct child
   struct node        node;         /* linking node for child block list */
   
   /* externally initialised */
-  pid_t              pid;
+  long               pid;
   uint32_t           id;
   uint32_t           refcount;
   uint32_t           chash;
