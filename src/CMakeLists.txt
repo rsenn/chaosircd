@@ -19,7 +19,7 @@ add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_IRCD=1)
 
-bison_target(IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/src/y.tab.h")
+bison_target(IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/y.tab.h")
 flex_target(IRCD_SCANNER ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
