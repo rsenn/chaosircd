@@ -31,7 +31,9 @@ if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
 
+include(CheckIncludeFile)
 
+check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 
 #if(CMAKE_HOST_WIN32)
 ##  check_include_file(winsock.h HAVE_WINSOCK2_H)
