@@ -2,7 +2,7 @@ set(LEXER_SOURCE src/ircd.l)
 set(PARSER_SOURCE src/ircd.y)
 
 
-include("${CMAKE_SOURCE_DIR}/cmake/ConfigSharedLib.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigSharedLib.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
 
 
