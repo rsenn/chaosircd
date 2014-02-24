@@ -180,3 +180,5 @@ add_executable(src/chaosircd
    include/chaosircd/user.h include/chaosircd/usermode.h) 
    
 target_link_libraries(src/chaosircd libchaos ${SOCKET_LIBRARIES})
+
+link_directories("${CMAKE_BINARY_DIR}")
