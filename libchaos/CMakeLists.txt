@@ -9,12 +9,18 @@ project(${PACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
-set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+if(NOT LIBCHAOS_SOURCE_DIR)
+  set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
+if(NOT LIBCHAOS_BINARY_DIR)
+  set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
+set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/cmake")
 
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PlatformChecks.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/cmake/PlatformChecks.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigMathLib.cmake")
 
 include(FindBISON)
 include(FindFLEX)
@@ -33,7 +39,7 @@ endif(NOT BUILD_SHARED_LIBS)
  
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
 
 substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
