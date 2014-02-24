@@ -43,6 +43,10 @@ check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
 check_include_file(unistd.h HAVE_UNISTD_H)
 
+if(NOT HAVE_UNISTD_H)
+  set(YY_NO_UNISTD_H 1)
+endif()
+
 if(CMAKE_HOST_WIN32)
 #  check_include_file(winsock.h HAVE_WINSOCK2_H)
   check_include_file(winsock2.h HAVE_WINSOCK2_H)

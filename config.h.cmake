@@ -117,3 +117,6 @@
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #cmakedefine YYTEXT_POINTER 1
+
+/* Define to 1 if the lexer must not include <unistd.h> */
+#cmakedefine YY_NO_UNISTD_H 1
