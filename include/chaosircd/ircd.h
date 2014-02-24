@@ -86,30 +86,39 @@
 #define IRCD_LINUX_STACKTOP  0xc0000000
 
 #ifdef WIN32
-#ifdef BUILD_MODULES
-#define IRCD_MODULE(type) extern __attribute__((dllexport)) type
-#endif
-#ifdef BUILD_IRCD
-#define IRCD_DATA(type)  __declspec(dllexport) type
-//extern __declspec(dllexport)  //__attribute__((dllexport)) type
-#define IRCD_API(type)  type
-// __declspec(dllexport)  //   __attribute__((dllexport)) type
-#else
-#define IRCD_DATA(type) extern __attribute__((dllimport)) type
-#define IRCD_API(type)                                    type
-#endif
+  #ifdef BUILD_MODULES
+  #define IRCD_MODULE(_type_) extern __attribute__((dllexport)) _type_
+  #endif
+  #ifdef BUILD_IRCD
+  #define IRCD_DATA_PROTO(_type_)  extern __declspec(dllexport) _type_
+  #define IRCD_DATA_DECL(_type_)   _type_
+  //__declspec(dllexport) _type_
+    //extern __declspec(dllexport)  //__attribute__((dllexport)) _type_
+  #define IRCD_API(_type_)  _type_
+    // __declspec(dllexport)  //   __attribute__((dllexport)) _type_
+  #else
+  #define IRCD_DATA_PROTO(_type_) extern __attribute__((dllimport)) _type_
+//  #define IRCD_DATA_DECL(_type_) __attribute__((dllimport)) _type_
+  #define IRCD_API(_type_)                                    _type_
+  #endif
 #endif
 
 #ifndef IRCD_MODULE
-#define IRCD_MODULE(type) extern type
+#define IRCD_MODULE(_type_) extern _type_
 #endif
 
-#ifndef IRCD_DATA
-#define IRCD_DATA(type) extern type
+#ifdef BUILD_IRCD
+#ifndef IRCD_DATA_DECL
+#define IRCD_DATA_DECL(_type_) _type_
+#endif
+#endif
+
+#ifndef IRCD_DATA_PROTO
+#define IRCD_DATA_PROTO(_type_) extern _type_
 #endif
 
 #ifndef IRCD_API
-#define IRCD_API(type) type
+#define IRCD_API(_type_) _type_
 #endif
 
 extern int         ircd_log;
@@ -134,10 +143,10 @@ struct support {
 struct client;
 
 /* -------------------------------------------------------------------------- */
-IRCD_DATA(int)     ircd_argc;
-IRCD_DATA(char **) ircd_argv;
-IRCD_DATA(char **) ircd_envp;
-IRCD_DATA(char)    ircd_path[PATHLEN];
+IRCD_DATA_PROTO(int)     ircd_argc;
+IRCD_DATA_PROTO(char **) ircd_argv;
+IRCD_DATA_PROTO(char **) ircd_envp;
+IRCD_DATA_PROTO(char)    ircd_path[PATHLEN];
 
 /* -------------------------------------------------------------------------- *
  * Initialize things.                                                         *

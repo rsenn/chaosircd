@@ -46,19 +46,19 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_DATA(int               server_log);
-IRCD_DATA(struct sheap      server_heap);
-IRCD_DATA(struct timer     *server_timer);
-IRCD_DATA(struct list       server_list);
-IRCD_DATA(struct list       server_lists[2]);
-IRCD_DATA(struct stats      server_stats[64]);
-IRCD_DATA(struct server    *server_me);
-IRCD_DATA(uint32_t          server_id);
-IRCD_DATA(int               server_default_caps   = CAP_DEFAULT);
-IRCD_DATA(int               server_default_cipher = CAP_ENC_AES_256);
-IRCD_DATA(uint32_t          server_serial);
+IRCD_DATA_DECL(int               server_log);
+IRCD_DATA_DECL(struct sheap      server_heap);
+IRCD_DATA_DECL(struct timer     *server_timer);
+IRCD_DATA_DECL(struct list       server_list);
+IRCD_DATA_DECL(struct list       server_lists[2]);
+IRCD_DATA_DECL(struct stats      server_stats[64]);
+IRCD_DATA_DECL(struct server    *server_me);
+IRCD_DATA_DECL(uint32_t          server_id);
+IRCD_DATA_DECL(int               server_default_caps) = CAP_DEFAULT;
+IRCD_DATA_DECL(int               server_default_cipher) = CAP_ENC_AES_256;
+IRCD_DATA_DECL(uint32_t          server_serial);
 
-IRCD_DATA(struct capab server_caps[]) = {
+IRCD_DATA_DECL(struct capab server_caps[]) = {
   { "HUB", CAP_HUB },
   { "EOB", CAP_EOB },
   { "UID", CAP_UID },
@@ -83,7 +83,7 @@ int server_get_log() { return server_log; }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_DATA(struct cryptcap server_ciphers[]) = {
+IRCD_DATA_DECL(struct cryptcap server_ciphers[]) = {
   { "AES/128",   CAP_ENC_AES_128,   16, CIPHER_AES_128 },
   { "AES/192",   CAP_ENC_AES_192,   24, CIPHER_AES_192 },
   { "AES/256",   CAP_ENC_AES_256,   32, CIPHER_AES_256 },

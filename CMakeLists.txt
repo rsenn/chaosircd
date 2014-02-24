@@ -1,12 +1,12 @@
 
-set(PACKAGE_NAME chaosircd)
-set(PACKAGE_VERSION 2.2.1)
-set(PACKAGE_RELEASE "peace, love & hippie edition")
-set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
+set(PROJECT_NAME chaosircd)
+set(PROJECT_VERSION 2.2.1)
+set(PROJECT_RELEASE "peace, love & hippie edition")
+set(PROJECT_TARNAME ${PROJECT_NAME}-${PROJECT_VERSION})
 
 set(DEFAULT_SHARED_LIB FALSE)
 
-project(${PACKAGE_NAME} C)
+project(${PROJECT_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -86,8 +86,8 @@ endif()
 
 
 set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")
-set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PACKAGE_NAME} CACHE FILEPATH "configuration directory")
-set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
+set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME} CACHE FILEPATH "configuration directory")
+set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME} CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPREFIX=\"${PREFIX}\")
 add_definitions(-DSYSCONFDIR=\"${SYSCONFDIR}\")
@@ -157,7 +157,7 @@ bison_target(IRCD_PARSER src/ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_parser.
 flex_target(IRCD_SCANNER src/ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
-add_executable(chaosircd 
+add_executable(src/chaosircd 
    ${BISON_IRCD_PARSER_OUTPUTS}
    ${FLEX_IRCD_SCANNER_OUTPUTS}
    src/chanmode.c src/channel.c src/chanuser.c src/chars.c
@@ -175,4 +175,4 @@ add_executable(chaosircd
    include/chaosircd/server.h include/chaosircd/service.h
    include/chaosircd/user.h include/chaosircd/usermode.h) 
    
-target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})
+target_link_libraries(src/chaosircd libchaos ${SOCKET_LIBRARIES})

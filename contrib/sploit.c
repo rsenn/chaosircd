@@ -34,7 +34,7 @@ struct protocol *sploit_proto;
 void sploit_init(void)
 {
   log(sploit_log, L_startup, "%s v%s sploit",
-      PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_RELEASE);
+      PROJECT_NAME, PROJECT_VERSION, PROJECT_RELEASE);
   
   log_init(STDOUT_FILENO, LOG_ALL, L_status);
   io_init_except(STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO);

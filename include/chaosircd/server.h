@@ -162,20 +162,20 @@ struct server
 
 /* -------------------------------------------------------------------------- *
   * -------------------------------------------------------------------------- */
-IRCD_DATA(int               )server_log;
-IRCD_DATA(struct sheap      )server_heap;
-IRCD_DATA(struct sheap      )server_stats_heap;
-IRCD_DATA(struct timer     *)server_timer;
-IRCD_DATA(struct list       )server_list;
-IRCD_DATA(struct list       )server_lists[2];
-IRCD_DATA(struct server    *)server_me;
-IRCD_DATA(uint32_t          )server_id;
-IRCD_DATA(uint32_t          )server_serial;
-IRCD_DATA(struct stats      )server_stats[];
-IRCD_DATA(int               )server_default_caps;
-IRCD_DATA(int               )server_default_cipher;
-IRCD_DATA(struct capab      )server_caps[];
-IRCD_DATA(struct cryptcap   )server_ciphers[];  
+IRCD_DATA_PROTO(int               )server_log;
+IRCD_DATA_PROTO(struct sheap      )server_heap;
+IRCD_DATA_PROTO(struct sheap      )server_stats_heap;
+IRCD_DATA_PROTO(struct timer     *)server_timer;
+IRCD_DATA_PROTO(struct list       )server_list;
+IRCD_DATA_PROTO(struct list       )server_lists[2];
+IRCD_DATA_PROTO(struct server    *)server_me;
+IRCD_DATA_PROTO(uint32_t          )server_id;
+IRCD_DATA_PROTO(uint32_t          )server_serial;
+IRCD_DATA_PROTO(struct stats      )server_stats[];
+IRCD_DATA_PROTO(int               )server_default_caps;
+IRCD_DATA_PROTO(int               )server_default_cipher;
+IRCD_DATA_PROTO(struct capab      )server_caps[];
+IRCD_DATA_PROTO(struct cryptcap   )server_ciphers[];  
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) server_get_log(void);

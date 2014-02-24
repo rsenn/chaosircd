@@ -154,7 +154,7 @@ done])
 #
 AC_DEFUN([AC_SUMMARIZE_HEADER],
 [echo
-echo "$PACKAGE_NAME-$PACKAGE_VERSION has been configured with the following options:"])
+echo "$PROJECT_NAME-$PROJECT_VERSION has been configured with the following options:"])
 #
 # AC_ADD_DIR
 # ---------------------------------------------------------------------------

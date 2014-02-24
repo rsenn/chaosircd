@@ -230,7 +230,7 @@ found:
  * -------------------------------------------------------------------------- */
 static void usage(char **argv)
 {
-  puts(PACKAGE_NAME"-"PACKAGE_VERSION
+  puts(PROJECT_NAME"-"PROJECT_VERSION
        " - pi-networks irc server\n");
   puts("Usage: %s [options]\n", *argv);
   puts("  -h, --help           show this help");

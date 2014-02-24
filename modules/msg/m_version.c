@@ -94,13 +94,13 @@ static void m_version(struct lclient *lcptr, struct client *cptr,
       return;
   }
   
-  numeric_send(cptr, RPL_VERSION, PACKAGE_NAME, PACKAGE_VERSION,
+  numeric_send(cptr, RPL_VERSION, PROJECT_NAME, PROJECT_VERSION,
 #ifdef DEBUG
                "DEBUG",
 #else
                "PRODUCTION",
 #endif /* DEBUG */
-               client_me->name, PACKAGE_RELEASE);
+               client_me->name, PROJECT_RELEASE);
   
   ircd_support_show(cptr);
 }

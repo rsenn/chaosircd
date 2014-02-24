@@ -68,7 +68,7 @@ static struct msg m_info_msg = {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static const char *m_info_text[] = {
-  PACKAGE_NAME " v" PACKAGE_VERSION " - " PACKAGE_RELEASE,
+  PROJECT_NAME " v" PROJECT_VERSION " - " PROJECT_RELEASE,
   "",
   "Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>",
   "                         Manuel Kohler <maenu.kohler@bluewin.ch>",

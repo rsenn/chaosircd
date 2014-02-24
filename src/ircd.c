@@ -98,9 +98,9 @@
 /* -------------------------------------------------------------------------- *
  * Global variables for the daemon code                                       *
  * -------------------------------------------------------------------------- */
-const char  *ircd_package = PACKAGE_NAME;
-const char  *ircd_version = PACKAGE_VERSION;
-const char  *ircd_release = PACKAGE_RELEASE;
+const char  *ircd_package = PROJECT_NAME;
+const char  *ircd_version = PROJECT_VERSION;
+const char  *ircd_release = PROJECT_RELEASE;
 uint64_t     ircd_start;
 struct dlog *ircd_drain;
 struct sheap ircd_heap;
@@ -354,7 +354,7 @@ static int ircd_coldstart(struct config *config)
 void ircd_init(int argc, char **argv, char **envp)
 {
   log(ircd_log, L_startup, "*** Firing up %s v%s - %s ***",
-      PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_RELEASE);
+      PROJECT_NAME, PROJECT_VERSION, PROJECT_RELEASE);
 
   log_init(STDOUT_FILENO, LOG_ALL, L_status);
   io_init_except(STDOUT_FILENO, STDOUT_FILENO, STDOUT_FILENO);  
@@ -392,7 +392,7 @@ void ircd_init(int argc, char **argv, char **envp)
   mem_static_note(&ircd_heap, "support heap");
   dlink_list_zero(&ircd_support);
   
-  log(ircd_log, L_status, "*** Done initialising %s library ***", PACKAGE_NAME);
+  log(ircd_log, L_status, "*** Done initialising %s library ***", PROJECT_NAME);
 
   lclient_init();
   server_init();
@@ -407,7 +407,7 @@ void ircd_init(int argc, char **argv, char **envp)
   oper_init();
   service_init();
   
-  log(ircd_log, L_status, "*** Done initialising %s core ***", PACKAGE_NAME);
+  log(ircd_log, L_status, "*** Done initialising %s core ***", PROJECT_NAME);
 
 #if 1
   ircd_drain = log_drain_setfd(1, LOG_ALL, L_debug, 0);
@@ -537,7 +537,7 @@ int ircd_restart(void)
  * -------------------------------------------------------------------------- */
 void ircd_shutdown(void)
 {
-  log(ircd_log, L_status, "*** Shutting down %s ***", PACKAGE_NAME);
+  log(ircd_log, L_status, "*** Shutting down %s ***", PROJECT_NAME);
 
   syscall_unlink(conf_current.global.pidfile);
   
