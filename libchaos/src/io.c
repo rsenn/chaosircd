@@ -697,11 +697,13 @@ void io_init_except(int fd0, int fd1, int fd2)
   
   io_log = log_source_register("i/o");
   
+#if !(defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(__MSYS__))
   /* Close all fds */
   for(i = 0; i < IO_MAX_FDS; i++)
     if(i != fd0 && i != fd1 && i != fd2)
       syscall_close(i);
-  
+#endif
+
   memset(io_list, 0, IO_MAX_FDS * sizeof(struct io));
 
 #ifdef USE_POLL
