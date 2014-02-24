@@ -10,6 +10,7 @@ project(${PACKAGE_NAME} C)
 cmake_minimum_required(VERSION 2.6)
 
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
@@ -34,7 +35,7 @@ set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
 
-substitute_project_includes(${PACKAGE_NAME})
+substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
 	       
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")

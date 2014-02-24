@@ -11,6 +11,7 @@ project(${PROJECT_NAME} C)
 cmake_minimum_required(VERSION 2.6)
 
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libchaos")
+set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
 
 add_subdirectory(libchaos)
 
@@ -91,7 +92,7 @@ add_definitions(-DBUILD_IRCD=1)
 
 include("${CMAKE_SOURCE_DIR}/libchaos/cmake/SubstituteProjectIncludes.cmake")
 
-substitute_project_includes(${PROJECT_NAME})
+substitute_project_includes(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 #
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
