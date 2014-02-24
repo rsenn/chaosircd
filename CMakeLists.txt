@@ -92,7 +92,8 @@ add_definitions(-DBUILD_IRCD=1)
 
 include("${CMAKE_SOURCE_DIR}/libchaos/cmake/SubstituteProjectIncludes.cmake")
 
-substitute_project_includes(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
+substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 #
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake

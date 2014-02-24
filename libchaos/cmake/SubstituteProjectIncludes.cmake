@@ -16,3 +16,14 @@ include_directories(
                  "${ARGV2}/config.h")
   	       
 ENDMACRO(substitute_project_includes)
+
+# include_project_includes(NAME SOURCE_DIR BINARY_DIR)
+MACRO(include_project_includes NAME)
+
+include_directories(
+    "${ARGV1}/src"
+    "${ARGV1}/include"
+    "${ARGV1}/include/${ARGV0}"
+    "${ARGV2}/include"
+  )
+ENDMACRO(include_project_includes)
