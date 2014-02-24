@@ -36,94 +36,14 @@ include(CheckIncludeFile)
 
 check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 
-#if(CMAKE_HOST_WIN32)
-##  check_include_file(winsock.h HAVE_WINSOCK2_H)
-#  check_include_file(winsock2.h HAVE_WINSOCK2_H)
-#  check_include_file(ws2tcpip.h HAVE_WS2TCPIP_H)
-#endif(CMAKE_HOST_WIN32)
-#
-#
-#check_function_exists(select, HAVE_SELECT)
-#
-#
-#if(HAVE_SYS_SOCKET_H)
-#  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} sys/socket.h)
-#endif(HAVE_SYS_SOCKET_H)
-#
-#if(CMAKE_HOST_WIN32)
-#  if(NOT HAVE_SELECT)
-#    if(HAVE_WINSOCK2_H)
-#      set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} winsock2.h)
-#    endif(HAVE_WINSOCK2_H)
-#    if(HAVE_WS2TCPIP_H)
-#      set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} ws2tcpip.h)
-#    endif(HAVE_WS2TCPIP_H)
-#    if(HAVE_WINSOCK2_H)
-#      set(SOCKET_LIBRARIES ws2_32)
-#    else(HAVE_WINSOCK2_H)
-#      set(SOCKET_LIBRARIES wsock32)
-#    endif(HAVE_WINSOCK2_H)
-#  endif(NOT HAVE_SELECT)
-#endif(CMAKE_HOST_WIN32)
-#
-#
-#if(MSVC)
-#  include_directories(${CMAKE_SOURCE_DIR}/libchaos/include/msinttypes)
-#  set(HAVE_STDINT_H 1)
-#  set(HAVE_INTTYPES_H 1)
-##  add_definitions(-D_POSIX_)
-##  add_definitions( "/W0 /D_CRT_SECURE_NO_WARNINGS /wd4005 /wd4996 /nologo" )
-#  add_definitions("/W0 /D_CRT_SECURE_NO_WARNINGS")
-#  set(MSINTTYPES_HEADERS ${CMAKE_SOURCE_DIR}/libchaos/include/msinttypes/stdint.h  ${CMAKE_SOURCE_DIR}/libchaos/include/msinttypes/inttypes.h)
-#endif()
-#
-#
-set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")
-set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME} CACHE FILEPATH "configuration directory")
-set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME} CACHE FILEPATH "plugin directory")
-
-add_definitions(-DPREFIX=\"${PREFIX}\")
-add_definitions(-DSYSCONFDIR=\"${SYSCONFDIR}\")
-add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
-
-add_definitions(-DBUILD_IRCD=1)
-
 
 include("${CMAKE_SOURCE_DIR}/libchaos/cmake/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
-#
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
-#               ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-#
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/chaosircd/config.h.cmake
-#               ${CMAKE_CURRENT_BINARY_DIR}/include/chaosircd/config.h)
-#
-#include_directories(
-#   ${CMAKE_CURRENT_BINARY_DIR}/src
-#   ${CMAKE_CURRENT_BINARY_DIR}
-#   ${CMAKE_CURRENT_SOURCE_DIR}/include
-#   ${CMAKE_CURRENT_SOURCE_DIR}/libchaos/include
-#   ${CMAKE_CURRENT_BINARY_DIR}/include
-#)
+include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
 
-set(CC "${CMAKE_C_COMPILER}")
-set(CFLAGS "${CMAKE_C_FLAGS}")
-set(INSTALL "")
-set(LIBS "${LINK_LIBRARIES}")
-set(prefix "${CMAKE_INSTALL_PREFIX}")
-set(bindir "${prefix}/bin")
-set(exec_prefix "${prefix}")
-set(includedir "${prefix}/include")
-set(inidir "${prefix}/var/lib/chaosircd")
-set(libexecdir "${prefix}/libexec")
-set(logdir "${prefix}/var/log/chaosircd")
-set(pidfile "${prefix}/var/run/chaosircd.pid")
-set(plugindir "${prefix}/lib/chaosircd")
-set(sbindir "${prefix}/sbin")
-set(sysconfdir "${prefix}/etc/chaosircd")
 
 set(CONFFILES conf/children.conf conf/classes.conf
    conf/inis.conf conf/ircd.conf conf/logs.conf

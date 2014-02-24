@@ -100,7 +100,7 @@ static void m_userhost(struct lclient *lcptr, struct client *cptr,
   size_t         i;
   int            first = 1;
   
-  len = snprintf(result, sizeof(result), ":%s 302 %s :",
+  len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
                  client_me->name, cptr->name);
   
   n = str_tokenize(argv[2], av, 63);

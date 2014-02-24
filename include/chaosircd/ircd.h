@@ -87,19 +87,20 @@
 
 #ifdef WIN32
   #ifdef BUILD_MODULES
-  #define IRCD_MODULE(_type_) extern __attribute__((dllexport)) _type_
-  #endif
-  #ifdef BUILD_IRCD
-  #define IRCD_DATA_PROTO(_type_)  extern __declspec(dllexport) _type_
-  #define IRCD_DATA_DECL(_type_)   _type_
+    #define IRCD_MODULE(_type_) extern __attribute__((dllexport)) _type_
+    #define IRCD_API(_type_) __declspec(dllimport) _type_
+    #define IRCD_DATA_PROTO IRCD_API
+  #elif defined(BUILD_IRCD)
+    #define IRCD_DATA_PROTO(_type_)  extern __declspec(dllexport) _type_
+    #define IRCD_DATA_DECL(_type_)   _type_
   //__declspec(dllexport) _type_
     //extern __declspec(dllexport)  //__attribute__((dllexport)) _type_
-  #define IRCD_API(_type_)  _type_
+    #define IRCD_API(_type_)  __declspec(dllexport) _type_
     // __declspec(dllexport)  //   __attribute__((dllexport)) _type_
   #else
-  #define IRCD_DATA_PROTO(_type_) extern __attribute__((dllimport)) _type_
+    #define IRCD_DATA_PROTO(_type_) extern __attribute__((dllimport)) _type_
 //  #define IRCD_DATA_DECL(_type_) __attribute__((dllimport)) _type_
-  #define IRCD_API(_type_)                                    _type_
+    #define IRCD_API(_type_)                                    _type_
   #endif
 #endif
 

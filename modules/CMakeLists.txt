@@ -18,6 +18,8 @@
 #
 #message(STATUS "Scanning for modules...")
 
+add_definitions(-DBUILD_MODULES=1)
+
 file(GLOB ALL_MODULES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" */??_*.c)
 
 foreach(MODULE_SOURCE ${ALL_MODULES})
