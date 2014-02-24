@@ -64,11 +64,21 @@ endif()
 
 check_library_exists(dl dlsym "" HAVE_DLFCN)
 
+if(HAVE_DLFCN)
+  set(DLFCN_LIBRARIES dl)
+endif()
+
 if(NOT HAVE_DLFCN)
   if(CMAKE_HOST_WIN32)
     set(DLFCN_SOURCES src/dlfcn_win32.c)
   endif(CMAKE_HOST_WIN32)  
 endif(NOT HAVE_DLFCN)
+
+check_library_exists(m sin "" HAVE_MATH)
+
+if(HAVE_MATH)
+  set(MATH_LIBRARIES m)
+endif()
 
 
 if(HAVE_SYS_SOCKET_H)
@@ -105,7 +115,7 @@ else(CMAKE_HOST_WIN32)
     set(USE_POLL TRUE)
   elseif(HAVE_SELECT)
     set(USE_SELECT TRUE)
-  endif(HAVE_SELECT)
+  endif()
 
 endif(CMAKE_HOST_WIN32)
 
@@ -171,4 +181,23 @@ string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
 set_target_properties(libchaos PROPERTIES SOVERSION ${LIBRARY_VERSION})
 
-target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES})
+target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+
+add_executable(test/cfgtest test/cfgtest.c)
+target_link_libraries(test/cfgtest libchaos)
+
+add_executable(test/dbtest test/dbtest.c)
+target_link_libraries(test/dbtest libchaos)
+
+add_executable(test/giftest test/giftest.c)
+target_link_libraries(test/giftest libchaos)
+
+add_executable(test/graphtest test/graphtest.c)
+target_link_libraries(test/graphtest libchaos)
+
+add_executable(test/imagetest test/imagetest.c)
+target_link_libraries(test/imagetest libchaos)
+
+add_executable(test/ttftest test/ttftest.c)
+target_link_libraries(test/ttftest libchaos)
+

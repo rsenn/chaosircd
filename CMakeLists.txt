@@ -173,6 +173,6 @@ add_executable(chaosircd
    include/chaosircd/lclient.h include/chaosircd/msg.h
    include/chaosircd/numeric.h include/chaosircd/oper.h
    include/chaosircd/server.h include/chaosircd/service.h
-   include/chaosircd/user.h include/chaosircd/usermode.h src/y.tab.h)
+   include/chaosircd/user.h include/chaosircd/usermode.h) 
    
 target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})
