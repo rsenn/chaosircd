@@ -15,9 +15,6 @@ set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
 
 add_subdirectory(libchaos)
 
-set(LEXER_SOURCE src/ircd.l)
-set(PARSER_SOURCE src/ircd.y)
-
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libchaos/cmake")
 
 include("${CMAKE_SOURCE_DIR}/libchaos/cmake/PlatformChecks.cmake")
@@ -32,10 +29,6 @@ if(NOT BUILD_SHARED_LIBS)
 endif(NOT BUILD_SHARED_LIBS)
 
 
-
-if(NOT HAVE_UNISTD_H)
-  set(YY_NO_UNISTD_H 1)
-endif()
 
 #if(CMAKE_HOST_WIN32)
 ##  check_include_file(winsock.h HAVE_WINSOCK2_H)
@@ -146,28 +139,4 @@ foreach(SUBSTFILE ${TOOLS})
                  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY NEWLINE_STYLE UNIX)
 endforeach(SUBSTFILE)
 
-bison_target(IRCD_PARSER src/ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/src/y.tab.h")
-flex_target(IRCD_SCANNER src/ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_lexer.c)
-add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
-
-add_executable(src/chaosircd 
-   ${BISON_IRCD_PARSER_OUTPUTS}
-   ${FLEX_IRCD_SCANNER_OUTPUTS}
-   src/chanmode.c src/channel.c src/chanuser.c src/chars.c
-   src/class.c src/client.c src/conf.c src/ircd.c
-   src/lclient.c src/main.c src/msg.c src/numeric.c src/oper.c
-   src/server.c src/service.c src/user.c src/usermode.c
-   ${MSINTTYPES_HEADERS}
-   config.h contrib/shellcode.h include/chaosircd/chanmode.h
-   include/chaosircd/channel.h include/chaosircd/chanuser.h
-   include/chaosircd/chars.h include/chaosircd/class.h
-   include/chaosircd/client.h include/chaosircd/conf.h
-   include/chaosircd/config.h include/chaosircd/ircd.h
-   include/chaosircd/lclient.h include/chaosircd/msg.h
-   include/chaosircd/numeric.h include/chaosircd/oper.h
-   include/chaosircd/server.h include/chaosircd/service.h
-   include/chaosircd/user.h include/chaosircd/usermode.h) 
-   
-target_link_libraries(src/chaosircd libchaos ${SOCKET_LIBRARIES})
-
-link_directories("${CMAKE_BINARY_DIR}")
+add_subdirectory(src)

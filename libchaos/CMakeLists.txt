@@ -72,24 +72,4 @@ set_target_properties(libchaos PROPERTIES SOVERSION ${LIBRARY_VERSION})
 
 target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 
-link_directories("${CMAKE_BINARY_DIR}")
-#link_directories(..)
-
-add_executable(test/cfgtest test/cfgtest.c)
-target_link_libraries(test/cfgtest libchaos)
-
-add_executable(test/dbtest test/dbtest.c)
-target_link_libraries(test/dbtest libchaos)
-
-add_executable(test/giftest test/giftest.c)
-target_link_libraries(test/giftest libchaos)
-
-add_executable(test/graphtest test/graphtest.c)
-target_link_libraries(test/graphtest libchaos)
-
-add_executable(test/imagetest test/imagetest.c)
-target_link_libraries(test/imagetest libchaos)
-
-add_executable(test/ttftest test/ttftest.c)
-target_link_libraries(test/ttftest libchaos)
-
+add_subdirectory(test)
