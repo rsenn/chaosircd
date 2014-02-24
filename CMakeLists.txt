@@ -146,3 +146,6 @@ foreach(SUBSTFILE ${TOOLS})
 endforeach(SUBSTFILE)
 
 add_subdirectory(src)
+
+
+add_subdirectory(modules)
