@@ -9,6 +9,7 @@ if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
 
+include("${LIBCHAOS_SOURCE_DIR}/cmake/PlatformChecks.cmake")
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
