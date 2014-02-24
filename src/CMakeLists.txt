@@ -36,7 +36,7 @@ add_executable(chaosircd
    lclient.c main.c msg.c numeric.c oper.c
    server.c service.c user.c usermode.c
    ${MSINTTYPES_HEADERS}
-   config.h "${CMAKE_SOURCE_DIR}/include/chaosircd/chanmode.h"
+   "${CMAKE_SOURCE_DIR}/include/chaosircd/chanmode.h"
    "${CMAKE_SOURCE_DIR}/include/chaosircd/channel.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/chanuser.h"
    "${CMAKE_SOURCE_DIR}/include/chaosircd/chars.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/class.h"
    "${CMAKE_SOURCE_DIR}/include/chaosircd/client.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/conf.h"
