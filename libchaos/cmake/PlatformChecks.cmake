@@ -1,6 +1,5 @@
 include(CheckFunctionExists)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
   include(ConfigStdIncludes)
   include(ConfigSockets)
   include(ConfigDlFcn)

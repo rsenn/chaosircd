@@ -9,8 +9,11 @@ project(${PACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
+set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include("${CMAKE_SOURCE_DIR}/cmake/PlatformChecks.cmake")
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PlatformChecks.cmake")
 
 include(FindBISON)
 include(FindFLEX)
@@ -29,7 +32,7 @@ endif(NOT BUILD_SHARED_LIBS)
  
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
-include("${CMAKE_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
 
 substitute_project_includes(${PACKAGE_NAME})
 
