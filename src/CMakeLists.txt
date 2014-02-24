@@ -9,12 +9,6 @@ if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
 
-include("${LIBCHAOS_SOURCE_DIR}/cmake/PlatformChecks.cmake")
-
-if(NOT HAVE_UNISTD_H)
-  set(YY_NO_UNISTD_H 1)
-endif()
-
 set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")
 set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME} CACHE FILEPATH "configuration directory")
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME} CACHE FILEPATH "plugin directory")

@@ -19,6 +19,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libchaos/cmake")
 
 include("${CMAKE_SOURCE_DIR}/libchaos/cmake/PlatformChecks.cmake")
 
+if(NOT HAVE_UNISTD_H)
+  set(YY_NO_UNISTD_H 1)
+endif()
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
   set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
