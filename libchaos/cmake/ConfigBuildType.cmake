@@ -1,11 +1,27 @@
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_COMPILER_IS_GNUCC)
+
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_C_FLAGS_DEBUG "-g -ggdb -O0 -Wall")
-elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+#elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -ggdb -O2 -Wall")
-elseif(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+#elseif(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
   set(CMAKE_C_FLAGS_MINSIZEREL "-fomit-frame-pointer -Wall -Os")
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+#elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
    set(CMAKE_C_FLAGS_RELEASE "-g -Wall -O2")
+#endif()
+
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+
+  set(CMAKE_C_FLAGS_DEBUG "-g")
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g")
+  set(CMAKE_C_FLAGS_MINSIZEREL "-Os")
+  set(CMAKE_C_FLAGS_RELEASE "-O2")
+
+else()
+
+  set(CMAKE_C_FLAGS_DEBUG "/Z7")
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Z7")
+  set(CMAKE_C_FLAGS_MINSIZEREL "/Os")
+  set(CMAKE_C_FLAGS_RELEASE "/Ox")
+
 endif()
-
-
