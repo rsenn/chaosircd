@@ -20,6 +20,7 @@ set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/cmake")
 
 
 include("${LIBCHAOS_SOURCE_DIR}/cmake/PlatformChecks.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigBuildType.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigMathLib.cmake")
 
 include(FindBISON)

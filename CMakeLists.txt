@@ -18,6 +18,7 @@ add_subdirectory(libchaos)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libchaos/cmake")
 
 include("${CMAKE_SOURCE_DIR}/libchaos/cmake/PlatformChecks.cmake")
+include("${CMAKE_SOURCE_DIR}/libchaos/cmake/ConfigBuildType.cmake")
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
