@@ -24,6 +24,7 @@
  * -------------------------------------------------------------------------- */
 #include <libchaos/log.h>
 #include <libchaos/str.h>
+#include <libchaos/timer.h>
 #include <libchaos/dlink.h>
 
 /* -------------------------------------------------------------------------- *
@@ -84,6 +85,23 @@ static int valid_base32(const char *s)
   return 1;
 }
 
+/* -------------------------------------------------------------------------- */
+static int check_hashes(int nhashes, char *hasharray[], const char *hash)
+{
+  int i;
+
+  for(i = 0; i < nhashes; i++)
+  {
+    size_t len = str_len(hasharray[i]);
+   
+    debug(ircd_log, "checking hash[%d](%s) against %s", i, hasharray[i], hash);
+    
+    if(!str_ncmp(hasharray[i], hash, len))
+      return 1;
+  }
+  return 0;
+}
+
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
@@ -117,6 +135,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
     {
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
 
+     cptr->lastmsg = timer_systime;
       //log(user_log, L_debug, "Set geolocation for %s to %s", cptr->name, cptr->user->name);    
     }
    
@@ -131,19 +150,38 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 static void m_geolocation(struct lclient *lcptr, struct client *cptr,
                           int             argc,  char         **argv)
 {
+  enum { SET, SEARCH } mode;
   int minlen = 9;
-  int len;
+  int i;
+  int len,  hashcount;
+  char **hasharray;
 
   if(argc <= 3)
   {
     numeric_lsend(lcptr, ERR_NEEDMOREPARAMS, argv[1]);
     return;
   }
-    
-  if(!valid_base32(argv[3]))
+
+  if(!str_icmp(argv[2], "SEARCH"))
+    mode = SEARCH;
+  else
+    mode = SET;
+
+  if(mode == SEARCH)
+    hashcount = argc - 3;
+  else
+    hashcount = 1;
+
+  hasharray = &argv[3];
+
+  /* check every hash for valid base32h */
+  for(i = 0; i < hashcount; i++)
   {
-    client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': not base32", server_me, cptr, argv[3]);
-    return;
+    if(!valid_base32(hasharray[i]))
+    {
+      client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': not base32", server_me, cptr, hasharray[i]);
+      return;
+    }
   }
 
   if(!str_icmp(argv[2], "SEARCH"))
@@ -151,12 +189,16 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
     minlen = 2;
   }
 
-  len = str_len(argv[3]);
-
-  if(len < minlen)
+  /* check every hash for minimum length */
+  for(i = 0; i < hashcount; i++)
   {
-    client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': too short", server_me, cptr, argv[3]);
-    return;
+    len = str_len(hasharray[i]);
+
+    if(len < minlen)
+    {
+      client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': too short", server_me, cptr, hasharray[i]);
+      return;
+    }
   }
 
   if(!str_icmp(argv[2], "SET"))
@@ -181,7 +223,8 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
        if(str_len(user->name) < len) continue;
        if(!valid_base32(user->name)) continue;
 
-       if(!str_ncmp(user->name, argv[3], len))
+//       if(!str_ncmp(user->name, argv[3], len))
+       if(check_hashes(hashcount, hasharray, user->name))
        {
          size_t toklen = str_len(user->client->name) + 1 + str_len(user->name);
 
@@ -192,11 +235,11 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
          }
          dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), " %N!%U", user->client, user->client);
 
+         if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
+           lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
+
          count++;
        }
-
-       if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
-         lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
      }
      if(dlen)
        client_send(cptr, "%s", buffer);
