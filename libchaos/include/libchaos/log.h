@@ -45,7 +45,7 @@
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 
-#define LOG_ALL 0xffffffffffffffffLLU
+#define LOG_ALL 0xffffffffffffffffull
 #define LOG_SOURCE_COUNT (sizeof(uint64_t) << 3)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -206,23 +206,28 @@ CHAOS_API(void         )log_drain_level       (struct dlog  *dlptr,
 /* ------------------------------------------------------------------------ *
  * Write a log line.                                                          *
  * ------------------------------------------------------------------------ */
+#ifndef DEBUG
 CHAOS_API(void         )log_output            (int           src,
                                                int           level,
                                                const char   *format,
                                                ...);
-
+#endif
 /* ------------------------------------------------------------------------ *
  * Dump log entries and heap.                                                 *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)         log_source_dump       (int id);
 CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 
+#ifdef _MSC_VER
+#define fprintf(ios, ...) \
+  log(conf_log, L_warning, __VA_ARGS__)
+#else
 #define fprintf(ios, format...) \
-  log_output(conf_log, L_warning, format)
+  log(conf_log, L_warning, format)
+#endif
+/*#if 1*/
 
-#if 1
-# if 0
-
+# ifdef DEBUG
 /* 
  * when DEBUG is defined the normal log 
  * messages get file/line instead of 
@@ -238,7 +243,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 #  define dump(src, format...) \
             log_debug(__FILE__, __LINE__, (src), L_debug, format)
 
-CHAOS_API(void log_debu)g(const char *file, int line,
+CHAOS_API(void log_debug)(const char *file, int line,
                       int src, int level, const char *format, ...);
 # else
 
@@ -248,20 +253,27 @@ CHAOS_API(void log_debu)g(const char *file, int line,
  * get compiled.
  */
 
-#  define debug(format...) ;
+#  define debug(...) ;
 
+#ifdef _MSC_VER
+#  define dump(src, ...) \
+            log_output((src), L_debug, __VA_ARGS__)
+#else
 #  define dump(src, format...) \
             log_output((src), L_debug, format)
-
+#endif
 
 /*#  define log(src, level, format...) \
             log_output((src), (level), format)*/
 #define log log_output
 
-# endif
-
-# define puts(s...) log(log_log, L_verbose, s)
+# endif //defined DEBUG
+#ifdef _MSC_VER
+# define puts(...) log(log_log, L_verbose, __VA_ARGS__)
 #else
+# define puts(s...) log(log_log, L_verbose, s)
+#endif
+/*#else
 
 #define log log_output
 #define dump log_output_debug
@@ -277,6 +289,6 @@ CHAOS_API(void log_debu)g(const char *file, int line,
 CHAOS_API(void) log_output_debug(int src, const char *format, ...);  
 CHAOS_API(void) log_output_dummy(int src, const char *format, ...);  
 
-#endif /* HAVE_VARARG_MACROS */
+#endif *//* HAVE_VARARG_MACROS */
 
 #endif /* LIB_LOG_H */
