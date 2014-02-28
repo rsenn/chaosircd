@@ -220,8 +220,8 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 #define fprintf(ios, format...) \
   log_output(conf_log, L_warning, format)
 
-#if 0
-# ifdef DEBUG
+#if 1
+# if 0
 
 /* 
  * when DEBUG is defined the normal log 
@@ -238,7 +238,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 #  define dump(src, format...) \
             log_debug(__FILE__, __LINE__, (src), L_debug, format)
 
-CHAOS_API(void) log_debug(const char *file, int line,
+CHAOS_API(void log_debu)g(const char *file, int line,
                       int src, int level, const char *format, ...);
 # else
 
@@ -272,7 +272,7 @@ CHAOS_API(void) log_debug(const char *file, int line,
 # define debug log_output_dummy
 #endif
 
-#define puts(x...) log_output(log_log, L_verbose, x)
+#define puts(x) log_output(log_log, L_verbose, x)
 
 CHAOS_API(void) log_output_debug(int src, const char *format, ...);  
 CHAOS_API(void) log_output_dummy(int src, const char *format, ...);  
