@@ -134,6 +134,12 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
   int minlen = 9;
   int len;
 
+  if(argc <= 3)
+  {
+    numeric_lsend(lcptr, ERR_NEEDMOREPARAMS, argv[1]);
+    return;
+  }
+    
   if(!valid_base32(argv[3]))
   {
     client_send(cptr, ":%S NOTICE %C :(m_geolocation) invalid geohash '%s': not base32", server_me, cptr, argv[3]);
@@ -141,8 +147,10 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
   }
 
   if(!str_icmp(argv[2], "SEARCH"))
+  {
     minlen = 2;
-    
+  }
+
   len = str_len(argv[3]);
 
   if(len < minlen)
@@ -160,8 +168,11 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
      struct user *user;
      struct node *node;
      char buffer[IRCD_LINELEN+1];
+     int count;
      size_t di, dlen = 0;
      di = str_snprintf(buffer, sizeof(buffer), ":%S 600 %N", server_me, cptr);
+
+     count = 0;
 
      dlink_foreach_data(&user_list, node, user)
      {
@@ -180,12 +191,20 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
            dlen = 0;
          }
          dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), " %N!%U", user->client, user->client);
+
+         count++;
        }
+
+       if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
+         lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
      }
      if(dlen)
        client_send(cptr, "%s", buffer);
 
      client_send(cptr, ":%S 601 %s :end of /GEOLOCATION query", server_me, argv[3]);
+     
+     if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
+       lclient_send(lcptr, ":%S NOTICE %N :--- end of /geolocation (%d replies)", server_me, cptr, count);
   }
 }
 

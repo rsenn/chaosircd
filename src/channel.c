@@ -437,8 +437,7 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
                      cptr, cmd, chptr->name, text);
 
     
-    debug(channel_log, "Bursting channel %s to %s.",
-                  chptr->name, lcptr->name);
+  //  debug(channel_log, "Message to channel %s from %s.", chptr->name, lcptr->name);
   
   dlink_foreach_data(&chptr->lchanusers, node, acuptr)
   {

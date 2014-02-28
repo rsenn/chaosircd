@@ -598,7 +598,7 @@ void log_voutput(int src, int level, const char *format, va_list ap)
   }
 }
 
-
+#ifndef DEBUG
 void log_output(int src, int level, const char *format, ...) 
 {
   va_list ap;
@@ -633,7 +633,7 @@ void log_output_dummy(int src, const char *format, ...)
 {
 }
 #endif /* HAVE_VARARG_MACROS */
-
+#endif // ndef DEBUG
 /* ------------------------------------------------------------------------ *
  * Log a line in debugging mode.                                            *
  * ------------------------------------------------------------------------ */

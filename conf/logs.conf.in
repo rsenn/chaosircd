@@ -1,4 +1,4 @@
- A log drain - redirecting logging to a file
+# A log drain - redirecting logging to a file
 
 log {
   path     = "@logdir@/ircd.log";
