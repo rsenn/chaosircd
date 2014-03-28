@@ -1026,13 +1026,15 @@ do
   # Work around the forget-to-reset-the-flag bug.
   echo 't clr' >>$CONFIG_STATUS
   echo ': clr' >>$CONFIG_STATUS
-  sed ${ac_max_here_lines}q conftest.undefs >>$CONFIG_STATUS
+  #sed ${ac_max_here_lines}q conftest.undefs >>$CONFIG_STATUS
+  cat conftest.undefs >>$CONFIG_STATUS
   echo 'CEOF
   sed -f $tmp/undefs.sed $tmp/in >$tmp/out
   rm -f $tmp/in
   mv $tmp/out $tmp/in
 ' >>$CONFIG_STATUS
-  sed 1,${ac_max_here_lines:-\$}d conftest.undefs >conftest.tail
+  #sed 1,${ac_max_here_lines:-\$}d conftest.undefs >conftest.tail
+  echo -n >conftest.tail
   rm -f conftest.undefs
   mv conftest.tail conftest.undefs
 done
