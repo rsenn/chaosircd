@@ -2,13 +2,13 @@
 
 # Global settings
 global {
-  name   = "sabcat.blah.ch";    # Server name (doesn't need 
+  name   = "crowdguard.org";    # Server name (doesn't need 
                                 # to match real hostname).
-  info   = "fuck society";      # Information about the server
+  info   = "CrowdGuard Server";      # Information about the server
                                 # shown in /links, /whois and others
   detach = yes;                 # Detach from terminal after 
                                 # configfile coldstart
-  hub    = no;                  # Hub mode: server forwards messages
+  hub    = yes;                  # Hub mode: server forwards messages
                                 # between two or more servers
   pid    = "@pidfile@";
 };
@@ -27,10 +27,10 @@ mfiles {
 .include "@sysconfdir@/opers.conf"        # IRC Operators
 .include "@sysconfdir@/ssl.conf"          # SSL contexts
 
-# Listen for incoming SSL connections on port 994
+# Listen for incoming SSL connections on port 9200
 listen {
   address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-  port     = 994;                         # Port to listen to
+  port     = 9200;                         # Port to listen to
   protocol = "irc";                       # Protocol handler for this port
   class    = "clients";                   # Class for client connects
   ssl      = yes;                         # Use OpenSSL encryption?
@@ -42,10 +42,10 @@ listen {
                                           # accept() is called.
 };
 
-# Listen for incoming connections on port 6667
+# Listen for incoming connections on port 9990
 listen {
   address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-  port     = 6667;                        # Port to listen to
+  port     = 9990;                        # Port to listen to
   protocol = "irc";                       # Protocol handler for this port
   class    = "clients";                   # Class for client connects
   ssl      = no;                          # Use OpenSSL encryption?

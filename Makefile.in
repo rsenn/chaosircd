@@ -55,7 +55,7 @@ DISTFILES = $(FILES) configure
 
 #config.mak: config.mak.in config.status
 #	@echo -e "  \033[31:1mCONFIG\033[0m  $(reldir)$@"
-#	@(./config.status config.mak) >& /dev/null
+#	@(./config.status config.mak) >/dev/null
 
 # Files that go into development tarball
 DEVFILES = CVS $(FILES)
