@@ -108,7 +108,7 @@ dummy=$tmp/dummy ;
 tmpfiles="$dummy.c $dummy.o $dummy.rel $dummy" ;
 case $CC_FOR_BUILD,$HOST_CC,$CC in
  ,,)    echo "int x;" > $dummy.c ;
-	for c in gcc c89 c99 cc ; do
+	for c in cc gcc c89 c99 ; do
 	  if ($c -c -o $dummy.o $dummy.c) >/dev/null 2>&1 ; then
 	     CC_FOR_BUILD="$c"; break ;
 	  fi ;
@@ -817,50 +817,8 @@ EOF
 		echo ${UNAME_PROCESSOR}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
 	esac
 	exit ;;
-    i*:CYGWIN*:* | i*:MINGW*:* | i*:mingw*:*)
-        TMPDIR='C:\\WINDOWS\\Temp'
-        eval $set_cc_for_build
-        sed 's/^        //' << EOF >$dummy.c
-        MACHINE=unknown
-        #ifdef WIN32
-        MACHINE=win32
-        #endif
-        #ifdef _WIN32
-        MACHINE=win32
-        #endif
-        #ifdef __MINGW32__
-        MACHINE=mingw32
-        #endif
-        #ifdef __CYGWIN__
-        MACHINE=cygwin
-        #endif
-        #ifdef __CYGWIN32__
-        MACHINE=cygwin
-        #endif
-EOF
-        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
-        TMPDIR='C:\\WINDOWS\\Temp'
-        eval $set_cc_for_build
-        sed 's/^        //' << EOF >$dummy.c
-        MACHINE=unknown
-        #ifdef WIN32
-        MACHINE=win32
-        #endif
-        #ifdef _WIN32
-        MACHINE=win32
-        #endif
-        #ifdef __MINGW32__
-        MACHINE=mingw32
-        #endif
-        #ifdef __CYGWIN__
-        MACHINE=cygwin
-        #endif
-        #ifdef __CYGWIN32__
-        MACHINE=cygwin
-        #endif
-EOF
-        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
-	echo ${UNAME_MACHINE}-pc-$MACHINE
+    i*:CYGWIN*:*)
+	echo ${UNAME_MACHINE}-pc-cygwin
 	exit ;;
     *:MINGW64*:*)
 	echo ${UNAME_MACHINE}-pc-mingw64
@@ -906,13 +864,13 @@ EOF
 	echo ${UNAME_MACHINE}-pc-uwin
 	exit ;;
     amd64:CYGWIN*:*:* | x86_64:CYGWIN*:*:*)
-	echo x86_64-unknown-$MACHINE
+	echo x86_64-unknown-cygwin
 	exit ;;
     amd64:MSYS*:*:* | x86_64:MSYS*:*:*)
 	echo x86_64-unknown-msys
 	exit ;;
     p*:CYGWIN*:*)
-	echo powerpcle-unknown-$MACHINE
+	echo powerpcle-unknown-cygwin
 	exit ;;
     prep*:SunOS:5.*:*)
 	echo powerpcle-unknown-solaris2`echo ${UNAME_RELEASE}|sed -e 's/[^.]*//'`
