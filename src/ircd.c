@@ -387,6 +387,8 @@ void ircd_init(int argc, char **argv, char **envp)
   ircd_log = log_source_register("ircd");
   ircd_log_in = log_source_register("in");
   ircd_log_out = log_source_register("out");
+
+  log_source_filter = (~log_sources[ircd_log_in].flag) & (~log_sources[ircd_log_out].flag);
   
   mem_static_create(&ircd_heap, sizeof(struct support), SUPPORT_BLOCK_SIZE);
   mem_static_note(&ircd_heap, "support heap");
@@ -409,10 +411,10 @@ void ircd_init(int argc, char **argv, char **envp)
   
   log(ircd_log, L_status, "*** Done initialising %s core ***", PACKAGE_NAME);
 
-#if 1
-  ircd_drain = log_drain_setfd(1, LOG_ALL, L_debug, 0);
+#ifdef DEBUG
+  ircd_drain = log_drain_setfd(1, LOG_ALL & log_source_filter, L_debug, 0);
 #else
-  ircd_drain = log_drain_setfd(1, LOG_ALL, L_status, 0);
+  ircd_drain = log_drain_setfd(1, LOG_ALL & log_source_filter, L_status, 0);
 #endif /* DEBUG */
   
   hook_register(conf_done, HOOK_DEFAULT, ircd_coldstart);
