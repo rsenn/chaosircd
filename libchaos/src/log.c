@@ -61,6 +61,7 @@ struct sheap log_heap;
 struct list  log_list;
 int          log_dirty;
 struct slog  log_sources[LOG_SOURCE_COUNT];
+uint64_t     log_source_filter = 0xffffffffffffffffllu;
 uint32_t     log_id;
 struct dlog  log_drain;
 
@@ -222,12 +223,12 @@ char *log_source_assemble(uint64_t flags)
   static char ret[512];
   size_t      n = 0;
   uint32_t    i;
-  
+ /* 
   if(flags == LOG_ALL)
   {
     strcpy(ret, "all");
     return ret;
-  }
+  }*/
   
   for(i = 0; i < LOG_SOURCE_COUNT; i++)
   {
@@ -281,7 +282,7 @@ uint64_t log_source_parse(const char *sources)
   for(i = 0; i < srcc; i++)
   {
     if(!str_icmp(srcv[i], "all"))
-      return LOG_ALL;
+      return LOG_ALL & log_source_filter;
     
     hash = str_ihash(srcv[i]);
   
@@ -740,7 +741,7 @@ void log_drain_dump(struct dlog *dlptr)
     dump(log_log, "   refcount: %u", dlptr->refcount);
     dump(log_log, "       hash: %p", dlptr->hash);
     dump(log_log, "    sources: %s", log_source_assemble(dlptr->sources));
-    dump(log_log, "      level: %s", log_levels[dlptr->sources][1]);
+    dump(log_log, "      level: %s", log_levels[dlptr->level][1]);
     dump(log_log, "         fd: %i", dlptr->fd);
     dump(log_log, "     prefix: %s", (dlptr->prefix ? "yes" : "no"));
     dump(log_log, "   truncate: %s", (dlptr->truncate ? "yes" : "no"));

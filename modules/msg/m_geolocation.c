@@ -60,7 +60,7 @@ static char *m_geolocation_help[] = {
 };
 
 static struct msg m_geolocation_msg = {
-  "GEOLOCATION", 1, 3, MFLG_CLIENT,
+  "GEOLOCATION", 1, 0, MFLG_CLIENT,
   { NULL, m_geolocation, ms_geolocation, m_geolocation },
   m_geolocation_help
 };
@@ -94,7 +94,7 @@ static int check_hashes(int nhashes, char *hasharray[], const char *hash)
   {
     size_t len = str_len(hasharray[i]);
    
-    debug(ircd_log, "checking hash[%d](%s) against %s", i, hasharray[i], hash);
+    //debug(ircd_log, "checking hash[%d](%s) against %s", i, hasharray[i], hash);
     
     if(!str_ncmp(hasharray[i], hash, len))
       return 1;
