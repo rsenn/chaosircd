@@ -134,10 +134,10 @@ AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LI
 AC_SUBST([plugindir])
 
 
-if test "$libdir" != /lib && test "$libdir" != /usr/lib; then
-  LDFLAGS="${LDFLAGS:+$LDFLAGS }-Xlinker -rpath=\$(libdir)"
-  PIE_LDFLAGS="${PIE_LDFLAGS:+$PIE_LDFLAGS }-Xlinker -rpath=\$(libdir)"
-fi
+#if test "$libdir" != /lib && test "$libdir" != /usr/lib; then
+#  LDFLAGS="${LDFLAGS:+$LDFLAGS }-Xlinker -rpath=\$(libdir)"
+#  PIE_LDFLAGS="${PIE_LDFLAGS:+$PIE_LDFLAGS }-Xlinker -rpath=\$(libdir)"
+#fi
 
 dnl LDFLAGS="${LDFLAGS:+$LDFLAGS }-rdynamic"
 DEFS='-DBUILD_CHAOS'
