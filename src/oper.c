@@ -281,7 +281,7 @@ void oper_up(struct oper *optr, struct client *cptr)
     hooks_call(oper_up, HOOK_DEFAULT, cptr->user);
   }
   
-  log(oper_log, L_status, "%s (%s@%s) has become a k-rad whore.",
+  log(oper_log, L_status, "%s (%s@%s) has become an IRC operator.",
       cptr->name, cptr->user->name, cptr->host);
 }
   
