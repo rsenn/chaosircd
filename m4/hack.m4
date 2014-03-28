@@ -997,17 +997,19 @@ do
   # Work around the forget-to-reset-the-flag bug.
   echo 't clr' >>$CONFIG_STATUS
   echo ': clr' >>$CONFIG_STATUS
-  sed ${ac_max_here_lines}q conftest.defines >>$CONFIG_STATUS
+  #sed ${ac_max_here_lines:-\$}q conftest.defines >>$CONFIG_STATUS
+  cat conftest.defines >>$CONFIG_STATUS
   echo 'CEOF
   sed -f $tmp/defines.sed $tmp/in >$tmp/out
   rm -f $tmp/in
   mv $tmp/out $tmp/in
 ' >>$CONFIG_STATUS
-  sed 1,${ac_max_here_lines}d conftest.defines >conftest.tail
+  #sed 1,${ac_max_here_lines:-\$}d conftest.defines >conftest.tail
+  echo -n >conftest.tail
   rm -f conftest.defines
   mv conftest.tail conftest.defines
 done
-rm -f conftest.defines
+#rm -f conftest.defines
 echo '  fi # grep' >>$CONFIG_STATUS
 echo >>$CONFIG_STATUS
 
@@ -1030,7 +1032,7 @@ do
   rm -f $tmp/in
   mv $tmp/out $tmp/in
 ' >>$CONFIG_STATUS
-  sed 1,${ac_max_here_lines}d conftest.undefs >conftest.tail
+  sed 1,${ac_max_here_lines:-\$}d conftest.undefs >conftest.tail
   rm -f conftest.undefs
   mv conftest.tail conftest.undefs
 done

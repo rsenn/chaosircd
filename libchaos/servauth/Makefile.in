@@ -54,6 +54,7 @@ $(PROGRAM): $(OBJECTS)
 
 # build config
 # ---------------------------------------------------------------------------
+LIBS     += $(DLFCN_LIBS)
 LIBS     += -L$(top_builddir)/src -lchaos
 LIB      += $(SSL_LIBS)
 CPPFLAGS += -DHAVE_CONFIG_H

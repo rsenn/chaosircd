@@ -42,6 +42,7 @@ MODULES              = m_away \
                        m_ntopic \
                        m_nuser \
                        m_omode \
+                       m_opart \
                        m_oper \
                        m_part \
                        m_pass \
