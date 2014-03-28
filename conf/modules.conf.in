@@ -34,7 +34,6 @@ modules {
   load "m_ntopic";          # Synchronizes topic on burst
   load "m_nuser";           # Introduces clients
   load "m_nick";            # Changes nickname
-  load "m_opart";           # Owner part
   load "m_oper";            # Operator authentication
   load "m_omode";           # Oper mode
   load "m_part";            # Makes the client leave a channel
