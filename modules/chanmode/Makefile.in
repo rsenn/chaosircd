@@ -19,6 +19,7 @@ MODULES              = cm_ahalfop \
                        cm_moderated \
                        cm_noext \
                        cm_op \
+                       cm_persistent \
                        cm_secret \
                        cm_topic \
                        cm_voice

@@ -36,6 +36,7 @@ modules {
   load "m_nick";            # Changes nickname
   load "m_oper";            # Operator authentication
   load "m_omode";           # Oper mode
+  load "m_opart";           # Owner /PART
   load "m_part";            # Makes the client leave a channel
   load "m_pass";            # Client authentication
   load "m_ping";            # PING?
@@ -74,6 +75,7 @@ modules {
   load "cm_noext";          # Channel mode +n
   load "cm_secret";         # Channel mode +s
   load "cm_topic";          # Channel mode +t
+  load "cm_persistent";     # Channel mode +P
   load "cm_aop";            # Channel mode +A
   load "cm_ahalfop";        # Channel mode +H 
   load "cm_avoice";         # Channel mode +V
