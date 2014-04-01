@@ -230,7 +230,7 @@ static void m_opart_send(struct lclient *lcptr, struct client *optr,
   {
     struct client *acptr = cuptr->client;
 
-    if(lcptr && lcptr->client == acptr)
+    if(acptr->lclient && lcptr == acptr->lclient)
     {
       if(reason && reason[0])
         client_send(acptr, ":%N!%U@%H PART %s :%s",
