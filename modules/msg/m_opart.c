@@ -45,9 +45,9 @@
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
 static void m_opart (struct lclient *lcptr, struct client *cptr, 
-                    int             argc,  char         **argv);
+                     int             argc,  char         **argv);
 static void ms_opart(struct lclient *lcptr, struct client *cptr, 
-                    int             argc,  char         **argv);
+                     int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
@@ -228,13 +228,26 @@ static void m_opart_send(struct lclient *lcptr, struct client *optr,
 
   dlink_foreach_data(&chptr->lchanusers, node, cuptr)
   {
-    struct client *cptr = cuptr->client;
-       
-    if(reason && reason[0])
-      client_send(cptr, ":%N!%U@%H PART %s :%s",
-                  cptr, cptr, cptr, chptr->name, reason);
+    struct client *acptr = cuptr->client;
+
+    if(lcptr && lcptr->client == acptr)
+    {
+      if(reason && reason[0])
+        client_send(acptr, ":%N!%U@%H PART %s :%s",
+                    acptr, acptr, acptr, chptr->name, reason);
+      else
+        client_send(acptr, ":%N!%U@%H PART %s",
+                    acptr, acptr, acptr, chptr->name);
+    }
     else
-      client_send(cptr, ":%N!%U@%H PART %s",
-                  cptr, cptr, cptr, chptr->name);    
+    {
+      if(reason && reason[0])
+        client_send(acptr, ":%N!%U@%H KICK %s %N :%s",
+                    optr, optr, optr, chptr->name, acptr, reason);
+      else
+        client_send(acptr, ":%N!%U@%H KICK %s %N",
+                    optr, optr, optr, chptr->name, acptr);
+      
+    }
   }
 }
