@@ -193,8 +193,14 @@ void channel_release(struct channel *chptr)
     user_uninvite(node->data);
   
   dlink_foreach_safe(&chptr->backlog, node, next)
-   ; 
-   
+  {
+    struct logentry *e = node->data;
+
+    if(e->text)
+      mem_dynamic_free(&channel_msglog_heap, e->text);
+    
+    mem_static_free(&channel_backlog_heap, e);
+  }
   
   dlink_list_zero(&chptr->lchanusers);
   dlink_list_zero(&chptr->chanusers);
@@ -628,6 +634,29 @@ struct channel *channel_push(struct channel **chptrptr)
   }
       
   return *chptrptr;
+}
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+void channel_backlog(struct channel *chptr, struct client *cptr,
+                     const char     *cmd,   const char *text)
+{
+  struct logentry *e = mem_static_alloc(&channel_backlog_heap);
+
+  strlcpy(e->cmd, cmd, sizeof(e->cmd));
+  strlcpy(e->from, cptr->name, sizeof(e->from));
+  
+  e->ts = timer_systime;
+
+  if(text && text[0])
+  {
+    e->text = mem_dynamic_alloc(&channel_msglog_heap, str_len(text)+1);
+    str_copy(e->text, text);
+  }
+  else
+    e->text = NULL;
+
+  dlink_add_tail(&chptr->backlog, &e->node, e);
 }
 
 /* -------------------------------------------------------------------------- *

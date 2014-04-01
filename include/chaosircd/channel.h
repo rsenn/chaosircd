@@ -238,6 +238,14 @@ extern struct channel *channel_pop            (struct channel *chptr);
 extern struct channel *channel_push           (struct channel **chptrptr);  
 
 /* -------------------------------------------------------------------------- *
+ * Adds an entry to the channel backlog                                       *
+ * -------------------------------------------------------------------------- */
+extern void channel_backlog                   (struct channel *chptr,
+                                               struct client  *cptr,
+                                               const char     *cmd,
+                                               const char     *text);
+
+/* -------------------------------------------------------------------------- *
  * Dump channels and channel heap.                                            *
  * -------------------------------------------------------------------------- */
 extern void            channel_dump           (struct channel *chptr);
