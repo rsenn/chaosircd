@@ -68,6 +68,15 @@ static struct msg m_part_msg = {
 };
 
 /* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+#define channel_owner_flags ((cuptr->flags & CHFLG(o)) | \
+                             (cuptr->flags & CHFLG(h)) | \
+                             (cuptr->flags & CHFLG(v)))
+
+#define is_channel_owner(cuptr) \
+  ((cuptr->flags & channel_owner_flags) == channel_owner_flags)
+
+/* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
 int m_part_load(void)
@@ -123,6 +132,13 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
                 client_me->name, cptr->name, argv[2]);
     return;
   }
+
+  if(is_channel_owner(cuptr))
+  {
+    client_send(cptr, ":%s NOTICE %N :*** You need to /OPART if you really want to leave %s.",
+                server_me->name, cptr, chptr->name);
+    return;
+  } 
 
   m_part_send(NULL, cptr, chptr, reason);
   
