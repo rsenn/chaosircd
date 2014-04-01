@@ -76,6 +76,9 @@ static struct msg m_opart_msg = {
 #define is_channel_owner(cuptr) \
   ((cuptr->flags & channel_owner_flags) == channel_owner_flags)
 
+#define channel_is_persistent(chptr) \
+  ((chptr)->modes & CHFLG(P))
+
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
@@ -154,8 +157,13 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
                 client_me->name, cptr->name, argv[2]);
     return;
   }
-  
-  cuptr = chanuser_find(chptr, cptr);
+
+  if(!channel_is_persistent(chptr))
+  {
+    client_send(cptr, ":%S NOTICE %N :*** Channel %s needs to be persistent (+P) for /OPART",
+                server_me, cptr, chptr->name);
+    return;
+  }
   
   if(cuptr == NULL)
   {

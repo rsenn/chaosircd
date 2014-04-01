@@ -76,6 +76,9 @@ static struct msg m_part_msg = {
 #define is_channel_owner(cuptr) \
   ((cuptr->flags & channel_owner_flags) == channel_owner_flags)
 
+#define channel_is_persistent(chptr) \
+  ((chptr)->modes & CHFLG(P))
+
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
@@ -133,8 +136,8 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-  if(is_channel_owner(cuptr) && 
-     !str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])))
+  if(is_channel_owner(cuptr) && client_is_local(cptr) && channel_is_persistent(chptr))
+//     !str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])))
   {
     client_send(cptr, ":%s NOTICE %N :*** You need to /OPART if you really want to leave %s.",
                 server_me->name, cptr, chptr->name);
