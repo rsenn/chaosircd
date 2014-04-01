@@ -94,6 +94,37 @@ void m_opart_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
+void m_opart_server_send(struct lclient *lcptr, struct chanuser *cuptr,
+                         const char     *reason)
+{
+  if(reason)
+  {
+    server_send(lcptr, NULL, CAP_UID, CAP_NONE,
+                ":%s OPART %s :%s",
+                cuptr->client->user->uid,
+                cuptr->channel->name,
+                reason);
+    server_send(lcptr, NULL, CAP_NONE, CAP_UID,
+                ":%s OPART %s :%s",
+                cuptr->client->name,
+                cuptr->channel->name,
+                reason);
+  }
+  else
+  {
+    server_send(lcptr, NULL, CAP_UID, CAP_NONE,
+                ":%s OPART %s",
+                cuptr->client->user->uid,
+                cuptr->channel->name);
+    server_send(lcptr, NULL, CAP_NONE, CAP_UID,
+                ":%s OPART %s",
+                cuptr->client->name,
+                cuptr->channel->name);
+  }  
+}
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
 static void m_opart_send(struct lclient *lcptr, struct client *cptr,
                          struct channel *chptr, const char    *reason);
 
@@ -152,7 +183,7 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
- * argv[1] - 'part'                                                           *
+ * argv[1] - 'OPART'                                                          *
  * argv[2] - channel                                                          *
  * argv[3] - reason                                                           *
  * -------------------------------------------------------------------------- */
@@ -178,28 +209,32 @@ static void ms_opart(struct lclient *lcptr, struct client *cptr,
 
   m_opart_send(lcptr, cptr, chptr, argv[3]);
   
-  /* send server PART */
-  chanuser_discharge(lcptr, cuptr, argv[3]);
+  /* send server OPART */
+  m_opart_server_send(lcptr, cuptr, argv[3]);
 
   chanuser_delete(cuptr);
   
-  if(chptr->chanusers.size == 0)
+ // if(chptr->chanusers.size == 0)
     channel_delete(chptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_opart_send(struct lclient *lcptr, struct client *cptr,
+static void m_opart_send(struct lclient *lcptr, struct client *optr,
                          struct channel *chptr, const char    *reason)
 {
-  if(reason && reason[0])
-    channel_send(NULL, chptr, CHFLG(NONE), CHFLG(NONE),
-                 ":%s!%s@%s OPART %s :%s",
-                 cptr->name, cptr->user->name,
-                 cptr->host, chptr->name, reason);
-  else
-    channel_send(NULL, chptr, CHFLG(NONE), CHFLG(NONE),
-                 ":%s!%s@%s OPART %s",
-                 cptr->name, cptr->user->name,
-                 cptr->host, chptr->name);
+  struct chanuser *cuptr;
+  struct node     *node;
+
+  dlink_foreach_data(&chptr->lchanusers, node, cuptr)
+  {
+    struct client *cptr = cuptr->client;
+       
+    if(reason && reason[0])
+      client_send(cptr, ":%N!%U@%H PART %s :%s",
+                  cptr, cptr, cptr, chptr->name, reason);
+    else
+      client_send(cptr, ":%N!%U@%H PART %s",
+                  cptr, cptr, cptr, chptr->name);    
+  }
 }
