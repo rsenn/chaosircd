@@ -170,7 +170,7 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-  m_opart_send(NULL, cptr, chptr, reason);
+  m_opart_send(lcptr, cptr, chptr, reason);
   
   /* send server OPART */
   m_opart_server_send(NULL, cuptr, argv[3]);
