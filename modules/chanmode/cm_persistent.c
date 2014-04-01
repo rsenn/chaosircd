@@ -72,7 +72,7 @@ int cm_persistent_load(void)
   if(chanmode_register(&cm_persistent_mode) == NULL)
     return -1;
   
-  hook_register(chanuser_whois, HOOK_DEFAULT, cm_persistent_hook);
+  //hook_register(chanuser_whois, HOOK_DEFAULT, cm_persistent_hook);
   
   return 0;
 }
@@ -82,7 +82,7 @@ void cm_persistent_unload(void)
   /* unregister the channel mode */
   chanmode_unregister(&cm_persistent_mode);
   
-  hook_unregister(chanuser_whois, HOOK_DEFAULT, cm_persistent_hook);
+ // hook_unregister(chanuser_whois, HOOK_DEFAULT, cm_persistent_hook);
 }
 
 /* -------------------------------------------------------------------------- *

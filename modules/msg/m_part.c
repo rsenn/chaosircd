@@ -151,7 +151,7 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
   
   chanuser_delete(cuptr);
   
-  if(chptr->chanusers.size == 0)
+  if(chptr->chanusers.size == 0 && !channel_is_persistent(chptr))
     channel_delete(chptr);
 }
 

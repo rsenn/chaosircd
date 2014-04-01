@@ -165,7 +165,7 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
     return;
   }
   
-  if(cuptr == NULL)
+  if((cuptr = chanuser_find(chptr, cptr)) == NULL)
   {
     client_send(cptr, numeric_format(ERR_NOTONCHANNEL),
                 client_me->name, cptr->name, argv[2]);

@@ -24,10 +24,27 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
+#include "chaosircd/server.h"
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+#include "libchaos/dlink.h"
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
 struct chanuser;
 struct user;
 struct client;
 struct lclient;
+
+struct logentry {
+  struct node     node;
+  time_t          ts;
+  char            from  [IRCD_INFOLEN + 1];
+  char            cmd   [32];
+//  char            text  [IRCD_LINELEN + 1];
+  char           *text;
+};
 
 struct channel {
   struct node      node;
@@ -51,6 +68,8 @@ struct channel {
   char             modebuf   [IRCD_MODEBUFLEN + 1];
   char             parabuf   [IRCD_PARABUFLEN + 1];
   char             key       [IRCD_KEYLEN + 1];
+  struct server   *server;      /* the server it was created on */
+  struct list      backlog;     /* message log */
 };
 
 struct invite {

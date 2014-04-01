@@ -40,6 +40,7 @@
 #include <chaosircd/server.h>
 #include <chaosircd/lclient.h>
 #include <chaosircd/chanuser.h>
+#include <chaosircd/chanmode.h>
 #include <chaosircd/channel.h>
 #include <chaosircd/service.h>
 
@@ -903,7 +904,7 @@ void client_vexit(struct lclient *lcptr,   struct client *cptr,
       
       chanuser_delete(cuptr);
       
-      if(cuptr->channel->chanusers.size == 0)
+      if(cuptr->channel->chanusers.size == 0 && !(cuptr->channel->modes & CHFLG(P)))
         channel_delete(cuptr->channel);
     }
     

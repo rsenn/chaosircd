@@ -59,6 +59,8 @@ struct list   channel_list;
 struct list   channel_lists[CHANNEL_HASH_SIZE];
 uint32_t      channel_id;
 uint32_t      channel_serial;
+struct sheap  channel_backlog_heap;
+struct dheap  channel_msglog_heap;
 
 /* ------------------------------------------------------------------------ */
 int channel_get_log() { return channel_log; }
@@ -88,6 +90,12 @@ void channel_init(void)
                     CHANUSER_BLOCK_SIZE);
   mem_static_note(&channel_invite_heap, "channel invite heap");
 
+  mem_static_create(&channel_backlog_heap, sizeof(struct logentry), 1024);
+  mem_static_note(&channel_backlog_heap, "channel backlog heap");
+
+  mem_dynamic_create(&channel_msglog_heap, IRCD_LINELEN + 1);
+  mem_dynamic_note(&channel_msglog_heap, "channel log msg heap");
+
   ircd_support_set("CHANTYPES", "#");
   ircd_support_set("TOPICLEN", "%u", IRCD_TOPICLEN);
   ircd_support_set("KICKLEN", "%u", IRCD_KICKLEN);
@@ -115,6 +123,9 @@ void channel_shutdown(void)
   mem_static_destroy(&channel_invite_heap);
   
   mem_static_destroy(&channel_heap);
+  
+  mem_static_destroy(&channel_backlog_heap);
+  mem_dynamic_destroy(&channel_msglog_heap);
   
   log_source_unregister(channel_log);
 }
@@ -180,6 +191,10 @@ void channel_release(struct channel *chptr)
   
   dlink_foreach_safe(&chptr->invites, node, next)
     user_uninvite(node->data);
+  
+  dlink_foreach_safe(&chptr->backlog, node, next)
+   ; 
+   
   
   dlink_list_zero(&chptr->lchanusers);
   dlink_list_zero(&chptr->chanusers);
@@ -508,6 +523,9 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
       numeric_send(cptr, ERR_UNAVAILRESOURCE, name);
       return;
     }
+
+    if(client_is_local(cptr))
+      chptr->server = server_me;
     
     /* Add the user to the channel */
     cuptr = chanuser_add(chptr, cptr);
@@ -650,13 +668,15 @@ void channel_dump(struct channel *chptr)
     for(i = 0; i < sizeof(chptr->modelists) / sizeof(chptr->modelists[0]); i++)
       n += chptr->modelists[i].size;
         
-    dump(channel_log, "         modelists: %u nodes", n);
+    dump(channel_log, "        modelists: %u nodes", n);
     dump(channel_log, "            modes: %llu", chptr->modes);
     dump(channel_log, "           serial: %u", chptr->serial);
     dump(channel_log, "            topic: %s", chptr->topic);
     dump(channel_log, "       topic_info: %s", chptr->topic_info);
     dump(channel_log, "          modebuf: %s", chptr->modebuf);
     dump(channel_log, "          parabuf: %s", chptr->parabuf);
+    dump(channel_log, "           server: %s", chptr->server ? chptr->server->name : "(null)");
+    dump(channel_log, "          backlog: %u nodes", chptr->backlog.size);
     dump(channel_log, "[========== end of channel dump ============]");    
   }
 }
