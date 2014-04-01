@@ -633,6 +633,8 @@ void channel_dump(struct channel *chptr)
   }
   else
   {
+    uint32_t i, n = 0;
+    
     dump(channel_log, "[============== channel dump ===============]");
     dump(channel_log, "               id: #%u", chptr->id);
     dump(channel_log, "         refcount: %u", chptr->refcount);
@@ -644,9 +646,13 @@ void channel_dump(struct channel *chptr)
     dump(channel_log, "       lchanusers: %u nodes", chptr->lchanusers.size);
     dump(channel_log, "       rchanusers: %u nodes", chptr->rchanusers.size);
     dump(channel_log, "          invites: %u nodes", chptr->rchanusers.size);
-/*    dump(channel_log, "         modelists: %u nodes", chptr->modelists.size);*/
-    dump(channel_log, "            modes: %llu", chptr->rchanusers.size);
-    dump(channel_log, "           serial: %u", chptr->rchanusers.size);
+
+    for(i = 0; i < sizeof(chptr->modelists) / sizeof(chptr->modelists[0]); i++)
+      n += chptr->modelists[i].size;
+        
+    dump(channel_log, "         modelists: %u nodes", n);
+    dump(channel_log, "            modes: %llu", chptr->modes);
+    dump(channel_log, "           serial: %u", chptr->serial);
     dump(channel_log, "            topic: %s", chptr->topic);
     dump(channel_log, "       topic_info: %s", chptr->topic_info);
     dump(channel_log, "          modebuf: %s", chptr->modebuf);
