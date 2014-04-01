@@ -173,11 +173,11 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
   m_opart_send(NULL, cptr, chptr, reason);
   
   /* send server OPART */
-  chanuser_discharge(NULL, cuptr, argv[3]);
+  m_opart_server_send(NULL, cuptr, argv[3]);
   
   chanuser_delete(cuptr);
   
-  if(chptr->chanusers.size == 0)
+//  if(chptr->chanusers.size == 0)
     channel_delete(chptr);
 }
 
