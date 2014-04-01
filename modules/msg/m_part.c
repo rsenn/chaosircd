@@ -133,7 +133,8 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-  if(is_channel_owner(cuptr))
+  if(is_channel_owner(cuptr) && 
+     !str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])))
   {
     client_send(cptr, ":%s NOTICE %N :*** You need to /OPART if you really want to leave %s.",
                 server_me->name, cptr, chptr->name);
