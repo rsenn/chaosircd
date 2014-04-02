@@ -434,7 +434,7 @@ size_t channel_burst(struct lclient *lcptr, struct channel *chptr)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 void channel_message(struct lclient *lcptr, struct client *cptr,
-                     struct channel *chptr, int            type,
+                     struct channel *chptr, intptr_t       type,
                      const char     *text)
 {
   struct chanuser *cuptr;
@@ -444,7 +444,7 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
   
   cuptr = chanuser_find(chptr, cptr);
   
-  if(hooks_call(channel_message, HOOK_DEFAULT, lcptr, cptr, chptr, cuptr))
+  if(hooks_call(channel_message, HOOK_DEFAULT, cptr, chptr, type, text))
     return;
     
   if(client_is_user(cptr) || client_is_service(cptr))

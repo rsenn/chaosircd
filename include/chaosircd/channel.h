@@ -24,6 +24,7 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
+#include "chaosircd/ircd.h"
 #include "chaosircd/server.h"
 
 /* -------------------------------------------------------------------------- *
@@ -240,7 +241,7 @@ extern struct channel *channel_push           (struct channel **chptrptr);
 /* -------------------------------------------------------------------------- *
  * Adds an entry to the channel backlog                                       *
  * -------------------------------------------------------------------------- */
-extern void channel_backlog                   (struct channel *chptr,
+extern void            channel_backlog        (struct channel *chptr,
                                                struct client  *cptr,
                                                const char     *cmd,
                                                const char     *text);

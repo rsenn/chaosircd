@@ -39,8 +39,8 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_noext_hook(struct lclient *lcptr, struct client   *cptr,
-                         struct channel *chptr, struct chanuser *cuptr);
+static int cm_noext_hook(struct client  *cptr, struct channel *chptr, 
+	                 intptr_t        type, const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -85,9 +85,11 @@ void cm_noext_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_noext_hook(struct lclient *lcptr, struct client   *cptr,
-                         struct channel *chptr, struct chanuser *cuptr)
+static int cm_noext_hook(struct client *cptr, struct channel *chptr, 
+	                 intptr_t       type, const char     *text)  
 {
+  struct chanuser *cuptr = chanuser_find(chptr, cptr);
+
   if(cuptr == NULL && (chptr->modes & CHFLG(n)))
   {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);

@@ -39,8 +39,8 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_moderated_hook(struct lclient *lcptr, struct client   *cptr,
-                             struct channel *chptr, struct chanuser *cuptr);
+static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
+	                     intptr_t         type, const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -85,9 +85,11 @@ void cm_moderated_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_moderated_hook(struct lclient *lcptr, struct client   *cptr,
-                             struct channel *chptr, struct chanuser *cuptr)
+static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
+	                     intptr_t         type, const char     *text)
 {
+  struct chanuser *cuptr = chanuser_find(chptr, cptr);
+
   if(chptr->modes & CHFLG(m) &&
      (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0LLU))
   {
