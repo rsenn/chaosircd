@@ -66,7 +66,7 @@ CHAOS_API(struct hook *)hook_register   (void *function,
 
 /* ------------------------------------------------------------------------ * 
  * ------------------------------------------------------------------------ */
-CHAOS_API(int          )hook_unregister (void *function, 
+CHAOS_API(int          )hook_unregister (void *function,
                                          int   type, 
                                          void *callback);
 
