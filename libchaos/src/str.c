@@ -198,7 +198,7 @@ static inline unsigned int str_ptoa(char *buf, void *i)
   uintptr_t mask;
   int shift;
 
-#define POINTER_BYTE_SIZE  sizeof(void *)
+#define POINTER_BYTE_SIZE  (uintptr_t)sizeof(void *)
 #define POINTER_BIT_SIZE   ((POINTER_BYTE_SIZE)*8)
 //#define POINTER_HEXCHARS   ((POINTER_BIT_SIZE)/4)
 #define POINTER_START_SHIFT ((POINTER_BIT_SIZE)-4)
