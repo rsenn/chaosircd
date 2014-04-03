@@ -110,7 +110,7 @@ static int cm_persistent_msg_hook(struct client   *cptr, struct channel *chptr,
 static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
                                    struct channel *chptr)
 {
-	if(chptr->server == server_me)
+	if(chptr->server == server_me && chptr->backlog.size)
 	{
 		struct logentry *e;
 
@@ -123,6 +123,9 @@ static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
   	    client_send(cptr, ":%S 610 %N %s %u %s %s", server_me, cptr, chptr->name,
   	                e->ts, e->from, e->cmd);
 		}
+
+    client_send(cptr, ":%S 611 %N %s :End of message replay",
+                server_me, cptr, chptr->name);
 	}
 	return 0;
 }
