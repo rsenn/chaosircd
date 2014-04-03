@@ -567,6 +567,8 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
     chanmode_send_local(client_me, chptr, modes.head, CHANMODE_PER_LINE);
     chanmode_change_destroy(&modes);
   }
+
+  hooks_call(channel_join, HOOK_3RD, lcptr, cptr, chptr);
 }            
 
 /* -------------------------------------------------------------------------- *

@@ -49,14 +49,14 @@ static void ms_ts(struct lclient *lcptr, struct client *cptr,
  * -------------------------------------------------------------------------- */
 static char *mo_ts_help[] =
 {
-  "TS <channel> [value]",
+  "TS [channel] [value]",
   "",
   "Operator command setting the TS of a channel.",
   NULL
 };
 
 static struct msg mo_ts_msg = {
-  "TS", 1, 2, MFLG_OPER,
+  "TS", 0, 2, MFLG_OPER,
   { NULL, NULL, ms_ts, mo_ts },
   mo_ts_help
 };
@@ -84,7 +84,8 @@ void m_ts_unload(void)
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'ts'                                                             *
- * argv[2] - name                                                             *
+ * argv[2] - [name]                                                           *
+ * argv[3] - [value]                                                          *
  * -------------------------------------------------------------------------- */
 static void mo_ts(struct lclient *lcptr, struct client *cptr, 
                   int             argc,  char         **argv)
@@ -92,6 +93,12 @@ static void mo_ts(struct lclient *lcptr, struct client *cptr,
   struct channel *chptr;
   uint32_t        ts;
   
+  if(!argv[2])
+  {
+    client_send(cptr, ":%S 599 %N TS %u", server_me, cptr->name, timer_systime);
+    return;
+  }
+
   if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
   

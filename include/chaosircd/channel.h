@@ -214,7 +214,7 @@ extern size_t          channel_burst          (struct lclient *lcptr,
 extern void            channel_message        (struct lclient *lcptr, 
                                                struct client  *cptr,
                                                struct channel *chptr, 
-                                               int             type,
+                                               intptr_t        type,
                                                const char     *text);
 
 /* -------------------------------------------------------------------------- *
