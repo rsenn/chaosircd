@@ -39,6 +39,8 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
+static void m_ts(struct lclient *lcptr, struct client *cptr, 
+                 int             argc,  char         **argv);
 static void mo_ts(struct lclient *lcptr, struct client *cptr, 
                   int             argc,  char         **argv);
 static void ms_ts(struct lclient *lcptr, struct client *cptr, 
@@ -57,7 +59,7 @@ static char *mo_ts_help[] =
 
 static struct msg mo_ts_msg = {
   "TS", 0, 2, MFLG_OPER,
-  { NULL, NULL, ms_ts, mo_ts },
+  { NULL, m_ts, ms_ts, mo_ts },
   mo_ts_help
 };
 
@@ -83,6 +85,16 @@ void m_ts_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
+ * argv[1] - 'TS'                                                             *
+ * -------------------------------------------------------------------------- */
+static void m_ts(struct lclient *lcptr, struct client *cptr, 
+                 int             argc,  char         **argv)
+{
+  client_send(cptr, ":%S 599 %N TS %u", server_me, cptr->name, timer_systime);
+}
+
+/* -------------------------------------------------------------------------- *
+ * argv[0] - prefix                                                           *
  * argv[1] - 'ts'                                                             *
  * argv[2] - [name]                                                           *
  * argv[3] - [value]                                                          *
@@ -95,7 +107,7 @@ static void mo_ts(struct lclient *lcptr, struct client *cptr,
   
   if(!argv[2])
   {
-    client_send(cptr, ":%S 599 %N TS %u", server_me, cptr->name, timer_systime);
+    m_ts(lcptr, cptr, argc, argv);
     return;
   }
 
