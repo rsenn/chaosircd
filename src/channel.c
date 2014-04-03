@@ -568,7 +568,7 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
     chanmode_change_destroy(&modes);
   }
 
-  hooks_call(channel_join, HOOK_3RD, lcptr, cptr, chptr);
+  hooks_call(channel_join, HOOK_4TH, lcptr, cptr, chptr);
 }            
 
 /* -------------------------------------------------------------------------- *
