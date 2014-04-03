@@ -44,14 +44,14 @@ typedef void (*htmlp_cb_t)(struct htmlp *, void *, void *, void *, void *);
 
 struct htmlp_var {
   struct node node;
-  uint32_t    hash;
+  hash_t      hash;
   char        name[64];
   char        value[128];
 };
 
 struct htmlp_tag {
   struct node node;
-  uint32_t    hash;
+  hash_t      hash;
   int         closing;
   struct list vars;
   char       *text;
@@ -63,7 +63,7 @@ struct htmlp {
   uint32_t           id;
   uint32_t           refcount;
   int                fd;
-  uint32_t           nhash;
+  hash_t             nhash;
   int                status;
   struct list        tags;
   char              *buf;

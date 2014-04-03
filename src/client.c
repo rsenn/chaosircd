@@ -584,7 +584,7 @@ struct client *client_find_id(uint32_t id)
 struct client *client_find_name(const char *name)
 {
   struct client *cptr;
-  uint32_t       hash;
+  hash_t         hash;
   
   hash = str_ihash(name);
   
@@ -604,7 +604,7 @@ struct client *client_find_nick(const char *nick)
 {
   struct client *cptr = NULL;
   struct node   *node;
-  uint32_t       hash;
+  hash_t         hash;
   
   hash = str_ihash(nick);
   
@@ -626,7 +626,7 @@ struct history *client_history_find(const char *nick)
 {
   struct history *hptr = NULL;
   struct node    *node;
-  uint32_t        hash;
+  hash_t          hash;
   
   hash = str_ihash(nick);
   
@@ -694,7 +694,7 @@ struct client *client_find_host(const char *host)
 {
   struct client *cptr = NULL;
   struct node   *node;
-  uint32_t       hash;
+  hash_t         hash;
   
   hash = str_ihash(host);
   

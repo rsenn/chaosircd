@@ -95,7 +95,7 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
   size_t          len;
   size_t          i;
   char           *lastinfo = infos[0];
-  uint32_t        lasthash = 0;
+  hash_t            lasthash = 0;
   
   if((chptr = channel_find_name(argv[2])) == NULL)
   {

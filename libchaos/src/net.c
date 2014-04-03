@@ -264,7 +264,7 @@ struct protocol *net_find(int type, const char *name)
 {
   struct protocol *p;
   struct node     *node;
-  uint32_t         hash;
+  hash_t           hash;
   
   hash = str_hash(name);
   

@@ -70,8 +70,8 @@ struct child
   pid_t              pid;
   uint32_t           id;
   uint32_t           refcount;
-  uint32_t           chash;
-  uint32_t           nhash;
+  hash_t             chash;
+  hash_t             nhash;
   uint32_t           status;
   struct timer      *timer;
   uint32_t           chans;

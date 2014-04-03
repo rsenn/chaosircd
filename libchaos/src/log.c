@@ -267,7 +267,7 @@ uint64_t log_source_parse(const char *sources)
 {
   struct slog *source;
   uint64_t     ret = 0;
-  uint32_t     hash;
+  hash_t       hash;
   size_t       srcc;
   size_t       i;
   size_t       j;
@@ -428,7 +428,7 @@ struct dlog *log_drain_callback(void *callback, uint64_t sources,
 struct dlog *log_drain_find_path(const char *path)
 {
   struct dlog *dlptr;
-  uint32_t     hash = 0;
+  hash_t       hash = 0;
   
   hash = str_hash(path);
   

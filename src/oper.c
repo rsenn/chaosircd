@@ -196,7 +196,7 @@ struct oper *oper_find(const char *name)
 {
   struct node *node;
   struct oper *optr;
-  uint32_t     hash;
+  hash_t       hash;
   
   hash = str_ihash(name);
   

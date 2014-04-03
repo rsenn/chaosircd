@@ -425,7 +425,7 @@ struct listen *listen_push(struct listen **liptrptr)
 struct listen *listen_find(const char *address, uint16_t port)
 {
   struct listen *lptr;
-  uint32_t       lhash;
+  hash_t         lhash;
   
   lhash = str_ihash(address) ^ port;
   
@@ -481,7 +481,7 @@ struct listen *listen_find_name(const char *name)
 {
   struct node   *node;
   struct listen *listen;
-  uint32_t       nhash;
+  hash_t         nhash;
   
   nhash = str_ihash(name);
   

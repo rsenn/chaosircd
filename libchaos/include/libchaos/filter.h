@@ -66,7 +66,7 @@ struct filter
   struct node         node;                 /* linking node for filter_list */
   uint32_t            id;
   uint32_t            refcount;             /* times this block is referenced */
-  uint32_t            hash;
+  hash_t              hash;
  
   void               *prog;                 /* pointer to filter program struct */
   

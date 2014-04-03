@@ -647,7 +647,7 @@ const char *connect_get_name(struct connect *cnptr)
 struct connect *connect_find_name(const char *name)
 {
   struct connect *cnptr;
-  uint32_t        nhash;
+  hash_t          nhash;
   
   nhash = str_ihash(name);
   

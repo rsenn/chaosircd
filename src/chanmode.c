@@ -1425,7 +1425,7 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
   size_t                 ilen = 0;
   size_t                 tlen = 0;
   size_t                 mlen = 0;
-  uint32_t               lasthash = 0;
+  hash_t                 lasthash = 0;
   time_t                 lastts = 0;
   
   flagbuf[flen] = '\0';

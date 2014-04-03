@@ -1150,7 +1150,7 @@ struct image *image_find_name(const char *name)
 {
   struct node   *node;
   struct image *image;
-  uint32_t       hash;
+  hash_t         hash;
   
   hash = str_ihash(name);
   

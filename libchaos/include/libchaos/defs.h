@@ -49,6 +49,8 @@
 
  */
 
+typedef uintptr_t hash_t;
+
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS

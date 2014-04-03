@@ -28,7 +28,7 @@ struct class {
   struct node node;
   uint32_t    id;
   uint32_t    refcount;
-  uint32_t    hash;
+  hash_t      hash;
   uint64_t    ping_freq;
   uint32_t    max_clients;
   uint32_t    clients_per_ip;

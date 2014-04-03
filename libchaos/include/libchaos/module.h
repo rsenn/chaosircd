@@ -39,8 +39,8 @@ struct module {
   struct node      node;
   uint32_t         id;
   uint32_t         refcount;
-  uint32_t         nhash;
-  uint32_t         phash;
+  hash_t           nhash;
+  hash_t           phash;
   int              fd;
   void            *map;
   void            *handle;

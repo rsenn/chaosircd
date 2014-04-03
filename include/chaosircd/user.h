@@ -37,8 +37,8 @@ struct user {
   struct node    hnode;         /* node for user_lists[] */
   uint32_t       id;            /* a unique id */
   uint32_t       refcount;      /* how many times this block is referenced */
-  uint32_t       nhash;
-  uint32_t       uhash;
+  hash_t         nhash;
+  hash_t         uhash;
   struct client *client;
   struct oper   *oper;
   struct list    channels;

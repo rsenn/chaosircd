@@ -596,7 +596,7 @@ struct graph *graph_find_name(const char *name)
 {
   struct node   *node;
   struct graph *graph;
-  uint32_t       hash;
+  hash_t         hash;
   
   hash = str_ihash(name);
   

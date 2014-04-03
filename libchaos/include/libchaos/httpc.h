@@ -53,7 +53,7 @@ typedef void (httpc_cb_t)(struct httpc *, void *, void *, void *, void *);
 
 struct httpc_var {
   struct node node;
-  uint32_t    hash;
+  hash_t      hash;
   char        name[64];
   char        value[128];
 };
@@ -64,7 +64,7 @@ struct httpc {
   uint32_t           refcount;
   int                fd;
   int                type;
-  uint32_t           nhash;
+  hash_t             nhash;
   int                status;
   uint16_t           port;
   int                ssl;

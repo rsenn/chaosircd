@@ -39,7 +39,7 @@ typedef void (ini_callback_t)(struct ini *ini);
 struct ini_key 
 {
   struct node              node;
-  uint32_t                 hash;
+  hash_t                   hash;
   char                    *name;
   char                    *value;
 };
@@ -49,7 +49,7 @@ struct ini_section
   struct node              node;
   struct list              keys;
   struct ini              *ini;
-  uint32_t                 hash;
+  hash_t                   hash;
   char                    *name;
 };
 
@@ -58,8 +58,8 @@ struct ini
   struct node              node;
   uint32_t                 id;
   uint32_t                 refcount;
-  uint32_t                 nhash;
-  uint32_t                 phash;  
+  hash_t                   nhash;
+  hash_t                   phash;  
   struct list              keys;        /* keys & comments before first section */
   struct list              sections;
   int                      fd;

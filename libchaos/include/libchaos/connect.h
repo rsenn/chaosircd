@@ -62,8 +62,8 @@ struct connect
   struct node      node;                 /* Linking node for connect_list */
   uint32_t         id;                   /* Serial number */
   uint32_t         refcount;             /* Times this block is referenced */
-  uint32_t         chash;                /* Hash based on address:port */
-  uint32_t         nhash;                /* Hash based on name */
+  hash_t           chash;                /* Hash based on address:port */
+  hash_t           nhash;                /* Hash based on name */
   uint32_t         status;               /* Status of the connect block */ 
   
   /* References to other blocks */

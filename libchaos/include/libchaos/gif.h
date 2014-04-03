@@ -160,7 +160,7 @@ struct gif
   struct node           node;
   uint32_t              id;
   uint32_t              refcount;
-  uint32_t              nhash;
+  hash_t                nhash;
   uint32_t              status;
   int                   fd;
   uint8_t              *mem;

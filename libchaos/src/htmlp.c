@@ -352,7 +352,7 @@ void htmlp_delete(struct htmlp *hpptr)
 struct htmlp *htmlp_find_name(const char *name)
 {
   struct htmlp *hpptr;
-  uint32_t       hash;
+  hash_t         hash;
     
   hash = str_hash(name);
   
@@ -468,7 +468,7 @@ struct htmlp_tag *htmlp_tag_next(struct htmlp *htptr)
 struct htmlp_tag *htmlp_tag_find(struct htmlp *htptr, const char *name)
 {
   struct htmlp_tag *tag;
-  uint32_t          hash = str_ihash(name);
+  hash_t            hash = str_ihash(name);
 
   if(htptr->current)
   {
@@ -522,7 +522,7 @@ struct htmlp_tag *htmlp_tag_index(struct htmlp *htptr, uint32_t i)
 struct htmlp_var *htmlp_var_set(struct htmlp *htptr, const char *name, const char *value)
 {
   struct htmlp_var *hvptr;
-  uint32_t          hash;
+  hash_t            hash;
   
   if(htptr->current == NULL)
     return NULL;
@@ -549,7 +549,7 @@ struct htmlp_var *htmlp_var_set(struct htmlp *htptr, const char *name, const cha
 struct htmlp_var *htmlp_var_find(struct htmlp *htptr, const char *name)
 {
   struct htmlp_var *hvptr;
-  uint32_t          hash = str_ihash(name);
+  hash_t            hash = str_ihash(name);
   
   if(htptr->current == NULL)
     return NULL;

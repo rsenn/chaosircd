@@ -277,7 +277,7 @@ struct user *user_find_uid(const char *uid)
 {
   struct user *uptr = NULL;
   struct node *node;
-  uint32_t     hash;
+  hash_t       hash;
   char         uidbuf[IRCD_IDLEN + 1];
   
   strlcpy(uidbuf, uid, sizeof(uidbuf));
@@ -301,7 +301,7 @@ struct user *user_find_uid(const char *uid)
 struct user *user_find_name(const char *name)
 {
   struct user *uptr;
-  uint32_t     hash;
+  hash_t       hash;
   
   hash = str_ihash(name);
   

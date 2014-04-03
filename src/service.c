@@ -175,7 +175,7 @@ struct service *service_find_id(uint32_t id)
 struct service *service_find_name(const char *name)
 {
   struct service *svptr;
-  uint32_t        hash;
+  hash_t          hash;
   
   hash = str_ihash(name);
   
@@ -225,7 +225,7 @@ struct service_handler *service_register(struct service *svptr, const char *msg,
 struct service_handler *service_handler_find(struct service *svptr, const char *cmd)
 {
   struct service_handler *svhptr;
-  uint32_t                hash;
+  hash_t                  hash;
   
   hash = str_ihash(cmd);
   

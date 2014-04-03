@@ -241,7 +241,7 @@ void httpc_shutdown(void)
 static struct httpc_var *httpc_var_find(struct httpc *hcptr, const char *name)
 {
   struct httpc_var *hvptr;
-  uint32_t          hash;
+  hash_t            hash;
   
   hash = str_hash(name);
   
@@ -349,7 +349,7 @@ void httpc_var_build(struct httpc *hcptr)
 struct httpc_var *httpc_header_find(struct httpc *hcptr, const char *name)
 {
   struct httpc_var *hvptr;
-  uint32_t          hash;
+  hash_t            hash;
   
   hash = str_hash(name);
   
@@ -786,7 +786,7 @@ void httpc_recv(int fd, struct httpc *hcptr)
 struct httpc *httpc_find_name(const char *name)
 {
   struct httpc *hcptr;
-  uint32_t       hash;
+  hash_t         hash;
     
   hash = str_hash(name);
   

@@ -73,7 +73,7 @@ struct msg {
   size_t         flags;
   msg_handler_t *handlers[MSG_LAST];
   char         **help;
-  uint32_t       hash;
+  hash_t         hash;
   uint32_t       counts[MSG_LAST];
   size_t         bytes;
   uint32_t       id;

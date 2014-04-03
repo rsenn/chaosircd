@@ -63,7 +63,7 @@ struct ssl_context
   uint32_t                    refcount;
   const struct ssl_ctx_st    *ctxt;
   const struct ssl_method_st *meth;
-  uint32_t                    hash;
+  hash_t                      hash;
   int                         context;
   char                        name[64];
   char                        cert[PATHLEN];

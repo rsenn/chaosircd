@@ -229,7 +229,7 @@ void mfile_delete(struct mfile *mfptr)
 struct mfile *mfile_find_path(const char *path)
 {
   struct mfile *mfptr;
-  uint32_t      hash;
+  hash_t        hash;
     
   hash = str_hash(path);
   
@@ -250,7 +250,7 @@ struct mfile *mfile_find_path(const char *path)
 struct mfile *mfile_find_name(const char *name)
 {
   struct mfile *mfptr;
-  uint32_t       hash;
+  hash_t         hash;
     
   hash = str_hash(name);
   

@@ -76,7 +76,7 @@ struct ttf {
   struct node            node;        /* linking node for ttf_list */
   uint32_t               id;
   uint32_t               refcount;    /* times this block is referenced */
-  uint32_t               hash;
+  hash_t                 hash;
   
   int                    height;
   int                    ascent;

@@ -47,7 +47,9 @@
 typedef void (str_format_cb)(char   **pptr, size_t  *bptr,
                              size_t   n,    int      padding,
                              int      left, void    *arg);
-               
+
+#define HASH_BIT_SIZE (sizeof(hash_t)*8)
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char)     str_hexchars[16];
@@ -504,15 +506,18 @@ extern inline char *str_dup(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t )str_hash(const char *s);
+CHAOS_API(hash_t )str_hash(const char *s);
 
-#define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-#define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-extern inline uint32_t str_hash(const char *s)
+#define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
+#define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
+extern inline hash_t str_hash(const char *s)
 {
-  uint32_t ret = 0xcafebabe;
-  uint32_t temp;
-  uint32_t i;
+  hash_t ret = 0xdefaced;
+  hash_t temp;
+  hash_t i;
+
+  ret <<= 32;
+  ret |= 0xcafebabe;
   
   if(s == NULL)
     return ret;
@@ -533,15 +538,18 @@ extern inline uint32_t str_hash(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t)str_ihash(const char *s);
+CHAOS_API(hash_t)str_ihash(const char *s);
 
-#define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-#define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-extern inline uint32_t str_ihash(const char *s)
+#define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
+#define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
+extern inline hash_t str_ihash(const char *s)
 {
-  uint32_t ret = 0xcafebabe;
-  uint32_t temp;
-  uint32_t i;
+  hash_t ret = 0xdefaced;
+  hash_t temp;
+  hash_t i;
+
+  ret <<= 32;
+  ret |= 0xcafebabe;
   
   if(s == NULL)
     return ret;

@@ -51,8 +51,8 @@ struct listen
   struct node         node;                 /* linking node for listen_list */
   uint32_t            id;
   uint32_t            refcount;             /* times this block is referenced */
-  uint32_t            lhash;
-  uint32_t            nhash;
+  hash_t              lhash;
+  hash_t              nhash;
   
   /* externally initialised */
   uint16_t            port;
