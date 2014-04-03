@@ -76,7 +76,7 @@ int cm_persistent_load(void)
     return -1;
   
   hook_register(channel_message, HOOK_DEFAULT, cm_persistent_msg_hook);
-  hook_register(channel_join, HOOK_3RD, cm_persistent_join_hook);
+  hook_register(channel_join, HOOK_4TH, cm_persistent_join_hook);
   
   return 0;
 }
@@ -86,7 +86,7 @@ void cm_persistent_unload(void)
   /* unregister the channel mode */
   chanmode_unregister(&cm_persistent_mode);
   
-  hook_unregister(channel_join, HOOK_3RD, cm_persistent_join_hook);
+  hook_unregister(channel_join, HOOK_4TH, cm_persistent_join_hook);
   hook_unregister(channel_message, HOOK_DEFAULT, cm_persistent_msg_hook);
 }
 
