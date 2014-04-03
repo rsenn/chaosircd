@@ -194,7 +194,15 @@ static inline unsigned int str_ptoa(char *buf, void *i)
 {
   register char *p = buf;
   register int n = 0; /* buffer index */
-  register size_t v = (size_t)i;
+  register uintptr_t v = (uintptr_t)i;
+  uintptr_t mask;
+  int shift;
+
+#define POINTER_BYTE_SIZE  sizeof(void *)
+#define POINTER_BIT_SIZE   ((POINTER_BYTE_SIZE)*8)
+//#define POINTER_HEXCHARS   ((POINTER_BIT_SIZE)/4)
+#define POINTER_START_SHIFT ((POINTER_BIT_SIZE)-4)
+#define POINTER_START_MASK (((uintptr_t)0xf)<<POINTER_START_SHIFT)
 
   if(i == NULL) {
     str_copy(buf, "(nil)");
@@ -202,14 +210,14 @@ static inline unsigned int str_ptoa(char *buf, void *i)
   } else {
     p[n++] = '0';
     p[n++] = 'x';
-    p[n++] = str_hexchars[(v & 0xf0000000) >> 0x1c];
-    p[n++] = str_hexchars[(v & 0x0f000000) >> 0x18];
-    p[n++] = str_hexchars[(v & 0x00f00000) >> 0x14];
-    p[n++] = str_hexchars[(v & 0x000f0000) >> 0x10];
-    p[n++] = str_hexchars[(v & 0x0000f000) >> 0x0c];
-    p[n++] = str_hexchars[(v & 0x00000f00) >> 0x08];
-    p[n++] = str_hexchars[(v & 0x000000f0) >> 0x04];
-    p[n++] = str_hexchars[(v & 0x0000000f)];
+
+    for(mask = POINTER_START_MASK, shift = POINTER_START_SHIFT;
+    		mask != 0 && shift >= 0;
+    		mask >>= 4, shift -= 4)
+    {
+      p[n++] = str_hexchars[(v & mask) >> shift];
+    }
+
     p[n] = '\0';
   }
 
@@ -542,7 +550,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       /* a pointer, no padding - useful for debugging*/
       if(c == 'p') 
       {
-        char              ps[11];
+        char              ps[sizeof(void*)*2+2+1];
         register size_t   len = str_ptoa(ps, va_arg(args, void *));
         register uint32_t idx = 0;
               
