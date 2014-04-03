@@ -2,7 +2,7 @@
 
 oper {
 
-  name     = "smolie";           # Operator name
+  name     = "enki";           # Operator name
    
   password = "lala";             # Operator password
   
