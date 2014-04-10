@@ -467,9 +467,9 @@ void lc_sauth_deny(struct lc_sauth *arg, uint16_t port, int type)
   char        msg[128];
   char *argv[] = { client_me->name, "GLINE", mask, msg, NULL };
   
-  snprintf(mask, sizeof(mask), "*@%s", net_ntoa(arg->lclient->addr_remote));
+  str_snprintf(mask, sizeof(mask), "*@%s", net_ntoa(arg->lclient->addr_remote));
   
-  snprintf(msg, sizeof(msg), "open %s proxy on port %u",
+  str_snprintf(msg, sizeof(msg), "open %s proxy on port %u",
            sauth_types[type], (uint32_t)port);
   
   lclient_set_type(arg->lclient, LCLIENT_USER);
@@ -578,7 +578,7 @@ static int m_proxy_save(void)
     port = val >> 16;
     type = val & 0xffff;
     
-    snprintf(namebuf, sizeof(namebuf), "%u", (uint32_t)port);
+    str_snprintf(namebuf, sizeof(namebuf), "%u", (uint32_t)port);
     
     isptr = ini_section_new(m_proxy_ini, namebuf);
     

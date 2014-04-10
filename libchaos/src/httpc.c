@@ -517,12 +517,12 @@ int httpc_url_build(struct httpc *hcptr)
   if((hcptr->ssl == 0 && hcptr->port == 80) ||
      (hcptr->ssl == 1 && hcptr->port == 443))
   {
-    i = snprintf(hcptr->url, sizeof(hcptr->url), "%s://%s",
+    i = str_snprintf(hcptr->url, sizeof(hcptr->url), "%s://%s",
                  hcptr->protocol, hcptr->host);
   }
   else
   {
-    i = snprintf(hcptr->url, sizeof(hcptr->url), "%s://%s:%u",
+    i = str_snprintf(hcptr->url, sizeof(hcptr->url), "%s://%s:%u",
                  hcptr->protocol, hcptr->host, (unsigned int)hcptr->port);
   }
   
