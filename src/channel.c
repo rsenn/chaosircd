@@ -643,10 +643,22 @@ struct channel *channel_push(struct channel **chptrptr)
 void channel_backlog(struct channel *chptr, struct client *cptr,
                      const char     *cmd,   const char *text)
 {
-  struct logentry *e = mem_static_alloc(&channel_backlog_heap);
+  struct logentry *e;
+  size_t i;
+
+  if(!client_is_user(cptr))
+  	return;
+
+  e = mem_static_alloc(&channel_backlog_heap);
 
   strlcpy(e->cmd, cmd, sizeof(e->cmd));
-  strlcpy(e->from, cptr->name, sizeof(e->from));
+  strlcpy(e->from, (cptr->user->name[0] ? cptr->user->name : cptr->name), sizeof(e->from));
+
+  for(i = 0; i < sizeof(e->from)-1; i++)
+  {
+  	if(e->from[i] == ' ')
+  		e->from[i] = 0x7f;
+  }
   
   e->ts = timer_systime;
 
