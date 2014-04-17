@@ -58,7 +58,7 @@ static char *mo_ts_help[] =
 };
 
 static struct msg mo_ts_msg = {
-  "TS", 0, 2, MFLG_OPER,
+  "TS", 0, 2, MFLG_CLIENT,
   { NULL, m_ts, ms_ts, mo_ts },
   mo_ts_help
 };
@@ -90,7 +90,7 @@ void m_ts_unload(void)
 static void m_ts(struct lclient *lcptr, struct client *cptr, 
                  int             argc,  char         **argv)
 {
-  client_send(cptr, ":%S 599 %N TS %u", server_me, cptr->name, timer_systime);
+  client_send(cptr, ":%S 599 %N TS %u", server_me, cptr, timer_systime);
 }
 
 /* -------------------------------------------------------------------------- *
