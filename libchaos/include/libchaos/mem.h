@@ -152,13 +152,13 @@ struct dheap {
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int         ) mem_log;       /* Log source */
+CHAOS_API(int)          mem_log;       /* Log source */
 CHAOS_API(struct dheap) mem_dheap;     /* Dynamic heap for malloc() and consorts */
-CHAOS_API(struct list ) mem_slist;
-CHAOS_API(struct list ) mem_dlist;
-CHAOS_API(uint32_t    ) mem_id;
+CHAOS_API(struct list)  mem_slist;
+CHAOS_API(struct list)  mem_dlist;
+CHAOS_API(uint32_t)     mem_id;
 #ifndef MAP_ANON
-CHAOS_API(int         ) mem_zero;      /* /dev/zero if we havent MAP_ANON */
+CHAOS_API(int)          mem_zero;      /* /dev/zero if we havent MAP_ANON */
 #endif /* MAP_ANON */
 
 /* ------------------------------------------------------------------------ */
@@ -167,17 +167,17 @@ CHAOS_API(int) mem_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize allocator                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_init                (void);
+CHAOS_API(void)  mem_init                (void);
 
 /* ------------------------------------------------------------------------ *
  * Close fd for allocator                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_shutdown            (void);
+CHAOS_API(void)  mem_shutdown            (void);
 
 /* ------------------------------------------------------------------------ *
  * Whine and exit if we got no memory                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_fatal               (void);
+CHAOS_API(void)  mem_fatal               (void);
 
 /* ------------------------------------------------------------------------ *
  * Create a static heap                                                       *
@@ -187,13 +187,13 @@ CHAOS_API(void  )mem_fatal               (void);
  *                  you want to store)                                        *
  * <count>          How many elements a block can contain                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_static_create       (struct sheap *shptr,
+CHAOS_API(void)  mem_static_create       (struct sheap *shptr,
                                           size_t        size,
                                           size_t        count);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_static_note         (struct sheap *shptr,
+CHAOS_API(void)  mem_static_note         (struct sheap *shptr,
                                           const char   *format,
                                           ...);
 
@@ -213,24 +213,24 @@ CHAOS_API(void *)mem_static_alloc        (struct sheap *shptr);
  * 
  * 
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_static_free         (struct sheap *shptr,
+CHAOS_API(void)  mem_static_free         (struct sheap *shptr,
                                           void         *scptr);
 
 /* ------------------------------------------------------------------------ *
  * Free all blocks which have no used elements.                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int   )mem_static_collect      (struct sheap *shptr);
+CHAOS_API(int)   mem_static_collect      (struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * Destroy the whole heap.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_static_destroy      (struct sheap *shptr);
+CHAOS_API(void)  mem_static_destroy      (struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <element> is valid.                                 *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(int   )mem_static_valid        (struct sheap *shptr,
+CHAOS_API(int)   mem_static_valid        (struct sheap *shptr,
                                           void         *scptr);
 #endif /* DEBUG */ 
 
@@ -240,12 +240,12 @@ CHAOS_API(int   )mem_static_valid        (struct sheap *shptr,
  * <dhptr>   Pointer to a dynamic heap structure                              *
  * <size>    How big the a chunk can be at the maximum                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_dynamic_create      (struct dheap *dhptr, 
+CHAOS_API(void)  mem_dynamic_create      (struct dheap *dhptr, 
                                           size_t        size);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_dynamic_note        (struct dheap *dhptr,
+CHAOS_API(void)  mem_dynamic_note        (struct dheap *dhptr,
                                           const char   *format,
                                           ...);
 
@@ -265,25 +265,25 @@ CHAOS_API(void *)mem_dynamic_realloc     (struct dheap *dhptr,
 /* ------------------------------------------------------------------------ *
  * Free a chunk. haha                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_dynamic_free        (struct dheap *dhptr,
+CHAOS_API(void)  mem_dynamic_free        (struct dheap *dhptr,
                                           void         *ptr);
 
 /* ------------------------------------------------------------------------ *
  * Free all blocks which have no chunks.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int   )mem_dynamic_collect     (struct dheap *dhptr);
+CHAOS_API(int)   mem_dynamic_collect     (struct dheap *dhptr);
 
 /* ------------------------------------------------------------------------ *
  * Destroy a dynamic heap, munmap() the blocks.                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void  )mem_dynamic_destroy     (struct dheap *dhptr);
+CHAOS_API(void)  mem_dynamic_destroy     (struct dheap *dhptr);
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <chnk> is valid.                                    *
  * this is time-consuming and will not be built without -DDEBUG               *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(int   )mem_dynamic_valid       (struct dheap *dhptr,
+CHAOS_API(int)   mem_dynamic_valid       (struct dheap *dhptr,
                                           void         *dcptr);
 #endif /* DEBUG */
 
@@ -309,7 +309,7 @@ CHAOS_API(void *)memcpy               (void       *d,
                                    size_t      n);
 
 #undef memcmp
-CHAOS_API(int   )memcmp               (const void *d,
+CHAOS_API(int)   memcmp               (const void *d,
                                    const void *s,
                                    size_t      n);
 

@@ -93,53 +93,53 @@ CHAOS_API(int) log_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize logging engine.                                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_init              (int           fd,
+CHAOS_API(void)         log_init              (int           fd,
                                                uint64_t      sources,
                                                int           level);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_level             (uint64_t      sources,
+CHAOS_API(void)         log_level             (uint64_t      sources,
                                                int           level);
 
 /* ------------------------------------------------------------------------ *
  * Shutdown logging engine.                                                   *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_shutdown          (void);
+CHAOS_API(void)         log_shutdown          (void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_collect           (void);
+CHAOS_API(void)         log_collect           (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int          )log_source_register   (const char   *name);
+CHAOS_API(int)          log_source_register   (const char   *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int          )log_source_unregister (int           id);
+CHAOS_API(int)          log_source_unregister (int           id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int          )log_source_find       (const char   *name);
+CHAOS_API(int)          log_source_find       (const char   *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char        *)log_source_assemble   (uint64_t      flags);
+CHAOS_API(char *)       log_source_assemble   (uint64_t      flags);
   
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int          )log_level_parse       (const char   *levstr);
+CHAOS_API(int)          log_level_parse       (const char   *levstr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint64_t     )log_source_parse      (const char   *sources);
+CHAOS_API(uint64_t)     log_source_parse      (const char   *sources);
 
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_drain_default     (struct dlog  *drain);
+CHAOS_API(void)         log_drain_default     (struct dlog  *drain);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -182,14 +182,14 @@ CHAOS_API(struct dlog *)log_drain_add         (uint64_t      sources,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int          )log_drain_update      (struct dlog  *dlptr,
+CHAOS_API(int)          log_drain_update      (struct dlog  *dlptr,
                                                uint64_t      sources,
                                                int           level,
                                                int           prefix);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_drain_delete      (struct dlog  *dlptr);
+CHAOS_API(void)         log_drain_delete      (struct dlog  *dlptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -201,14 +201,14 @@ CHAOS_API(struct dlog *)log_drain_push        (struct dlog **dlptrptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void         )log_drain_level       (struct dlog  *dlptr,
+CHAOS_API(void)         log_drain_level       (struct dlog  *dlptr,
                                                int           level);
   
 /* ------------------------------------------------------------------------ *
  * Write a log line.                                                          *
  * ------------------------------------------------------------------------ */
 #ifndef DEBUG
-CHAOS_API(void         )log_output            (int           src,
+CHAOS_API(void)         log_output            (int           src,
                                                int           level,
                                                const char   *format,
                                                ...);

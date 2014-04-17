@@ -75,12 +75,12 @@ struct htmlp {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )htmlp_log;
-CHAOS_API(struct sheap  )htmlp_heap;
-CHAOS_API(struct sheap  )htmlp_var_heap;
-CHAOS_API(struct dheap  )htmlp_dheap;
-CHAOS_API(struct list   )htmlp_list;
-CHAOS_API(uint32_t      )htmlp_id;
+CHAOS_API(int)           htmlp_log;
+CHAOS_API(struct sheap)  htmlp_heap;
+CHAOS_API(struct sheap)  htmlp_var_heap;
+CHAOS_API(struct dheap)  htmlp_dheap;
+CHAOS_API(struct list)   htmlp_list;
+CHAOS_API(uint32_t)      htmlp_id;
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) htmlp_get_log(void);
@@ -88,12 +88,12 @@ CHAOS_API(int) htmlp_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize htmlp heap.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )htmlp_init      (void);
+CHAOS_API(void)          htmlp_init      (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy htmlp heap.                                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )htmlp_shutdown  (void);
+CHAOS_API(void)          htmlp_shutdown  (void);
 
 /* ------------------------------------------------------------------------ *
  * Add a htmlp.                                                               *
@@ -102,22 +102,22 @@ CHAOS_API(struct htmlp *)htmlp_new       (const char    *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )htmlp_update    (struct htmlp  *htmlp);
+CHAOS_API(int)           htmlp_update    (struct htmlp  *htmlp);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )htmlp_parse     (struct htmlp  *htmlp,
+CHAOS_API(int)           htmlp_parse     (struct htmlp  *htmlp,
                                           const char    *data,
                                           size_t         n);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )htmlp_clear     (struct htmlp  *htmlp);
+CHAOS_API(void)          htmlp_clear     (struct htmlp  *htmlp);
 
 /* ------------------------------------------------------------------------ *
  * Remove a htmlp.                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )htmlp_delete    (struct htmlp  *htmlp);
+CHAOS_API(void)          htmlp_delete    (struct htmlp  *htmlp);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -129,9 +129,9 @@ CHAOS_API(struct htmlp *)htmlp_find_id   (uint32_t       id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )htmlp_vset_args (struct htmlp  *htmlp, 
+CHAOS_API(void)          htmlp_vset_args (struct htmlp  *htmlp, 
                                           va_list        args);
-CHAOS_API(void          )htmlp_set_args  (struct htmlp  *htmlp, 
+CHAOS_API(void)          htmlp_set_args  (struct htmlp  *htmlp, 
                                           ...);    
 
 /* ------------------------------------------------------------------------ *
@@ -149,7 +149,7 @@ CHAOS_API(struct htmlp_tag *)htmlp_tag_find  (struct htmlp *htptr,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t          )htmlp_tag_count (struct htmlp *htptr);
+CHAOS_API(uint32_t)          htmlp_tag_count (struct htmlp *htptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -177,7 +177,7 @@ CHAOS_API(struct htmlp *)htmlp_push      (struct htmlp **htmlpptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char *)        htmlp_decode    (const char    *s);
+CHAOS_API(char *)       htmlp_decode    (const char    *s);
   
 
 /* ------------------------------------------------------------------------ *

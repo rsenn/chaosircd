@@ -91,11 +91,11 @@ struct child
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )child_log;          /* Log source */
-CHAOS_API(struct sheap  )child_heap;         /* Heap containing child blocks */
-CHAOS_API(struct list   )child_list;         /* List linking child blocks */
-CHAOS_API(int           )child_dirty;        /* we need a garbage collect */
-CHAOS_API(uint32_t      )child_id;           /* Next serial number */
+CHAOS_API(int)           child_log;          /* Log source */
+CHAOS_API(struct sheap)  child_heap;         /* Heap containing child blocks */
+CHAOS_API(struct list)   child_list;         /* List linking child blocks */
+CHAOS_API(int)           child_dirty;        /* we need a garbage collect */
+CHAOS_API(uint32_t)      child_id;           /* Next serial number */
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) child_get_log(void);
@@ -103,21 +103,21 @@ CHAOS_API(int) child_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize child heap and add garbage collect timer.                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_init         (void);
+CHAOS_API(void)          child_init         (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy child heap and cancel timer.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_shutdown     (void);
+CHAOS_API(void)          child_shutdown     (void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect child blocks                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_collect      (void);
+CHAOS_API(void)          child_collect      (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_default      (struct child  *cdptr);
+CHAOS_API(void)          child_default      (struct child  *cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -129,7 +129,7 @@ CHAOS_API(struct child *)child_new          (const char    *path,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )child_update       (struct child  *cdptr,
+CHAOS_API(int)           child_update       (struct child  *cdptr,
                                              uint32_t       channels,
                                              const char    *argv,
                                              uint64_t       interval,
@@ -137,7 +137,7 @@ CHAOS_API(int           )child_update       (struct child  *cdptr,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_delete       (struct child  *cdptr);
+CHAOS_API(void)          child_delete       (struct child  *cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -153,37 +153,37 @@ CHAOS_API(struct child *)child_push         (struct child **cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )child_launch       (struct child  *cdptr);
+CHAOS_API(int)           child_launch       (struct child  *cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_cancel       (struct child  *cdptr);
+CHAOS_API(void)          child_cancel       (struct child  *cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_kill         (struct child  *cdptr);
+CHAOS_API(void)          child_kill         (struct child  *cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_set_callback (struct child  *cdptr,
+CHAOS_API(void)          child_set_callback (struct child  *cdptr,
                                              void          *callback);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_vset_args    (struct child  *cdptr,
+CHAOS_API(void)          child_vset_args    (struct child  *cdptr,
                                              va_list        args);
 
-CHAOS_API(void          )child_set_args     (struct child  *cdptr,
+CHAOS_API(void)          child_set_args     (struct child  *cdptr,
                                              ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )child_set_name     (struct child  *cdptr,
+CHAOS_API(void)          child_set_name     (struct child  *cdptr,
                                          const char    *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(const char   *)child_get_name     (struct child  *cdptr);
+CHAOS_API(const char *)  child_get_name     (struct child  *cdptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
