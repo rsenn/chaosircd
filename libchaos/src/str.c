@@ -611,7 +611,7 @@ size_t str_len(const char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#if 1
+#ifdef NO_C99
 char *str_chr(const char *s, int c)
 {
   size_t i = 0;
@@ -627,15 +627,15 @@ char *str_chr(const char *s, int c)
   
   return NULL;
 }
-#endif /* __i386__ */
+#endif /* NO_C99 */
 
 /* ------------------------------------------------------------------------ *
  * Get first occurance of char <c> in string <s>                            *
  * ------------------------------------------------------------------------ */
-#if 1 // 1 //def __i386__
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 char *str_cat(char *d, const char *s)
 {
   size_t i;
@@ -660,11 +660,12 @@ char *str_cat(char *d, const char *s)
 
   return d;
 }
-#endif /* __i386__ */
+#endif 
 
 /* ------------------------------------------------------------------------ *
  * Copy string from <s> to <d>.                                             *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 size_t str_copy(char *d, const char *s)
 {
   size_t i = 0;
@@ -681,12 +682,13 @@ size_t str_copy(char *d, const char *s)
   
   return i;
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Copy string from <s> to <d>. Write max <n> bytes to <d> and always       *
  * null-terminate it. Returns new string length of <d>.                     *
  * ------------------------------------------------------------------------ */
-#ifndef HAVE_STRLCPY
+#if !defined(HAVE_STRLCPY) && defined(NO_C99)
 size_t strlcpy(char *d, const char *s, size_t n)
 {
   size_t i = 0;
@@ -709,13 +711,13 @@ size_t strlcpy(char *d, const char *s, size_t n)
   
   return i;
 }
-#endif /* HAVE_STRLCPY */
+#endif 
 
 /* ------------------------------------------------------------------------ *
  * Append string <src> to <dst>. Don't let <dst> be bigger than <siz> bytes *
  * and always null-terminate. Returns new string length of <dst>            *
  * ------------------------------------------------------------------------ */
-#ifndef HAVE_STRLCAT
+#if !defined(HAVE_STRLCAT) && defined(NO_C99)
 size_t strlcat(char *d, const char *s, size_t n)
 {
   size_t i = 0;
@@ -751,11 +753,12 @@ size_t strlcat(char *d, const char *s, size_t n)
   
   return i;
 }
-#endif /* HAVE_STRLCAT */
+#endif
+
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-#if 1 //def __i386__
+#ifdef NO_C99
 int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
@@ -771,11 +774,12 @@ int str_cmp(const char *s1, const char *s2)
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
 }
-#endif /* __i386__ */
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
@@ -791,11 +795,12 @@ int str_icmp(const char *s1, const char *s2)
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-#if 1 //def __i386__
+#ifdef NO_C99
 int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
@@ -814,7 +819,7 @@ int str_ncmp(const char *s1, const char *s2, size_t n)
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
 }
-#endif /* __i386__ */
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
@@ -841,6 +846,7 @@ int str_nicmp(const char *s1, const char *s2, size_t n)
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 int str_snprintf(char *str, size_t n, const char *format, ...)
 {
   int ret;
@@ -855,6 +861,7 @@ int str_snprintf(char *str, size_t n, const char *format, ...)
   
   return ret;
 }
+#endif
 
 int str_sprintf(char *str, const char *format, ...)
 {
@@ -889,6 +896,7 @@ int str_sprintf(char *str, const char *format, ...)
 /* ------------------------------------------------------------------------ *
  * Converts a string to a signed int.                                       *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 int str_toi(const char *s)
 {
 #define ISNUM(c) ((c) >= '0' && (c) <= '9')
@@ -924,6 +932,7 @@ int str_toi(const char *s)
   
 #undef ISNUM
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                             *
@@ -942,6 +951,7 @@ int str_toi(const char *s)
  *                                                                          *
  * return value will not be bigger than maxtok                              *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 size_t str_tokenize(char *s, char **v, size_t maxtok)
 {
   size_t c = 0;
@@ -1006,6 +1016,7 @@ size_t str_tokenize(char *s, char **v, size_t maxtok)
   
   return c;
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                             *
@@ -1125,6 +1136,7 @@ size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 char *str_dup(const char *s)
 {
   char *r;
@@ -1136,9 +1148,11 @@ char *str_dup(const char *s)
   
   return r;
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+#ifdef NO_C99
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
@@ -1162,10 +1176,11 @@ uint32_t str_hash(const char *s)
 
   return ret;
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-
+#ifdef NO_C99
 uint32_t str_ihash(const char *s)
 {  
   uint32_t ret = 0xcafebabe;
@@ -1188,6 +1203,7 @@ uint32_t str_ihash(const char *s)
 }
 #undef ROL
 #undef ROR
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                    *

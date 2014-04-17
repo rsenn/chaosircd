@@ -93,32 +93,32 @@ typedef struct sauth {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sheap  )sauth_heap;
-CHAOS_API(struct list   )sauth_list;
-CHAOS_API(uint32_t      )sauth_serial;
+CHAOS_API(struct sheap)  sauth_heap;
+CHAOS_API(struct list)   sauth_list;
+CHAOS_API(uint32_t)      sauth_serial;
 CHAOS_API(struct timer *)sauth_timer;
 CHAOS_API(struct timer *)sauth_rtimer;
 CHAOS_API(struct child *)sauth_child;
-CHAOS_API(int           )sauth_log;
-CHAOS_API(int           )sauth_fds[2];
-CHAOS_API(char          )sauth_readbuf[BUFSIZE];
-CHAOS_API(const char   *)sauth_types[6];
-CHAOS_API(const char   *)sauth_replies[8];
+CHAOS_API(int)           sauth_log;
+CHAOS_API(int)           sauth_fds[2];
+CHAOS_API(char)          sauth_readbuf[BUFSIZE];
+CHAOS_API(const char *)  sauth_types[6];
+CHAOS_API(const char *)  sauth_replies[8];
   
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) sauth_get_log(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )sauth_init         (void);
+CHAOS_API(void)          sauth_init         (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )sauth_shutdown     (void);
+CHAOS_API(void)          sauth_shutdown     (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )sauth_collect      (void);
+CHAOS_API(void)          sauth_collect      (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -134,7 +134,7 @@ CHAOS_API(struct sauth *)sauth_dns_reverse  (net_addr_t     address,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )sauth_launch       (void);
+CHAOS_API(int)           sauth_launch       (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -156,15 +156,15 @@ CHAOS_API(struct sauth *)sauth_proxy        (int            type,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )sauth_proxy_reply  (const char    *reply);
+CHAOS_API(int)           sauth_proxy_reply  (const char    *reply);
   
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )sauth_proxy_type   (const char    *type);
+CHAOS_API(int)           sauth_proxy_type   (const char    *type);
   
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )sauth_delete       (struct sauth  *sauth);
+CHAOS_API(void)          sauth_delete       (struct sauth  *sauth);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -180,14 +180,14 @@ CHAOS_API(struct sauth *)sauth_push         (struct sauth **sauth);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )sauth_cancel       (struct sauth  *sauth);
+CHAOS_API(void)          sauth_cancel       (struct sauth  *sauth);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )sauth_vset_args    (struct sauth  *sauth,
+CHAOS_API(void)          sauth_vset_args    (struct sauth  *sauth,
                                              va_list        args);
 
-CHAOS_API(void          )sauth_set_args     (sauth_t       *sauth, 
+CHAOS_API(void)          sauth_set_args     (sauth_t       *sauth, 
                                              ...);
 
 /* ------------------------------------------------------------------------ *
