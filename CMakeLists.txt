@@ -44,16 +44,53 @@ substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${C
 
 include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
 
+set(CONFFILES
+    conf/children.conf
+    conf/classes.conf
+    conf/inis.conf
+    conf/ircd.conf
+    conf/logs.conf
+    conf/modules.conf
+    conf/opers.conf
+    conf/ssl.conf)
 
-set(CONFFILES conf/children.conf conf/classes.conf
-   conf/inis.conf conf/ircd.conf conf/logs.conf
-   conf/modules.conf conf/opers.conf conf/ssl.conf)
+set(TOOLS
+    tools/chaosircd-config
+    tools/mkca
+    tools/mkcrt
+    tools/mkkeys
+    tools/mkreq
+    tools/openssl.cnf
+    tools/sign)
 
-foreach(SUBSTFILE ${CONFFILES})
+foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
+
+set(CHAOSIRCD_HEADERS
+    include/chaosircd/chanmode.h
+    include/chaosircd/channel.h
+    include/chaosircd/chanuser.h
+    include/chaosircd/chars.h
+    include/chaosircd/class.h
+    include/chaosircd/client.h
+    include/chaosircd/conf.h
+    include/chaosircd/config.h
+    include/chaosircd/ircd.h
+    include/chaosircd/lclient.h
+    include/chaosircd/msg.h
+    include/chaosircd/numeric.h
+    include/chaosircd/oper.h
+    include/chaosircd/server.h
+    include/chaosircd/service.h
+    include/chaosircd/user.h
+    include/chaosircd/usermode.h)
+
+install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/chaosircd)
+install(FILES ${CONFFILES} DESTINATION etc/chaosircd)
+install(FILES ${TOOLS} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
 
 set(TOOLS 
    tools/chaosircd-config tools/mkca tools/mkcrt tools/mkkeys

@@ -32,4 +32,10 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
     #string(REGEX REPLACE \\.c$ "" MODULE_NAME "${MODULE_SOURCE}")
 
     add_library("${MODULE_NAME}" MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
+    set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
+
+    install(TARGETS "${MODULE_NAME}"
+            RUNTIME DESTINATION libexec/chaosircd
+            LIBRARY DESTINATION lib/chaosircd
+            ARCHIVE DESTINATION lib/chaosircd)
 endforeach()

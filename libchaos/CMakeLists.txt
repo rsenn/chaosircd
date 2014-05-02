@@ -75,8 +75,18 @@ add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
-set_target_properties(libchaos PROPERTIES SOVERSION ${LIBRARY_VERSION})
+set_target_properties(libchaos PROPERTIES
+                      SOVERSION "${LIBRARY_VERSION}"
+                      PREFIX "")
 
 target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 
+install(TARGETS libchaos
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+
+install(FILES ${LIBCHAOS_HEADERS} DESTINATION include/libchaos)
+
+add_subdirectory(servauth)
 add_subdirectory(test)

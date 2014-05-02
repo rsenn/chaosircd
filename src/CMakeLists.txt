@@ -33,3 +33,6 @@ add_executable(chaosircd
 link_directories("${LIBCHAOS_BINARY_DIR}")
    
 target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})
+
+install(TARGETS chaosircd 
+        RUNTIME DESTINATION bin)
