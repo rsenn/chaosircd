@@ -70,6 +70,20 @@ typedef uintptr_t hash_t;
 # define CHAOS_DATA(type) extern type
 #endif
 
+#ifndef CHAOS_INLINE
+#ifdef __clang__
+#define CHAOS_INLINE static inline
+#else
+#define CHAOS_INLINE extern inline
+#endif
+#endif
+
+#ifdef __clang__
+#undef NO_C99
+#else
+#define NO_C99 1
+#endif
+
 /*#ifdef HAVE_SYS_TYPES_H
 #ifndef _BSD_SIZE_T_
 #define _BSD_SIZE_T_ unsigned int
