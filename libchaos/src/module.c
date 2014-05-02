@@ -382,8 +382,8 @@ void module_delete(struct module *module)
 struct module *module_find_path(const char *path)
 {
   struct module *module;
-  uint32_t       hash;
-
+  hash_t         hash;
+    
   hash = str_hash(path);
 
   dlink_foreach(&module_list, module)
@@ -403,8 +403,8 @@ struct module *module_find_path(const char *path)
 struct module *module_find_name(const char *name)
 {
   struct module *module;
-  uint32_t       hash;
-
+  hash_t         hash;
+    
   hash = str_hash(name);
 
   dlink_foreach(&module_list, module)

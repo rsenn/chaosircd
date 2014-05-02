@@ -147,7 +147,7 @@ struct chanmodechange {
   char            *nmask;
   char            *umask;
   char            *hmask;
-  uint32_t         ihash;
+  hash_t           ihash;
   char             info[IRCD_PREFIXLEN + 1];
   char             arg[IRCD_PREFIXLEN + 1]; /* arg as a string */
 };
@@ -160,7 +160,7 @@ struct chanmodeitem {
   char        hmask[IRCD_HOSTLEN + 1];
   char        info[IRCD_PREFIXLEN + 1];
   time_t      ts;
-  uint32_t    ihash;
+  hash_t      ihash;
 };
 
 /* -------------------------------------------------------------------------- *

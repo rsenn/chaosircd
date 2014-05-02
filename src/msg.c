@@ -84,8 +84,8 @@ struct msg *msg_find(const char *name)
 {
   struct node *node;
   struct msg  *m;
-  uint32_t     hash;
-
+  hash_t       hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&msg_table[hash % MSG_HASH_SIZE], node)

@@ -1,4 +1,8 @@
-/*
+/* 
+ * Copyright (C) 2013-2014  CrowdGuard organisation
+ * All rights reserved.
+ *
+ * Author: Roman Senn <rls@crowdguard.org>
  */
 
 #ifndef SRC_CROWDGUARD_H

@@ -217,8 +217,8 @@ struct cfg *cfg_find_name(const char *name)
 {
   struct node   *node;
   struct cfg *cfptr;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&cfg_list, node)

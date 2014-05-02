@@ -23,8 +23,7 @@ TESTS = cfgtest \
         giftest \
         graphtest \
         imagetest \
-        ttftest \
-				strtest
+        ttftest
 
 SOURCES = $(TESTS:%=%.c)
 OBJECTS = $(TESTS:%=%.o)

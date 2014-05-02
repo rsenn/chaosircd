@@ -585,8 +585,8 @@ struct client *client_find_id(uint32_t id)
 struct client *client_find_name(const char *name)
 {
   struct client *cptr;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&client_list, cptr)
@@ -605,8 +605,8 @@ struct client *client_find_nick(const char *nick)
 {
   struct client *cptr = NULL;
   struct node   *node;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(nick);
 
   dlink_foreach_data(&client_listsn[hash % CLIENT_HASH_SIZE], node, cptr)
@@ -627,8 +627,8 @@ struct history *client_history_find(const char *nick)
 {
   struct history *hptr = NULL;
   struct node    *node;
-  uint32_t        hash;
-
+  hash_t          hash;
+  
   hash = str_ihash(nick);
 
   dlink_foreach_data(&client_history[hash % CLIENT_HASH_SIZE], node, hptr)
@@ -695,8 +695,8 @@ struct client *client_find_host(const char *host)
 {
   struct client *cptr = NULL;
   struct node   *node;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(host);
 
   dlink_foreach_data(&client_lists[CLIENT_GLOBAL][CLIENT_USER], node, cptr)

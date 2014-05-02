@@ -1552,8 +1552,8 @@ struct ttf *ttf_find_name(const char *name)
 {
   struct node   *node;
   struct ttf *ttf;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&ttf_list, node)

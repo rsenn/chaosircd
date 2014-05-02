@@ -41,7 +41,7 @@ struct cfg
   struct node            node;        /* linking node for cfg_list */
   uint32_t               id;
   uint32_t               refcount;    /* times this block is referenced */
-  uint32_t               hash;
+  hash_t                 hash;
   struct list            chain;       /* chain of ini files */
   char                   name[64];    /* user-definable name */
 };

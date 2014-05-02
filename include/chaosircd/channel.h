@@ -52,7 +52,7 @@ struct channel {
   struct node      hnode;
   uint32_t         id;
   uint32_t         refcount;
-  uint32_t         hash;        /* channel name hash */
+  hash_t           hash;        /* channel name hash */
   time_t           ts;          /* channel timestamp */
   time_t           topic_ts;
   struct list      chanusers;   /* all channel members */

@@ -74,7 +74,7 @@ struct protocol
   struct node     node;
   uint32_t        id;
   int             refcount;
-  uint32_t        hash;
+  hash_t          hash;
   int             type;
   char            name[PROTOLEN + 1];
   net_callback_t *handler;

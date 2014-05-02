@@ -71,7 +71,7 @@ struct client
   struct node      dnode;
   uint32_t         id;          /* a unique id */
   uint32_t         refcount;    /* how many times this block is referenced */
-  uint32_t         hash;
+  hash_t           hash;
   uint32_t         type;
   uint32_t         location;
   struct lclient  *lclient;     /* if its a local client */
@@ -88,9 +88,9 @@ struct client
   time_t           lastread;
   time_t           ts;
   net_addr_t       ip;
-  uint32_t         hhash;
-  uint32_t         ihash;
-  uint32_t         rhash;
+  hash_t           hhash;
+  hash_t           ihash;
+  hash_t           rhash;
   char             name    [IRCD_HOSTLEN + 1];
   char             host    [IRCD_HOSTLEN + 1];   /* client's hostname */
   char             hostreal[IRCD_HOSTLEN + 1];
@@ -100,7 +100,7 @@ struct client
 
 struct history {
   struct node    node;
-  uint32_t       hash;
+  hash_t         hash;
   struct client *client;
   char           nick[IRCD_NICKLEN + 1];
 };

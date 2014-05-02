@@ -213,8 +213,8 @@ struct channel *channel_find_name(const char *name)
 {
   struct channel *chptr;
   struct node    *node;
-  uint32_t        hash;
-
+  hash_t          hash;
+  
   hash = str_ihash(name);
 
   /* Walk through a hashed list */

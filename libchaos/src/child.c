@@ -240,7 +240,7 @@ void child_delete(struct child *child)
  * ------------------------------------------------------------------------ */
 struct child *child_find(const char *path)
 {
-  uint32_t      chash;
+  hash_t        chash;
   struct node   *node;
   struct child *child;
 
@@ -667,8 +667,8 @@ struct child *child_find_name(const char *name)
 {
   struct child *child;
   struct node  *node;
-  uint32_t      nhash;
-
+  hash_t        nhash;
+  
   nhash = str_ihash(name);
 
   dlink_foreach(&child_list, node)

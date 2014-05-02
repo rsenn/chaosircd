@@ -316,8 +316,8 @@ void ssl_delete(struct ssl_context *scptr)
 struct ssl_context *ssl_find_name(const char *name)
 {
   struct ssl_context *scptr;
-  uint32_t            hash;
-
+  hash_t              hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&ssl_list, scptr)

@@ -39,8 +39,8 @@ struct mfile {
   uint32_t    id;
   uint32_t    refcount;
   struct list lines;
-  uint32_t    nhash;
-  uint32_t    phash;
+  hash_t      nhash;
+  hash_t      phash;
   int         fd;
   char        path[256];
   char        name[32];
