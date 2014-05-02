@@ -61,7 +61,7 @@ static char *m_oper_help[] = {
   "If supplied with a correct username/password pair,",
   "you get oper'ed, and have elevated privileges.",
   NULL
-};    
+};
 
 static struct msg m_oper_msg = {
   "OPER", 2, 2, MFLG_CLIENT | MFLG_UNREG,
@@ -76,7 +76,7 @@ int m_oper_load(void)
 {
   if(msg_register(&m_oper_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -91,37 +91,37 @@ void m_oper_unload(void)
  * argv[2] - name                                                             *
  * argv[3] - password                                                         *
  * -------------------------------------------------------------------------- */
-static void m_oper(struct lclient *lcptr, struct client *cptr, 
+static void m_oper(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
   struct oper *oper;
-  
+
   oper = oper_find(argv[2]);
-  
+
   if(oper == NULL)
   {
     numeric_send(cptr, ERR_NOOPERHOST);
-    log(oper_log, L_warning, 
+    log(oper_log, L_warning,
         "failed oper attempt by %s (%s@%s) - "
         "no such oper entry: %s [%s]",
         cptr->name, cptr->user->name,
         cptr->host, argv[2], argv[3]);
     return;
   }
-  
+
   if(str_cmp(argv[3], oper->passwd))
-  {    
-    client_send(cptr, numeric_format(ERR_PASSWDMISMATCH), 
-                client_me->name, cptr->name);    
-    
-    log(oper_log, L_warning, 
+  {
+    client_send(cptr, numeric_format(ERR_PASSWDMISMATCH),
+                client_me->name, cptr->name);
+
+    log(oper_log, L_warning,
         "failed oper attempt by %s (%s@%s) - "
         "wrong password for %s: %s",
         cptr->name, cptr->user->name,
         cptr->host, argv[2], argv[3]);
     return;
   }
-  
+
   if(cptr->oper == NULL)
   {
     oper_up(oper, cptr);

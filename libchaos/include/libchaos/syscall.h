@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: syscall.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -37,7 +37,7 @@ extern int syscall_errno;*/
 #else
 # undef __USE_LARGEFILE64
 # define __USE_LARGEFILE64 1
-#endif 
+#endif
 
 #define _SIGNAL_H
 
@@ -146,7 +146,7 @@ __asm__ volatile("int $0x80" \
                    "c" ((uint32_t)args)); \
 __syscall_return(type, __res); \
 }
-                     
+
 #define psocketcall3(type,  name, \
                      type1, arg1, \
                      type2, arg2, \
@@ -324,7 +324,7 @@ psyscall0(int,              syscall_fork);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -339,7 +339,7 @@ psyscall0(int,              syscall_setsid);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -354,7 +354,7 @@ psyscall0(pid_t,            syscall_getpid);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -370,7 +370,7 @@ psyscall1(int,              syscall_close,     /* non-negative on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -382,12 +382,12 @@ _syscall1(int,              syscall_close,     /* non-negative on error */
  * ------------------------------------------------------------------------ */
 #ifndef PIC
 extern
-psyscall1(int,              syscall_unlink, 
+psyscall1(int,              syscall_unlink,
           const char *,     path);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -399,12 +399,12 @@ _syscall1(int,              syscall_unlink,
  * ------------------------------------------------------------------------ */
 #ifndef PIC
 extern
-psyscall1(int,              syscall_pipe, 
-          int *,            filedes); 
+psyscall1(int,              syscall_pipe,
+          int *,            filedes);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -421,7 +421,7 @@ psyscall1(int,              syscall_exit,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -438,7 +438,7 @@ psyscall1(int,               syscall_chdir,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -456,7 +456,7 @@ psyscall2(int,                  syscall_kill,  /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -475,7 +475,7 @@ psyscall2(int,                  syscall_gettimeofday,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -494,7 +494,7 @@ psyscall2(int,                  syscall_munmap,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -513,7 +513,7 @@ psyscall2(int,                  syscall_stat,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -532,7 +532,7 @@ psyscall2(int,                  syscall_fstat,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -544,14 +544,14 @@ _syscall2(int,                  syscall_fstat,/* -1 on error */
  * int dup2(int oldfd, int newfd)                                             *
  * ------------------------------------------------------------------------ */
 #ifndef PIC
-extern 
+extern
 psyscall2(int,               syscall_dup2,  /* -1 on error */
           int,               oldfd,
           int,               newfd);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -563,14 +563,14 @@ _syscall2(int,               syscall_dup2,  /* -1 on error */
  * int signal(int signum, sighandler_t handler)                               *
  * ------------------------------------------------------------------------ */
 #ifndef PIC
-extern 
+extern
 psyscall2(int,               syscall_signal,        /* -1 on error */
           int,               signum,
           void *,            handler);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -582,14 +582,14 @@ _syscall2(int,               syscall_signal,        /* -1 on error */
  * int setrlimit(int resource, const struct rlimit *rlim)                     *
  * ------------------------------------------------------------------------ */
 #ifndef PIC
-extern 
+extern
 psyscall2(int,                   syscall_setrlimit,     /* -1 on error */
           int,                   resource,
           const struct rlimit *, rlim);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -603,18 +603,18 @@ _syscall2(int,                   syscall_setrlimit,     /* -1 on error */
 #ifndef PIC
 extern
 psyscall3(int,               syscall_execve,
-          const char *,      filename,         
+          const char *,      filename,
           char *const *,     argv,
           char *const *,     envp);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
 _syscall3(int,               syscall_execve,
-          const char *,      filename,         
+          const char *,      filename,
           char *const *,     argv,
           char *const *,     envp);
 
@@ -630,7 +630,7 @@ psyscall3(int,               syscall_waitpid,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -651,7 +651,7 @@ psyscall3(ssize_t,              syscall_read,  /* 0 on EOF, -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -672,7 +672,7 @@ psyscall3(ssize_t,              syscall_write, /* -1 on error, else bytes writte
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -694,7 +694,7 @@ psyscall3(int,                  syscall_poll,  /* -1 on error, else active fds *
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -715,7 +715,7 @@ psyscall3(int,                  syscall_open,  /* -1 on error, else valid fd */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -727,9 +727,9 @@ psyscall3(int,                  syscall_open,  /* -1 on error, else valid fd */
 {
   int     res;
   va_list args;
-  
+
   va_start(args, flags);
-  
+
   __asm__ volatile ("int $0x80"
                     : "=a" (res)
                     : "0" ((long)__NR_open),
@@ -737,7 +737,7 @@ psyscall3(int,                  syscall_open,  /* -1 on error, else valid fd */
                       "c" ((long)flags),
                       "d" (va_arg(args, long)));
   va_end(args);
-  
+
   if((unsigned long)res >= (unsigned long)-125)
   {
     errno = -res;
@@ -760,7 +760,7 @@ psyscall3(int,                  syscall_fcntl,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -772,7 +772,7 @@ psyscall3(int,                  syscall_fcntl,
 {
   int res;
   long arg;
-  
+
   arg = (&cmd)[1];
 
   __asm__ volatile ("int $0x80"
@@ -804,7 +804,7 @@ psyscall3(int,                  syscall_readlink,   /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -825,7 +825,7 @@ psyscall3(int,                  syscall_mprotect,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -849,7 +849,7 @@ psyscall5(int,                  syscall_select,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -876,7 +876,7 @@ poldmmapcall(void *,               syscall_mmap,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -896,11 +896,11 @@ extern
 psocketcall3(int,               syscall_socket,
              int,               domain,
              int,               type,
-             int,               protocol);            
+             int,               protocol);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -908,21 +908,21 @@ _socketcall3(SYS_SOCKET,
              int,               syscall_socket,
              int,               domain,
              int,               type,
-             int,               protocol);            
+             int,               protocol);
 
 /* ------------------------------------------------------------------------ *
  * int bind(int sockfd, struct sockaddr *my_addr, socklen_t addrlen)          *
  * ------------------------------------------------------------------------ */
 #ifndef PIC
-extern 
+extern
 psocketcall3(int,                     syscall_bind,
              int,                     sockfd,
              const struct sockaddr *, my_addr,
              socklen_t,               addrlen);
 #endif /* PIC */
-             
+
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -931,7 +931,7 @@ _socketcall3(SYS_BIND,
              int,                     sockfd,
              const struct sockaddr *, my_addr,
              socklen_t,               addrlen);
-             
+
 /* ------------------------------------------------------------------------ *
  * int connect(int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)     *
  * ------------------------------------------------------------------------ */
@@ -940,11 +940,11 @@ extern
 psocketcall3(int,                     syscall_connect,
              int,                     sockfd,
              const struct sockaddr *, serv_addr,
-             socklen_t,               addrlen);             
+             socklen_t,               addrlen);
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -952,7 +952,7 @@ _socketcall3(SYS_CONNECT,
              int,                     syscall_connect,
              int,                     sockfd,
              const struct sockaddr *, serv_addr,
-             socklen_t,               addrlen);             
+             socklen_t,               addrlen);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -965,7 +965,7 @@ psocketcall3(int,                     syscall_getsockname,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -978,7 +978,7 @@ _socketcall3(SYS_GETSOCKNAME,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifndef PIC
-extern 
+extern
 psocketcall3(int,                     syscall_getpeername,
              int,                     sockfd,
              const struct sockaddr *, serv_addr,
@@ -986,7 +986,7 @@ psocketcall3(int,                     syscall_getpeername,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -1007,7 +1007,7 @@ psocketcall2(int,               syscall_listen,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -1028,7 +1028,7 @@ psocketcall3(int,               syscall_accept,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -1051,7 +1051,7 @@ psocketcall4(int,               syscall_send,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -1075,11 +1075,11 @@ psocketcall4(int,               syscall_recv,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
-_socketcall4(SYS_RECV, 
+_socketcall4(SYS_RECV,
              int,               syscall_recv,
              int,               s,
              void *,            buf,
@@ -1099,7 +1099,7 @@ psocketcall4(int,               syscall_socketpair,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -1124,7 +1124,7 @@ psocketcall5(int,               syscall_getsockopt,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif
@@ -1150,7 +1150,7 @@ psocketcall5(int,               syscall_setsockopt,
 #endif /* PIC */
 
 #ifndef PIC
-CHAOS_INLINE 
+CHAOS_INLINE
 #else
 static inline
 #endif

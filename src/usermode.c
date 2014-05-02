@@ -75,15 +75,15 @@ int usermode_get_log() { return usermode_log; }
 void usermode_init(void)
 {
   usermode_log = log_source_register("usermode");
-  
-  
+
+
   mem_static_create(&usermodechange_heap, sizeof(struct usermodechange),
                     USERMODE_BLOCK_SIZE);
   mem_static_note(&usermodechange_heap, "usermode modechange heap");
 
   dlink_list_zero(&usermode_list);
   dlink_list_zero(&usermodechange_list);
-  
+
   log(usermode_log, L_status, "Initialised [usermode] module");
 }
 
@@ -95,7 +95,7 @@ void usermode_shutdown(void)
   log(usermode_log, L_status, "Shutting down [usermode] module...");
 
   mem_static_destroy(&usermodechange_heap);
-  
+
   log_source_unregister(usermode_log);
 }
 
@@ -106,40 +106,40 @@ int
 usermode_register(struct usermode *umptr)
 {
   int table_index;
-  
+
   if(!USERMODE_VALID(umptr->character))
   {
     log(usermode_log, L_warning, "usermode register failed: "
         "invalid usermode %c", umptr->character);
-    
+
     return -1;
   }
-  
+
   /* get the table index */
   table_index = (uint32_t)umptr->character - 0x40;
-  
+
   /* is this usermode already registered? */
   if(usermode_table[table_index] != NULL)
   {
     log(usermode_log, L_warning, "usermode register failed: "
         "%c already registered", umptr->character);
-    
+
     return -1;
   }
-  
+
   /* register new usermode! */
-  
+
   /* add user modeto usermode_table */
   usermode_table[table_index] = umptr;
-  
+
   /* link new usermode to the usermode list */
   dlink_node_zero(&umptr->node);
   dlink_add_tail(&usermode_list, &umptr->node, umptr);
-  
+
   debug(usermode_log, "usermode %c registered", umptr->character);
 
   /* set default vaules */
-  
+
   /* set the flag for struct user->modes */
   umptr->flag = 1ULL << table_index;
 
@@ -148,9 +148,9 @@ usermode_register(struct usermode *umptr)
 
   /* link users to the list (list_mode = USERMODE_LIST_OFF) */
   usermode_linkall_mode(umptr);
-  
+
   usermode_support();
-  
+
   return 0;
 }
 
@@ -159,10 +159,10 @@ usermode_register(struct usermode *umptr)
 void usermode_unregister(struct usermode *umptr)
 {
   int table_index;
-  
+
   /* get the index of this usermode in the table */
   table_index = (uint32_t)umptr->character - 0x40;
-  
+
   if(usermode_table[table_index] == NULL)
   {
     log(usermode_log, L_warning, "usermode unregister failed: not registered");
@@ -177,9 +177,9 @@ void usermode_unregister(struct usermode *umptr)
 
   /* unlink all users from this mode's list */
   usermode_unlinkall_mode(umptr);
-  
+
   usermode_support();
-  
+
   log(usermode_log, L_debug, "usermode %c unregistered", umptr->character);
 }
 
@@ -190,11 +190,11 @@ void usermode_assemble(uint64_t modes, char *umbuf)
   struct node     *n;
   struct usermode *umptr;
   char            *p = umbuf;
-  
+
   dlink_foreach_data(&usermode_list, n, umptr)
     if(umptr->flag & modes)
       *p++ = umptr->character;
-      
+
   *p = '\0';
 }
 
@@ -213,7 +213,7 @@ void usermode_show(struct client *cptr)
 void usermode_change_delete(struct usermodechange *umcptr)
 {
   dlink_delete(&usermodechange_list, &umcptr->node);
-  
+
   mem_static_free(&usermodechange_heap, umcptr);
 }
 
@@ -225,13 +225,13 @@ void usermode_change_add(struct usermode *umptr, int change, char *arg)
   struct node *node;
   struct node *next;
   struct usermodechange *umcptr;
-  
+
   /* go through the list of changes and check for similar ones */
   dlink_foreach_safe_data(&usermodechange_list, node, next, umcptr)
   {
     if(umcptr->mode != umptr)
       continue;
-    
+
     if(umcptr->arg != NULL && arg != NULL)
     {
       if(str_icmp(umcptr->arg, arg))
@@ -239,21 +239,21 @@ void usermode_change_add(struct usermode *umptr, int change, char *arg)
     }
     else if(umcptr->arg != arg)
       continue;
-    
+
     /* remove this if there's already the opposite */
     dlink_delete(&usermodechange_list, node);
-    
+
     mem_static_free(&usermodechange_heap, umcptr);
-    
+
     break;
   }
-    
+
   umcptr = mem_static_alloc(&usermodechange_heap);
 
   umcptr->mode   = umptr;
   umcptr->change = change;
   umcptr->arg    = arg;
-  
+
   dlink_add_tail(&usermodechange_list, &umcptr->node, umcptr);
 }
 
@@ -265,7 +265,7 @@ void usermode_change_destroy(void)
   struct node *node;
   struct node *next;
   struct chanmodechange *umcptr;
-  
+
   dlink_foreach_safe_data(&usermodechange_list, node, next, umcptr)
   {
     dlink_delete(&usermodechange_list, node);
@@ -287,10 +287,10 @@ usermode_parse(uint64_t       modes, char    **args,
   char           **arg;
   char            *singlearg[2];
   char            *changearg;
-  
+
   /* destroy old changes */
   usermode_change_destroy();
- 
+
   if(flags & USERMODE_OPTION_SINGLEARG)
   {
     singlearg[0] = *args;
@@ -299,7 +299,7 @@ usermode_parse(uint64_t       modes, char    **args,
   }
   else
     arg = args;
-  
+
   for(; *arg != NULL; arg++)
   {
     for(p = *arg; *p != '\0'; p++)
@@ -309,23 +309,23 @@ usermode_parse(uint64_t       modes, char    **args,
         change = USERMODE_ON;
         continue;
       }
-      
+
       if(*p == '-')
       {
         change = USERMODE_OFF;
         continue;
       }
-      
+
       if(USERMODE_VALID(*p))
       {
         if((usermode = usermode_table[(uint32_t)*p - 0x40]) != NULL)
         {
           changearg = NULL;
-          
+
           if(usermode->arg & USERMODE_ARG_ENABLE)
           {
             changearg = *(arg + 1);
-            
+
             if(changearg == NULL)
             {
               if(!(usermode->arg & USERMODE_ARG_EMPTY))
@@ -337,7 +337,7 @@ usermode_parse(uint64_t       modes, char    **args,
             else
               arg++;
           }
-          
+
           if(changearg == NULL || (!(usermode->arg)))
           {
             if(change == USERMODE_ON)
@@ -345,25 +345,25 @@ usermode_parse(uint64_t       modes, char    **args,
               if(modes & usermode->flag)
                 continue;
             }
-            else 
+            else
             {
               if(!(modes & usermode->flag))
                 continue;
             }
           }
-          
+
           usermode_change_add(usermode, change, changearg);
-          
+
           continue;
         }
       }
-      
+
       /* unknown mode character */
       if(cptr != NULL)
         numeric_send(cptr, ERR_UMODEUNKNOWNFLAG);
     }
   }
-    
+
   return usermodechange_list.size;
 }
 
@@ -374,7 +374,7 @@ int usermode_link_test(struct user *uptr, struct usermode *umptr, int change)
   /* don't do anything if no list ist kept for this usermode */
   if(umptr->list_mode == USERMODE_LIST_NOLIST)
     return 0;
-  
+
   /* */
   if(umptr->list_type != USERMODE_LIST_GLOBAL)
   {
@@ -382,10 +382,10 @@ int usermode_link_test(struct user *uptr, struct usermode *umptr, int change)
     if(umptr->list_type != uptr->client->location)
       return 0;
   }
-  
+
   if(umptr->list_mode != change)
     return -1;
-  
+
   return 1;
 }
 
@@ -399,7 +399,7 @@ void usermode_link(struct user *uptr, struct usermode *umptr)
         uptr->name, umptr->character); */
 
   node = dlink_node_new();
-  
+
   dlink_add_tail(&umptr->list, node, uptr);
 }
 
@@ -408,7 +408,7 @@ void usermode_link(struct user *uptr, struct usermode *umptr)
 void usermode_unlink(struct user *uptr, struct usermode *umptr)
 {
   dlink_find_delete(&umptr->list, uptr);
-    
+
 /*  debug(usermode_log, "user %s unlinked from list of user mode %c",
         uptr->name, umptr->character); */
 }
@@ -424,7 +424,7 @@ void usermode_linkall_user(struct user *uptr)
   {
     if(usermode_link_test(uptr, umptr, USERMODE_OFF) > 0)
       usermode_link(uptr, umptr);
-  } 
+  }
 }
 
 /* -------------------------------------------------------------------------- *
@@ -433,7 +433,7 @@ void usermode_unlinkall_user(struct user *uptr)
 {
   struct node     *n;
   struct usermode *umptr;
-  
+
   dlink_foreach_data(&usermode_list, n, umptr)
     dlink_find_delete(&umptr->list, uptr);
 }
@@ -444,7 +444,7 @@ void usermode_linkall_mode(struct usermode *umptr)
 {
   struct node *n;
   struct user *uptr;
-  
+
   dlink_foreach_data(&user_list, n, uptr)
   {
     if(usermode_link_test(uptr, umptr, USERMODE_ON) > 0)
@@ -468,7 +468,7 @@ int usermode_apply(struct user *uptr, uint64_t *modes, uint32_t flags)
   struct node *next;
   struct usermodechange *umcptr;
   int link;
-  
+
   dlink_foreach_safe_data(&usermodechange_list, node, next, umcptr)
   {
     /* call bounce handler */
@@ -480,7 +480,7 @@ int usermode_apply(struct user *uptr, uint64_t *modes, uint32_t flags)
         continue;
       }
     }
-    
+
     /* change modes */
     if(umcptr->arg == NULL)
     {
@@ -489,7 +489,7 @@ int usermode_apply(struct user *uptr, uint64_t *modes, uint32_t flags)
       else
         *modes &= ~umcptr->mode->flag;
     }
-    
+
     /* update list of users for this mode */
     if(!(flags & USERMODE_OPTION_LINKALL))
     {
@@ -502,7 +502,7 @@ int usermode_apply(struct user *uptr, uint64_t *modes, uint32_t flags)
       }
     }
   }
-  
+
   return usermodechange_list.size;
 }
 
@@ -534,19 +534,19 @@ usermode_send_local(struct lclient *lcptr,
  * -------------------------------------------------------------------------- */
 void
 usermode_send_remote(struct lclient *lcptr,
-                     struct client  *cptr, 
+                     struct client  *cptr,
                      char           *umcbuf,
                      char           *umcargs)
 {
   char noargs = '\0';
-  
+
   if(umcargs == NULL)
     umcargs = &noargs;
-  
+
   server_send(lcptr, NULL, CAP_UID, CAP_NONE, ":%s UMODE %s%s",
               client_is_user(cptr) ? cptr->user->uid : cptr->name,
               umcbuf, umcargs);
-  
+
   server_send(lcptr, NULL, CAP_NONE, CAP_UID, ":%s UMODE %s%s",
               cptr->name, umcbuf, umcargs);
 }
@@ -566,7 +566,7 @@ usermode_change_send(struct lclient *lcptr,
   int change = USERMODE_NOCHANGE;
   int arglen;
   int maxchange = remote ? USERMODE_PERLINE_REMOTE : USERMODE_PERLINE_LOCAL;
-  
+
   dlink_foreach_data(&usermodechange_list, node, umcptr)
   {
     /* if necessery append '+' or '-' to the mode string */
@@ -575,20 +575,20 @@ usermode_change_send(struct lclient *lcptr,
       change = umcptr->change;
       *pb++ = change == USERMODE_ON ? '+' : '-';
     }
-    
+
     /* add character to change buffer */
     *pb++ = umcptr->mode->character;
-    
+
     /* if necessery append '+' or '-' to the mode string */
     if(umcptr->arg != NULL)
     {
       *pa++ = ' ';
-      
+
       arglen = str_len(umcptr->arg);
       memcpy(pa, umcptr->arg, arglen);
       pa += arglen;
     }
-    
+
     if(++count >= maxchange || node->next == NULL)
     {
       *pb = '\0';
@@ -598,13 +598,13 @@ usermode_change_send(struct lclient *lcptr,
         usermode_send_remote(lcptr, cptr, umcbuf, umcargs);
       else
         usermode_send_local(lcptr, cptr, umcbuf, umcargs);
-      
+
       pb = umcbuf;
       pa = umcargs;
       count = 0;
       change = USERMODE_NOCHANGE;
     }
-    
+
   }
 }
 
@@ -614,20 +614,20 @@ int usermode_make(struct user   *uptr, char    **umbuf,
                   struct client *cptr, uint32_t  flags)
 {
   int ret = 0;
-  
+
   /* parse the string and make struct usermodechange */
   if(usermode_parse(uptr->modes, umbuf, cptr, flags))
     /* make the changes out of usermodechanges */
     if(usermode_apply(uptr, &uptr->modes, flags))
     {
       usermode_assemble(uptr->modes, uptr->mode);
-    
+
       ret = 1;
     }
 
   if(flags & USERMODE_OPTION_LINKALL)
     usermode_linkall_user(uptr);
-  
+
   return ret;
 }
 
@@ -637,12 +637,12 @@ int usermode_make(struct user   *uptr, char    **umbuf,
 struct usermode *usermode_find(char character)
 {
   struct usermode *umptr;
-  
+
   if(!USERMODE_VALID(character))
     return NULL;
-  
+
   umptr = usermode_table[(uint32_t)character - 0x40];
-  
+
   return umptr;
 }
 
@@ -651,23 +651,23 @@ struct usermode *usermode_find(char character)
 void usermode_support(void)
 {
   char modes[129];
-  
+
   uint32_t i;
   uint32_t di = 0;
-  
+
   for(i = 0; i < USERMODE_TABLE_SIZE; i++)
   {
     if(usermode_table[i])
     {
       modes[di++] = usermode_table[i]->character;
-      
+
       if(usermode_table[i]->arg & USERMODE_ARG_ENABLE)
         modes[di++] = ',';
     }
   }
-  
+
   modes[di] = '\0';
-  
+
   ircd_support_set("USERMODES", "%s", modes);
 }
 
@@ -681,14 +681,14 @@ usermode_dump(struct usermode *umptr)
   {
     struct node *n;
     struct usermode *um;
-    
+
     dump(usermode_log, "[============== usermode summary ===============]");
-    
+
     dlink_foreach_data(&usermode_list, n, um)
     {
       dump(usermode_log, "%c %x", um->character, um->flag);
     }
-    
+
     dump(usermode_log, "[=========== end of usermode summary ===========]");
   }
   else
@@ -704,20 +704,20 @@ usermode_dump(struct usermode *umptr)
     {
       char *modestr = NULL;
       char *typestr = NULL;
-   
+
       switch(umptr->list_mode)
       {
         case USERMODE_LIST_ON:  modestr = "on";  break;
         case USERMODE_LIST_OFF: modestr = "off"; break;
       }
-      
+
       switch(umptr->list_type)
       {
         case USERMODE_LIST_GLOBAL: typestr = "global"; break;
         case USERMODE_LIST_LOCAL:  typestr = "local";  break;
         case USERMODE_LIST_REMOTE: typestr = "remote"; break;
       }
-      
+
       if(modestr == NULL)
         dump(usermode_log, "  list mode: %i (?)", umptr->list_mode);
       else
@@ -730,21 +730,21 @@ usermode_dump(struct usermode *umptr)
 
       dump(usermode_log, " list count: %i", umptr->list.size);
     }
-    
+
     dump(usermode_log, "   argument: %s",
          umptr->arg & USERMODE_ARG_ENABLE ? "yes" : "no");
-    
+
     if(umptr->arg & USERMODE_ARG_ENABLE)
       dump(usermode_log, "empty arg: %s",
            umptr->arg & USERMODE_ARG_EMPTY ? "yes" : "no");
-    
+
     if(umptr->handler == NULL)
     {
       dump(usermode_log, "    handler: <no handler>", umptr->handler);
     }
     else
       dump(usermode_log, "    handler: %x", umptr->handler);
-    
+
     dump(usermode_log, "       flag: %x", umptr->flag);
     dump(usermode_log, "[=========== end of usermode dump ===========]");
   }

@@ -37,7 +37,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_links  (struct lclient *lcptr, struct client *cptr, 
+static void m_links  (struct lclient *lcptr, struct client *cptr,
                       int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -45,19 +45,19 @@ static void m_links  (struct lclient *lcptr, struct client *cptr,
  * -------------------------------------------------------------------------- */
 static char *m_links_help[] = {
   "LINKS [server]",
-  "",   
+  "",
   "Displays a list of all servers in the network.",
   "This list also shows which server is connected to which,",
   "and also the server description field.",
   "If a server is specified then the list is displayed from",
   "the view of this server",
   NULL
-};    
+};
 
 static struct msg m_links_msg = {
   "LINKS", 0, 1, MFLG_CLIENT,
   { NULL, m_links, m_links, m_links },
-  m_links_help  
+  m_links_help
 };
 
 /* -------------------------------------------------------------------------- *
@@ -67,7 +67,7 @@ int m_links_load(void)
 {
   if(msg_register(&m_links_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -81,7 +81,7 @@ void m_links_unload(void)
  * argv[1] - 'links'                                                          *
  * argv[2] - server                                                           *
  * -------------------------------------------------------------------------- */
-static void m_links(struct lclient *lcptr, struct client *cptr, 
+static void m_links(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   if(argv[2])
@@ -89,6 +89,6 @@ static void m_links(struct lclient *lcptr, struct client *cptr,
     if(server_relay_always(lcptr, cptr, 2, ":%C LINKS %s", &argc, argv))
       return;
   }
-  
+
   server_links(cptr, server_me);
 }

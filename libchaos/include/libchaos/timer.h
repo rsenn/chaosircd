@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: timer.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -59,17 +59,17 @@ typedef void (timer_shift_cb)(int64_t);
  * Timer block structure                                                      *
  * ------------------------------------------------------------------------ */
 
-struct timer 
+struct timer
 {
   struct node node;           /* linking node for timer block list */
-  
+
   /* externally initialised */
   timer_cb_t *callback;       /* the function called on timer deadline */
   uint64_t    interval;       /* timer interval (deadline = mtime + interval) */
   void       *args[4];        /* 4 user-defineable arguments for the callback */
   char        note[104];      /* timer description */
   int         refcount;
-  
+
   /* internally initialised */
   uint64_t    deadline;       /* time at which the callback will be called */
   uint32_t    id;
@@ -104,10 +104,10 @@ CHAOS_API(int) timer_get_log(void);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(size_t)        timer_strftime   (char               *s,
-                                           size_t              max, 
+                                           size_t              max,
                                            const char         *format,
                                            const struct tm    *tm);
-  
+
 /* ------------------------------------------------------------------------ *
  * Convert a struct tm to unixtime in miliseconds                             *
  * ------------------------------------------------------------------------ */
@@ -122,7 +122,7 @@ CHAOS_API(uint64_t)      timer_parse_time (const char         *t);
  * Parse a date in DD.MM(.YY(YY)) format                                       *
  * ------------------------------------------------------------------------ */
 CHAOS_API(uint64_t)      timer_parse_date (const char         *d);
-    
+
 /* ------------------------------------------------------------------------ *
  * Initialize the timer code.                                                 *
  * ------------------------------------------------------------------------ */
@@ -131,7 +131,7 @@ CHAOS_API(void)          timer_init       (void);
 /* ------------------------------------------------------------------------ *
  * Shutdown the timer code.                                                   *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          timer_shutdown   (void);  
+CHAOS_API(void)          timer_shutdown   (void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
@@ -144,17 +144,17 @@ CHAOS_API(int)           timer_collect    (void);
  * <src>            - pointer to timeval to convert                           *
  * <dst>            - pointer to 64bit integer to store result                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          timer_to_msec    (uint64_t           *dst, 
+CHAOS_API(void)          timer_to_msec    (uint64_t           *dst,
                                            struct timeval     *src);
-  
+
 /* ------------------------------------------------------------------------ *
  * Convert from miliseconds to timeval.                                       *
  *                                                                            *
  * <src>            - pointer to 64bit integer to convert                     *
  * <dst>            - pointer to timeval to store result                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          timer_to_timeval (struct timeval *dst, 
-                                           uint64_t       *src);    
+CHAOS_API(void)          timer_to_timeval (struct timeval *dst,
+                                           uint64_t       *src);
 
 /* ------------------------------------------------------------------------ *
  * Update the system time.                                                    *
@@ -166,7 +166,7 @@ CHAOS_API(int)           timer_update     (void);
  * Add a timer shifting callback                                              *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)          timer_shift_register (timer_shift_cb *shift_cb);
-  
+
 /* ------------------------------------------------------------------------ *
  * Remove a timer shifting callback                                           *
  * ------------------------------------------------------------------------ */
@@ -216,7 +216,7 @@ CHAOS_API(void)          timer_remove     (struct timer   *timer);
  *                                                                            *
  * Returns NULL if not found.                                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct timer *)timer_find       (void           *callback, 
+CHAOS_API(struct timer *)timer_find       (void           *callback,
                                        ...);
 
 /* ------------------------------------------------------------------------ *
@@ -232,7 +232,7 @@ CHAOS_API(struct timer *)timer_find_id    (uint32_t        id);
  *                                                                            *
  * Returns -1 if the timer wasn't found.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)           timer_find_cancel(void           *callback, 
+CHAOS_API(int)           timer_find_cancel(void           *callback,
                                        void           *userarg);
 
 /* ------------------------------------------------------------------------ *
@@ -243,11 +243,11 @@ CHAOS_API(int)           timer_find_cancel(void           *callback,
  * <format>          - format string                                          *
  *                   - your args                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          timer_vnote      (struct timer   *timer, 
+CHAOS_API(void)          timer_vnote      (struct timer   *timer,
                                        const char     *format,
                                        va_list         args);
 
-CHAOS_API(void)          timer_note       (struct timer   *timer, 
+CHAOS_API(void)          timer_note       (struct timer   *timer,
                                        const char     *format,
                                        ...);
 

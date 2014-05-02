@@ -70,3 +70,11 @@ log {
   prefix   = yes;
   truncate = yes;
 };
+
+log {
+  path     = "@logdir@/crowdguard.log";
+  sources  = "login geohash event participation";
+  level    = "verbose";
+  prefix   = yes;
+  truncate = yes;
+};

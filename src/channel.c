@@ -71,18 +71,18 @@ int channel_get_log() { return channel_log; }
 void channel_init(void)
 {
   size_t i;
-  
+
   channel_log = log_source_register("channel");
 
   channel_id = 0;
   channel_serial = 0;
-  
+
   dlink_list_zero(&channel_list);
-  
+
   for(i = 0; i < CHANNEL_HASH_SIZE; i++)
     dlink_list_zero(&channel_lists[i]);
-  
-  mem_static_create(&channel_heap, sizeof(struct channel), 
+
+  mem_static_create(&channel_heap, sizeof(struct channel),
                     CHANNEL_BLOCK_SIZE);
   mem_static_note(&channel_heap, "channel heap");
 
@@ -99,7 +99,7 @@ void channel_init(void)
   ircd_support_set("CHANTYPES", "#");
   ircd_support_set("TOPICLEN", "%u", IRCD_TOPICLEN);
   ircd_support_set("KICKLEN", "%u", IRCD_KICKLEN);
-  
+
   log(channel_log, L_status, "Initialised [channel] module.");
 }
 
@@ -110,23 +110,23 @@ void channel_shutdown(void)
 {
   struct channel *chptr;
   struct channel *next;
-  
+
   log(channel_log, L_status, "Shutting down [channel] module...");
-  
+
   ircd_support_unset("KICKLEN");
   ircd_support_unset("TOPICLEN");
   ircd_support_unset("CHANTYPES");
-  
+
   dlink_foreach_safe(&channel_list, chptr, next)
     channel_delete(chptr);
 
   mem_static_destroy(&channel_invite_heap);
-  
+
   mem_static_destroy(&channel_heap);
-  
+
   mem_static_destroy(&channel_backlog_heap);
   mem_dynamic_destroy(&channel_msglog_heap);
-  
+
   log_source_unregister(channel_log);
 }
 
@@ -136,45 +136,45 @@ void channel_shutdown(void)
 struct channel *channel_new(const char *name)
 {
   struct channel *chptr;
-  
+
   /* allocate, zero and link channel struct */
   chptr = mem_static_alloc(&channel_heap);
-  
+
   memset(chptr, 0, sizeof(struct channel));
-  
+
   /* initialize the struct */
   strlcpy(chptr->name, name, sizeof(chptr->name));
-  
+
   chptr->ts = timer_systime;
   chptr->hash = str_ihash(chptr->name);
   chptr->refcount = 1;
   chptr->id = channel_id++;
   chptr->serial = channel_serial;
   chptr->modes = 0LLU;
-  
+
   dlink_list_zero(&chptr->invites);
-  
+
   dlink_add_tail(&channel_list, &chptr->node, chptr);
-  dlink_add_tail(&channel_lists[chptr->hash % CHANNEL_HASH_SIZE], 
+  dlink_add_tail(&channel_lists[chptr->hash % CHANNEL_HASH_SIZE],
                  &chptr->hnode, chptr);
 
   debug(channel_log, "Created channel block: %s", chptr->name);
-  
+
   return chptr;
-}     
-     
+}
+
 /* -------------------------------------------------------------------------- *
  * Delete a channel.                                                          *
  * -------------------------------------------------------------------------- */
 void channel_delete(struct channel *chptr)
 {
   debug(channel_log, "Destroying channel block: %s", chptr->name);
-  
+
   dlink_delete(&channel_list, &chptr->node);
   dlink_delete(&channel_lists[chptr->hash % CHANNEL_HASH_SIZE], &chptr->hnode);
-  
+
   channel_release(chptr);
-  
+
   mem_static_free(&channel_heap, chptr);
 }
 
@@ -185,26 +185,26 @@ void channel_release(struct channel *chptr)
 {
   struct node *node;
   struct node *next;
-  
+
   dlink_foreach_safe(&chptr->chanusers, node, next)
     chanuser_delete(node->data);
-  
+
   dlink_foreach_safe(&chptr->invites, node, next)
     user_uninvite(node->data);
-  
+
   dlink_foreach_safe(&chptr->backlog, node, next)
   {
     struct logentry *e = node->data;
 
     if(e->text)
       mem_dynamic_free(&channel_msglog_heap, e->text);
-    
+
     mem_static_free(&channel_backlog_heap, e);
   }
-  
+
   dlink_list_zero(&chptr->lchanusers);
   dlink_list_zero(&chptr->chanusers);
-} 
+}
 
 /* -------------------------------------------------------------------------- *
  * Find a channel by name.                                                    *
@@ -214,14 +214,14 @@ struct channel *channel_find_name(const char *name)
   struct channel *chptr;
   struct node    *node;
   uint32_t        hash;
-  
+
   hash = str_ihash(name);
-  
+
   /* Walk through a hashed list */
   dlink_foreach(&channel_lists[hash % CHANNEL_HASH_SIZE], node)
   {
     chptr = node->data;
-    
+
     /* Hash matches */
     if(hash == chptr->hash)
     {
@@ -230,7 +230,7 @@ struct channel *channel_find_name(const char *name)
         return chptr;
     }
   }
-  
+
   return NULL;
 }
 
@@ -240,13 +240,13 @@ struct channel *channel_find_name(const char *name)
 struct channel *channel_find_id(uint32_t id)
 {
   struct channel *chptr;
-  
+
   dlink_foreach(&channel_list, chptr)
   {
     if(chptr->id == id)
       return chptr;
   }
-  
+
   return NULL;
 }
 
@@ -255,15 +255,15 @@ struct channel *channel_find_id(uint32_t id)
 struct channel *channel_find_warn(struct client *cptr, const char *name)
 {
   struct channel *chptr;
-  
+
   chptr = channel_find_name(name);
-  
+
   if(chptr)
     return chptr;
-  
+
   if(client_is_user(cptr))
     numeric_send(cptr, ERR_NOSUCHCHANNEL, name);
-   
+
   return NULL;
 }
 
@@ -275,27 +275,27 @@ void channel_topic(struct lclient *lcptr, struct client   *cptr,
 {
   if(hooks_call(channel_topic, HOOK_DEFAULT, lcptr, cptr, chptr, cuptr, topic))
     return;
-  
+
   /* Did the topic change? */
   if(str_ncmp(chptr->topic, topic, sizeof(chptr->topic) - 1))
   {
     /* Yes it did, actualise it */
     strlcpy(chptr->topic, topic, sizeof(chptr->topic));
-    
+
     /* Set topic info */
     if(client_is_user(cptr))
       str_snprintf(chptr->topic_info, sizeof(chptr->topic_info), "%s!%s@%s",
                cptr->name, cptr->user->name, cptr->host);
     else
       strlcpy(chptr->topic_info, cptr->name, sizeof(chptr->topic_info));
-    
+
     chptr->topic_ts = timer_systime;
-    
+
     /* Send out to channel */
     channel_send(NULL, chptr, CHFLG(NONE), CHFLG(NONE),
-                 ":%s TOPIC %s :%s", 
+                 ":%s TOPIC %s :%s",
                  chptr->topic_info, chptr->name, chptr->topic);
-    
+
     /* Send to servers */
     if(client_is_user(cptr))
     {
@@ -309,7 +309,7 @@ void channel_topic(struct lclient *lcptr, struct client   *cptr,
     else
     {
       server_send(lcptr, NULL, CAP_NONE, CAP_NONE,
-                  ":%s TOPIC %s :%s", 
+                  ":%s TOPIC %s :%s",
                   cptr->name, chptr->name, chptr->topic);
     }
   }
@@ -318,7 +318,7 @@ void channel_topic(struct lclient *lcptr, struct client   *cptr,
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 void channel_vsend(struct lclient *lcptr,  struct channel *chptr,
-                   uint64_t        flag,   uint64_t        noflag, 
+                   uint64_t        flag,   uint64_t        noflag,
                    const char     *format, va_list         args)
 {
   struct chanuser *cuptr;
@@ -326,45 +326,45 @@ void channel_vsend(struct lclient *lcptr,  struct channel *chptr,
   struct fqueue    multi;
   size_t           n;
   char             buf[IRCD_LINELEN + 1];
-  
+
   /* Formatted print */
   n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
-  
+
 /*  debug(channel_log, "Sending to channel %s: %s", chptr->name, buf);*/
-  
+
   /* Add line separator */
   buf[n++] = '\r';
   buf[n++] = '\n';
-  
+
   /* Start a multicast queue */
   io_multi_start(&multi);
-  
+
   io_multi_write(&multi, buf, n);
-  
+
   /* Loop through local chanuseres */
   dlink_foreach(&chptr->lchanusers, node)
   {
     cuptr = node->data;
-    
+
     /* Huh? What the hell does a remote user on local chanuser list? */
     if(!client_is_local(cuptr->client))
       continue;
-     
+
     if(client_is_service(cuptr->client))
       continue;
-    
+
     /* The one we shouldn't send to */
     if(cuptr->client->source == lcptr)
       continue;
-    
+
     /* Required flags check */
     if((cuptr->flags & flag) != flag)
       continue;
-    
+
     /* Refused flags check */
     if((cuptr->flags & noflag) != 0)
       continue;
-   
+
     /* Link it to the local queue */
     io_multi_link(&multi, cuptr->client->lclient->fds[1]);
     lclient_update_sendb(cuptr->client->lclient, n);
@@ -373,17 +373,17 @@ void channel_vsend(struct lclient *lcptr,  struct channel *chptr,
     debug(ircd_log_out, "To %s: %s", cuptr->client->lclient->name, buf);
 #endif /* DEBUG */
   }
-                    
+
   /* End multicasting */
   io_multi_end(&multi);
 }
 
-void channel_send(struct lclient *lcptr, struct channel *chptr, 
-                  uint64_t        flag,  uint64_t        noflag, 
+void channel_send(struct lclient *lcptr, struct channel *chptr,
+                  uint64_t        flag,  uint64_t        noflag,
                   const char     *format, ...)
 {
   va_list args;
-  
+
   va_start(args, format);
   channel_vsend(lcptr, chptr, flag, noflag, format, args);
   va_end(args);
@@ -396,38 +396,38 @@ size_t channel_burst(struct lclient *lcptr, struct channel *chptr)
   struct chanuser *acuptr = NULL;
   struct node     *node;
   size_t           chanmodes;
-  
+
   debug(channel_log, "Bursting channel %s to %s.",
         chptr->name, lcptr->name);
-  
+
   dlink_foreach_data(&chptr->chanusers, node, acuptr)
   {
     if(acuptr->client->serial != client_serial)
     {
       client_burst(lcptr, acuptr->client);
-      
+
       acuptr->client->serial = client_serial;
     }
   }
-  
+
   chanmodes = 0;
-  
+
   chanmodes += chanuser_burst(lcptr, chptr);
   chanmodes += chanmode_burst(lcptr, chptr);
-  
+
   if(chptr->topic[0])
   {
     lclient_send(lcptr, "NTOPIC %s %lu %s %lu :%s",
-                 chptr->name, chptr->ts, 
+                 chptr->name, chptr->ts,
                  chptr->topic_info, chptr->topic_ts, chptr->topic);
   }
   else
   {
     lclient_send(lcptr, "NTOPIC %s %lu %S %lu :",
-                 chptr->name, chptr->ts, 
+                 chptr->name, chptr->ts,
                  server_me, timer_systime);
   }
-  
+
   return chanmodes;
 }
 
@@ -441,12 +441,12 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
   struct chanuser *acuptr = NULL;
   struct node     *node;
   const char      *cmd = (type == CHANNEL_PRIVMSG ? "PRIVMSG" : "NOTICE");
-  
+
   cuptr = chanuser_find(chptr, cptr);
-  
+
   if(hooks_call(channel_message, HOOK_DEFAULT, cptr, chptr, type, text))
     return;
-    
+
   if(client_is_user(cptr) || client_is_service(cptr))
     channel_send(lcptr, chptr, CHFLG(NONE), CHFLG(NONE),
                      ":%N!%U@%H %s %s :%s",
@@ -457,15 +457,15 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
                      ":%N %s %s :%s",
                      cptr, cmd, chptr->name, text);
 
-    
+
   //  debug(channel_log, "Message to channel %s from %s.", chptr->name, lcptr->name);
-  
+
   dlink_foreach_data(&chptr->lchanusers, node, acuptr)
   {
     if(client_is_service(acuptr->client))
       service_handle(acuptr->client->service, lcptr, cptr, chptr, cmd, "%s", text);
   }
-    
+
   server_send(lcptr, chptr, CAP_UID, CAP_NONE,
               ":%s %s %s :%s",
                 cptr->user ? cptr->user->uid : cptr->name,
@@ -473,12 +473,12 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
   server_send(lcptr, chptr, CAP_NONE, CAP_UID,
                 ":%s %s %s :%s",
                 cptr->name, cmd, chptr->name, text);
-  
+
   /* Don't reset idle time when client messages
      to a channel where only he is member */
   if((cuptr && chptr->chanusers.size == 1))
     return;
-    
+
   cptr->lastmsg = timer_systime;
 }
 
@@ -493,10 +493,10 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
   int              reply = 0;
 
   dlink_list_zero(&modes);
-  
+
   /* Try to find the channel */
   chptr = channel_find_name(name);
-  
+
   if(chptr)
   {
     /* The user already joined, ignore the join */
@@ -505,7 +505,7 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
 
     /* Check the plugin hooks if we have permission to join */
     hooks_call(channel_join, HOOK_1ST, cptr, chptr, key, &reply);
-    
+
     if(reply > 0)
     {
       numeric_send(cptr, reply, chptr->name);
@@ -514,7 +514,7 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
 
     /* Add the user to the channel */
     cuptr = chanuser_add(chptr, cptr);
-    
+
     /* Initial mode hooks */
     hooks_call(channel_join, HOOK_3RD, &modes, cuptr);
   }
@@ -522,7 +522,7 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
   {
     /* Add to channel list */
     chptr = channel_new(name);
-    
+
     /* Uh, error adding channel */
     if(chptr == NULL)
     {
@@ -532,20 +532,20 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
 
     if(client_is_local(cptr))
       chptr->server = server_me;
-    
+
     /* Add the user to the channel */
     cuptr = chanuser_add(chptr, cptr);
-    
+
     /* Initial mode hooks */
     hooks_call(channel_join, HOOK_2ND, &modes, cuptr);
   }
-  
+
   /* Send out netjoin */
   chanuser_introduce(NULL, NULL, &cuptr->gnode);
-  
+
   /* Send the join command to the channel */
   chanuser_send_joins(NULL, &cuptr->gnode);
-  
+
   /* Send out local shit */
   if(chptr->topic[0] == '\0')
   {
@@ -557,10 +557,10 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
     numeric_send(cptr, RPL_TOPICWHOTIME, chptr->name,
                  chptr->topic_info, chptr->topic_ts);
   }
-  
+
   /* Show /names list */
   chanuser_show(cptr, chptr, cuptr, 1);
-  
+
   /* Send out modechanges for initial modes */
   if(modes.size)
   {
@@ -569,22 +569,22 @@ void channel_join(struct lclient *lcptr, struct client *cptr,
   }
 
   hooks_call(channel_join, HOOK_4TH, lcptr, cptr, chptr);
-}            
+}
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 void channel_show(struct client *cptr)
 {
   struct channel *chptr;
-  
+
   client_send(cptr, numeric_format(RPL_LISTSTART),
               client_me->name, cptr->name);
-  
+
   dlink_foreach(&channel_list, chptr)
   {
     if(hooks_call(channel_show, HOOK_DEFAULT, cptr, chptr))
       continue;
-    
+
     client_send(cptr, numeric_format(RPL_LIST),
                 client_me->name, cptr->name,
                 chptr->name, chptr->chanusers.size,
@@ -607,10 +607,10 @@ struct channel *channel_pop(struct channel *chptr)
       debug(channel_log, "Poping deprecated channel %s",
           chptr->name);
     }
-    
+
     chptr->refcount++;
   }
-  
+
   return chptr;
 }
 
@@ -630,11 +630,11 @@ struct channel *channel_push(struct channel **chptrptr)
     {
       if(--(*chptrptr)->refcount == 0)
         channel_release(*chptrptr);
-      
+
       (*chptrptr) = NULL;
     }
   }
-      
+
   return *chptrptr;
 }
 
@@ -659,7 +659,7 @@ void channel_backlog(struct channel *chptr, struct client *cptr,
   	if(e->from[i] == ' ')
   		e->from[i] = 0x7f;
   }
-  
+
   e->ts = timer_systime;
 
   if(text && text[0])
@@ -680,22 +680,22 @@ void channel_dump(struct channel *chptr)
   if(chptr == NULL)
   {
     struct node *node;
-    
+
     dump(channel_log, "[============== channel summary ===============]");
-    
+
     dlink_foreach_data(&channel_list, node, chptr)
       dump(channel_log, " #%03u: [%u] %-20s (%u users)",
             chptr->id,
             chptr->refcount,
             chptr->name,
             chptr->chanusers.size);
-    
+
     dump(channel_log, "[========== end of channel summary ============]");
   }
   else
   {
     uint32_t i, n = 0;
-    
+
     dump(channel_log, "[============== channel dump ===============]");
     dump(channel_log, "               id: #%u", chptr->id);
     dump(channel_log, "         refcount: %u", chptr->refcount);
@@ -710,7 +710,7 @@ void channel_dump(struct channel *chptr)
 
     for(i = 0; i < sizeof(chptr->modelists) / sizeof(chptr->modelists[0]); i++)
       n += chptr->modelists[i].size;
-        
+
     dump(channel_log, "        modelists: %u nodes", n);
     dump(channel_log, "            modes: %llu", chptr->modes);
     dump(channel_log, "           serial: %u", chptr->serial);
@@ -720,6 +720,6 @@ void channel_dump(struct channel *chptr)
     dump(channel_log, "          parabuf: %s", chptr->parabuf);
     dump(channel_log, "           server: %s", chptr->server ? chptr->server->name : "(null)");
     dump(channel_log, "          backlog: %u nodes", chptr->backlog.size);
-    dump(channel_log, "[========== end of channel dump ============]");    
+    dump(channel_log, "[========== end of channel dump ============]");
   }
 }

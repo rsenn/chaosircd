@@ -41,7 +41,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_rehash(struct lclient *lcptr, struct client *cptr, 
+static void mo_rehash(struct lclient *lcptr, struct client *cptr,
                       int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -68,7 +68,7 @@ int m_rehash_load(void)
 {
   if(msg_register(&mo_rehash_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -82,7 +82,7 @@ void m_rehash_unload(void)
  * argv[1] - 'rehash'                                                         *
  * argv[2] - name                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_rehash(struct lclient *lcptr, struct client *cptr, 
+static void mo_rehash(struct lclient *lcptr, struct client *cptr,
                       int             argc,  char         **argv)
 {
   if(argc == 3)

@@ -68,7 +68,7 @@ int m_pass_load(void)
 {
   if(msg_register(&mr_pass_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -83,11 +83,11 @@ void m_pass_unload(void)
  * argv[2] - password                                                         *
  * argv[3] - optional ts info                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_pass(struct lclient *lcptr, struct client *cptr, 
+static void mr_pass(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   strlcpy(lcptr->pass, argv[2], sizeof(lcptr->pass));
-  
+
   if(argc > 3)
   {
     if(lcptr->ts == 0)

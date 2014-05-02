@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: listen.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -46,14 +46,14 @@
  * ------------------------------------------------------------------------ */
 struct filter;
 
-struct listen 
+struct listen
 {
   struct node         node;                 /* linking node for listen_list */
   uint32_t            id;
   uint32_t            refcount;             /* times this block is referenced */
   uint32_t            lhash;
   uint32_t            nhash;
-  
+
   /* externally initialised */
   uint16_t            port;
   uint16_t            backlog;              /* backlog buffer size */
@@ -131,7 +131,7 @@ CHAOS_API(void)           listen_delete        (struct listen  *liptr);
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           listen_release       (struct listen  *liptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct listen *)listen_pop           (struct listen  *liptr);
@@ -147,25 +147,25 @@ CHAOS_API(struct listen *)listen_find          (const char     *address,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_set_args      (struct listen  *liptr, 
+CHAOS_API(void)           listen_set_args      (struct listen  *liptr,
                                                 const void     *argbuf,
                                                 size_t          n);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_get_args      (struct listen  *liptr, 
+CHAOS_API(void)           listen_get_args      (struct listen  *liptr,
                                                 void           *argbuf,
                                                 size_t          n);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           listen_set_name      (struct listen  *liptr,
                                                 const char     *name);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char *)   listen_get_name      (struct listen  *liptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct listen *)listen_find_name     (const char     *name);
@@ -176,8 +176,8 @@ CHAOS_API(struct listen *)listen_find_id       (uint32_t        id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            listen_attach_filter (struct listen *lptr, 
-                                                struct filter *fptr);  
+CHAOS_API(int)            listen_attach_filter (struct listen *lptr,
+                                                struct filter *fptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -187,5 +187,5 @@ CHAOS_API(int)            listen_detach_filter (struct listen *lptr);
  * Dump listeners and listen heap.                                            *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           listen_dump          (struct listen  *lptr);
-  
+
 #endif /* LIB_LISTEN_H */

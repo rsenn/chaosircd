@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2004-2005  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: image.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -176,16 +176,16 @@ CHAOS_API(void)            image_32to8             (struct image   *iptr,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            image_convert           (struct image   *iptr, 
+CHAOS_API(void)            image_convert           (struct image   *iptr,
                                                     int             type);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_blit_32to32       (struct image   *src,
                                                     struct rect    *srect,
                                                     struct image   *dst,
                                                     struct rect    *drect);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct palette *)image_quantize          (struct image   *iptr,
@@ -221,26 +221,26 @@ CHAOS_API(void)            image_putcolor          (struct image   *iptr,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_puthline          (struct image   *iptr,
-                                                    int16_t         x1, 
+                                                    int16_t         x1,
                                                     int16_t         x2,
-                                                    int16_t         y, 
+                                                    int16_t         y,
                                                     uint32_t        c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putvline          (struct image   *iptr,
-                                                    int16_t         x,  
+                                                    int16_t         x,
                                                     int16_t         y1,
-                                                    int16_t         y2,   
-                                                    uint32_t        c);    
+                                                    int16_t         y2,
+                                                    uint32_t        c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putline           (struct image   *iptr,
-                                                    int16_t         x1, 
+                                                    int16_t         x1,
                                                     int16_t         y1,
                                                     int16_t         x2,
-                                                    int16_t         y2, 
+                                                    int16_t         y2,
                                                     uint32_t        c);
 
 /* ------------------------------------------------------------------------ *
@@ -248,19 +248,19 @@ CHAOS_API(void)            image_putline           (struct image   *iptr,
 CHAOS_API(void)            image_putrect           (struct image   *iptr,
                                                     struct rect    *rect,
                                                     uint32_t        c);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putfrect          (struct image   *iptr,
                                                     struct rect    *rect,
                                                     uint32_t        c);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putcircle         (struct image   *iptr,
-                                                    int16_t         x,  
+                                                    int16_t         x,
                                                     int16_t         y,
-                                                    int             rad,  
+                                                    int             rad,
                                                     int             steps,
                                                     uint32_t        c);
 
@@ -273,43 +273,43 @@ CHAOS_API(void)            image_putellipse        (struct image   *iptr,
                                                     int             yrad,
                                                     int             steps,
                                                     uint32_t        c);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putchar           (struct image   *iptr,
-                                                    struct font    *ifptr, 
+                                                    struct font    *ifptr,
                                                     uint16_t        x,
                                                     uint16_t        y,
-                                                    uint32_t        c, 
+                                                    uint32_t        c,
                                                     char            a);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putstr            (struct image   *iptr,
-                                                    struct font    *ifptr, 
+                                                    struct font    *ifptr,
                                                     uint16_t        x,
                                                     uint16_t        y,
-                                                    uint32_t        c, 
+                                                    uint32_t        c,
                                                     int             align,
                                                     char           *s);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_putnum            (struct image   *iptr,
-                                                    struct font    *ifptr, 
+                                                    struct font    *ifptr,
                                                     uint16_t        x,
                                                     uint16_t        y,
                                                     uint32_t        c,
                                                     int             align,
                                                     int             num);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)             image_save_gif          (struct image   *iptr,
-                                                    const char     *name);  
+                                                    const char     *name);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct image *)  image_load_gif          (const char     *name);  
+CHAOS_API(struct image *)  image_load_gif          (const char     *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -319,16 +319,16 @@ CHAOS_API(void)            image_delete            (struct image   *iptr);
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_release           (struct image   *iptr);
-   
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_set_name          (struct image   *iptr,
                                                     const char     *name);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char *)    image_get_name          (struct image   *iptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct image *)  image_find_name         (const char     *name);
@@ -366,13 +366,13 @@ CHAOS_API(void)            image_color_sethtml     (struct image   *iptr,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(char *)          image_color_str         (struct color    color);
-  
+
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_color_parse       (struct color   *color,
                                                     const char     *str);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            image_color_dump        (struct color   *color);
@@ -383,20 +383,20 @@ CHAOS_API(void)            image_rect_dump         (struct rect    *rect);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            image_palette_set       (struct image   *iptr, 
+CHAOS_API(void)            image_palette_set       (struct image   *iptr,
                                                     struct palette *pal);
-  
+
 /* ------------------------------------------------------------------------ *
  * Create an empty palette                                                    *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct palette *)image_palette_new       (uint32_t        ncolors);
- 
+
 /* ------------------------------------------------------------------------ *
  * Create a greyscale palette                                                 *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct palette *)image_palette_greyscale (uint32_t        ncolors,
                                                     int             colorkey);
- 
+
 /* ------------------------------------------------------------------------ *
  * Create an initialised palette                                              *
  * ------------------------------------------------------------------------ */
@@ -417,7 +417,7 @@ CHAOS_API(void)            image_palette_free      (struct palette *palette);
  * Returns index of the closest match                                         *
  * ------------------------------------------------------------------------ */
 CHAOS_API(uint8_t)         image_palette_match     (struct palette *palette,
-                                                    struct color   *c, 
+                                                    struct color   *c,
                                                     int             colorkey);
 
   /* ------------------------------------------------------------------------ *

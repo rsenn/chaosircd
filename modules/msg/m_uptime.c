@@ -56,7 +56,7 @@ static char *m_uptime_help[] = {
   "without parameters, the uptime of the local",
   "server is displayed.",
   NULL
-};    
+};
 
 static struct msg m_uptime_msg = {
   "UPTIME", 0, 1, MFLG_CLIENT,
@@ -71,7 +71,7 @@ int m_uptime_load(void)
 {
   if(msg_register(&m_uptime_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -92,7 +92,7 @@ static void m_uptime(struct lclient *lcptr, struct client *cptr,
     if(server_relay_always(lcptr, cptr, 2, ":%C UPTIME :%s", &argc, argv))
       return;
   }
-  
+
   numeric_send(cptr, RPL_STATSUPTIME, ircd_uptime());
 }
 

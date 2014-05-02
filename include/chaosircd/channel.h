@@ -142,7 +142,7 @@ extern struct channel *channel_find_id        (uint32_t         id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct channel *channel_find_warn      (struct client   *cptr, 
+extern struct channel *channel_find_warn      (struct client   *cptr,
                                                const char      *name);
 
 /* -------------------------------------------------------------------------- *
@@ -156,20 +156,20 @@ extern void            channel_send           (struct lclient  *lcptr,
                                                struct channel  *chptr,
                                                uint64_t         flag,
                                                uint64_t         noflag,
-                                               const char      *format, 
+                                               const char      *format,
                                                ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void            channel_send_common    (struct client   *sptr,
                                                struct client   *one,
-                                               const char      *format, 
+                                               const char      *format,
                                                ...);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void            channel_delete_members (struct channel  *chptr,
-                                               struct list     *list, 
+                                               struct list     *list,
                                                int              delref);
 
 /* -------------------------------------------------------------------------- *
@@ -179,7 +179,7 @@ extern int             channel_welcome        (struct channel  *chptr);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void            channel_show_lusers    (struct channel  *chptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern int             channel_nick           (struct channel  *cptr,
@@ -187,7 +187,7 @@ extern int             channel_nick           (struct channel  *cptr,
                                                char            *nick);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int             channel_can_join       (struct channel  *chptr, 
+extern int             channel_can_join       (struct channel  *chptr,
                                                struct client   *sptr,
                                                const char      *key);
 
@@ -211,15 +211,15 @@ extern size_t          channel_burst          (struct lclient *lcptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void            channel_message        (struct lclient *lcptr, 
+extern void            channel_message        (struct lclient *lcptr,
                                                struct client  *cptr,
-                                               struct channel *chptr, 
+                                               struct channel *chptr,
                                                intptr_t        type,
                                                const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void            channel_join           (struct lclient *lcptr, 
+extern void            channel_join           (struct lclient *lcptr,
                                                struct client  *cptr,
                                                const char     *name,
                                                const char     *key);
@@ -227,16 +227,16 @@ extern void            channel_join           (struct lclient *lcptr,
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void            channel_show           (struct client  *cptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * Get a reference to an channel block                                        *
  * -------------------------------------------------------------------------- */
-extern struct channel *channel_pop            (struct channel *chptr);  
+extern struct channel *channel_pop            (struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Push back a reference to a channel block                                   *
  * -------------------------------------------------------------------------- */
-extern struct channel *channel_push           (struct channel **chptrptr);  
+extern struct channel *channel_push           (struct channel **chptrptr);
 
 /* -------------------------------------------------------------------------- *
  * Adds an entry to the channel backlog                                       *
@@ -250,5 +250,5 @@ extern void            channel_backlog        (struct channel *chptr,
  * Dump channels and channel heap.                                            *
  * -------------------------------------------------------------------------- */
 extern void            channel_dump           (struct channel *chptr);
-  
+
 #endif /* SRC_CHANNEL_H */

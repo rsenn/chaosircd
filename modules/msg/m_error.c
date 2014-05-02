@@ -49,7 +49,7 @@ static char *m_error_help[] = {
   "",
   "Servers generate this command to warn about errors.",
   NULL
-};    
+};
 
 static struct msg m_error_msg = {
   "ERROR", 1, 1, MFLG_UNREG,
@@ -64,7 +64,7 @@ int m_error_load(void)
 {
   if(msg_register(&m_error_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -87,10 +87,10 @@ static void m_error(struct lclient *lcptr, struct client *cptr,
     {
       log(server_log, L_warning, "Connection to %s dropped: %s",
           lcptr->connect->name, argv[2]);
-      
+
       connect_cancel(lcptr->connect);
     }
-    
+
     lclient_exit(lcptr, "%s", argv[2]);
   }
   else

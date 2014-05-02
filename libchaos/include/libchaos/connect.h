@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: connect.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -56,7 +56,7 @@
 /* ------------------------------------------------------------------------ *
  * Connect block structure.                                                   *
  * ------------------------------------------------------------------------ */
-struct connect 
+struct connect
 {
   /* Block info */
   struct node      node;                 /* Linking node for connect_list */
@@ -64,12 +64,12 @@ struct connect
   uint32_t         refcount;             /* Times this block is referenced */
   uint32_t         chash;                /* Hash based on address:port */
   uint32_t         nhash;                /* Hash based on name */
-  uint32_t         status;               /* Status of the connect block */ 
-  
+  uint32_t         status;               /* Status of the connect block */
+
   /* References to other blocks */
   struct timer    *timer;                /* Connect timeout timer */
   struct protocol *proto;                /* Protocol block */
-  
+
   /* Internally initialised */
   int              fd;                   /* File descriptor */
   int              active;
@@ -137,7 +137,7 @@ CHAOS_API(void)            connect_shutdown       (void);
  * - collect garbage on connect_heap                                        *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)             connect_collect        (void);
-  
+
 /* ------------------------------------------------------------------------ *
  * Fill a connect block with default values.                                *
  *                                                                          *
@@ -148,7 +148,7 @@ CHAOS_API(void)            connect_default        (struct connect  *cnptr);
 /* ------------------------------------------------------------------------ *
  * Add a new connect block if we got a valid address and a valid protocol   *
  * handler. Initialise all the user-supplied (externally initialised) and   *
- * the internal stuff. If the autoconn flag is set the connect will be      * 
+ * the internal stuff. If the autoconn flag is set the connect will be      *
  * initiated immediately.                                                   *
  *                                                                          *
  * <address>           A valid hostname or address                          *
@@ -180,9 +180,9 @@ CHAOS_API(struct connect *)connect_add          (const char      *address,
  * <timeout>           Connect timeout in msecs                             *
  * <interval>          Connect interval for autoconnect                     *
  * <autoconn>          Flag for autoconnect                                 *
- * <ssl>               SSL connection?                                      * 
+ * <ssl>               SSL connection?                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_update       (struct connect  *cnptr, 
+CHAOS_API(int)             connect_update       (struct connect  *cnptr,
                                                  const char      *address,
                                                  uint16_t         port,
                                                  struct protocol *pptr,
@@ -231,9 +231,9 @@ CHAOS_API(int)             connect_retry        (struct connect  *cnptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_set_arg      (struct connect  *cnptr, 
+CHAOS_API(void)            connect_set_arg      (struct connect  *cnptr,
                                                  void            *arg);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            connect_set_args     (struct connect  *cnptr,
@@ -265,5 +265,5 @@ CHAOS_API(struct connect *)connect_find_id      (uint32_t         id);
  * Dump connects and connect heap.                                          *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)            connect_dump         (struct connect  *cnptr);
-  
+
 #endif /* LIB_CONNECT_H */

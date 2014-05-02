@@ -109,9 +109,9 @@
 
 #define chanmode_index(c) ((uint32_t)c - 0x40)
 
-#define CHANMODE_FLAG_LETTER 0 
+#define CHANMODE_FLAG_LETTER 0
 #define CHANMODE_FLAG_PREFIX 1
-  
+
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
  * -------------------------------------------------------------------------- */
@@ -190,7 +190,7 @@ extern void             chanmode_shutdown       (void);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern struct chanmode *chanmode_register       (struct chanmode       *cmptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern int              chanmode_unregister     (struct chanmode       *cmptr);
@@ -200,7 +200,7 @@ extern int              chanmode_unregister     (struct chanmode       *cmptr);
 extern struct chanmodechange *
                         chanmode_change_add     (struct list           *list,
                                                  int                    what,
-                                                 char                   mode, 
+                                                 char                   mode,
                                                  char                  *arg,
                                                  struct chanuser       *acuptr);
 
@@ -210,13 +210,13 @@ extern struct chanmodechange *
                         chanmode_change_insert  (struct list           *list,
                                                  struct chanmodechange *before,
                                                  int                    what,
-                                                 char                   mode, 
+                                                 char                   mode,
                                                  char                  *arg);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanmode_change_destroy (struct list *list);
-    
+
 
 /* -------------------------------------------------------------------------- *
  * Parse channel mode changes                                                 *
@@ -260,9 +260,9 @@ extern uint32_t         chanmode_apply          (struct lclient        *lcptr,
 
 /* -------------------------------------------------------------------------- *
  *  * -------------------------------------------------------------------------- */
-extern void             chanmode_send_local     (struct client         *cptr, 
+extern void             chanmode_send_local     (struct client         *cptr,
                                                  struct channel        *chptr,
-                                                 struct node           *nptr, 
+                                                 struct node           *nptr,
                                                  size_t                 n);
 
 /* -------------------------------------------------------------------------- *
@@ -271,7 +271,7 @@ extern void             chanmode_send_remote    (struct lclient        *lcptr,
                                                  struct client         *cptr,
                                                  struct channel        *chptr,
                                                  struct node           *nptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanmode_send           (struct lclient        *lcptr,
@@ -282,14 +282,14 @@ extern void             chanmode_send           (struct lclient        *lcptr,
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern uint32_t         chanmode_flags_build    (char                  *dst,
-                                                 int                    types, 
+                                                 int                    types,
                                                  uint64_t               flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern uint32_t         chanmode_args_build     (char                  *dst,
                                                  struct channel        *chptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanmode_show           (struct client         *cptr,
@@ -297,59 +297,59 @@ extern void             chanmode_show           (struct client         *cptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanmode_bounce_simple  (struct lclient        *lcptr, 
+extern int              chanmode_bounce_simple  (struct lclient        *lcptr,
                                                  struct client         *cptr,
-                                                 struct channel        *chptr, 
+                                                 struct channel        *chptr,
                                                  struct chanuser       *cuptr,
-                                                 struct list           *lptr,  
+                                                 struct list           *lptr,
                                                  struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanmode_bounce_ban     (struct lclient        *lcptr, 
+extern int              chanmode_bounce_ban     (struct lclient        *lcptr,
                                                  struct client         *cptr,
                                                  struct channel        *chptr,
                                                  struct chanuser       *cuptr,
-                                                 struct list           *lptr,  
+                                                 struct list           *lptr,
                                                  struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanmode_bounce_mask    (struct lclient        *lcptr, 
+extern int              chanmode_bounce_mask    (struct lclient        *lcptr,
                                                  struct client         *cptr,
                                                  struct channel        *chptr,
                                                  struct chanuser       *cuptr,
-                                                 struct list           *lptr,  
+                                                 struct list           *lptr,
                                                  struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanmode_match_ban      (struct client         *cptr, 
+extern int              chanmode_match_ban      (struct client         *cptr,
                                                  struct channel        *chptr,
-                                                 struct list           *mlptr);  
+                                                 struct list           *mlptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanmode_match_amode    (struct client         *cptr, 
+extern int              chanmode_match_amode    (struct client         *cptr,
                                                  struct channel        *chptr,
-                                                 struct list           *mlptr);  
+                                                 struct list           *mlptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanmode_match_deny     (struct client         *cptr, 
+extern int              chanmode_match_deny     (struct client         *cptr,
                                                  struct channel        *chptr,
-                                                 struct list           *mlptr);  
+                                                 struct list           *mlptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern int              chanmode_mask_add       (struct client         *cptr,
                                                  struct list           *mlptr,
                                                  struct chanmodechange *cmcptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanmode_mask_delete    (struct list           *mlptr, 
-                                                 struct chanmodeitem   *cmiptr);  
+extern void             chanmode_mask_delete    (struct list           *mlptr,
+                                                 struct chanmodeitem   *cmiptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -359,8 +359,8 @@ extern void             chanmode_prefix_make    (char                  *buf,
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanmode_changes_make   (struct list           *list,
-                                                 int                    what, 
-                                                 struct chanuser       *cuptr);  
+                                                 int                    what,
+                                                 struct chanuser       *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -375,18 +375,18 @@ extern uint64_t         chanmode_prefix_parse   (const char            *pfx);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanmode_list           (struct client         *cptr,
-                                                 struct channel        *chptr, 
+                                                 struct channel        *chptr,
                                                  char                   c);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern struct node     *chanmode_assemble_list  (char                  *buf,
-                                                 struct node           *nptr, 
+                                                 struct node           *nptr,
                                                  size_t                 len);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanmode_introduce      (struct lclient        *lcptr, 
+extern void             chanmode_introduce      (struct lclient        *lcptr,
                                                  struct client         *cptr,
                                                  struct channel        *chptr,
                                                  struct node           *nptr);
@@ -398,7 +398,7 @@ extern size_t           chanmode_burst          (struct lclient        *lcptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanmode_drop           (struct client         *cptr, 
+extern void             chanmode_drop           (struct client         *cptr,
                                                  struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *

@@ -50,7 +50,7 @@ static void cm_ahalfop_hook(struct list *lptr, struct chanuser *cuptr);
 static const char *cm_ahalfop_help[] = {
   "+H <mask>       Users matching the mask will get auto-halfopped on join.",
   NULL
-}; 
+};
 
 static struct chanmode cm_ahalfop_mode = {
   CM_AHALFOP_CHAR,         /* Mode character */
@@ -76,7 +76,7 @@ int cm_ahalfop_load(void)
 
   /* set support flag */
   ircd_support_set("AUTOHALFOP", NULL);
-  
+
   return 0;
 }
 
@@ -84,10 +84,10 @@ void cm_ahalfop_unload(void)
 {
   /* unset the support flag */
   ircd_support_unset("AUTOHALFOP");
-  
+
   /* unregister the channel mode */
   chanmode_unregister(&cm_ahalfop_mode);
-  
+
   /* unregister the hook in channel_join */
   hook_unregister(channel_join, HOOK_3RD, cm_ahalfop_hook);
 }
@@ -99,7 +99,7 @@ static void cm_ahalfop_hook(struct list *lptr, struct chanuser *cuptr)
 {
   struct channel *chptr = cuptr->channel;
   struct list    *mlptr;
-  
+
   /* get the mode list for +H */
   mlptr = &chptr->modelists[chanmode_index(CM_AHALFOP_CHAR)];
 
@@ -108,7 +108,7 @@ static void cm_ahalfop_hook(struct list *lptr, struct chanuser *cuptr)
   {
     /* if the client matched, then give him +h mode */
     cuptr->flags |= CHFLG(h);
-    
+
     /* update the nickname prefix (%) */
     chanmode_prefix_make(cuptr->prefix, cuptr->flags);
 

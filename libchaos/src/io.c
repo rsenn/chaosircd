@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: io.c,v 1.6 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -86,7 +86,7 @@ size_t    io_count = 0;
 #elif defined(USE_SELECT)
 int       io_top   = -1;
 #else
-# error "no i/o multiplexing" 
+# error "no i/o multiplexing"
 #endif /* USE_SELECT || USE_POLL */
 
 /* ------------------------------------------------------------------------ *
@@ -103,7 +103,7 @@ static fd_set io_wfds, io_wfds_r;
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *io_types[] = 
+const char *io_types[] =
 {
   "none",
   "file",
@@ -113,30 +113,30 @@ const char *io_types[] =
 
 /* ------------------------------------------------------------------------ */
 int io_get_log() { return io_log; }
- 
+
 /* ------------------------------------------------------------------------ *
  * Register fd for use with select/poll.                                    *
  * ------------------------------------------------------------------------ */
 static void io_add_fd(int fd)
 {
 #ifdef USE_POLL
-  
+
   /* Assign the next available pollfd struct to the fd */
   io_list[fd].index = io_count;
-  
+
   /* Initialize the pollfd struct */
   io_pfds[io_count].fd = fd;
   io_pfds[io_count].events = 0;
   io_pfds[io_count].revents = 0;
-  
+
   /* Update pollfd count */
-  io_count++;  
+  io_count++;
 #else
-  
+
   /* New fd is higher than io_top, update io_top */
   if(fd > io_top)
     io_top = fd;
-  
+
 #endif /* USE_SELECT || USE_POLL */
 }
 
@@ -146,38 +146,38 @@ static void io_add_fd(int fd)
 static void io_remove_fd(int fd)
 {
 #ifdef USE_POLL
-  
+
   size_t index = io_list[fd].index;
-     
+
   if(index >= 0 && index < io_count)
   {
     /* Clear the pollfd struct */
     io_pfds[index].fd = -1;
     io_pfds[index].events = 0;
     io_pfds[index].revents = 0;
-    
-    /* 
+
+    /*
      * If it's not the last pollfd struct we'll have to
-     * move the following ones down. 
+     * move the following ones down.
      */
     while(index + 1 < io_count)
-    { 
+    {
       io_pfds[index] = io_pfds[index + 1];
-      
+
       if(io_pfds[index].fd > 0)
         io_list[io_pfds[index].fd].index = index;
-      
+
       index++;
     }
-    
+
     io_list[fd].index = -1;
-    
+
     /* Decrease pollfd count */
     io_count--;
   }
-  
+
 #else
-  
+
   /* Oh, it's the topmost fd, we need to decrease io_top */
   if(fd == io_top)
   {
@@ -189,7 +189,7 @@ static void io_remove_fd(int fd)
         break;
     }
   }
-  
+
 #endif /* USE_SELECT || USE_POLL */
 }
 
@@ -210,9 +210,9 @@ void io_set_events(int fd, int events)
     io_pfds[io_list[fd].index].events |= POLLIN;
   if(events & IO_WRITE)
     io_pfds[io_list[fd].index].events |= POLLOUT;
-    
+
 #else
-  
+
   /* If we use select, each flag modifies another fd_set */
   if(events & IO_ERROR)
     FD_SET(fd, &io_efds);
@@ -220,7 +220,7 @@ void io_set_events(int fd, int events)
     FD_SET(fd, &io_rfds);
   if(events & IO_WRITE)
     FD_SET(fd, &io_wfds);
-  
+
 #endif /* USE_SELECT || USE_POLL */
 }
 
@@ -233,7 +233,7 @@ void io_unset_events(int fd, int events)
   io_list[fd].control.events &= ~events;
 
 #ifdef USE_POLL
-  
+
   if(io_list[fd].index >= 0)
   {
     /* Remove the flags from the pollfd struct */
@@ -244,9 +244,9 @@ void io_unset_events(int fd, int events)
     if(events & IO_WRITE)
       io_pfds[io_list[fd].index].events &= ~POLLOUT;
   }
-  
+
 #else
-  
+
   /* If we use select, each flag modifies another fd_set */
   if(events & IO_ERROR)
     FD_CLR(fd, &io_efds);
@@ -254,7 +254,7 @@ void io_unset_events(int fd, int events)
     FD_CLR(fd, &io_rfds);
   if(events & IO_WRITE)
     FD_CLR(fd, &io_wfds);
-  
+
 #endif /* USE_SELECT || USE_POLL */
 }
 
@@ -277,9 +277,9 @@ static void io_set_revents(int fd)
     if(io_pfds[io_list[fd].index].revents & POLLOUT)
       io_list[fd].status.events |= IO_WRITE;
   }
-  
+
 #else
-  
+
   /* Collect event info from all 3 fd_sets */
   if(FD_ISSET(fd, &io_efds_r))
     io_list[fd].status.events |= IO_ERROR;
@@ -287,7 +287,7 @@ static void io_set_revents(int fd)
     io_list[fd].status.events |= IO_READ;
   if(FD_ISSET(fd, &io_wfds_r))
     io_list[fd].status.events |= IO_WRITE;
-  
+
 # endif /* USE_SELECT || USE_POLL */
 }
 
@@ -299,7 +299,7 @@ int io_queued_read(int fd)
   int ret = 0;
   size_t sz = 0;
   char buf[IO_READ_SIZE];
-  
+
   syscall_errno = 0;
 
   do
@@ -320,7 +320,7 @@ int io_queued_read(int fd)
         ret = syscall_read(fd, buf, IO_READ_SIZE);
         break;
     }
-  
+
     /* We got data, add it to the queue */
     if(ret > 0)
       sz += queue_write(&io_list[fd].recvq, buf, ret);
@@ -329,37 +329,37 @@ int io_queued_read(int fd)
 
   io_list[fd].status.onread = 1;
   io_list[fd].status.onwrite = 0;
-  
+
 /*  if(ret == 0 || (io_list[fd].type == FD_FILE && ret >= 0 && ret < IO_READ_SIZE))
   {
     io_list[fd].error = 0;
     io_list[fd].status.err = 1;
-    
+
     return -1;
   }*/
-  
+
 #ifdef HAVE_SSL
 /*  if(io_list[fd].ssl)
   {
     if(io_list[fd].error)
       return -1;
-    else 
+    else
       return 0;
   }
   else*/
   {
-#endif /* HAVE_SSL */    
+#endif /* HAVE_SSL */
     if(ret < 0)
     {
       io_list[fd].error = syscall_errno;
       io_list[fd].status.err = 1;
-      
+
       if(io_list[fd].error == EAGAIN)
       {
-        io_list[fd].status.err = 0;        
+        io_list[fd].status.err = 0;
         return 0;
       }
-      
+
       return -1;
     }
     else if(ret == 0)
@@ -370,7 +370,7 @@ int io_queued_read(int fd)
     {
       io_list[fd].error = 0;
       io_list[fd].status.err = 0;
-    }  
+    }
 #ifdef HAVE_SSL
   }
 #endif /* HAVE_SSL */
@@ -393,16 +393,16 @@ int io_queued_write(int fd)
     n = io_list[fd].sendq.size > IO_WRITE_SIZE ?
         IO_WRITE_SIZE :
         io_list[fd].sendq.size;
-    
+
     if(n == 0)
     {
       io_unset_events(fd, IO_WRITE);
       return 0;
     }
-  
+
     /* Get the stuff from queue, but not remove it */
     queue_map(&io_list[fd].sendq, buf, n);
-  
+
     /* Write to fd */
     switch(io_list[fd].type)
     {
@@ -411,7 +411,7 @@ int io_queued_write(int fd)
         if(io_list[fd].ssl)
           ret = ssl_write(fd, buf, n);
         else
-#endif /* HAVE_SSL */        
+#endif /* HAVE_SSL */
           ret = syscall_send(fd, buf, n, 0);
         break;
       default:
@@ -420,7 +420,7 @@ int io_queued_write(int fd)
         ret = syscall_write(fd, buf, n);
         break;
     }
-  
+
     /* Only remove stuff from the queue that has been sent */
     if(ret > 0)
       queue_cut(&io_list[fd].sendq, ret);
@@ -432,12 +432,12 @@ int io_queued_write(int fd)
   {
     if(io_list[fd].error)
       return -1;
-    else 
+    else
       return 0;
   }
   else
   {
-#endif /* HAVE_SSL */    
+#endif /* HAVE_SSL */
     if(ret < 0)
     {
       if(syscall_errno && syscall_errno != EWOULDBLOCK)
@@ -446,17 +446,17 @@ int io_queued_write(int fd)
         syscall_errno = 0;
         io_list[fd].status.err = 1;
         io_list[fd].status.onwrite = 1;
-        
+
         return -1;
       }
-      
+
       return 0;
     }
     else
     {
       io_list[fd].status.err = 0;
     }
-#ifdef HAVE_SSL    
+#ifdef HAVE_SSL
   }
 #endif /* HAVE_SSL */
 
@@ -473,15 +473,15 @@ int io_flush(int fd)
 {
   int ret;
   size_t bytes = 0;
-  
+
   while(io_list[fd].sendq.size)
   {
     if((ret = io_queued_write(fd)) == -1)
       return -1;
-    
+
     bytes += ret;
   }
-  
+
   return bytes;
 }
 
@@ -491,32 +491,32 @@ int io_flush(int fd)
 void io_shutup(int fd)
 {
   int i;
-  
-  if(fd < 0) 
+
+  if(fd < 0)
     return;
-  
+
   if(!io_list[fd].status.closed)
   {
     if(io_list[fd].sendq.size &&
-       !io_list[fd].status.err && 
+       !io_list[fd].status.err &&
        !io_list[fd].status.dead)
     {
       io_queued_write(fd);
-      
+
       if(io_list[fd].sendq.size)
         queue_destroy(&io_list[fd].sendq);
       if(io_list[fd].recvq.size)
         queue_destroy(&io_list[fd].recvq);
     }
-    
+
     io_remove_fd(fd);
-    
+
     io_list[fd].status.closed = 1;
-    
+
     for(i = 0; i < IO_CB_MAX; i++)
       io_list[fd].callbacks[i] = NULL;
   }
-  
+
   if(io_list[fd].control.events)
     io_unset_events(fd, IO_READ|IO_WRITE|IO_ERROR);
 }
@@ -528,10 +528,10 @@ int io_push(int *fdptr)
   if(*fdptr >= 0 && *fdptr < IO_MAX_FDS)
   {
     io_shutup(*fdptr);
-    
+
     *fdptr = -1;
   }
-  
+
   return *fdptr;
 }
 
@@ -541,36 +541,36 @@ int io_push(int *fdptr)
 void io_handle_fd(int fd)
 {
   io_list[fd].status.onwrite = 0;
-  io_list[fd].status.onread = 0;  
-  
+  io_list[fd].status.onread = 0;
+
   /* Do SSL handshakes if not done yet */
 #ifdef HAVE_SSL
-  if(io_list[fd].ssl && io_list[fd].sslstate) 
+  if(io_list[fd].ssl && io_list[fd].sslstate)
   {
     if(ssl_handshake(fd, &io_list[fd]))
     {
       io_list[fd].status.onread = 1;
       io_list[fd].status.onwrite = 1;
       io_list[fd].status.err = 1;
-      
+
       if(io_list[fd].sslerror)
         io_list[fd].error = 666;
       else
         io_list[fd].error = 0;
-      
+
       io_list[fd].status.closed = 1;
-      
+
       if(io_list[fd].callbacks[IO_CB_READ])
-        io_list[fd].callbacks[IO_CB_READ](fd, 
+        io_list[fd].callbacks[IO_CB_READ](fd,
                                     io_list[fd].args[0], io_list[fd].args[1],
                                     io_list[fd].args[1], io_list[fd].args[2]);
       io_list[fd].status.closed = 0;
       io_close(fd);
       return;
-    } 
-  } 
+    }
+  }
 #endif /* HAVE_SSL */
-  
+
   /* There is data on the fd */
   if(!io_list[fd].status.err && !io_list[fd].status.closed &&
      (io_list[fd].status.events & IO_READ))
@@ -579,16 +579,16 @@ void io_handle_fd(int fd)
     if(io_list[fd].control.recvq)
     {
       io_list[fd].ret = io_queued_read(fd);
-      
+
       if(io_list[fd].ret <= 0)
       {
         io_list[fd].status.closed = 1;
         io_list[fd].status.err = (io_list[fd].ret < 0);
         io_list[fd].status.onread = 1;
-        
+
 //        io_queued_write(fd);
         io_remove_fd(fd);
-        
+
         if(io_list[fd].control.events)
           io_unset_events(fd, IO_READ|IO_WRITE|IO_ERROR);
       }
@@ -599,27 +599,27 @@ void io_handle_fd(int fd)
   if(io_list[fd].status.events & IO_WRITE)
   {
     /* If this fd is queued then we try to write */
-    if(io_list[fd].control.sendq && 
+    if(io_list[fd].control.sendq &&
        !io_list[fd].status.err && !io_list[fd].status.dead)
     {
       io_list[fd].ret = io_queued_write(fd);
-      
+
       if(io_list[fd].ret < 0)
       {
         io_list[fd].status.onwrite = 1;
-        
+
         io_queued_write(fd);
         io_remove_fd(fd);
-        
+
         if(io_list[fd].control.events)
           io_unset_events(fd, IO_READ|IO_WRITE|IO_ERROR);
       }
     }
-    
+
     if(io_list[fd].status.err || io_list[fd].status.dead)
       io_list[fd].status.events |= IO_READ;
   }
-    
+
   /* We had an error */
   if(io_list[fd].status.events & IO_ERROR)
   {
@@ -628,21 +628,21 @@ void io_handle_fd(int fd)
       io_list[fd].callbacks[IO_CB_ERROR](fd, io_list[fd].args[0], io_list[fd].args[1],
                                          io_list[fd].args[1], io_list[fd].args[2]);
   }
-  
+
   if(!io_list[fd].status.err && (io_list[fd].status.events & IO_WRITE))
   {
     if(io_list[fd].callbacks[IO_CB_WRITE])
       io_list[fd].callbacks[IO_CB_WRITE](fd, io_list[fd].args[0], io_list[fd].args[1],
                                          io_list[fd].args[1], io_list[fd].args[2]);
   }
-  
+
   if(io_list[fd].status.err || io_list[fd].status.closed || (io_list[fd].status.events & IO_READ) || io_list[fd].recvq.size)
   {
     if(io_list[fd].callbacks[IO_CB_READ])
       io_list[fd].callbacks[IO_CB_READ](fd, io_list[fd].args[0], io_list[fd].args[1],
                                         io_list[fd].args[1], io_list[fd].args[2]);
   }
-  
+
   if(io_list[fd].status.closed || io_list[fd].status.err)
   {
     io_close(fd);
@@ -656,11 +656,11 @@ void io_handle_fd(int fd)
 void io_init(void)
 {
   size_t i;
-  
+
   io_log = log_source_register("i/o");
-  
+
   memset(io_list, 0, IO_MAX_FDS * sizeof(struct io));
-  
+
   /* Close all fds */
   for(i = 0; i < IO_MAX_FDS; i++)
   {
@@ -685,14 +685,14 @@ void io_init(void)
 void io_init_except(int fd0, int fd1, int fd2)
 {
   size_t i;
-  
+
   io_log = log_source_register("i/o");
-  
+
   /* Close all fds */
   for(i = 0; i < IO_MAX_FDS; i++)
     if(i != fd0 && i != fd1 && i != fd2)
       syscall_close(i);
-  
+
   memset(io_list, 0, IO_MAX_FDS * sizeof(struct io));
 
 #ifdef USE_POLL
@@ -710,7 +710,7 @@ void io_init_except(int fd0, int fd1, int fd2)
 void io_shutdown(void)
 {
   size_t i;
-  
+
   /* Close all fds */
   for(i = 0; i < IO_MAX_FDS; i++) if(io_list[i].type)
   {
@@ -718,7 +718,7 @@ void io_shutdown(void)
     queue_destroy(&io_list[i].recvq);
     io_close(i);
   }
-  
+
   log_source_unregister(io_log);
 }
 
@@ -731,7 +731,7 @@ int io_nonblock(int fd)
   if(io_list[fd].type == FD_SOCKET)
   {
     int on = 1;
-    
+
     ioctlsocket(fd, FIONBIO, &on);
   }
 #elif defined(HAVE_FCNTL_H)
@@ -768,31 +768,31 @@ int io_queue_control(int fd, int recvq, int sendq, int linebuf)
 {
   if(fd < 0)
     return -1;
-  
+
   /* Can't disable recvq when there is data */
   if(recvq == OFF && io_list[fd].recvq.size)
     return -1;
-  
+
   /* Can't disable sendq when there is data */
   if(sendq == OFF && io_list[fd].recvq.size)
     return -1;
-  
+
   /* Update queue control information */
   io_list[fd].control.recvq = recvq;
   io_list[fd].control.sendq = sendq;
   io_list[fd].control.linebuf = linebuf;
-  
+
   /* If receive queue has been enabled then wait for read events */
   if(recvq == ON)
     io_set_events(fd, IO_READ);
-  
-  /* 
+
+  /*
    * If send queue has been enabled and there is data in the queue
    * wait for write events.
    */
   if(sendq == ON && io_list[fd].sendq.size)
     io_set_events(fd, IO_WRITE);
-  
+
   return 0;
 }
 
@@ -800,7 +800,7 @@ int io_queue_control(int fd, int recvq, int sendq, int linebuf)
  * Register a file descriptor to the io_list.                                *
  * ------------------------------------------------------------------------ */
 int io_new(int fd, int type)
-{  
+{
   if(fd < 0 || fd >= IO_MAX_FDS)
     return -1;
 
@@ -811,12 +811,12 @@ int io_new(int fd, int type)
   queue_zero(&io_list[fd].sendq);
 */
   io_list[fd].type = type;
-  
+
   io_add_fd(fd);
 
   if(!io_list[fd].flags)
     io_nonblock(fd);
-  
+
   return fd;
 }
 /* ------------------------------------------------------------------------ *
@@ -829,7 +829,7 @@ int io_open(const char *path, int mode, ...)
   int         ret;
   struct stat st;
   va_list     args;
-  
+
 #ifdef O_BINARY
   flags |= O_BINARY;
 #endif /* O_BINARY */
@@ -840,38 +840,38 @@ int io_open(const char *path, int mode, ...)
     case IO_OPEN_WRITE: flags |= O_WRONLY; break;
     case IO_OPEN_RDWR: flags |= O_RDWR; break;
   }
-  
+
   if(mode & IO_OPEN_CREATE) flags |= O_CREAT;
   if(mode & IO_OPEN_APPEND) flags |= O_APPEND;
   if(mode & IO_OPEN_TRUNCATE) flags |= O_TRUNC;
-  
+
   if(!(flags & O_CREAT) && (stat(path, &st) == -1))
-    return -1;  
-  
+    return -1;
+
   va_start(args, mode);
-  
+
   fd = syscall_open(path, flags, va_arg(args, long));
-  
+
   va_end(args);
-  
+
   if(fd == -1)
     return -1;
-  
+
   if(fd >= IO_MAX_FDS)
   {
     syscall_close(fd);
     return -1;
   }
-  
+
   io_list[fd].stat = st;
-  
+
   ret = io_new(fd, FD_FILE);
-  
+
   if(ret >= 0)
   {
     io_note(fd, "%s", path);
   }
-  
+
   return ret;
 }
 
@@ -882,26 +882,26 @@ void io_close(int fd)
 {
   if(io_list[fd].status.dead)
     return;
-  
+
   if(fd < 0 || !io_list[fd].type)
     return;
-  
+
   if(io_list[fd].sendq.size && !io_list[fd].status.closed)
     io_queued_write(fd);
-  
+
   io_shutup(fd);
 
   syscall_close(fd);
-  
+
   if(io_list[fd].recvq.size)
     queue_destroy(&io_list[fd].recvq);
-  
+
   if(io_list[fd].sendq.size)
     queue_destroy(&io_list[fd].sendq);
 
   io_remove_fd(fd);
   io_list[fd].index = -1;
-  
+
 #ifdef HAVE_SSL
   if(io_list[fd].ssl)
     ssl_close(fd);
@@ -917,14 +917,14 @@ void io_close(int fd)
 void io_note(int fd, const char *format, ...)
 {
   va_list args;
-  
+
   if(fd < 0)
     return;
-  
+
   va_start(args, format);
-  
+
   str_vsnprintf(io_list[fd].note, 64, format, args);
-  
+
   va_end(args);
 }
 
@@ -932,7 +932,7 @@ void io_note(int fd, const char *format, ...)
  * Register a I/O event callback.                                           *
  *                                                                          *
  * type            - on which type of event to call the callback            *
- *                   IO_CB_ERROR   - I/O error                                * 
+ *                   IO_CB_ERROR   - I/O error                                *
  *                   IO_CB_READ    - incoming data                          *
  *                   IO_CB_WRITE   - outgoing data                          *
  *                   IO_CB_ACCEPT  - a client connecting                    *
@@ -946,13 +946,13 @@ void io_note(int fd, const char *format, ...)
  *                                                                          *
  * timeout         - if the event doesn't occur after this miliseconds      *
  *                   then call the callback anyway.                         *
- *                                                                            * 
+ *                                                                            *
  * ------------------------------------------------------------------------ */
 int io_vregister(int fd, int type, void *callback, va_list args)
-{  
+{
   if(fd < 0 || type >= IO_CB_MAX || type < 0)
     return -1;
-  
+
   switch(type)
   {
     case IO_CB_ERROR:
@@ -974,11 +974,11 @@ int io_vregister(int fd, int type, void *callback, va_list args)
       log(io_log, L_fatal, "invalid callback type %02u", type);
       return -1;
   }
-  
+
   io_list[fd].callbacks[type] = callback;
-  
+
   io_vset_args(fd, args);
-  
+
   return 0;
 }
 
@@ -986,13 +986,13 @@ int io_register(int fd, int type, void *callback, ...)
 {
   int     ret;
   va_list args;
-  
+
   va_start(args, callback);
-  
+
   ret = io_vregister(fd, type, callback, args);
-  
+
   va_end(args);
-  
+
   return ret;
 }
 
@@ -1015,9 +1015,9 @@ int io_unregister(int fd, int type)
       log(io_log, L_fatal, "invalid callback type %02u", type);
       return -1;
   }
-  
+
   io_list[fd].callbacks[type] = NULL;
-  
+
   return 0;
 }
 
@@ -1029,7 +1029,7 @@ int io_read(int fd, void *buf, size_t n)
   /* Catch invalid arguments */
   if(fd < 0) return -1;
   if(n == 0) return 0;
-  
+
   /* fd is queued, read from the receive queue */
   if(io_list[fd].control.recvq)
   {
@@ -1039,10 +1039,10 @@ int io_read(int fd, void *buf, size_t n)
       syscall_errno = EAGAIN;
       return -1;
     }
-    
+
     return queue_read(&io_list[fd].recvq, buf, n);
   }
-  
+
   /* Read directly from fd */
   switch(io_list[fd].type)
   {
@@ -1058,7 +1058,7 @@ int io_read(int fd, void *buf, size_t n)
     case FD_PIPE:
       return syscall_read(fd, buf, n);
   }
-  
+
   return -1;
 }
 
@@ -1068,22 +1068,22 @@ int io_read(int fd, void *buf, size_t n)
 int io_write(int fd, const void *buf, size_t n)
 {
   int ret;
-  
+
   /* Catch invalid arguments */
   if(fd < 0) return -1;
   if(n == 0) return 0;
-  
+
   /* fd is queued, write to the send queue */
   if(io_list[fd].control.sendq)
   {
     ret = queue_write(&io_list[fd].sendq, buf, n);
-    
+
     if(io_list[fd].sendq.size)
       io_set_events(fd, IO_WRITE);
-  
+
     return ret;
   }
-  
+
   /* Write directly to fd */
   switch(io_list[fd].type)
   {
@@ -1099,7 +1099,7 @@ int io_write(int fd, const void *buf, size_t n)
     case FD_PIPE:
       return syscall_write(fd, buf, n);
   }
-  
+
   return -1;
 }
 
@@ -1107,14 +1107,14 @@ int io_write(int fd, const void *buf, size_t n)
  * Read either from the fd directly or from its queue.                      *
  * ------------------------------------------------------------------------ */
 int io_gets(int fd, void *buf, size_t n)
-{  
+{
   /* Catch invalid arguments */
   if(fd < 0)
     return 0;
-  
-  if(n == 0) 
+
+  if(n == 0)
     return 0;
-  
+
   /* fd is queued, read from the receive queue */
   if(io_list[fd].control.recvq)
   {
@@ -1125,13 +1125,13 @@ int io_gets(int fd, void *buf, size_t n)
       {
         io_list[fd].error = EAGAIN;
       }
-      
+
       return 0;
     }
-    
+
     return queue_gets(&io_list[fd].recvq, buf, n);
   }
-  
+
   return 0;
 }
 
@@ -1143,19 +1143,19 @@ int io_puts(int fd, const char *s, ...)
   size_t len;
   va_list args;
   char buf[IO_LINE_SIZE];
-  
+
   /* Catch invalid arguments */
   if(fd < 0)
     return -1;
-  
+
   va_start(args, s);
 
   len = str_vsnprintf(buf, IO_LINE_SIZE - 1, s, args);
-  
+
   va_end(args);
-  
+
   buf[len++] = '\n';
-    
+
   return io_write(fd, buf, len);
 }
 
@@ -1166,15 +1166,15 @@ int io_vputs(int fd, const char *s, va_list args)
 {
   size_t len;
   char buf[IO_LINE_SIZE];
-  
+
   /* Catch invalid arguments */
   if(fd < 0)
     return -1;
-  
+
   len = str_vsnprintf(buf, IO_LINE_SIZE - 1, s, args);
-  
+
   buf[len++] = '\n';
-    
+
   return io_write(fd, buf, len);
 }
 
@@ -1196,7 +1196,7 @@ void io_multi_link(struct fqueue *fifoptr, int fd)
 /*  if(io_valid(fd))
   {*/
     queue_link(fifoptr, &io_list[fd].sendq);
-    
+
     if(io_list[fd].sendq.size)
       io_set_events(fd, IO_WRITE);
 /*  }*/
@@ -1221,37 +1221,37 @@ int io_select(int64_t *remain, int64_t *timeout)
   struct timeval *tp = NULL;
   int             ret;
   size_t          i;
-  
+
   /* timeout is present, set timeout pointer */
   if(timeout) if(*timeout >= 0LL)
   {
     timer_to_timeval(&tv, (uint64_t *)timeout);
     tp = &tv;
   }
-  
+
   /* Do the actual select() */
   io_rfds_r = io_rfds;
   io_wfds_r = io_wfds;
   io_efds_r = io_efds;
-  
+
   ret = syscall_select(io_top + 1, &io_rfds_r, &io_wfds_r, &io_efds_r, tp);
-  
+
   /* Update system time */
   timer_update();
-  
+
   /* Now set the returned events */
   if(io_top >= 0) for(i = 0; i <= io_top; i++)
   {
     if(!io_list[i].type)
       continue;
-    
+
     io_set_revents(i);
   }
-  
+
   /* If there was timeout value then return remaining time */
   if(tp && remain)
     timer_to_msec((uint64_t *)remain, tp);
-  
+
   return ret;
 }
 
@@ -1274,7 +1274,7 @@ int io_poll(int64_t *remain, int64_t *timeout)
   old = timer_mtime;
 
   /* There is a timeout, set it */
-  if(timeout) if(*timeout >= 0LL) 
+  if(timeout) if(*timeout >= 0LL)
   {
     to = (int)(*timeout);
     deadline = timer_mtime + *timeout + 10;
@@ -1286,8 +1286,8 @@ int io_poll(int64_t *remain, int64_t *timeout)
   /* Update system time */
   timer_update();
 
-  /* 
-   * If a timeout was set then set the timeout pointer 
+  /*
+   * If a timeout was set then set the timeout pointer
    * to the remaining time until the poll deadline.
    */
   if(timeout && remain)
@@ -1297,7 +1297,7 @@ int io_poll(int64_t *remain, int64_t *timeout)
     if(*remain < 0LL)
     {
       if(*remain < -POLL_WARN_DELTA)
-        log(io_log, L_warning, 
+        log(io_log, L_warning,
             "Timing error: poll() returned too late (diff: %lli)",
             *remain);
 
@@ -1310,15 +1310,15 @@ int io_poll(int64_t *remain, int64_t *timeout)
         log(io_log, L_warning,
             "Timing error: poll() returned too early (diff: %lli)",
             *remain);
-      
+
       *remain = *timeout;
     }
   }
-  
+
   /* Now set the returned events */
   for(i = 0; i < io_count; i++)
     io_set_revents(io_pfds[i].fd);
-  
+
   return ret;
 }
 #endif
@@ -1337,46 +1337,46 @@ void io_wait(void)
 void io_handle(void)
 {
 #ifdef USE_POLL
-  
+
   size_t i;
-  
+
   for(i = 0; i < io_count; i++)
     io_handle_fd(io_pfds[i].fd);
-  
+
 #else
 
   int i;
-  
+
   if(io_top >= 0) for(i = 0; i <= io_top; i++)
   {
     if(io_list[i].type)
       io_handle_fd(i);
   }
-  
-#endif /* USE_SELECT || USE_POLL */  
+
+#endif /* USE_SELECT || USE_POLL */
 }
 
 /* ------------------------------------------------------------------------ *
  * Move an fd.                                                              *
  * ------------------------------------------------------------------------ */
 void io_move(int from, int to)
-{  
+{
   if(io_list[to].type)
   {
     log(io_log, L_warning, "Cannot move fd %i to %i: Destination busy", from, to);
     return;
   }
-  
+
   if(syscall_dup2(from, to) != to)
   {
     log(io_log, L_warning, "Failed dup()ing fd %i", from);
     return;
   }
-  
+
   io_set_events(to, io_list[from].control.events);
-  
+
   memcpy(&io_list[to], &io_list[from], sizeof(struct io));
-  
+
   io_close(from);
 }
 
@@ -1393,7 +1393,7 @@ void io_vset_args(int fd, va_list args)
 void io_set_args(int fd, ...)
 {
   va_list args;
-  
+
   va_start(args, fd);
   io_vset_args(fd, args);
   va_end(args);
@@ -1406,30 +1406,30 @@ void io_dump(int fd)
   if(fd < 0 || fd >= IO_MAX_FDS)
   {
     dump(io_log, "[================ i/o summary =================]");
-    
+
     for(fd = 0; fd < IO_MAX_FDS; fd++)
     {
       if(!io_list[fd].type)
         continue;
-      
+
       dump(io_log, " #%u: <%s> %-20s",
            fd, io_types[io_list[fd].type], io_list[fd].note);
     }
-    
-    dump(io_log, "[============= end of i/o summary =============]");    
+
+    dump(io_log, "[============= end of i/o summary =============]");
   }
   else
   {
-#ifdef HAVE_SSL    
+#ifdef HAVE_SSL
     char ciphbuf[100];
-    
+
     if(io_list[fd].ssl)
       ssl_cipher(fd, ciphbuf, sizeof(ciphbuf));
     else
       ciphbuf[0] = '\0';
 #endif /* HAVE_SSL */
     dump(io_log, "[================ i/o dump =================]");
-    
+
     dump(io_log, "          fd: #%u", fd);
     dump(io_log, "        type: %s", io_types[io_list[fd].type]);
     dump(io_log, "       error: %s", syscall_strerror(io_list[fd].error));
@@ -1457,7 +1457,7 @@ void io_dump(int fd)
          (io_list[fd].status.events & IO_READ) ? "r" : "",
          (io_list[fd].status.events & IO_WRITE) ? "w" : "");
     dump(io_log, "         ret: %i", io_list[fd].ret);
-    dump(io_log, "        args: %p, %p, %p, %p", 
+    dump(io_log, "        args: %p, %p, %p, %p",
          io_list[fd].args[0], io_list[fd].args[1],
          io_list[fd].args[2], io_list[fd].args[3]);
 #ifdef HAVE_FCNTL
@@ -1473,12 +1473,12 @@ void io_dump(int fd)
     dump(io_log, "       sendq: %u", io_list[fd].sendq.size);
     dump(io_log, "       recvq: %u", io_list[fd].recvq.size);
     dump(io_log, "        note: %s", io_list[fd].note);
-    dump(io_log, "   callbacks: E: %p R: %p W: %p", 
+    dump(io_log, "   callbacks: E: %p R: %p W: %p",
          io_list[fd].callbacks[IO_CB_ERROR],
          io_list[fd].callbacks[IO_CB_READ],
          io_list[fd].callbacks[IO_CB_WRITE]);
-#ifdef HAVE_SSL    
-    dump(io_log, "         ssl: %p (%s)", 
+#ifdef HAVE_SSL
+    dump(io_log, "         ssl: %p (%s)",
          io_list[fd].ssl, ciphbuf[0] ? ciphbuf : "none");
     dump(io_log, "    sslstate: %s",
          (io_list[fd].sslstate == SSL_WRITE_WANTS_READ ? "w/r" :
@@ -1497,7 +1497,7 @@ void io_dump(int fd)
          (io_list[fd].sslwhere == SSL_WRITE ? "w" :
          (io_list[fd].sslwhere == SSL_ACCEPT ? "a" :
          (io_list[fd].sslwhere == SSL_CONNECT ? "c" : "none")))));
-#endif /* HAVE_SSL */    
-    dump(io_log, "[============= end of i/o dump =============]");        
+#endif /* HAVE_SSL */
+    dump(io_log, "[============= end of i/o dump =============]");
   }
 }

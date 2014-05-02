@@ -35,13 +35,13 @@
  * Constants                                                                  *
  * ------------------------------------------------------------------------ */
 /* File identification */
-#define GIF_MAGIC           "GIF89a"        
+#define GIF_MAGIC           "GIF89a"
 #define GIF_MAGIC_LEN       6
 
 /* Hashtable constants and macros */
 #define GIF_HT_SIZE         8192
 #define GIF_HT_KEY_MASK     0x1FFF
-#define GIF_HT_KEY_NUM_BITS 13 
+#define GIF_HT_KEY_NUM_BITS 13
 #define GIF_HT_MAX_KEY      8191
 #define GIF_HT_MAX_CODE     4095
 
@@ -116,7 +116,7 @@ struct gif_hashtable {
 
 /* Internal GIF stuff, mainly for LZW compression */
 struct gif_lzw
-{ 
+{
   int                   handle;
   int                   clear_code;
   int                   eof_code;
@@ -138,7 +138,7 @@ struct gif_lzw
 };
 
 /* GIF extension header */
-struct gif_ext { 
+struct gif_ext {
   struct node           node;
   uint32_t              size;
   uint8_t              *buf;
@@ -205,7 +205,7 @@ CHAOS_API(struct gif *)      gif_new              (const char      *name,
 /* ------------------------------------------------------------------------ *
  * Open GIF file                                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct gif *)      gif_open             (const char      *filename, 
+CHAOS_API(struct gif *)      gif_open             (const char      *filename,
                                                    int              state);
 
 /* ------------------------------------------------------------------------ *
@@ -224,7 +224,7 @@ CHAOS_API(struct gif *)      gif_open_mem         (void            *mem,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)               gif_slurp            (struct gif      *gif);
-  
+
 /* ------------------------------------------------------------------------- *
  * Clear structural data                                                       *
  * ------------------------------------------------------------------------- */
@@ -254,11 +254,11 @@ CHAOS_API(int)               gif_screen_get       (struct gif       *gif);
 /* ------------------------------------------------------------------------- *
  * Put screen descriptor                                                       *
  * ------------------------------------------------------------------------- */
-CHAOS_API(int)               gif_screen_put       (struct gif       *gif,       
+CHAOS_API(int)               gif_screen_put       (struct gif       *gif,
                                                    uint16_t          width,
-                                                   uint16_t          height,    
+                                                   uint16_t          height,
                                                    int               resolution,
-                                                   uint8_t           background, 
+                                                   uint8_t           background,
                                                    struct palette   *pal);
 /* ------------------------------------------------------------------------- *
  * Get an image                                                                *
@@ -269,7 +269,7 @@ CHAOS_API(int)               gif_image_get        (struct gif       *gif);
  * Put an image                                                                *
  * ------------------------------------------------------------------------- */
 CHAOS_API(int)               gif_image_put        (struct gif       *gif,
-                                                   int16_t           left, 
+                                                   int16_t           left,
                                                    int16_t           top,
                                                    uint16_t          width,
                                                    uint16_t          height,
@@ -280,7 +280,7 @@ CHAOS_API(int)               gif_image_put        (struct gif       *gif,
  * Get data from current image                                                 *
  * ------------------------------------------------------------------------- */
 CHAOS_API(int)               gif_data_get         (struct gif       *gif,
-                                                   uint8_t          *data, 
+                                                   uint8_t          *data,
                                                    uint32_t          len);
 
 /* ------------------------------------------------------------------------- *
@@ -288,7 +288,7 @@ CHAOS_API(int)               gif_data_get         (struct gif       *gif,
  * ------------------------------------------------------------------------- */
 CHAOS_API(int)               gif_data_put         (struct gif       *gif,
                                                    uint8_t          *data,
-                                                   uint32_t          len);  
+                                                   uint32_t          len);
 
 /* ------------------------------------------------------------------------ *
  * Create an empty palette                                                    *
@@ -314,35 +314,35 @@ CHAOS_API(void)              gif_palette_free     (struct palette   *palette);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct gif_image *)gif_image_add        (struct gif       *gif,    
+CHAOS_API(struct gif_image *)gif_image_add        (struct gif       *gif,
                                                    int16_t           left,
-                                                   int16_t           top, 
+                                                   int16_t           top,
                                                    uint16_t          width,
-                                                   uint16_t          height, 
+                                                   uint16_t          height,
                                                    int               interlace,
                                                    struct palette   *pal);
 
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)              gif_image_delete     (struct gif       *gif, 
+CHAOS_API(void)              gif_image_delete     (struct gif       *gif,
                                                    struct gif_image *image);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)              gif_image_clear      (struct gif       *gif);
- 
+
 /* ------------------------------------------------------------------------ *
  * Add an extension to an image header                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct gif_ext *)  gif_extension_add    (struct gif_image *image, 
+CHAOS_API(struct gif_ext *)  gif_extension_add    (struct gif_image *image,
                                                    uint32_t          len,
                                                    uint8_t          *ext);
 
 /* ------------------------------------------------------------------------ *
  * Remove an extension from an image header                                   *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)              gif_extension_delete (struct gif_image *image, 
+CHAOS_API(void)              gif_extension_delete (struct gif_image *image,
                                                    struct gif_ext   *ext);
 
 /* ------------------------------------------------------------------------ *
@@ -362,12 +362,12 @@ CHAOS_API(int)               gif_get_gfx_control  (struct gif_image *image,
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)               gif_put_gfx_control  (struct gif       *gif,
                                                    int               disposal,
-                                                   int               user_input, 
+                                                   int               user_input,
                                                    int               trans,
                                                    uint16_t          delay);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)               gif_save             (struct gif       *gif);
-      
+
 #endif /* GIF_H */

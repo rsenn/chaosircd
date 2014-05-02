@@ -41,10 +41,10 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_user(struct lclient *lcptr, struct client *cptr, 
+static void mr_user(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
 
-static void ms_user(struct lclient *lcptr, struct client *cptr, 
+static void ms_user(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -73,7 +73,7 @@ int m_user_load(void)
 {
   if(msg_register(&m_user_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -90,27 +90,27 @@ void m_user_unload(void)
  * argv[4] - server                                                           *
  * argv[5] - realname                                                         *
  * -------------------------------------------------------------------------- */
-static void mr_user(struct lclient *lcptr, struct client *cptr, 
+static void mr_user(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   char username[IRCD_USERLEN + 1];
-  
+
   if(lcptr->user == NULL)
   {
     username[0] = '~';
     strlcpy(&username[1], argv[2], sizeof(username) - 1);
     strlcpy(lcptr->info, argv[5], sizeof(lcptr->info));
-    
+
     lcptr->user = user_new(username, NULL);
 
     if(argv[3][0] == '+')
       strlcpy(lcptr->user->mode, &argv[3][1], sizeof(lcptr->user->mode));
     else
       lcptr->user->mode[0] = '\0';
-    
-    /* usermode stuff has been moved to lclient_login, 
-       because we should do the usermode only when registered. 
-       
+
+    /* usermode stuff has been moved to lclient_login,
+       because we should do the usermode only when registered.
+
        (or else a unregistered user that sent this command with +i
         could end up on the invisible list) */
 /*    usermode_make(lcptr->user, argv[3], NULL, USERMODE_NOFLAG);*/
@@ -128,7 +128,7 @@ static void mr_user(struct lclient *lcptr, struct client *cptr,
  * argv[4] - server                                                           *
  * argv[5] - realname                                                         *
  * -------------------------------------------------------------------------- */
-static void ms_user(struct lclient *lcptr, struct client *cptr, 
+static void ms_user(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
 }

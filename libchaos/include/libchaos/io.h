@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: io.h,v 1.4 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -65,7 +65,7 @@ struct io;
 #define IO_OPEN_CREATE   4
 #define IO_OPEN_TRUNCATE 8
 #define IO_OPEN_APPEND   16
-  
+
 #define IO_READ_SIZE  4096    /* How many bytes we read at once */
 #define IO_WRITE_SIZE 4096    /* How many bytes we write at once */
 #define IO_LINE_SIZE  1024
@@ -89,14 +89,14 @@ struct io;
 /* ------------------------------------------------------------------------ *
  * Types                                                                      *
  * ------------------------------------------------------------------------ */
-enum 
+enum
 {
   OFF = 0,
   ON = 1
 };
 
 
-enum 
+enum
 {
   FD_NONE   = 0,        /* unassigned */
   FD_FILE   = 1,        /* something that can be fsync'd and memory mapped,
@@ -105,26 +105,26 @@ enum
   FD_SOCKET = 2,        /* a network socket */
   FD_PIPE   = 3
 };
-  
+
 typedef void (io_callback_t)(int fd, void *, void *, void *, void *);
 
-struct io 
+struct io
 {
   int                type;
   int                error;
-  /* 
+  /*
    * configuration flags
-   * 
+   *
    *    sendq        - when set to 1, an io_write() will
    *                   not go directly to the file descriptor.
    *                   it'll be put into the queue and the
    *                   queue will be emptied on a write event.
-   * 
+   *
    *    recvq        - when set to 1, an io_read() will not
    *                   directly read from a file descriptor.
    *                   it'll read from a queue which is
    *                   filled on read events.
-   * 
+   *
    *    linebuf      - this works only when the recvq
    *                   is enabled.
    *                   when is is set to 1 then the
@@ -133,7 +133,7 @@ struct io
    *                   is a line in the linebuffer.
    *                   otherwise its called simply
    *                   when there is data in the queue.
-   * 
+   *
    *    waitdns      - call IO_CB_ACCEPT after completed
    *                   reverse DNS.
    */
@@ -144,13 +144,13 @@ struct io
     int events:5;
   } control;
 
-  /* 
-   * event flags 
-   * 
+  /*
+   * event flags
+   *
    *    err          - there was an error
-   * 
+   *
    *    line         - there is a line in the queue
-   * 
+   *
    *    timeout      - operation timed out
    */
   struct {
@@ -208,7 +208,7 @@ CHAOS_API(void)       io_shutdown       (void);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_flush          (int            fd);
-  
+
 /* ------------------------------------------------------------------------ *
  * Put a file descriptor into non-blocking mode.                              *
  * ------------------------------------------------------------------------ */
@@ -228,32 +228,32 @@ CHAOS_API(int)        io_nonblock       (int            fd);
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_queue_control  (int            fd,
                                          int            recvq,
-                                         int            sendq, 
+                                         int            sendq,
                                          int            linebuf);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_queued_read    (int            fd);
-                               
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_queued_write   (int            fd);
-                               
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_handle_fd      (int            fd);
-                               
+
 /* ------------------------------------------------------------------------ *
  * Register a file descriptor to the io_list.                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_new            (int            fd, 
+CHAOS_API(int)        io_new            (int            fd,
                                          int            type);
-  
+
 /* ------------------------------------------------------------------------ *
  * Open a file.                                                               *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_open           (const char    *path,
-                                         int            flags, 
+                                         int            flags,
                                          ...);
 
 /* ------------------------------------------------------------------------ *
@@ -269,19 +269,19 @@ CHAOS_API(int)        io_push           (int           *fdptr);
  * Close an fd.                                                               *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_close          (int            fd);
-  
+
 /* ------------------------------------------------------------------------ *
  * Write a description string.                                                *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_note           (int            fd,
-                                         const char    *format, 
+                                         const char    *format,
                                          ...);
-  
+
 /* ------------------------------------------------------------------------ *
  * Register a I/O event callback.                                             *
  *                                                                            *
  * type            - on which type of event to call the callback              *
- *                   IO_CB_ERROR   - I/O error                                * 
+ *                   IO_CB_ERROR   - I/O error                                *
  *                   IO_CB_READ    - incoming data                            *
  *                   IO_CB_WRITE   - outgoing data                            *
  *                   IO_CB_ACCEPT  - a client connecting                      *
@@ -295,28 +295,28 @@ CHAOS_API(void)       io_note           (int            fd,
  *                                                                            *
  * timeout         - if the event doesn't occur after this miliseconds        *
  *                   then call the callback anyway.                           *
- *                                                                            * 
+ *                                                                            *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_vregister      (int            fd,
-                                         int            type, 
+                                         int            type,
                                          void          *callback,
                                          va_list        args);
 
 CHAOS_API(int)        io_register       (int            fd,
-                                         int            type, 
+                                         int            type,
                                          void          *callback,
                                          ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_unregister     (int           fd, 
+CHAOS_API(int)        io_unregister     (int           fd,
                                          int           type);
-  
+
 /* ------------------------------------------------------------------------ *
  * Read either from the fd directly or from its queue.                        *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_read           (int            fd,
-                                         void          *buf, 
+                                         void          *buf,
                                          size_t         n);
 
 /* ------------------------------------------------------------------------ *
@@ -330,20 +330,20 @@ CHAOS_API(int)        io_write          (int            fd,
  * Read a line from queue.                                                    *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_gets           (int            fd,
-                                         void          *buf, 
+                                         void          *buf,
                                          size_t         n);
 
 /* ------------------------------------------------------------------------ *
  * Write a line to fd or queue.                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_puts           (int            fd, 
-                                         const char    *s, 
+CHAOS_API(int)        io_puts           (int            fd,
+                                         const char    *s,
                                          ...);
 
 /* ------------------------------------------------------------------------ *
  * Write a line to fd or queue.                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)           io_vputs       (int            fd, 
+CHAOS_API(int)           io_vputs       (int            fd,
                                          const char    *s,
                                          va_list        args);
 
@@ -352,9 +352,9 @@ CHAOS_API(int)           io_vputs       (int            fd,
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_multi_start    (struct fqueue *fifoptr);
 CHAOS_API(uint32_t)   io_multi_write    (struct fqueue *fifoptr,
-                                         const void    *buf, 
+                                         const void    *buf,
                                          uint32_t       n);
-CHAOS_API(void)       io_multi_link     (struct fqueue *fifoptr, 
+CHAOS_API(void)       io_multi_link     (struct fqueue *fifoptr,
                                          int            fd);
 CHAOS_API(void)       io_multi_end      (struct fqueue *fifoptr);
 
@@ -367,7 +367,7 @@ CHAOS_API(void)       io_multi_end      (struct fqueue *fifoptr);
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)        io_select         (int64_t       *remain,
                                          int64_t       *timeout);
-  
+
 /* ------------------------------------------------------------------------ *
  * Do a poll() system call.                                                   *
  *                                                                            *
@@ -381,16 +381,16 @@ CHAOS_API(int)        io_poll           (int64_t       *remain,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_wait           (void);
-  
+
 /* ------------------------------------------------------------------------ *
  * Handle pending I/O events                                                  *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_handle         (void);
-  
+
 /* ------------------------------------------------------------------------ *
  * Move an fd.                                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_move           (int            from, 
+CHAOS_API(void)       io_move           (int            from,
                                          int            to);
 
 /* ------------------------------------------------------------------------ *
@@ -405,16 +405,16 @@ CHAOS_API(void)       io_set_args       (int            fd,
  * This function will set the necessary flags in the fd_sets/pollfds for the  *
  * requested events.                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_set_events     (int            fd, 
+CHAOS_API(void)       io_set_events     (int            fd,
                                          int            events);
 
 /* ------------------------------------------------------------------------ *
  * This function will unset the necessary flags in the fd_sets/pollfds for    *
  * the requested events.                                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_unset_events   (int            fd, 
+CHAOS_API(void)       io_unset_events   (int            fd,
                                          int            events);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)       io_dump           (int            fd);

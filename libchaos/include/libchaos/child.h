@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: child.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -62,10 +62,10 @@ typedef void (child_cb_t)(struct child *, void *, void *, void *, void *);
 /* ------------------------------------------------------------------------ *
  * Child block structure.                                                     *
  * ------------------------------------------------------------------------ */
-struct child 
+struct child
 {
   struct node        node;         /* linking node for child block list */
-  
+
   /* externally initialised */
   pid_t              pid;
   uint32_t           id;
@@ -196,5 +196,5 @@ CHAOS_API(struct child *)child_find_id      (uint32_t       id);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)          child_dump         (struct child  *cdptr);
-  
+
 #endif /* LIB_CHILD_H */

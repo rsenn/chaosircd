@@ -43,7 +43,7 @@
  * -------------------------------------------------------------------------- */
 static void cm_except_hook(struct client *cptr, struct channel *chptr,
                            const char    *key,  int            *reply);
-    
+
 /* -------------------------------------------------------------------------- *
  * Setup chanmode structure                                                   *
  * -------------------------------------------------------------------------- */
@@ -70,10 +70,10 @@ int cm_except_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_except_mode) == NULL)
     return -1;
-  
+
   /* register a hook in channel_join */
   hook_register(channel_join, HOOK_1ST, cm_except_hook);
-  
+
   /* set support flag */
   ircd_support_set("EXCEPTS", NULL);
 
@@ -87,8 +87,8 @@ void cm_except_unload(void)
 
   /* unregister the channel mode */
   chanmode_unregister(&cm_except_mode);
-  
-  /* unregister the hook in channel_join */  
+
+  /* unregister the hook in channel_join */
   hook_unregister(channel_join, HOOK_1ST, cm_except_hook);
 }
 
@@ -99,14 +99,14 @@ static void cm_except_hook(struct client *cptr, struct channel *chptr,
                            const char    *key,  int            *reply)
 {
   struct list *mlptr;
-  
+
   /* client not banned and not denied but something else */
   if(*reply > 0 && *reply != ERR_BANNEDFROMCHAN && *reply != ERR_DENIEDFROMCHAN)
     return;
 
   /* get the mode list for +e */
   mlptr = &chptr->modelists[chanmode_index(CM_EXCEPT_CHAR)];
-   
+
   /* except the client from bans and denys */
   if(chanmode_match_ban(cptr, chptr, mlptr))
     *reply = -CM_EXCEPT_CHAR;

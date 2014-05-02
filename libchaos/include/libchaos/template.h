@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: template.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -86,16 +86,16 @@ extern void              template_delete          (struct template  *iptr);
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
 extern void              template_release         (struct template  *iptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern void              template_set_name        (struct template  *iptr,
                                                    const char    *name);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern const char       *template_get_name        (struct template  *iptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct template  *template_find_name       (const char    *name);

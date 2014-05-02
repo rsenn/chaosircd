@@ -2,7 +2,7 @@
  *   IRC - Internet Relay Chat, servauth/commands.h
  *
  *   Copyright (C) 2003 by Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
  *   the Free Software Foundation; either version 1, or (at your option)
@@ -29,7 +29,7 @@ typedef int (cmd_t)(struct control *, int, char **);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct cmd_table 
+struct cmd_table
 {
   char    *name; /* name of command */
   cmd_t   *func; /* function to call */
@@ -44,7 +44,7 @@ extern struct cmd_table dns_cmds[];
  * cmd_table  - the command table                                             *
  * name       - name of the command to find                                   *
  * -------------------------------------------------------------------------- */
-extern struct cmd_table *command_get (struct cmd_table *cmd_table, 
+extern struct cmd_table *command_get (struct cmd_table *cmd_table,
                                       const char       *name);
 
 #endif /* SERVAUTH_COMMANDS_H */

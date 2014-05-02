@@ -55,7 +55,7 @@ static char *m_names_help[] = {
   "to the names of the users with their appropriate",
   "symbols.",
   NULL
-};    
+};
 
 static struct msg m_names_msg = {
   "NAMES", 0, 1, MFLG_CLIENT,
@@ -70,7 +70,7 @@ int m_names_load(void)
 {
   if(msg_register(&m_names_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -88,46 +88,46 @@ static void m_names(struct lclient *lcptr, struct client *cptr,
 {
   struct chanuser *cuptr;
   struct channel  *chptr;
-  
+
   if(!client_is_user(cptr))
     return;
-  
+
   if(argv[2] && argv[2][0] != '*')
   {
     struct channel *chptr;
-    
+
     if(!chars_valid_chan(argv[2]))
     {
       client_send(cptr, numeric_format(ERR_BADCHANNAME),
                   client_me->name, cptr->name, argv[2]);
       return;
     }
-    
+
     if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
       return;
 
     cuptr = chanuser_find(chptr, cptr);
-    
+
     chanuser_show(cptr, chptr, cuptr, 1);
   }
   else
   {
     channel_serial++;
-    
+
     dlink_foreach(&cptr->user->channels, cuptr)
     {
       cuptr->channel->serial = channel_serial;
 
       chanuser_show(cptr, cuptr->channel, cuptr, 1);
     }
-    
+
     dlink_foreach(&channel_list, chptr)
     {
       if(chptr->serial == channel_serial)
         continue;
-      
+
       if(!(chptr->modes & CHFLG(s)))
         chanuser_show(cptr, chptr, NULL, 2);
-    }    
+    }
   }
 }

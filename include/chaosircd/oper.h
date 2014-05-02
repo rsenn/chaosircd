@@ -33,7 +33,7 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct oper 
+struct oper
 {
   struct node   node;
   uint32_t      hash;
@@ -134,5 +134,5 @@ extern struct oper *oper_push             (struct oper  **optr);
 #ifdef DEBUG
 extern void         oper_dump             (void);
 #endif /* DEBUG */
-  
+
 #endif /* SRC_OPER_H */

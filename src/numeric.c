@@ -575,7 +575,7 @@ char *numeric_replies[] = {
 /* 532 */ NULL,
 /* 533 */ NULL,
 /* 534 */ NULL,
-/* 535 */ NULL, 
+/* 535 */ NULL,
 /* 536 */ NULL,
 /* 537 */ NULL,
 /* 538 */ NULL,
@@ -1049,14 +1049,14 @@ const char *numeric_format(int numeric)
 {
   static char buf[IRCD_LINELEN - 1];
   size_t      n;
-  
+
   if(numeric > ERR_LAST_ERR_MSG || numeric < 0 ||
      numeric_replies[numeric] == NULL)
   {
     log(ircd_log, L_fatal, "stupid coder using invalid numeric (%u)!", numeric);
     return NULL;
   }
-  
+
   n = 0;
   buf[n++] = ':';
   buf[n++] = '%';
@@ -1071,7 +1071,7 @@ const char *numeric_format(int numeric)
   buf[n++] = ' ';
 
   strlcpy(&buf[n], numeric_replies[numeric], sizeof(buf) - n);
-  
+
   return buf;
 }
 
@@ -1081,44 +1081,44 @@ void numeric_vsend(struct client *cptr, int numeric, va_list args)
 {
   char   buf[IRCD_LINELEN - 1];
   size_t n;
-  
+
   if(!client_is_user(cptr))
     return;
-  
+
   if(numeric > ERR_LAST_ERR_MSG || numeric < 0 ||
      numeric_replies[numeric] == NULL)
   {
     log(ircd_log, L_fatal, "stupid coder using invalid numeric (%u)!", numeric);
     return;
   }
-  
+
   n = 0;
   buf[n++] = ':';
   n += strlcpy(&buf[n], client_me->name, sizeof(buf) - n);
   buf[n++] = ' ';
-  
+
   buf[n++] = (numeric / 100) + '0';
   buf[n++] = ((numeric % 100) / 10) + '0';
   buf[n++] = (numeric % 10) + '0';
   buf[n++] = ' ';
-  
+
   if(cptr->source->caps & CAP_UID)
     n += strlcpy(&buf[n], cptr->user->uid, sizeof(buf) - n);
   else
     n += strlcpy(&buf[n], cptr->name, sizeof(buf) - n);
-  
+
   buf[n++] = ' ';
-  
+
   str_vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
-            
+
   client_send(cptr, "%s", buf);
 }
 
 void numeric_send(struct client *cptr, int numeric, ...)
 {
   va_list args;
-  
-  va_start(args, numeric);  
+
+  va_start(args, numeric);
   numeric_vsend(cptr, numeric, args);
   va_end(args);
 }
@@ -1129,38 +1129,38 @@ void numeric_vlsend(struct lclient *lcptr, int numeric, va_list args)
 {
   char   buf[IRCD_LINELEN - 1];
   size_t n;
-  
+
   if(numeric > ERR_LAST_ERR_MSG || numeric < 0 ||
      numeric_replies[numeric] == NULL)
   {
     log(ircd_log, L_fatal, "stupid coder using invalid numeric (%u)!", numeric);
     return;
   }
-  
+
   n = 0;
   buf[n++] = ':';
   n += strlcpy(&buf[n], lclient_me->name, sizeof(buf) - n);
   buf[n++] = ' ';
-  
+
   buf[n++] = (numeric / 100) + '0';
   buf[n++] = ((numeric % 100) / 10) + '0';
   buf[n++] = (numeric % 10) + '0';
   buf[n++] = ' ';
-  
+
   n += strlcpy(&buf[n], lcptr->name[0] ? lcptr->name : "*", sizeof(buf) - n);
-  
+
   buf[n++] = ' ';
-  
+
   str_vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
-            
+
   lclient_send(lcptr, "%s", buf);
 }
 
 void numeric_lsend(struct lclient *lcptr, int numeric, ...)
 {
   va_list args;
-  
-  va_start(args, numeric);  
+
+  va_start(args, numeric);
   numeric_vlsend(lcptr, numeric, args);
   va_end(args);
 }

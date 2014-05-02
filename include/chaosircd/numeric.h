@@ -83,7 +83,7 @@
 #define RPL_STATSYLINE       218
 #define RPL_ENDOFSTATS       219
 /* note ircu uses 217 for STATSPLINE frip. conflict
- * as RPL_STATSQLINE was used in old 2.8 for Q line 
+ * as RPL_STATSQLINE was used in old 2.8 for Q line
  * I'm going to steal 220 for now *sigh*
  * -Dianora
  */
@@ -101,7 +101,7 @@
   RPL_STATSELINE      225    unreal
   RPL_STATSCOUNT      226    Dalnet
  RPL_STATSNLINE      226    unreal
- RPL_STATSGLINE      227    Dalnet 
+ RPL_STATSGLINE      227    Dalnet
  RPL_STATSVLINE      227    unreal */
 
 #define RPL_STATSFLINE       224
@@ -452,16 +452,16 @@
  RPL_NOWOFF           605 dalnet,unreal
  RPL_WATCHLIST        606 dalnet,unreal
  RPL_ENDOFWATCHLIST   607 dalnet,unreal
- 
+
  RPL_MAPMORE          610 unreal
- 
+
  RPL_MAPMORE          615 PTlink
- 
+
  RPL_DCCSTATUS        617 dalnet
  RPL_DCCLIST          618 dalnet
  RPL_ENDOFDCCLIST     619 dalnet
  RPL_DCCINFO          620 dalnet
- 
+
  RPL_DUMPING      640 unreal
  RPL_DUMPRPL      641 unreal
  RPL_EODUMP      642 unreal
@@ -492,21 +492,21 @@ extern const char *numeric_format (int             numeric);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void        numeric_vsend  (struct client  *cptr,
-                                   int             numeric, 
+                                   int             numeric,
                                    va_list         args);
 
 extern void        numeric_send   (struct client  *cptr,
-                                   int             numeric, 
+                                   int             numeric,
                                    ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void        numeric_vlsend (struct lclient *lcptr,
-                                   int             numeric, 
+                                   int             numeric,
                                    va_list         args);
 
 extern void        numeric_lsend  (struct lclient *lcptr,
-                                   int             numeric, 
+                                   int             numeric,
                                    ...);
 
 #endif /* SRC_NUMERIC_H */

@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2004-2005  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: image_defpal.h,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -30,7 +30,7 @@ const struct color image_defpal[256] = {
   { 0x80, 0x00, 0x80 },         /* magenta */
   { 0x00, 0x80, 0x80 },         /* cyan */
   { 0x80, 0x80, 0x80 },         /* light gray */
-  
+
   { 0x40, 0x40, 0x40 },         /* dark gray */
   { 0xff, 0x00, 0x00 },         /* light red */
   { 0x00, 0xff, 0x00 },         /* light green */
@@ -39,7 +39,7 @@ const struct color image_defpal[256] = {
   { 0xff, 0x00, 0xff },         /* light magenta */
   { 0x00, 0xff, 0xff },         /* light cyan */
   { 0xff, 0xff, 0xff },         /* white */
-  
+
   /* Black-White Gradient */
   { 0x00, 0x00, 0x00 },
   { 0x11, 0x11, 0x11 },

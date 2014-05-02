@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: htmlp.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -129,10 +129,10 @@ CHAOS_API(struct htmlp *)htmlp_find_id   (uint32_t       id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          htmlp_vset_args (struct htmlp  *htmlp, 
+CHAOS_API(void)          htmlp_vset_args (struct htmlp  *htmlp,
                                           va_list        args);
-CHAOS_API(void)          htmlp_set_args  (struct htmlp  *htmlp, 
-                                          ...);    
+CHAOS_API(void)          htmlp_set_args  (struct htmlp  *htmlp,
+                                          ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -144,7 +144,7 @@ CHAOS_API(struct htmlp_tag *)htmlp_tag_next  (struct htmlp *htptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct htmlp_tag *)htmlp_tag_find  (struct htmlp *htptr, 
+CHAOS_API(struct htmlp_tag *)htmlp_tag_find  (struct htmlp *htptr,
                                               const char   *name);
 
 /* ------------------------------------------------------------------------ *
@@ -153,7 +153,7 @@ CHAOS_API(uint32_t)          htmlp_tag_count (struct htmlp *htptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct htmlp_tag *)htmlp_tag_index (struct htmlp *htptr, 
+CHAOS_API(struct htmlp_tag *)htmlp_tag_index (struct htmlp *htptr,
                                               uint32_t      i);
 
 /* ------------------------------------------------------------------------ *
@@ -164,8 +164,8 @@ CHAOS_API(struct htmlp_var *)htmlp_var_find  (struct htmlp *htptr,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct htmlp_var *)htmlp_var_set   (struct htmlp *htptr,
-                                              const char   *name, 
-                                              const char   *value);  
+                                              const char   *name,
+                                              const char   *value);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -173,12 +173,12 @@ CHAOS_API(struct htmlp *)htmlp_pop       (struct htmlp  *htmlp);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct htmlp *)htmlp_push      (struct htmlp **htmlpptr);    
+CHAOS_API(struct htmlp *)htmlp_push      (struct htmlp **htmlpptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(char *)       htmlp_decode    (const char    *s);
-  
+
 
 /* ------------------------------------------------------------------------ *
  * Dump htmlps.                                                               *

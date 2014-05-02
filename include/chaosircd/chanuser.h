@@ -70,20 +70,20 @@ extern void             chanuser_shutdown    (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct chanuser *chanuser_new         (struct channel        *chptr, 
+extern struct chanuser *chanuser_new         (struct channel        *chptr,
                                               struct client         *sptr);
 
 /* -------------------------------------------------------------------------- *
  * Create a chanuser block, link it to the channel and the user and           *
  * set the flags                                                              *
  * -------------------------------------------------------------------------- */
-extern struct chanuser *chanuser_add         (struct channel        *chptr, 
+extern struct chanuser *chanuser_add         (struct channel        *chptr,
                                               struct client         *sptr);
 
 /* -------------------------------------------------------------------------- *
  * Find a chanuser block                                                      *
  * -------------------------------------------------------------------------- */
-extern struct chanuser *chanuser_find        (struct channel        *chptr, 
+extern struct chanuser *chanuser_find        (struct channel        *chptr,
                                               struct client         *sptr);
 
 /* -------------------------------------------------------------------------- *
@@ -102,18 +102,18 @@ extern void             chanuser_delete      (struct chanuser       *cuptr);
  * Show all chanusers to a client                                             *
  * -------------------------------------------------------------------------- */
 extern void             chanuser_show        (struct client         *cptr,
-                                              struct channel        *chptr, 
+                                              struct channel        *chptr,
                                               struct chanuser       *cuptr,
                                               int                    eon);
 
 /* -------------------------------------------------------------------------- *
  * Parse chanusers                                                            *
  * -------------------------------------------------------------------------- */
-extern uint32_t         chanuser_parse       (struct lclient        *lcptr,  
+extern uint32_t         chanuser_parse       (struct lclient        *lcptr,
                                               struct list           *lptr,
-                                              struct channel        *chptr, 
+                                              struct channel        *chptr,
                                               char                  *args,
-                                              int                    prefix);  
+                                              int                    prefix);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -152,47 +152,47 @@ extern int              chanuser_mode_bounce (struct lclient        *lcptr,
                                               struct channel        *chptr,
                                               struct chanuser       *cuptr,
                                               struct list           *lptr,
-                                              struct chanmodechange *cmcptr);  
+                                              struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_send_joins  (struct lclient        *lcptr, 
+extern void             chanuser_send_joins  (struct lclient        *lcptr,
                                               struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanuser_send_modes  (struct lclient        *lcptr,
                                               struct client         *cptr,
-                                              struct node           *nptr);  
+                                              struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * Walk through all channels a client is in and message all members           *
  * -------------------------------------------------------------------------- */
 extern void             chanuser_vsend       (struct lclient        *one,
                                               struct client         *sptr,
-                                              const char            *format, 
+                                              const char            *format,
                                               va_list                args);
 
 extern void             chanuser_send        (struct lclient        *one,
                                               struct client         *sptr,
-                                              const char            *format, 
+                                              const char            *format,
                                               ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_drop        (struct client         *cptr, 
-                                              struct channel        *chptr);  
+extern void             chanuser_drop        (struct client         *cptr,
+                                              struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_whois       (struct client         *cptr, 
+extern void             chanuser_whois       (struct client         *cptr,
                                               struct user           *auptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanuser_kick        (struct lclient        *lcptr,
                                               struct client         *cptr,
-                                              struct channel        *chptr, 
+                                              struct channel        *chptr,
                                               struct chanuser       *cuptr,
                                               char                 **targetv,
                                               const char            *reason);
@@ -200,5 +200,5 @@ extern void             chanuser_kick        (struct lclient        *lcptr,
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             chanuser_support     (void);
-  
+
 #endif /* SRC_CHANUSER_H */

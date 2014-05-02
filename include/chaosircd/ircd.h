@@ -40,7 +40,7 @@
 #define CHANNEL_BLOCK_SIZE   32
 #define CHANMODE_BLOCK_SIZE 128
 #define BAN_BLOCK_SIZE      128
-#define CLASS_BLOCK_SIZE      8 
+#define CLASS_BLOCK_SIZE      8
 #define OPER_BLOCK_SIZE       8
 #define SERVER_BLOCK_SIZE    16
 #define CHANUSER_BLOCK_SIZE 128
@@ -118,9 +118,9 @@ extern const char *ircd_version;
 extern const char *ircd_release;
 extern struct list ircd_support;
 
-typedef enum { 
+typedef enum {
    false = 0,
-   true = 1 
+   true = 1
 } bool;
 
 struct support {
@@ -141,12 +141,12 @@ IRCD_DATA(char)    ircd_path[PATHLEN];
  * Initialize things.                                                         *
  * -------------------------------------------------------------------------- */
 IRCD_API(void) ircd_init(int argc, char **argv, char **envp);
-  
+
 /* -------------------------------------------------------------------------- *
  * Clean things up.                                                           *
  * -------------------------------------------------------------------------- */
 IRCD_API(void) ircd_shutdown(void);
-  
+
 /* -------------------------------------------------------------------------- *
  * Loop around some timer stuff and the i/o multiplexer.                      *
  * -------------------------------------------------------------------------- */
@@ -156,7 +156,7 @@ IRCD_API(void) ircd_loop(void);
  * Assemble uptime string                                                     *
  * -------------------------------------------------------------------------- */
 extern const char     *ircd_uptime       (void);
-  
+
 /* -------------------------------------------------------------------------- *
  * Garbage collect.                                                           *
  * -------------------------------------------------------------------------- */
@@ -190,12 +190,12 @@ extern void            ircd_support_unset(const char *name);
 /* -------------------------------------------------------------------------- *
  * Set a support value                                                        *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_set  (const char *name, 
+extern struct support *ircd_support_set  (const char *name,
                                           const char *value, ...);
 
 /* -------------------------------------------------------------------------- *
  * Show support numeric to a client                                           *
  * -------------------------------------------------------------------------- */
 extern void            ircd_support_show (struct client *cptr);
-  
+
 #endif /* SRC_IRCD_H */

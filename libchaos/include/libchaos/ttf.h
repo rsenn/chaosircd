@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: ttf.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -31,7 +31,7 @@
 #define FT_FREETYPE_H <freetype/freetype.h>
 #endif
 
-#include FT_FREETYPE_H 
+#include FT_FREETYPE_H
 
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
@@ -70,14 +70,14 @@ struct ttf_cache {
   int       yoffset;
   int       advance;
   uint16_t  cached;
-};  
+};
 
 struct ttf {
   struct node            node;        /* linking node for ttf_list */
   uint32_t               id;
   uint32_t               refcount;    /* times this block is referenced */
   uint32_t               hash;
-  
+
   int                    height;
   int                    ascent;
   int                    descent;
@@ -88,11 +88,11 @@ struct ttf {
   int                    underline_offset;
   int                    underline_height;
   int                    font_size;
-  
+
   FT_Face                face;
   FT_Open_Args           args;
   char                   name[64];    /* user-definable name */
-  
+
   struct ttf_cache      *current;
   struct ttf_cache       cache[256];
   struct ttf_cache       scratch;
@@ -157,31 +157,31 @@ extern int               ttf_calc            (struct ttf      *ttf,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_glyph_solid     (struct ttf      *ttf,
-                                              uint16_t         ch, 
+                                              uint16_t         ch,
                                               struct color    *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern uint32_t          ttf_glyph_width     (struct ttf      *ttf, 
+extern uint32_t          ttf_glyph_width     (struct ttf      *ttf,
                                               uint16_t         ch);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_unicode_solid   (struct ttf      *ttf,
                                               const uint16_t  *text,
                                               struct color    *c);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_text_solid      (struct ttf      *ttf,
-                                              const char      *text, 
+                                              const char      *text,
                                               struct color    *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_utf8_solid      (struct ttf      *ttf,
                                               const char      *utf8,
-                                              struct color    *c);      
+                                              struct color    *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -189,52 +189,52 @@ extern struct image     *ttf_glyph_shaded    (struct ttf      *ttf,
                                               uint16_t         ch,
                                               struct color    *bg,
                                               struct color    *fg);
-    
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_unicode_shaded  (struct ttf      *ttf,
                                               const uint16_t  *text,
                                               struct color    *bg,
-                                              struct color    *fg);      
-  
+                                              struct color    *fg);
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_text_shaded     (struct ttf      *ttf,
-                                              const char      *text, 
+                                              const char      *text,
                                               struct color    *bg,
-                                              struct color    *fg);      
+                                              struct color    *fg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_utf8_shaded     (struct ttf      *ttf,
                                               const char      *utf8,
                                               struct color    *bg,
-                                              struct color    *fg);      
+                                              struct color    *fg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_glyph_blended    (struct ttf     *ttf,
                                                uint16_t        ch,
                                                struct color   *c);
-    
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_unicode_blended  (struct ttf     *ttf,
                                                const uint16_t *ch,
                                                struct color   *c);
-    
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_text_blended     (struct ttf     *ttf,
                                                const char     *text,
                                                struct color   *c);
-    
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct image     *ttf_utf8_blended     (struct ttf     *ttf,
                                                const char     *utf8,
                                                struct color   *c);
-    
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern void              ttf_delete          (struct ttf      *iptr);
@@ -243,7 +243,7 @@ extern void              ttf_delete          (struct ttf      *iptr);
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
 extern void              ttf_release         (struct ttf      *iptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern void              ttf_set_name        (struct ttf      *iptr,
@@ -252,7 +252,7 @@ extern void              ttf_set_name        (struct ttf      *iptr,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern const char       *ttf_get_name        (struct ttf      *iptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct ttf       *ttf_find_name       (const char      *name);

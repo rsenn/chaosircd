@@ -12,22 +12,22 @@ uint32_t bytes_out = 666;
 void graphtest_write(void)
 {
   struct graph *graph;
-  
+
   graph = graph_new("traffic", 400, 160, GRAPH_TYPE_LINE);
 
 /*  graph_colorize(graph, GRAPH_COLOR_DARK);
-  
+
   graph_source_add(graph, GRAPH_MEASURE_DIFFTIME,
                    GRAPH_SOURCE_UINT, &bytes_in, "in");
-  
-  graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, 
+
+  graph_source_add(graph, GRAPH_MEASURE_DIFFTIME,
                    GRAPH_SOURCE_UINT, &bytes_out, "out");
 
   graph_drain_add(graph, GRAPH_DATA_HOURLY);
   graph_drain_add(graph, GRAPH_DATA_DAILY);
   graph_drain_add(graph, GRAPH_DATA_WEEKLY);
   graph_drain_add(graph, GRAPH_DATA_MONTHLY);
-  
+
   graph_drain_render(graph, GRAPH_DATA_HOURLY);
   graph_drain_save(graph, GRAPH_DATA_HOURLY);
   */
@@ -44,7 +44,7 @@ int main()
   image_init();
   timer_init();
   graph_init();
-  
+
   graphtest_write();
 
   graph_shutdown();
@@ -55,7 +55,7 @@ int main()
   mem_shutdown();
   log_shutdown();
   io_shutdown();
-  
+
   return 0;
 }
- 
+
