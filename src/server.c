@@ -284,8 +284,8 @@ struct server *server_find_id(uint32_t id)
 struct server *server_find_name(const char *name)
 {
   struct server *sptr;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&server_list, sptr)
@@ -303,8 +303,8 @@ struct server *server_find_name(const char *name)
 struct server *server_find_namew(struct client *cptr, const char *name)
 {
   struct server *sptr;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&server_list, sptr)

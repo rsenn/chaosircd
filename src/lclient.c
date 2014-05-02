@@ -1383,8 +1383,8 @@ struct lclient *lclient_find_id(int id)
 struct lclient *lclient_find_name(const char *name)
 {
   struct lclient *lcptr;
-  uint32_t        hash;
-
+  hash_t          hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&lclient_list, lcptr)

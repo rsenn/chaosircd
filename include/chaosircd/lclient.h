@@ -49,7 +49,7 @@ struct lclient {
   uint32_t        id;
   uint32_t        refcount;      /* how many times this block is referenced */
   uint32_t        type;          /* lclient type */
-  uint32_t        hash;
+  hash_t          hash;
   struct user    *user;
   struct class   *class;         /* reference to connection class */
   struct client  *client;        /* reference to global client */

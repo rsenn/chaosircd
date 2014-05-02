@@ -49,7 +49,7 @@ typedef void (service_callback_t)(struct lclient *, struct client *,
 struct service_handler {
   struct node         node;
   char                name[32];
-  uint32_t            hash;
+  hash_t              hash;
   service_callback_t *callback;
 };
 
@@ -58,8 +58,8 @@ struct service {
   struct node    hnode;         /* node for service_lists[] */
   uint32_t       id;            /* a unique id */
   uint32_t       refcount;      /* how many times this block is referenced */
-  uint32_t       nhash;
-  uint32_t       uhash;
+  hash_t         nhash;
+  hash_t         uhash;
   struct client *client;
   struct user   *user;
   struct list    handlers;

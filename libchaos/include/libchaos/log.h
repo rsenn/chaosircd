@@ -59,7 +59,7 @@ typedef void (log_drain_cb_t)(uint64_t    src,   int         lvl,
  * ------------------------------------------------------------------------ */
 struct slog {
   uint64_t flag;                  /* source bitflag for masking purposes */
-  uint32_t hash;
+  hash_t   hash;
   char     name[16];              /* log source name */
 };
 
@@ -67,7 +67,7 @@ struct slog {
  * ------------------------------------------------------------------------ */
 struct dlog {
   struct node     node;
-  uint32_t        hash;
+  hash_t          hash;
   uint32_t        refcount;
   uint32_t        id;
   uint64_t        sources;

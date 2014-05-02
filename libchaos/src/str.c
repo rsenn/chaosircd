@@ -1162,14 +1162,17 @@ char *str_dup(const char *s)
  * ------------------------------------------------------------------------ */
 #ifdef NO_C99
 
-#define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-#define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-uint32_t str_hash(const char *s)
-{
-  uint32_t ret = 0xcafebabe;
-  uint32_t temp;
-  uint32_t i;
+#define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
+#define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
+hash_t str_hash(const char *s)
+{  
+  hash_t ret = 0xdefaced;
+  hash_t temp;
+  hash_t i;
 
+  ret <<= 32;
+  ret |= 0xcafebabe;
+  
   if(s == NULL)
     return ret;
 
@@ -1189,12 +1192,15 @@ uint32_t str_hash(const char *s)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef NO_C99
-uint32_t str_ihash(const char *s)
-{
-  uint32_t ret = 0xcafebabe;
-  uint32_t temp;
-  uint32_t i;
+hash_t str_ihash(const char *s)
+{  
+  hash_t ret = 0xdefaced;
+  hash_t temp;
+  hash_t i;
 
+  ret <<= 32;
+  ret |= 0xcafebabe;
+  
   if(s == NULL)
     return ret;
 

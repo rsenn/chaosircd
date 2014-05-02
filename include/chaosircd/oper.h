@@ -36,7 +36,7 @@
 struct oper
 {
   struct node   node;
-  uint32_t      hash;
+  hash_t        hash;
   char          name[IRCD_USERLEN + 1];
   char          passwd[IRCD_PASSWDLEN + 1];
   struct class *clptr;

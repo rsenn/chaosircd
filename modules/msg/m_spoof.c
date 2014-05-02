@@ -114,7 +114,7 @@ struct m_spoof_entry
   net_addr_t     ip;
   uint64_t       ts;
   char           host[IRCD_HOSTLEN];
-  uint32_t       hash;
+  hash_t           hash;
   int            waslame;
 };
 
@@ -319,8 +319,8 @@ static struct m_spoof_entry *m_spoof_find_ip(net_addr_t ip)
 static struct m_spoof_entry *m_spoof_find_host(const char *host)
 {
   struct m_spoof_entry *mseptr;
-  uint32_t              hash;
-
+  hash_t                  hash;
+  
   hash = str_ihash(host);
 
   dlink_foreach(&m_spoof_list, mseptr)
@@ -476,7 +476,7 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
 {
   struct m_spoof_entry *mseptr;
   char                  host[IRCD_HOSTLEN];
-  uint32_t              hash;
+  hash_t                  hash;
 
   strlcpy(host, argv[2], sizeof(host));
 

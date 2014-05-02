@@ -121,8 +121,8 @@ static inline struct ini_key *ini_key_get(struct ini_section *section, const cha
 {
   struct ini_key     *key;
   struct node    *node;
-  uint32_t       hash;
-
+  hash_t         hash;
+  
   if(section == NULL)
     return NULL;
 
@@ -343,8 +343,8 @@ void ini_remove(struct ini *ini)
 struct ini *ini_find_name(const char *name)
 {
   struct ini  *ini;
-  uint32_t     hash;
-
+  hash_t       hash;
+  
   hash = str_ihash(name);
 
   dlink_foreach(&ini_list, ini)
@@ -365,8 +365,8 @@ struct ini *ini_find_name(const char *name)
 struct ini *ini_find_path(const char *path)
 {
   struct ini  *ini;
-  uint32_t     hash;
-
+  hash_t       hash;
+  
   hash = str_hash(path);
 
   dlink_foreach(&ini_list, ini)
@@ -572,8 +572,8 @@ void ini_callback(struct ini *ini, ini_callback_t *cb)
 struct ini_section *ini_section_find(struct ini *ini, const char *name)
 {
   struct ini_section *section;
-  uint32_t            hash;
-
+  hash_t              hash;
+  
   if(name == NULL)
     return NULL;
 
@@ -604,8 +604,8 @@ struct ini_section *ini_section_find_next(struct ini *ini, const char *name)
 {
   struct ini_section *section;
   struct node        *node;
-  uint32_t            hash;
-
+  hash_t              hash;
+  
   if(ini->current == NULL)
     return NULL;
 

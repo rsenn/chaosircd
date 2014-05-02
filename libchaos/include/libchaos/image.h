@@ -107,7 +107,7 @@ struct image {
   struct node         node;                 /* linking node for image_list */
   uint32_t            id;
   uint32_t            refcount;             /* times this block is referenced */
-  uint32_t            hash;
+  hash_t              hash;
   uint16_t            w;
   uint16_t            h;
   uint32_t            pitch;

@@ -74,7 +74,7 @@ struct server
   struct node     snode;
   uint32_t        id;
   int             refcount;
-  uint32_t        hash;
+  hash_t          hash;
   int             location;
   struct client  *client;
   struct lclient *lclient;
