@@ -1,6 +1,6 @@
 [Anjuta]
 Maximized=1
-Geometry=1280x967+0+0
+Geometry=1280x953+-4+-4
 
 [File Loader]
 Files=../../modules/import-modules.sh#9%%%../../src/channel.c#1%%%../../src/chanuser.c#1%%%../../src/chanmode.c#1%%%../../src/server.c#1%%%../../src/service.c#1%%%../../src/numeric.c#1%%%../../src/oper.c#1
