@@ -56,8 +56,19 @@ void lc_crowdguard_unload(void)
  * -------------------------------------------------------------------------- */
 static int lc_crowdguard_hook(struct lclient *lcptr)
 {
+  char info[IRCD_INFOLEN+1];
+  size_t i;
+
+  strlcpy(info, lcptr->info, sizeof(info));
+
+  for(i = 0; i < str_len(info); i++)
+  {
+    if(info[i] == 0x7f || info[i] < 0x20)
+      info[i] = ' ';
+  }
+
   log(lc_crowdguard_login_log, L_status, "User login from %s with handle %s, info: %s",
-      lcptr->host, lcptr->name, lcptr->info);
+      lcptr->host, lcptr->name, info);
 
   return 0;
 }

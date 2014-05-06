@@ -817,7 +817,7 @@ void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
   {
     /* send error message & return */
     if(lclient_is_unknown(lcptr))
-      lclient_exit(lcptr, "protocol mismatch");
+      lclient_exit(lcptr, "protocol mismatch: %s", argv[1]);
     else if(lclient_is_server(lcptr))
       lclient_exit(lcptr, "unknown command: %s", argv[1]);
     else
