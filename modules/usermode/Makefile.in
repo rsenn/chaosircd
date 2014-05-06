@@ -10,7 +10,8 @@ MODULES              = um_client \
                        um_operator \
                        um_paranoid \
                        um_servnotice \
-                       um_wallops
+                       um_wallops \
+                       um_crowdguard
 
 INCLUDES             = -I$(top_srcdir)/libchaos/include \
                        -I$(top_srcdir)/include \

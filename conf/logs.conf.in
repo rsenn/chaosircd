@@ -1,4 +1,4 @@
- A log drain - redirecting logging to a file
+# A log drain - redirecting logging to a file
 
 log {
   path     = "@logdir@/ircd.log";
@@ -73,7 +73,7 @@ log {
 
 log {
   path     = "@logdir@/crowdguard.log";
-  sources  = "login geohash event participation";
+  sources  = "login geolocation event participation";
   level    = "verbose";
   prefix   = yes;
   truncate = yes;

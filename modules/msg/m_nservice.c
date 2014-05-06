@@ -95,7 +95,7 @@ static void ms_nservice(struct lclient *lcptr, struct client *cptr,
                         int             argc,  char         **argv)
 {
   struct user    *uptr;
-  struct service *svptr;
+//  struct service *svptr;
 
   if(!client_is_server(cptr))
     return;
@@ -149,7 +149,7 @@ static void ms_nservice(struct lclient *lcptr, struct client *cptr,
   /* ...*/
 
   /* Register and introduce the remote client */
-  svptr = service_new(argv[2], argv[3], argv[4], argv[6]);
+  /*svptr = */service_new(argv[2], argv[3], argv[4], argv[6]);
 
 }
 

@@ -47,6 +47,8 @@ static void mr_user(struct lclient *lcptr, struct client *cptr,
 static void ms_user(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
 
+static int m_user_login_log;
+
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
@@ -74,11 +76,18 @@ int m_user_load(void)
   if(msg_register(&m_user_msg) == NULL)
     return -1;
 
+  m_user_login_log = log_source_find("login");                                                                                                                     
+  if(m_user_login_log == -1)                                                                                                                                       
+    m_user_login_log = log_source_register("login");                                                                                                               
+      
   return 0;
 }
 
 void m_user_unload(void)
 {
+  log_source_unregister(m_user_login_log);
+  m_user_login_log = -1;
+
   msg_unregister(&m_user_msg);
 }
 

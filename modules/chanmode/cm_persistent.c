@@ -9,6 +9,7 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "libchaos/hook.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
@@ -119,7 +120,7 @@ static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
   if(chptr->server != server_me)
     return 0;
 
-  owner = (0 == strncmp(cptr->name, &chptr->name[1], strlen(&chptr->name[1])));
+  owner = (0 == str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])));
   created = (chptr->chanusers.size <= 1);
   
   if(owner)

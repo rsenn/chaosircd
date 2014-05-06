@@ -36,6 +36,8 @@ static void m_opart (struct lclient *lcptr, struct client *cptr,
 static void ms_opart(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv);
 
+static int m_opart_event_log;
+
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
@@ -61,12 +63,19 @@ int m_opart_load(void)
 {
   if(msg_register(&m_opart_msg) == NULL)
     return -1;
-
+  
+  m_opart_event_log = log_source_find("event");                                                                                                              
+  if(m_opart_event_log == -1)                                                                                                                                
+    m_opart_event_log = log_source_register("event");              
+  
   return 0;
 }
 
 void m_opart_unload(void)
 {
+  log_source_unregister(m_opart_event_log);
+  m_opart_event_log = -1;
+
   msg_unregister(&m_opart_msg);
 }
 
@@ -158,6 +167,11 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
   /* send server OPART */
   m_opart_server_send(NULL, cuptr, argv[3]);
 
+
+  if(chptr->server == server_me)
+  {
+    log(m_opart_event_log, L_status, "%s destroyed event %s", cptr->name, chptr->name);
+  }
   chanuser_delete(cuptr);
 
 //  if(chptr->chanusers.size == 0)
