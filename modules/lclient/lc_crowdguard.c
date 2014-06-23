@@ -63,7 +63,8 @@ static int lc_crowdguard_hook(struct lclient *lcptr)
 
   for(i = 0; i < str_len(info); i++)
   {
-    if(info[i] == 0x7f || info[i] < 0x20)
+    unsigned char c = info[i];
+    if(c == 0xa0 || c <= 0x20)
       info[i] = ' ';
   }
 

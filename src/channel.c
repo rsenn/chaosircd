@@ -645,6 +645,7 @@ void channel_backlog(struct channel *chptr, struct client *cptr,
 {
   struct logentry *e;
   size_t i;
+  char info[IRCD_INFOLEN+1];
 
   if(!client_is_user(cptr))
   	return;
@@ -652,7 +653,21 @@ void channel_backlog(struct channel *chptr, struct client *cptr,
   e = mem_static_alloc(&channel_backlog_heap);
 
   strlcpy(e->cmd, cmd, sizeof(e->cmd));
-  strlcpy(e->from, (cptr->user->name[0] ? cptr->user->name : cptr->name), sizeof(e->from));
+
+  if(cptr->info[0]) {
+    int n;
+    strlcpy(info, cptr->info, sizeof(info));
+    for(n = strlen(info) - 2; n >= 2; n--) {
+      if(!str_ncmp(&info[n], " (", 2)) {
+        info[n] = '\0';
+        break;
+      }
+    }
+  } else {
+    strlcpy(info,cptr->name ,sizeof(info));
+  }
+  
+  strlcpy(e->from, info, sizeof(e->from));
 
   for(i = 0; i < sizeof(e->from)-1; i++)
   {

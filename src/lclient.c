@@ -468,8 +468,8 @@ void lclient_accept(int fd, struct listen *listen)
     }
 
     /* Inform about the new lclient */
-    log(lclient_log, L_verbose, "New local client %s:%u on listener %s",
-        lcptr->host, lcptr->port_remote, listen->name);
+    log(lclient_log, L_verbose, "New local client %s:%u on listener %s (class %s)",
+        lcptr->host, lcptr->port_remote, listen->name, clptr->name);
 
     /* Get references */
     lcptr->listen = listen_pop(listen);

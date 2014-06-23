@@ -52,7 +52,7 @@ log {
   sources  = "all";
   level    = "verbose";
   prefix   = yes;
-  truncate = yes;
+  truncate = no;
 };
 
 log {
@@ -76,5 +76,5 @@ log {
   sources  = "login geolocation event participation";
   level    = "verbose";
   prefix   = yes;
-  truncate = yes;
+  truncate = no;
 };

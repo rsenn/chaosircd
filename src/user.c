@@ -231,7 +231,7 @@ struct user *user_new(const char *name, const char *uid)
   }
 
   /* Inform about the new user */
-  debug(user_log, "New user block: %s (%s)", name, uptr->uid);
+  //debug(user_log, "New user block: %s (%s)", name, uptr->uid);
 
   dlink_add_tail(&user_list, &uptr->node, uptr);
 
