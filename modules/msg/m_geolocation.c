@@ -128,6 +128,8 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 
     if(client_is_user(cptr))
     {
+      int first_location = (cptr->user->name[0] == '~');
+      int changed_location = strcmp(cptr->user->name, argv[3]);
       int do_log = 0;
       struct chanuser *cuptr;
       struct channel *chptr = NULL;
@@ -169,11 +171,11 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 
       // Log the geolocation if there's a channel for this user (user has been set to sharp)
     //  if((chptr = channel_find_name(channame)))
-      if(do_log)
+      if(do_log && changed_location)
       {
         // CrowdGuard functionality requires a persistent (+P) channel
     //    if(chptr->modes & CHFLG(P))
-          log(m_geolocation_log, L_verbose, "Set geolocation for %s to %s", cptr->name, cptr->user->name);
+          log(m_geolocation_log, L_verbose, "%s geolocation for %s to %s", (first_location ? "Set" : "Changed"), cptr->name, cptr->user->name);
       }
     }
 
