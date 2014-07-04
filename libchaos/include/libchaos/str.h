@@ -516,8 +516,10 @@ extern inline hash_t str_hash(const char *s)
   hash_t temp;
   hash_t i;
 
+#if __SIZEOF_POINTER__ > 4
   ret <<= 32;
   ret |= 0xcafebabe;
+#endif
   
   if(s == NULL)
     return ret;
@@ -548,8 +550,10 @@ extern inline hash_t str_ihash(const char *s)
   hash_t temp;
   hash_t i;
 
+#if __SIZEOF_POINTER__ > 4
   ret <<= 32;
   ret |= 0xcafebabe;
+#endif
   
   if(s == NULL)
     return ret;

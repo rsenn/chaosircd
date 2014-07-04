@@ -36,7 +36,7 @@ install: install-exec
 # build config
 # ---------------------------------------------------------------------------
 LDADD    += $(top_builddir)/src/libchaos.a
-#LIB      += $(SSL_LIBS)
+LIB      += $(SSL_LIBS)
 #LIB      += $(PSQL_LIBS)
 #LIB      += $(MYSQL_LIBS)
 ttftest: LIB      += $(FT2_LIBS)

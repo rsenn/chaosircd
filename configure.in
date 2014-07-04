@@ -177,7 +177,7 @@ dnl esac
 
 dnl AC_SUBST([DLFCN_LDADD])
 
-if [ "$HAVE_SSL" = yes ]; then
+if test "$HAVE_SSL" = yes; then
   SSL_DISABLED='#' 
 else
  SSL_ENABLED='#'
