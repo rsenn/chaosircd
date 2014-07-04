@@ -20,7 +20,8 @@ include $(top_builddir)/config.mk
 # ---------------------------------------------------------------------------
 LIBNAME     = $(PACKAGE)
 A_LIBRARY   = $(LIBNAME).$(A_EXEEXT)
-PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_EXEEXT)$(PIE_VERSION_SUFFIX)
+#PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_EXEEXT)$(PIE_VERSION_SUFFIX)
+PIE_LIBRARY = $(PIE_NAME).$(PIE_EXEEXT)
 MODULES     = cfg \
               child \
               connect \

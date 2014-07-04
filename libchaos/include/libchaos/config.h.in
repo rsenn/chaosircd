@@ -12,3 +12,6 @@
 
 /* Define this if you have Linux-type socket filters */
 #undef LINUX_SOCKET_FILTER
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H

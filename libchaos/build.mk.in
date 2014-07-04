@@ -260,14 +260,14 @@ $(A_LIBRARY): $(OBJECTS)
 $(PIE_LIBRARY): $(PIC_OBJECTS)
 	@$(ECHO_PIE_LD)
 	@QUIET@$(PIE_LINK) $(PIE_LDFLAGS) -o $(PIE_LIBRARY) $(PIC_OBJECTS) $(LDADD) $(LIBS)
-	prev='$@' ; for link in $(PIE_LINKS) ; \
-   do \
-     $(ECHO_LN)$$link ; \
-     $(RM) -f $$link ; \
-     $(LN) -s $$prev $$link ; \
-     prev=$$link ; \
-   done
-
+#	prev='$@' ; for link in $(PIE_LINKS) ; \
+#   do \
+#     $(ECHO_LN)$$link ; \
+#     $(RM) -f $$link ; \
+#     $(LN) -s $$prev $$link ; \
+#     prev=$$link ; \
+#   done
+#
 # rule for programs
 # ---------------------------------------------------------------------------
 $(PROGRAM): $(OBJECTS) $(LDADD)

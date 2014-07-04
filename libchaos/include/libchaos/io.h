@@ -33,9 +33,14 @@ struct io;
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
+#include "libchaos/config.h"
 #include "libchaos/defs.h"
 #include "libchaos/syscall.h"
 #include "libchaos/queue.h"
+
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
 
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
