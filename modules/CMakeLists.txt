@@ -3,7 +3,7 @@
 #endif(NOT DEFINED BUILD_SHARED_LIBS)
 #
 #if(NOT BUILD_SHARED_LIBS)
-#  add_definitions(-DSTATIC_LIBCHAOS=1)
+##  add_definitions(-DSTATIC_LIBCHAOS=1)
 #endif(NOT BUILD_SHARED_LIBS)
 #
 #set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")

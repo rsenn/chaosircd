@@ -10,6 +10,8 @@ project(${PROJECT_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
+set(BUILD_SHARED_LIBS TRUE)
+
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libchaos")
 set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
 
@@ -29,7 +31,7 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
 endif(NOT DEFINED BUILD_SHARED_LIBS)
 
 if(NOT BUILD_SHARED_LIBS)
-  add_definitions(-DSTATIC_LIBCHAOS=1)
+#  add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
 
 include(CheckIncludeFile)

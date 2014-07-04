@@ -9,7 +9,7 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
 endif(NOT DEFINED BUILD_SHARED_LIBS)
 
 if(NOT BUILD_SHARED_LIBS)
-  add_definitions(-DSTATIC_LIBCHAOS=1)
+#  add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
 
 include("${LIBCHAOS_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
@@ -21,8 +21,8 @@ link_directories("${LIBCHAOS_BINARY_DIR}")
 add_executable(cfgtest cfgtest.c)
 target_link_libraries(cfgtest libchaos)
 
-add_executable(dbtest dbtest.c)
-target_link_libraries(dbtest libchaos)
+#add_executable(dbtest dbtest.c)
+#target_link_libraries(dbtest libchaos)
 
 add_executable(giftest giftest.c)
 target_link_libraries(giftest libchaos)

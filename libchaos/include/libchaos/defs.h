@@ -54,11 +54,11 @@ typedef uintptr_t hash_t;
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
-#   define CHAOS_API(type) __attribute__((dllexport)) type
-#   define CHAOS_DATA(type) extern __attribute__((dllexport)) type
+#   define CHAOS_API(type) __declspec(dllexport) type
+#   define CHAOS_DATA(type) extern __declspec(dllexport) type
 #  else
 #   define CHAOS_API(type) type
-#   define CHAOS_DATA(type) extern __attribute__((dllimport)) type
+#   define CHAOS_DATA(type) extern __declspec(dllimport) type
 #  endif
 # endif
 #endif
@@ -67,7 +67,7 @@ typedef uintptr_t hash_t;
 # define CHAOS_API(type) type
 #endif
 #ifndef CHAOS_DATA
-# define CHAOS_DATA(type) extern type
+# define CHAOS_DATA(type) extern __declspec(dllimport) type
 #endif
 
 #ifndef CHAOS_INLINE_FN

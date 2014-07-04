@@ -33,14 +33,14 @@ if(WIN32)
 add_library(ircd SHARED ${SOURCES})
 target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
-add_executable(chaosircd main.c)
+add_executable(chaosircd main.c "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/config.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h")
 target_link_libraries(ircd libchaos ${SOCKET_LIBRARIES})
 
 target_link_libraries(chaosircd ircd)
 
 else(WIN32)
 
-add_executable(chaosircd ${SOURCES} ircd.c)
+add_executable(chaosircd ${SOURCES} main.c)
     
 
 link_directories("${LIBCHAOS_BINARY_DIR}")

@@ -19,7 +19,7 @@
  * $Id: ircd.c,v 1.6 2006/09/28 08:38:31 roman Exp $
  */
 
-#define _GNU_SOURCE
+#define MAIN 1
 
 /* -------------------------------------------------------------------------- */
 #include <libchaos/defs.h>

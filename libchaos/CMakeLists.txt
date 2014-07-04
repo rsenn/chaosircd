@@ -35,7 +35,7 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
 endif(NOT DEFINED BUILD_SHARED_LIBS)
 
 if(NOT BUILD_SHARED_LIBS)
-  add_definitions(-DSTATIC_LIBCHAOS=1)
+#  add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
  
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
@@ -78,6 +78,7 @@ string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 set_target_properties(libchaos PROPERTIES
                       SOVERSION "${LIBRARY_VERSION}"
                       PREFIX "")
+target_compile_definitions(ircd PUBLIC "-DBUILD_LIBCHAOS=1")
 
 target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 

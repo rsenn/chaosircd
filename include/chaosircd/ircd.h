@@ -89,12 +89,12 @@
 # ifdef BUILD_MODULES
 #  define IRCD_MODULE(type) extern  __declspec(dllexport) type
 # endif
-# ifdef BUILD_IRCD
+# if defined(BUILD_IRCD) && !defined(MAIN) && !defined(BUILD_MODULES)
 #  define IRCD_DATA(type) extern  __declspec(dllexport) type
 #  define IRCD_API(type)          __declspec(dllexport) type
 # else
 #  define IRCD_DATA(type) extern  __declspec(dllimport) type
-#  define IRCD_API(type)                                    type
+#  define IRCD_API(type)                                type
 # endif
 #endif
 
@@ -103,7 +103,7 @@
 #endif
 
 #ifndef IRCD_DATA
-# define IRCD_DATA(type) extern type
+# define IRCD_DATA(type) extern __declspec(dllimport) type
 #endif
 #ifndef IRCD_DATA_DECL
 # define IRCD_DATA_DECL(type) __declspec(dllexport) type
