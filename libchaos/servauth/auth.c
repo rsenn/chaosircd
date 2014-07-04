@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: auth.c,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -42,18 +42,18 @@
 static int auth_timeout(struct auth_client *auth)
 {
   auth->recvbuf[0] = '\0';
-  
+
   io_shutup(auth_fd(auth));
-  
+
   if(auth->callback)
     auth->callback(auth);
-  
+
   if(auth->timer)
   {
     timer_remove(auth->timer);
     auth->timer = NULL;
   }
-  
+
   return 0;
 }
 
@@ -96,7 +96,7 @@ static int auth_parse(struct auth_client *auth)
     {
       if(!auth_is_ident_char(*p))
         break;
-      
+
       auth->reply[i] = *p++;
     }
   }
@@ -115,9 +115,9 @@ static int auth_parse(struct auth_client *auth)
 static void auth_event_rd(int fd, void *ptr)
 {
   struct auth_client *auth = ptr;
-  
+
   auth->recvbuf[0] = '\0';
-  
+
   if(io_gets(fd, auth->recvbuf, sizeof(auth->recvbuf)) > 0)
   {
     auth_parse(ptr);
@@ -139,10 +139,10 @@ static void auth_event_cn(int fd, void *ptr)
   else
   {
     timeout = timer_systime - auth->deadline;
-  
+
     if(timeout < 0LL)
       timeout = 1LL;
-    
+
     io_register(fd, IO_CB_READ, auth_event_rd, ptr);
   }
 }
@@ -164,7 +164,7 @@ void auth_clear(struct auth_client *auth)
     io_shutup(auth_fd(auth));
 
   timer_push(&auth->timer);
-  
+
   auth_zero(auth);
 }
 
@@ -179,28 +179,28 @@ int auth_lookup(struct auth_client *auth, net_addr_t addr,
                 net_port_t local_port, net_port_t remote_port, uint64_t t)
 {
   auth->sock = net_socket(NET_ADDRESS_IPV4, NET_SOCKET_STREAM) + 1;
-  
+
   if(auth->sock)
   {
     auth->local_port = local_port;
     auth->remote_port = remote_port;
     auth->deadline = timer_systime + t;
-    
+
     io_nonblock(auth->sock - 1);
 
     if(net_connect(auth->sock - 1, addr, 113, auth_event_cn, auth_event_cn, auth) &&
        syscall_errno != EINPROGRESS)
       return -1;
-    
+
     io_queue_control(auth->sock - 1, ON, ON, OFF);
-    
+
     auth_send(auth);
-    
+
     auth->timer = timer_start(auth_timeout, AUTH_TIMEOUT, auth);
-    
+
     return 0;
   }
-  
+
   return -1;
 }
 
@@ -220,7 +220,7 @@ void *auth_get_userarg(struct auth_client *auth)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void auth_set_callback(struct auth_client *auth, auth_callback_t *cb, 
+void auth_set_callback(struct auth_client *auth, auth_callback_t *cb,
                        uint64_t timeout)
 {
   auth->callback = cb;

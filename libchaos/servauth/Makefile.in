@@ -63,7 +63,10 @@ INCLUDES += -I$(srcdir) \
             -I$(top_srcdir)/include \
             -I$(builddir) \
             -I$(top_builddir) \
-            -I$(top_builddir)/include
+            -I$(top_builddir)/include \
+            -I. \
+            -I.. \
+            -I../include
 
 # include global make targets
 # ---------------------------------------------------------------------------

@@ -96,7 +96,7 @@ struct usermode {
                             * bitwise-ORed with USERMODE_ARG_ENABLE and
                             * USERMODE_ARG_EMPTY */
   um_handler_t *handler;   /* called on a change on this flag */
-  
+
   /* ..and these by usermode.c */
   struct list   list;      /* the list users are kept in when flag is on */
   uint64_t      flag;      /* the bit flag */
@@ -153,13 +153,13 @@ usermode_show          (struct client  *cptr);
 /* -------------------------------------------------------------------------- *
  * Add a usermode change to the usermode_heap                                 *
  * -------------------------------------------------------------------------- */
-extern void 
+extern void
 usermode_change_add    (struct usermode *mode, int change, char *arg);
 
 /* -------------------------------------------------------------------------- *
  * Removes all usermode changes from the usermode_list and free the memory    *
  * -------------------------------------------------------------------------- */
-extern void 
+extern void
 usermode_change_destroy(void);
 
 /* -------------------------------------------------------------------------- *

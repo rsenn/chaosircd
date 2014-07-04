@@ -61,12 +61,14 @@ modules {
   #load "lc_cookie";         # Client PING cookie
   #load "lc_mflood";         # Client message flood trigger
   #load "lc_sauth";          # Client AUTH/DNS resolver
+  load "lc_crowdguard";
   load "um_client";         # Usermode +c
   load "um_invisible";      # Usermode +i
   load "um_operator";       # Usermode +o
   load "um_paranoid";       # Usermode +p
   load "um_servnotice";     # Usermode +s
   load "um_wallops";        # Usermode +w
+  load "um_crowdguard";     # Usermode +g
   load "cm_op";             # Channel mode +o
   load "cm_halfop";         # Channel mode +h
   load "cm_voice";          # Channel mode +v
@@ -75,7 +77,6 @@ modules {
   load "cm_noext";          # Channel mode +n
   load "cm_secret";         # Channel mode +s
   load "cm_topic";          # Channel mode +t
-  load "cm_persistent";     # Channel mode +P
   load "cm_aop";            # Channel mode +A
   load "cm_ahalfop";        # Channel mode +H 
   load "cm_avoice";         # Channel mode +V
@@ -85,6 +86,8 @@ modules {
   load "cm_invex";          # Channel mode +I
   load "cm_limit";          # Channel mode +l
   load "cm_key";            # Channel mode +k
+  load "cm_persistent";     # Channel mode +P
+  load "cm_alarm";          # Channel mode +A
 #  load "sv_sbb";            # SBB Timetable
 #  load "st_traffic";        # Traffic stats
 };

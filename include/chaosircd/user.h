@@ -25,7 +25,7 @@
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #define USER_HASH_SIZE      16
-  
+
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
  * -------------------------------------------------------------------------- */
@@ -37,8 +37,8 @@ struct user {
   struct node    hnode;         /* node for user_lists[] */
   uint32_t       id;            /* a unique id */
   uint32_t       refcount;      /* how many times this block is referenced */
-  uint32_t       nhash;
-  uint32_t       uhash;
+  hash_t         nhash;
+  hash_t         uhash;
   struct client *client;
   struct oper   *oper;
   struct list    channels;
@@ -49,7 +49,7 @@ struct user {
   char           uid [IRCD_IDLEN + 1];
   char           away[IRCD_AWAYLEN + 1];
   char           mode[IRCD_MODEBUFLEN + 1];
-};  
+};
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -99,7 +99,7 @@ extern struct user *user_find_name    (const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_set_name     (struct user    *uptr, 
+extern void         user_set_name     (struct user    *uptr,
                                        const char     *name);
 
 /* -------------------------------------------------------------------------- *
@@ -109,7 +109,7 @@ extern void         user_whois        (struct client  *cptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_invite       (struct user    *uptr, 
+extern void         user_invite       (struct user    *uptr,
                                        struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
@@ -127,9 +127,9 @@ extern struct user *user_pop          (struct user    *uptr);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern struct user *user_push         (struct user   **ucptrptr);
- 
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void         user_dump         (struct user    *uptr);
-  
+
 #endif /* SRC_USER_H */

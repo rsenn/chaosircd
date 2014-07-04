@@ -57,7 +57,7 @@ static char *m_topic_help[] = {
   "channel. If used without text, the actual topic is shown.",
   "If + is prepended to the text then the text is added in",
   "front of the topic.",
-  NULL    
+  NULL
 };
 
 static struct msg m_topic_msg = {
@@ -73,7 +73,7 @@ int m_topic_load(void)
 {
   if(msg_register(&m_topic_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -94,18 +94,18 @@ static void m_topic(struct lclient *lcptr, struct client *cptr,
   struct channel  *chptr;
   struct chanuser *cuptr;
   char             newtopic[IRCD_TOPICLEN + 1];
-  
+
   if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
 
   cuptr = chanuser_find(chptr, cptr);
-  
+
   if(cuptr == NULL)
   {
     numeric_send(cptr, ERR_NOTONCHANNEL, chptr->name);
     return;
   }
-  
+
   if(argc < 4)
   {
     if(chptr->topic[0] == '\0')
@@ -115,22 +115,22 @@ static void m_topic(struct lclient *lcptr, struct client *cptr,
     else
     {
       numeric_send(cptr, RPL_TOPIC, chptr->name, chptr->topic);
-      numeric_send(cptr, RPL_TOPICWHOTIME, 
+      numeric_send(cptr, RPL_TOPICWHOTIME,
                    chptr->name, chptr->topic_info, chptr->topic_ts);
     }
-    
+
     return;
   }
 
   strlcpy(newtopic, argv[3], sizeof(newtopic));
-  
+
   if(newtopic[0] == '+')
   {
     strlcpy(newtopic, &argv[3][1], sizeof(newtopic));
     strlcat(newtopic, " | ", sizeof(newtopic));
     strlcat(newtopic, chptr->topic, sizeof(newtopic));
   }
-  
+
   channel_topic(lcptr, cptr, chptr, cuptr, newtopic);
 }
 
@@ -151,6 +151,6 @@ static void ms_topic(struct lclient *lcptr, struct client *cptr,
         argv[2]);
     return;
   }
-  
+
   channel_topic(lcptr, cptr, chptr, NULL, argv[3]);
 }

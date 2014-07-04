@@ -72,7 +72,7 @@ int m_who_load(void)
 {
   if(msg_register(&m_who_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -90,21 +90,21 @@ static void ms_who (struct lclient *lcptr, struct client *cptr,
 {
   struct server *asptr;
   char          *av[5];
-  
+
   if((asptr = server_find_name(argv[2])) == NULL)
   {
     log(server_log, L_warning, "Dropping WHO for unknown server %s.",
         argv[2]);
     return;
   }
-  
+
   if(asptr == server_me)
   {
     av[0] = argv[0];
     av[1] = argv[1];
     av[2] = argv[3];
     av[4] = NULL;
-    
+
     m_who(lcptr, cptr, argc - 1, av);
   }
   else
@@ -129,20 +129,20 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
   {
     struct server *asptr;
     char          *av[6];
-    
+
     if((asptr = server_find_name(argv[3])) == NULL)
     {
       numeric_send(cptr, ERR_NOSUCHSERVER, argv[3]);
       return;
     }
-    
+
     av[0] = argv[0];
     av[1] = argv[1];
     av[2] = argv[3];
     av[3] = argv[4];
     av[4] = argv[5];
     av[5] = NULL;
-    
+
     ms_who(lcptr, cptr, argc - 1, av);
   }
   else if(chars_valid_chan(argv[2]))
@@ -151,24 +151,24 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
     struct chanuser *cuptr = NULL;
     struct channel  *chptr;
     struct node     *node;
-    
+
     if((chptr = channel_find_name(argv[2])) == NULL)
     {
       numeric_send(cptr, ERR_NOSUCHCHANNEL, argv[2]);
       return;
     }
-    
+
     client_serial++;
-    
+
     if((cuptr = chanuser_find(chptr, cptr)))
     {
       dlink_foreach_data(&chptr->chanusers, node, acuptr)
       {
         if(acuptr->client->serial == client_serial)
           continue;
-        
+
         numeric_send(cptr, RPL_WHOREPLY,
-                     chptr->name, 
+                     chptr->name,
                      acuptr->client->user->name,
                      acuptr->client->host,
                      acuptr->client->origin->name,
@@ -176,7 +176,7 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
                      acuptr->prefix[0] ? acuptr->prefix : "*",
                      acuptr->client->hops,
                      acuptr->client->info);
-        
+
         acuptr->client->serial = client_serial;
       }
     }
@@ -192,7 +192,7 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
             continue;*/
 
           numeric_send(cptr, RPL_WHOREPLY,
-                       chptr->name, 
+                       chptr->name,
                        acuptr->client->user->name,
                        acuptr->client->host,
                        acuptr->client->origin->name,
@@ -204,26 +204,26 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
           acuptr->client->serial = client_serial;
         }
       }
-      
+
     }
-    
+
     numeric_send(cptr, RPL_ENDOFWHO, chptr->name);
   }
   else if(chars_valid_nick(argv[2]))
   {
     struct chanuser *cuptr;
     struct client   *acptr;
-    
+
     if((acptr = client_find_nickhw(cptr, argv[2])) == NULL)
       return;
-    
+
     dlink_foreach(&acptr->user->channels, cuptr)
     {
       /* FIXME: invisible check */
       if((cuptr->channel->modes & CHFLG(s)) &&
          !channel_is_member(cuptr->channel, cptr))
         continue;
-      
+
       numeric_send(cptr, RPL_WHOREPLY,
                    cuptr->channel->name,
                    acptr->user->name,
@@ -234,7 +234,7 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
                    acptr->hops,
                    acptr->info);
     }
-    
+
     numeric_send(cptr, RPL_ENDOFWHO, acptr->name);
   }
   else
@@ -242,15 +242,15 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
     struct chanuser *cuptr;
     struct node     *node;
     struct client   *acptr = NULL;
-    
+
     client_serial++;
-    
+
     dlink_foreach(&cptr->user->channels, cuptr)
     {
       if(cuptr->client->serial == client_serial)
         continue;
-      
-      numeric_send(cptr, RPL_WHOREPLY,                   
+
+      numeric_send(cptr, RPL_WHOREPLY,
                    "*",
                    cuptr->client->user->name,
                    cuptr->client->host,
@@ -259,16 +259,16 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
                    "*",
                    cuptr->client->hops,
                    cuptr->client->info);
-      
+
       cuptr->client->serial = client_serial;
     }
-    
+
     dlink_foreach_data(&client_lists[CLIENT_GLOBAL][CLIENT_USER], node, acptr)
     {
       if(acptr->serial == client_serial)
         continue;
-      
-      numeric_send(cptr, RPL_WHOREPLY,                   
+
+      numeric_send(cptr, RPL_WHOREPLY,
                    "*",
                    acptr->user->name,
                    acptr->host,
@@ -277,10 +277,10 @@ static void m_who(struct lclient *lcptr, struct client *cptr,
                    "*",
                    acptr->hops,
                    acptr->info);
-      
+
       acptr->serial = client_serial;
     }
-    
+
     numeric_send(cptr, RPL_ENDOFWHO, "*");
   }
 }

@@ -36,20 +36,20 @@
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #define USER_HASH_SIZE      16
-  
+
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
  * -------------------------------------------------------------------------- */
 struct channel;
 struct invite;
 
-typedef void (service_callback_t)(struct lclient *, struct client *, 
+typedef void (service_callback_t)(struct lclient *, struct client *,
                                   struct channel *, const char *msg);
 
 struct service_handler {
   struct node         node;
   char                name[32];
-  uint32_t            hash;
+  hash_t              hash;
   service_callback_t *callback;
 };
 
@@ -58,13 +58,13 @@ struct service {
   struct node    hnode;         /* node for service_lists[] */
   uint32_t       id;            /* a unique id */
   uint32_t       refcount;      /* how many times this block is referenced */
-  uint32_t       nhash;
-  uint32_t       uhash;
+  hash_t         nhash;
+  hash_t         uhash;
   struct client *client;
   struct user   *user;
   struct list    handlers;
   char           name[IRCD_NICKLEN + 1];
-};  
+};
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -113,28 +113,28 @@ extern struct service  *service_find_name    (const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             service_set_name     (struct service *svptr, 
+extern void             service_set_name     (struct service *svptr,
                                               const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service_handler *service_register     (struct service     *svptr, 
+struct service_handler *service_register     (struct service     *svptr,
                                               const char         *msg,
                                               service_callback_t *callback);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void                    service_vhandle      (struct service     *svptr, 
+void                    service_vhandle      (struct service     *svptr,
                                               struct lclient     *lcptr,
-                                              struct client      *cptr, 
+                                              struct client      *cptr,
                                               struct channel     *chptr,
                                               const char         *cmd,
                                               const char         *format,
-                                              va_list             args);  
+                                              va_list             args);
 
-void                    service_handle       (struct service     *svptr, 
+void                    service_handle       (struct service     *svptr,
                                               struct lclient     *lcptr,
-                                              struct client      *cptr,  
+                                              struct client      *cptr,
                                               struct channel     *chptr,
                                               const char         *cmd,
                                               const char         *format,
@@ -151,9 +151,9 @@ extern struct service  *service_pop          (struct service *svptr);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern struct service  *service_push         (struct service **ucptrptr);
- 
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void             service_dump         (struct service  *svptr);
-  
+
 #endif /* SRC_SERVICE_H */

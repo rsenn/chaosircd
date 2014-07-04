@@ -52,7 +52,7 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *ms_nuser_help[] =
-{ 
+{
   "NUSER <nick> <hops> <ts> <umodes> <user> <host> <ip> <server> <uid> <info>",
   "",
   "Introduces a client to a remote server.",
@@ -60,7 +60,7 @@ static char *ms_nuser_help[] =
 };
 
 static struct msg ms_nuser_msg = {
-  "NUSER", 10, 10, MFLG_SERVER, 
+  "NUSER", 10, 10, MFLG_SERVER,
   { NULL, NULL, ms_nuser, NULL },
   ms_nuser_help
 };
@@ -72,7 +72,7 @@ int m_nuser_load(void)
 {
   if(msg_register(&ms_nuser_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -103,15 +103,15 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
   struct user   *uptr;
   time_t         ts;
   char           newnick[IRCD_NICKLEN + 1];
-  
+
   if(!client_is_server(cptr))
     return;
-  
+
   /* Check UID collision */
   if((uptr = user_find_uid(argv[10])))
   {
     log(server_log, L_warning, "UID collision");
-    
+
     client_send(cptr, "KILL %s :UID collision", argv[10]);
     return;
   }
@@ -121,21 +121,21 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
   {
     log(server_log, L_warning, "User has invalid nickname: %s",
         argv[2]);
-    
+
     client_send(cptr, "KILL %s :Invalid nickname", argv[10]);
     return;
   }
-  
+
   /* Validate username */
   if(!chars_valid_user(argv[6]))
   {
     log(server_log, L_warning, "User %s has invalid username: %s",
         argv[2], argv[6]);
-    
+
     client_send(cptr, "KILL %s :Invalid username", argv[10]);
     return;
   }
-  
+
   if((sptr = server_find_name(argv[9])) == NULL)
   {
     log(server_log, L_warning, "Client %s from invalid origin %s.",
@@ -143,9 +143,9 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
     client_send(cptr, "KILL %s :Invalid origin", argv[10]);
     return;
   }
-  
+
   ts = str_toul(argv[4], NULL, 10);
-  
+
   /* Check nick collision */
   if((acptr = client_find_nick(argv[2])))
   {
@@ -153,24 +153,24 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
     if(acptr->ts <= ts)
     {
       ts = timer_systime;
-      
+
       if(client_nick_rotate(argv[2], newnick))
         client_nick_random(newnick);
-      
+
       client_send(cptr, ":%S NBOUNCE %s %s :%lu",
                   server_me, argv[10], newnick, ts);
-      
+
       argv[2] = newnick;
     }
   }
-  
+
   /* ...*/
-  
+
   /* Register and introduce the remote client */
   uptr = user_new(argv[6], argv[10]);
 
   uptr->client = client_new_remote(CLIENT_USER, lcptr, uptr, sptr->client,
-                                   argv[2], atoi(argv[3]), 
+                                   argv[2], atoi(argv[3]),
                                    argv[7], argv[8], argv[11]);
 
   usermode_make(uptr, &argv[5], NULL,
@@ -180,9 +180,9 @@ static void ms_nuser(struct lclient *lcptr, struct client *cptr,
   acptr = uptr->client;
   acptr->user = user_pop(uptr);
   acptr->ts = ts;
-  
+
   cptr->server->in.clients++;
-  
+
   client_introduce(lcptr, cptr, acptr);
 }
 

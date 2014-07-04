@@ -12,16 +12,16 @@ int main()
   dlink_init();
   timer_init();
   cfg_init();
-  
-  
-  
+
+
+
   cfg_shutdown();
   timer_shutdown();
   dlink_shutdown();
   mem_shutdown();
   log_shutdown();
   io_shutdown();
-  
+
   return 0;
 }
- 
+

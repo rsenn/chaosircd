@@ -52,11 +52,11 @@ int class_get_log() { return class_log; }
 void class_init(void)
 {
   class_log = log_source_register("class");
-  
+
   class_id = 0;
-  
+
   dlink_list_zero(&class_list);
-  
+
   mem_static_create(&class_heap, sizeof(struct class), CLASS_BLOCK_SIZE);
   mem_static_note(&class_heap, "class heap");
 
@@ -70,14 +70,14 @@ void class_shutdown(void)
 {
   struct class *clptr;
   struct class *next;
-  
+
   log(class_log, L_status, "Shutting down [class] module...");
-  
+
   dlink_foreach_safe(&class_list, clptr, next)
     class_delete(clptr);
 
   mem_static_destroy(&class_heap);
-  
+
   log_source_unregister(class_log);
 }
 
@@ -86,7 +86,7 @@ void class_shutdown(void)
 void class_default(struct class *clptr)
 {
   dlink_node_zero(&clptr->node);
-  
+
   strcpy(clptr->name, "default");
   clptr->ping_freq = 360;
   clptr->max_clients = 1000;
@@ -97,28 +97,28 @@ void class_default(struct class *clptr)
   clptr->flood_interval = 0;
   clptr->throttle_trigger = 0;
   clptr->throttle_interval = 0;
-  
+
   clptr->hash = str_ihash(clptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 struct class *class_add(const char *name,             uint64_t ping_freq,
-                        uint32_t    max_clients,      uint32_t clients_per_ip, 
+                        uint32_t    max_clients,      uint32_t clients_per_ip,
                         uint32_t    recvq,            uint32_t sendq,
                         uint32_t    flood_trigger,    uint64_t flood_interval,
                         uint32_t    throttle_trigger, uint64_t throttle_interval)
 {
   struct class *clptr;
-  
+
   /* allocate, zero and link class struct */
   clptr = mem_static_alloc(&class_heap);
-  
+
   memset(clptr, 0, sizeof(struct class));
-  
+
   dlink_add_tail(&class_list, &clptr->node, clptr);
 
-  strlcpy(clptr->name, name, sizeof(clptr->name));  
+  strlcpy(clptr->name, name, sizeof(clptr->name));
   clptr->hash = str_ihash(clptr->name);
 
   clptr->ping_freq = ping_freq;
@@ -132,16 +132,16 @@ struct class *class_add(const char *name,             uint64_t ping_freq,
   clptr->flood_interval = flood_interval;
   clptr->throttle_trigger = throttle_trigger;
   clptr->throttle_interval = throttle_interval;
-  
+
   log(class_log, L_status, "Added class block: %s", clptr->name);
-  
+
   return clptr;
-}     
-     
+}
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 int class_update(struct class *clptr,            uint64_t ping_freq,
-                 uint32_t      max_clients,      uint32_t clients_per_ip, 
+                 uint32_t      max_clients,      uint32_t clients_per_ip,
                  uint32_t      recvq,            uint32_t sendq,
                  uint32_t      flood_trigger,    uint64_t flood_interval,
                  uint32_t      throttle_trigger, uint64_t throttle_interval)
@@ -155,20 +155,20 @@ int class_update(struct class *clptr,            uint64_t ping_freq,
   clptr->flood_interval = flood_interval;
   clptr->throttle_trigger = throttle_trigger;
   clptr->throttle_interval = throttle_interval;
-  
+
   log(class_log, L_status, "Updated class block: %s", clptr->name);
-  
+
   return 0;
-}     
-     
+}
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 void class_delete(struct class *clptr)
 {
   log(class_log, L_status, "Deleting class block: %s", clptr->name);
-  
+
   dlink_delete(&class_list, &clptr->node);
-  
+
   mem_static_free(&class_heap, clptr);
 }
 
@@ -181,10 +181,10 @@ struct class *class_pop(struct class *clptr)
     if(!clptr->refcount)
       log(class_log, L_warning, "Poping deprecated class: %s",
           clptr->name);
-  
+
     clptr->refcount++;
   }
-  
+
   return clptr;
 }
 
@@ -203,10 +203,10 @@ struct class *class_push(struct class **clptrptr)
     {
       (*clptrptr)->refcount--;
     }
-    
+
     (*clptrptr) = NULL;
   }
-  
+
   return *clptrptr;
 }
 
@@ -216,21 +216,21 @@ struct class *class_find_name(const char *name)
 {
   struct class *clptr;
   struct node  *node;
-  uint32_t      hash;
+  hash_t        hash;
   
   hash = str_ihash(name);
-  
+
   dlink_foreach(&class_list, node)
   {
     clptr = (struct class *)node;
-    
+
     if(hash == clptr->hash)
     {
       if(!str_icmp(clptr->name, name))
         return clptr;
     }
   }
-  
+
   return NULL;
 }
 
@@ -239,13 +239,13 @@ struct class *class_find_name(const char *name)
 struct class *class_find_id(uint32_t id)
 {
   struct class *clptr;
-  
+
   dlink_foreach(&class_list, clptr)
   {
     if(id == clptr->id)
       return clptr;
   }
-  
+
   return NULL;
 }
 
@@ -256,17 +256,17 @@ void class_dump(struct class *clptr)
   if(clptr == NULL)
   {
     struct node *node;
-    
+
     dump(class_log, "[============== class summary ===============]");
-    
+
     dlink_foreach_data(&class_list, node, clptr)
       dump(class_log, " #%03u: [%u] %-20s (sendq: %u/recvq: %u)",
-            clptr->id, 
+            clptr->id,
             clptr->refcount,
             clptr->name,
             clptr->sendq,
             clptr->recvq);
-    
+
     dump(class_log, "[========== end of class summary ============]");
   }
   else
@@ -285,6 +285,6 @@ void class_dump(struct class *clptr)
     dump(class_log, "   flood_interval: %u", clptr->flood_interval);
     dump(class_log, " throttle_trigger: %u", clptr->throttle_trigger);
     dump(class_log, "throttle_interval: %u", clptr->throttle_interval);
-    dump(class_log, "[========== end of class dump ============]");    
+    dump(class_log, "[========== end of class dump ============]");
   }
 }

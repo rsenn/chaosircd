@@ -57,7 +57,7 @@ static char *m_motd_help[] = {
   "If used without parameters, the motd of the local",
   "server is displayed.",
   NULL
-};    
+};
 
 static struct msg m_motd_msg = {
   "MOTD", 0, 1, MFLG_CLIENT,
@@ -72,7 +72,7 @@ int m_motd_load(void)
 {
   if(msg_register(&m_motd_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -95,7 +95,7 @@ static void m_motd(struct lclient *lcptr, struct client *cptr,
     if(server_relay_always(lcptr, cptr, 2, ":%C MOTD :%s", &argc, argv))
       return;
   }
-  
+
   if((motd = mfile_find_name("ircd.motd")) == NULL)
   {
     numeric_send(cptr, ERR_NOMOTD);
@@ -104,12 +104,12 @@ static void m_motd(struct lclient *lcptr, struct client *cptr,
   {
     struct node *nptr;
     char        *line = NULL;
-    
+
     numeric_send(cptr, RPL_MOTDSTART, server_me->name);
-    
+
     dlink_foreach_data(&motd->lines, nptr, line)
       numeric_send(cptr, RPL_MOTD, line);
-      
+
     numeric_send(cptr, RPL_ENDOFMOTD);
   }
 }

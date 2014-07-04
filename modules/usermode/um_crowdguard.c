@@ -1,6 +1,6 @@
 /* chaosircd - pi-networks irc server
  *
- * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
+ * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,88 +16,85 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: m_quit.c,v 1.2 2006/09/28 08:38:31 roman Exp $
+ * $Id: um_crowdguard.c,v 1.4 2006/09/28 08:38:31 roman Exp $
  */
 
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/log.h>
-#include <libchaos/str.h>
+#include <libchaos/hook.h>
+#include <libchaos/ssl.h>
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/chars.h>
+#include <chaosircd/ircd.h>
+#include <chaosircd/user.h>
+#include <chaosircd/server.h>
 #include <chaosircd/client.h>
 #include <chaosircd/lclient.h>
-#include <chaosircd/channel.h>
 #include <chaosircd/numeric.h>
-#include <chaosircd/chanmode.h>
+#include <chaosircd/usermode.h>
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_quit (struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void um_crowdguard_whois_hook (struct client         *cptr,
+                                      struct user           *uptr);
 
-static void m_quit  (struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+int         um_crowdguard_bounce     (struct user           *uptr,
+                                      struct usermodechange *umcptr,
+                                      uint32_t               flags);
 
 /* -------------------------------------------------------------------------- *
- * Message entries                                                            *
+ * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static char *m_quit_help[] = {
-  "QUIT [text]",
-  "",
-  "Disconnects your irc session. If a message is supplied,",
-  "it will be sent to all channels you have been in.",
-  NULL
-};
-
-static struct msg m_quit_msg = {
-  "QUIT", 0, 1, MFLG_CLIENT | MFLG_UNREG,
-  { mr_quit, m_quit, m_quit, m_quit },
-  m_quit_help
+static struct usermode um_crowdguard =
+{
+  'g',
+  USERMODE_LIST_OFF,
+  USERMODE_LIST_LOCAL,
+  USERMODE_ARG_DISABLE,
+  um_crowdguard_bounce
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_quit_load(void)
+int um_crowdguard_load(void)
 {
-  if(msg_register(&m_quit_msg) == NULL)
+  if(usermode_register(&um_crowdguard))
     return -1;
+
+  hook_register(user_whois, HOOK_DEFAULT, um_crowdguard_whois_hook);
 
   return 0;
 }
 
-void m_quit_unload(void)
+void um_crowdguard_unload(void)
 {
-  msg_unregister(&m_quit_msg);
+  hook_unregister(user_whois, HOOK_DEFAULT, um_crowdguard_whois_hook);
+  usermode_unregister(&um_crowdguard);
+
+}
+
+int um_crowdguard_bounce(struct user *uptr, struct usermodechange *umcptr,
+                         uint32_t flags)
+{
+//  return -1;
+
+/*  if(flags & USERMODE_OPTION_PERMISSION)
+    return -1;
+*/
+  return 0;
 }
 
 /* -------------------------------------------------------------------------- *
- * argv[0] - prefix                                                           *
- * argv[1] - 'quit'                                                           *
- * argv[2] - comment                                                          *
+ * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-static void mr_quit(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
+static void um_crowdguard_whois_hook(struct client *cptr,
+                                     struct user   *uptr)
 {
-  lclient_exit(lcptr, "%s", argv[2] ? argv[2] : "client exited");
-}
-
-/* -------------------------------------------------------------------------- *
- * argv[0] - prefix                                                           *
- * argv[1] - 'quit'                                                           *
- * argv[2] - comment                                                          *
- * -------------------------------------------------------------------------- */
-static void m_quit(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
-  client_exit(lcptr, cptr, "%s", argv[2] ? argv[2] : "client exited");
+  if(uptr->modes & (1ll << ((int)'g' - 0x40)))
+    client_send(cptr, ":%S 320 %N %N :is at geolocation %s", server_me, cptr, uptr->client, uptr->name);
 }

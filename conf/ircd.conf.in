@@ -55,6 +55,19 @@ listen {
                                           # accept() is called.
 };
 
+# Listen for incoming connections on 127.0.0.1:9989
+listen {
+  address  = "127.0.0.1";                   # Address to listen to (0.0.0.0 = any)
+  port     = 9989;                        # Port to listen to
+  protocol = "irc";                       # Protocol handler for this port
+  class    = "local";                   # Class for client connects
+  ssl      = no;                          # Use OpenSSL encryption?
+  backlog  = 5;                           # Backlog argument for listen(),
+                                          # this defines how many incoming
+                                          # connections can be buffered before
+                                          # accept() is called.
+};
+
 # Listen for incoming SSL connections on port 7007
 #listen {
 #  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)

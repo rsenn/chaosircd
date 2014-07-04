@@ -28,7 +28,7 @@ struct class {
   struct node node;
   uint32_t    id;
   uint32_t    refcount;
-  uint32_t    hash;
+  hash_t      hash;
   uint64_t    ping_freq;
   uint32_t    max_clients;
   uint32_t    clients_per_ip;
@@ -76,7 +76,7 @@ extern struct class *class_add              (const char    *name,
                                              uint32_t       sendq,
                                              uint32_t       flood_trigger,
                                              uint64_t       flood_interval,
-                                             uint32_t       throttle_trigger, 
+                                             uint32_t       throttle_trigger,
                                              uint64_t       throttle_interval);
 
 /* -------------------------------------------------------------------------- *
@@ -89,7 +89,7 @@ extern int           class_update           (struct class  *clptr,
                                              uint32_t       sendq,
                                              uint32_t       flood_trigger,
                                              uint64_t       flood_interval,
-                                             uint32_t       throttle_trigger, 
+                                             uint32_t       throttle_trigger,
                                              uint64_t       throttle_interval);
 
 /* -------------------------------------------------------------------------- *
@@ -116,5 +116,5 @@ extern struct class *class_push             (struct class **clptr);
  * Dump classes and class heap.                                               *
  * -------------------------------------------------------------------------- */
 extern void          class_dump             (struct class  *clptr);
-  
+
 #endif /* SRC_CLASS_H */

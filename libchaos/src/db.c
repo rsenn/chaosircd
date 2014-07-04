@@ -45,22 +45,22 @@ char         *db_tmpbuf;
 /* ------------------------------------------------------------------------ *
  * Strip whitespace                                                         *
  * ------------------------------------------------------------------------ */
-static inline char *db_trim(char *s) 
-{  
+static inline char *db_trim(char *s)
+{
   uint32_t i;
   uint32_t len;
-  
+
   len = str_len(s);
-  
-  for(i = len; i > 0; i--) 
+
+  for(i = len; i > 0; i--)
   {
-    if(!str_isspace(s[i - 1])) 
+    if(!str_isspace(s[i - 1]))
     {
       s[i] = '\0';
       break;
     }
   }
-  
+
   return s;
 }
 
@@ -73,31 +73,31 @@ static void db_format_str(char   **pptr, size_t  *bptr,
   size_t len;
   char *escaped;
   int i;
-  
+
   len = str_len(arg) + 1024;
-  
+
   if(arg)
   {
     escaped = mem_dynamic_alloc(&db_dheap, str_len(arg) + 1024);
-    
+
     len = db_escape_string(db_current, escaped, arg, str_len(arg));
   }
   else
   {
     escaped = "(null)";
-    
+
     len = 6;
   }
-  
+
   for(i = 0; i < len; i++)
   {
     if(*bptr >= n)
       break;
-    
+
     *(*pptr)++ = escaped[i];
     (*bptr)++;
   }
- 
+
   if(arg)
     mem_dynamic_free(&db_dheap, escaped);
 }
@@ -105,7 +105,7 @@ static void db_format_str(char   **pptr, size_t  *bptr,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_PGSQL
-static void db_notice_handler(void *arg, const char *message) 
+static void db_notice_handler(void *arg, const char *message)
 {
   log(db_log, L_verbose, "Notice from PostgreSQL: %s", message);
 }
@@ -117,9 +117,9 @@ static void db_notice_handler(void *arg, const char *message)
 static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t rows)
 {
   struct db_result *result;
-  
+
   result = mem_static_alloc(&db_result_heap);
-  
+
   result->db = db;
   result->res.common = NULL;
   result->row = 0LLU;
@@ -127,7 +127,7 @@ static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t 
   result->fields = fields;
   result->data = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
   result->fdata = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
-  
+
   return result;
 }
 #endif
@@ -138,7 +138,7 @@ static void db_set_error(struct db *db)
   if(db->handle.common)
   {
     const char *error = NULL;
-    
+
     switch(db->type)
     {
 #ifdef HAVE_PQSQL
@@ -158,7 +158,7 @@ static void db_set_error(struct db *db)
       default:
         strcpy(db->error, "no database support");
     }
-    
+
     if(error)
       strlcpy(db->error, error, sizeof(db->error));
   }
@@ -176,16 +176,16 @@ void db_init(void)
   db_log = log_source_register("db");
 
   str_register('Q', db_format_str);
-  
+
   mem_static_create(&db_heap, sizeof(struct db), DB_BLOCK_SIZE);
   mem_static_note(&db_heap, "db block heap");
   mem_static_create(&db_result_heap, sizeof(struct db_result), DB_BLOCK_SIZE * 4);
   mem_static_note(&db_result_heap, "db result heap");
 
   mem_dynamic_create(&db_dheap, 256 * 1024);
-  
+
   db_serial = 0;
-  
+
   dlink_list_zero(&db_list);
 
   db_tmpbuf = mem_dynamic_alloc(&db_dheap, DB_TMPBUF_SIZE);
@@ -198,7 +198,7 @@ void db_shutdown(void)
 {
   struct node *next;
   struct db   *db;
-  
+
   dlink_foreach_safe(&db_list, db, next)
     db_destroy(db);
 
@@ -207,9 +207,9 @@ void db_shutdown(void)
   mem_dynamic_destroy(&db_dheap);
 
   str_unregister('Q');
-  
+
   log_source_unregister(db_log);
-}  
+}
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB instance                                                      *
@@ -217,7 +217,7 @@ void db_shutdown(void)
 void db_destroy(struct db *db)
 {
   dlink_delete(&db_list, &db->node);
-  
+
   mem_static_free(&db_heap, db);
 }
 
@@ -226,7 +226,7 @@ void db_destroy(struct db *db)
 struct db *db_new(int type)
 {
   struct db *db;
-  
+
   switch(type)
   {
 #ifdef HAVE_MYSQL
@@ -241,20 +241,20 @@ struct db *db_new(int type)
       log(db_log, L_fatal, "Database type #%i not supported.", type);
       return NULL;
   }
-  
-  
+
+
   db = mem_static_alloc(&db_heap);
-  
+
   db->type = type;
   db->refcount = 0;
   db->id = db_serial++;
   db->error[0] = '\0';
   db->handle.common = NULL;
-  
+
   dlink_add_tail(&db_list, &db->node, db);
-  
+
   db_current = db;
-  
+
   return db;
 }
 
@@ -263,14 +263,14 @@ struct db *db_new(int type)
 int db_connect(struct db *db, char *host, char *user, char *pass, char *dbname)
 {
   db_current = db;
-  
+
   switch(db->type)
   {
 #ifdef HAVE_PGSQL
     case DB_TYPE_PGSQL:
     {
       db->handle.pg = PQsetdbLogin(host, NULL, NULL, NULL, dbname, user, pass);
-      
+
       if(db->handle.pg != NULL && PQstatus(db->handle.pg) == CONNECTION_OK)
       {
         PQsetNoticeProcessor(db->handle.pg, db_notice_handler, NULL);
@@ -283,7 +283,7 @@ int db_connect(struct db *db, char *host, char *user, char *pass, char *dbname)
     case DB_TYPE_MYSQL:
     {
       db->handle.my = mysql_init(NULL);
-      
+
       if(mysql_real_connect(db->handle.my, host, user, pass,
 #if MYSQL_VERSION_ID >= 32200
                             dbname,
@@ -300,15 +300,15 @@ int db_connect(struct db *db, char *host, char *user, char *pass, char *dbname)
         else
 #endif /* MYSQL_VERSION_ID */
           return 0;
-      }      
+      }
     }
     break;
 #endif /* HAVE_MYSQL */
   }
-  
+
   db_set_error(db);
   db_close(db);
-  
+
   return -1;
 }
 
@@ -317,7 +317,7 @@ int db_connect(struct db *db, char *host, char *user, char *pass, char *dbname)
 void db_close(struct db *db)
 {
   db_current = db;
-  
+
   if(db->handle.common)
   {
     switch(db->type)
@@ -337,7 +337,7 @@ void db_close(struct db *db)
       break;
 #endif /* HAVE_MYSQL */
     }
-    
+
     db->handle.common = NULL;
   }
 }
@@ -347,7 +347,7 @@ void db_close(struct db *db)
 size_t db_escape_string(struct db *db, char *to, const char *from, size_t len)
 {
   db_current = db;
-  
+
   switch(db->type)
   {
 #ifdef HAVE_PGSQL
@@ -359,7 +359,7 @@ size_t db_escape_string(struct db *db, char *to, const char *from, size_t len)
       return (size_t)mysql_escape_string(to, from, len);
 #endif /* HAVE_MYSQL */
   }
-  
+
   return 0;
 }
 
@@ -380,23 +380,23 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
       uint64_t          rows;
       uint32_t          fields;
       char             *tuples;
-      
+
       res = PQexec(db->handle.pg, db_tmpbuf);
-      
+
       db_set_error(db);
-      
+
       if(res != NULL)
         status = PQresultStatus(res);
       else
         status = (ExecStatusType)PQstatus(db->handle.pg);
-      
+
       switch(status)
       {
         case PGRES_EMPTY_QUERY:
         {
           if(res != NULL)
             PQclear(res);
-          
+
           res = NULL;
         }
         break;
@@ -406,9 +406,9 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
         {
           if(res != NULL)
             PQclear(res);
-          
+
           res = NULL;
-          
+
           return NULL;
         }
         case PGRES_COMMAND_OK:
@@ -419,17 +419,17 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
         }
         break;
       }
-      
+
       rows = PQntuples(res);
       fields = PQnfields(res);
-      
+
       tuples = PQcmdTuples(res);
-      
+
       if(tuples && tuples[0])
         db->affected_rows = str_toull(tuples, NULL, 10);
       else
         db->affected_rows = 0LLU;
-      
+
       if(rows || fields)
       {
         result = db_new_result(db, fields, rows);
@@ -439,7 +439,7 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
       {
         PQclear(res);
       }
-      
+
       return result;
     }
 #endif /* HAVE_PGSQL */
@@ -449,48 +449,48 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
       MYSQL_RES *res;
       int ret;
       struct db_result *result = NULL;
-      
+
       ret = mysql_query(db->handle.my, db_tmpbuf);
-      
+
       db_set_error(db);
-      
+
       if(ret)
         return NULL;
 
       db->affected_rows = mysql_affected_rows(db->handle.my);
-      
+
       res = mysql_store_result(db->handle.my);
-      
+
       if(res)
       {
         result = db_new_result(db, mysql_num_fields(res), mysql_num_rows(res));
-      
+
         result->res.my = res;
         result->row = 0;
       }
-        
+
       return result;
     }
 #endif /* HAVE_MYSQL */
   }
-  
+
   return NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct db_result *db_query(struct db *db, const char *format, ...) 
-{      
+struct db_result *db_query(struct db *db, const char *format, ...)
+{
   struct db_result *ret;
-  
+
   va_list args;
-  
+
   va_start(args, format);
-  
+
   ret = db_vquery(db, format, args);
-  
+
   va_end(args);
-  
+
   return ret;
 }
 
@@ -524,11 +524,11 @@ void db_free_result(struct db_result *result)
     break;
 #endif /* HAVE_MYSQL */
   }
-  
+
   result->res.common = NULL;
-  
+
   mem_dynamic_free(&db_dheap, result->data);
-  
+
   mem_static_free(&db_result_heap, result);
 }
 
@@ -538,14 +538,14 @@ char **db_fetch_row(struct db_result *result)
 {
   if(result->row >= result->rows)
     return NULL;
-  
+
   switch(result->db->type)
   {
 #ifdef HAVE_PGSQL
     case DB_TYPE_PGSQL:
     {
       int i;
-      
+
       for(i = 0; i < result->fields; i++)
       {
         if(PQgetisnull(result->res.pg, result->row, i))
@@ -553,10 +553,10 @@ char **db_fetch_row(struct db_result *result)
         else
           result->data[i] = db_trim(PQgetvalue(result->res.pg, result->row, i));
       }
-      
+
       result->data[i] = NULL;
       result->row++;
-      
+
       return result->data;
     }
     break;
@@ -566,16 +566,16 @@ char **db_fetch_row(struct db_result *result)
     {
       char **row;
       int i;
-      
+
       row = mysql_fetch_row(result->res.my);
-      
+
       for(i = 0; i < result->fields; i++)
         result->data[i] = row[i];
 
       result->data[i] = NULL;
-      
+
       result->row++;
-      
+
       return result->data;
     }
     break;

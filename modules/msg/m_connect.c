@@ -36,7 +36,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_connect(struct lclient *lcptr, struct client *cptr,  
+static void mo_connect(struct lclient *lcptr, struct client *cptr,
                        int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -64,7 +64,7 @@ int m_connect_load(void)
 {
   if(msg_register(&mo_connect_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -84,14 +84,14 @@ static void mo_connect(struct lclient *lcptr, struct client *cptr,
 {
   struct connect *cnptr;
   struct server  *asptr;
-  
+
   /* We have 2 arguments, the message must be relayed */
   if(argv[3])
   {
     if(server_relay_always(lcptr, cptr, 2, ":%C CONNECT %s %s", &argc, argv))
       return;
   }
-  
+
   /* Message is targeted to us, search connect{} block */
   if((cnptr = connect_find_name(argv[2])) == NULL)
   {
@@ -104,11 +104,11 @@ static void mo_connect(struct lclient *lcptr, struct client *cptr,
   if((asptr = server_find_name(cnptr->name)))
   {
     if(asptr->client->origin != client_me)
-      client_send(cptr, 
+      client_send(cptr,
                   ":%S NOTICE %C :*** server %S already exists from %S.",
                   server_me, cptr, asptr, asptr->client->origin->server);
     else
-      client_send(cptr, 
+      client_send(cptr,
                   ":%S NOTICE %C :*** server %S already exists.",
                   server_me, cptr, asptr);
     return;
@@ -118,7 +118,7 @@ static void mo_connect(struct lclient *lcptr, struct client *cptr,
   if(server_connect(cptr, cnptr))
   {
     client_send(cptr, ":%S NOTICE %C :*** couldn't connect to %s[%s:%u]",
-                server_me, cptr, cnptr->name, 
+                server_me, cptr, cnptr->name,
                 cnptr->address, cnptr->port_remote);
   }
 }

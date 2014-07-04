@@ -69,14 +69,14 @@ int m_away_load(void)
     return -1;
 
   hook_register(user_whois, HOOK_DEFAULT, m_away_whois);
-  
+
   return 0;
 }
 
 void m_away_unload(void)
 {
   hook_unregister(user_whois, HOOK_DEFAULT, m_away_whois);
-  
+
   msg_unregister(&m_away_msg);
 }
 
@@ -90,7 +90,7 @@ static void m_away(struct lclient *lcptr, struct client *cptr,
 {
   if(!client_is_user(cptr))
     return;
-  
+
   if(argv[2] == NULL || argv[2][0] == '\0')
   {
     if(cptr->user->away[0])
@@ -100,20 +100,20 @@ static void m_away(struct lclient *lcptr, struct client *cptr,
       server_send(lcptr, NULL, CAP_NONE, CAP_UID,
                   ":%s AWAY", cptr->name);
       cptr->user->away[0] = '\0';
-      
+
       if(client_is_local(cptr))
         numeric_send(cptr, RPL_UNAWAY);
     }
 
     return;
   }
-  
+
   if(!str_cmp(cptr->user->away, argv[2]))
     return;
-  
+
   strlcpy(cptr->user->away, argv[2], sizeof(cptr->user->away));
   cptr->user->away_time = timer_systime;
-  
+
   server_send(lcptr, NULL, CAP_UID, CAP_NONE,
               ":%s AWAY :%s", cptr->user->uid, cptr->user->away);
   server_send(lcptr, NULL, CAP_NONE, CAP_UID,

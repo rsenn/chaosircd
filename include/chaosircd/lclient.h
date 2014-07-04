@@ -49,7 +49,7 @@ struct lclient {
   uint32_t        id;
   uint32_t        refcount;      /* how many times this block is referenced */
   uint32_t        type;          /* lclient type */
-  uint32_t        hash;
+  hash_t          hash;
   struct user    *user;
   struct class   *class;         /* reference to connection class */
   struct client  *client;        /* reference to global client */
@@ -65,7 +65,7 @@ struct lclient {
   struct timer   *ptimer;        /* ping timer */
 /*  struct timer   *atimer;         auth timer
   struct timer   *rtimer;         register timer */
-  
+
   /* statistics */
   uint32_t        recvb;
   uint32_t        sendb;
@@ -73,7 +73,7 @@ struct lclient {
   uint32_t        sendk;
   uint32_t        recvm;
   uint32_t        sendm;
-  
+
   /* capabilities bit-field */
   uint64_t        caps;
   uint32_t        ts;
@@ -83,14 +83,14 @@ struct lclient {
   int             hops;
   int             shut;          /* don't read (for flood throttling etc.) */
   int             silent;        /* don't send server broadcast (during handshake) */
-  
+
   /* string fields */
   char            name   [IRCD_NICKLEN   + 1];
   char            host   [IRCD_HOSTLEN   + 1];
   char            hostip [IRCD_HOSTIPLEN + 1];
   char            pass   [IRCD_PASSWDLEN + 1];
   char            info   [IRCD_INFOLEN   + 1];
-  
+
   void           *plugdata[32];
 };
 
@@ -140,7 +140,7 @@ extern void            lclient_collect      (void);
 /* -------------------------------------------------------------------------- *
  * A 32-bit PRNG for the ping cookies                                         *
  * -------------------------------------------------------------------------- */
-extern uint32_t        lclient_random       (void);  
+extern uint32_t        lclient_random       (void);
 
 /* -------------------------------------------------------------------------- *
  * Create a new lclient block                                                 *
@@ -172,13 +172,13 @@ extern struct lclient *lclient_push         (struct lclient **lcptrptr);
 /* -------------------------------------------------------------------------- *
  * Set the type of an lclient and move it to the appropriate list             *
  * -------------------------------------------------------------------------- */
-extern void            lclient_set_type     (struct lclient  *lcptr, 
+extern void            lclient_set_type     (struct lclient  *lcptr,
                                              uint32_t         type);
 
 /* -------------------------------------------------------------------------- *
  * Set the name of an lclient block                                           *
  * -------------------------------------------------------------------------- */
-extern void            lclient_set_name     (struct lclient  *lcptr, 
+extern void            lclient_set_name     (struct lclient  *lcptr,
                                              const char      *name);
 
 /* -------------------------------------------------------------------------- *
@@ -193,7 +193,7 @@ extern void            lclient_accept       (int              fd,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void            lclient_connect      (int              fd, 
+extern void            lclient_connect      (int              fd,
                                              struct connect  *connect);
 
 /* -------------------------------------------------------------------------- *
@@ -205,13 +205,13 @@ extern void            lclient_recv         (int              fd,
 /* -------------------------------------------------------------------------- *
  * Read a line from queue and process it                                      *
  * -------------------------------------------------------------------------- */
-extern void            lclient_process      (int              fd, 
-                                             struct lclient  *lcptr);  
+extern void            lclient_process      (int              fd,
+                                             struct lclient  *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Parse the prefix and the command                                           *
  * -------------------------------------------------------------------------- */
-extern void            lclient_parse        (struct lclient  *lcptr, 
+extern void            lclient_parse        (struct lclient  *lcptr,
                                              char            *s,
                                              size_t           n);
 
@@ -220,7 +220,7 @@ extern void            lclient_parse        (struct lclient  *lcptr,
  * message handler.                                                           *
  * -------------------------------------------------------------------------- */
 extern void            lclient_message      (struct lclient  *client,
-                                             char           **argv, 
+                                             char           **argv,
                                              char            *arg,
                                              size_t           n);
 
@@ -228,14 +228,14 @@ extern void            lclient_message      (struct lclient  *client,
  * Process a numeric message                                                  *
  * -------------------------------------------------------------------------- */
 extern void            lclient_numeric      (struct lclient  *lcptr,
-                                             char           **argv, 
+                                             char           **argv,
                                              char            *arg);
 
 /* -------------------------------------------------------------------------- *
  * Process a command                                                          *
  * -------------------------------------------------------------------------- */
 extern void            lclient_command      (struct lclient  *lcptr,
-                                             char           **argv, 
+                                             char           **argv,
                                              char            *arg,
                                              size_t           n);
 
@@ -244,17 +244,17 @@ extern void            lclient_command      (struct lclient  *lcptr,
  * -------------------------------------------------------------------------- */
 extern struct client  *lclient_prefix       (struct lclient  *lcptr,
                                              const char      *pfx);
-  
+
 
 /* -------------------------------------------------------------------------- *
  * Exit a local client and leave him an error message if he has registered.   *
  * -------------------------------------------------------------------------- */
 extern void            lclient_vexit        (struct lclient  *lcptr,
-                                             char            *format, 
+                                             char            *format,
                                              va_list          args);
 
 extern int             lclient_exit         (struct lclient  *lcptr,
-                                             char            *format, 
+                                             char            *format,
                                              ...);
 
 /* -------------------------------------------------------------------------- *
@@ -263,31 +263,31 @@ extern int             lclient_exit         (struct lclient  *lcptr,
 extern void            lclient_update_recvb (struct lclient  *lcptr,
                                              size_t           n);
 
-extern void            lclient_update_sendb (struct lclient  *lcptr, 
+extern void            lclient_update_sendb (struct lclient  *lcptr,
                                              size_t           n);
 
 /* -------------------------------------------------------------------------- *
  * Send a line to a local client                                              *
  * -------------------------------------------------------------------------- */
 extern void            lclient_vsend        (struct lclient  *lcptr,
-                                             const char      *format, 
-                                             va_list          args); 
+                                             const char      *format,
+                                             va_list          args);
 
 extern void            lclient_send         (struct lclient  *lcptr,
-                                             const char      *format, 
-                                             ...);  
+                                             const char      *format,
+                                             ...);
 
 /* -------------------------------------------------------------------------- *
  * Send a line to a client list but one                                       *
  * -------------------------------------------------------------------------- */
 extern void            lclient_vsend_list   (struct lclient  *one,
                                              struct list     *list,
-                                             const char      *format, 
-                                             va_list          args); 
+                                             const char      *format,
+                                             va_list          args);
 
 extern void            lclient_send_list    (struct lclient  *one,
                                              struct list     *list,
-                                             const char      *format, 
+                                             const char      *format,
                                              ...);
 
 /* -------------------------------------------------------------------------- *
@@ -304,12 +304,12 @@ extern int             lclient_register     (struct lclient  *lcptr);
  * Check if we got a PONG, if not exit the client otherwise send another PING *
  * -------------------------------------------------------------------------- */
 extern int             lclient_ping         (struct lclient  *lcptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * USER/NICK has been sent but not yet validated                              *
  * -------------------------------------------------------------------------- */
 extern void            lclient_login        (struct lclient  *lcptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * Send welcome messages to the client                                        *
  * -------------------------------------------------------------------------- */
@@ -329,5 +329,5 @@ extern struct lclient *lclient_find_name    (const char      *name);
  * Dump lclients and lclient heap.                                            *
  * -------------------------------------------------------------------------- */
 extern void            lclient_dump         (struct lclient  *lcptr);
-  
+
 #endif /* SRC_LCLIENT_H */

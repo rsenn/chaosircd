@@ -36,13 +36,13 @@
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
  * -------------------------------------------------------------------------- */
-#define CM_BAN_CHAR    'b'   
+#define CM_BAN_CHAR    'b'
 #define CM_EXCEPT_CHAR 'e'   /* exceptions work together with this module */
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
-static void cm_ban_hook(struct client *cptr, struct channel *chptr, 
+static void cm_ban_hook(struct client *cptr, struct channel *chptr,
                         const char    *key,  int            *reply);
 
 /* -------------------------------------------------------------------------- *
@@ -71,10 +71,10 @@ int cm_ban_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_ban_mode) == NULL)
     return -1;
-  
+
   /* register a hook in channel_join */
   hook_register(channel_join, HOOK_DEFAULT, cm_ban_hook);
-  
+
   return 0;
 }
 
@@ -82,7 +82,7 @@ void cm_ban_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_ban_mode);
-  
+
   /* unregister the hook in channel_join */
   hook_unregister(channel_join, HOOK_DEFAULT, cm_ban_hook);
 }
@@ -90,18 +90,18 @@ void cm_ban_unload(void)
 /* -------------------------------------------------------------------------- *
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
-static void cm_ban_hook(struct client *cptr, struct channel *chptr, 
+static void cm_ban_hook(struct client *cptr, struct channel *chptr,
                         const char    *key,  int            *reply)
 {
   struct list *mlptr;
-  
+
   /* client is already denied or excepted */
   if(*reply > 0 || *reply == -CM_EXCEPT_CHAR)
     return;
-  
+
   /* get the mode list for +b */
   mlptr = &chptr->modelists[chanmode_index(CM_BAN_CHAR)];
-  
+
   /* match all masks against the client */
   if(chanmode_match_ban(cptr, chptr, mlptr))
     *reply = ERR_BANNEDFROMCHAN;

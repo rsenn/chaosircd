@@ -58,7 +58,7 @@ static void              lc_cookie_done    (struct lc_cookie *cookie);
 
 static void              mr_pong           (struct lclient *lcptr,
                                             struct client  *cptr,
-                                            int             argc,  
+                                            int             argc,
                                             char          **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -77,26 +77,26 @@ int lc_cookie_load(void)
 {
   if(hook_register(lclient_login, HOOK_DEFAULT, lc_cookie_hook) == NULL)
     return -1;
-  
+
   hook_register(lclient_release, HOOK_DEFAULT, lc_cookie_release);
 
   lc_cookie_seed = timer_mtime;
-  
+
   lc_cookie_msg = msg_find("PONG");
-  
+
   if(lc_cookie_msg == NULL)
   {
     log(lclient_log, L_warning, "You need to load m_pong.so before this module");
-    
+
     return -1;
   }
-  
+
   lc_cookie_msg->handlers[MSG_UNREGISTERED] = mr_pong;
-  
-  mem_static_create(&lc_cookie_heap, sizeof(struct lc_cookie), 
+
+  mem_static_create(&lc_cookie_heap, sizeof(struct lc_cookie),
                     LCLIENT_BLOCK_SIZE / 4);
   mem_static_note(&lc_cookie_heap, "cookie heap");
-  
+
   return 0;
 }
 
@@ -105,15 +105,15 @@ void lc_cookie_unload(void)
   struct lc_cookie *cookie = NULL;
   struct node      *nptr;
   struct node      *next;
-  
+
   dlink_foreach_safe_data(&lc_cookie_list, nptr, next, cookie)
     lc_cookie_done(cookie);
-  
+
   hook_unregister(lclient_release, HOOK_DEFAULT, lc_cookie_release);
   hook_unregister(lclient_login, HOOK_DEFAULT, lc_cookie_hook);
-  
+
   lc_cookie_msg->handlers[MSG_UNREGISTERED] = m_unregistered;
-  
+
   mem_static_destroy(&lc_cookie_heap);
 }
 
@@ -127,34 +127,34 @@ static uint32_t lc_cookie_random(void)
   int      it;
   int      i;
   uint64_t ns = timer_mtime;
-  
+
   it = (ns & 0x1f) + 0x20;
-  
+
   for(i = 0; i < it; i++)
   {
     ns = ROL(ns, lc_cookie_seed);
-    
+
     if(ns & 0x01)
       lc_cookie_seed += ns;
     else
       lc_cookie_seed -= ns;
-    
+
     lc_cookie_seed = ROR(lc_cookie_seed, ns >> 6);
-    
+
     if(lc_cookie_seed & 0x02LLU)
       lc_cookie_seed ^= ns;
     else
       ns ^= lc_cookie_seed;
-    
+
     ns = ROL(ns, lc_cookie_seed >> 12);
-    
+
     if(ns & 0x04LLU)
       lc_cookie_seed += 0xdeadbeef;
     else
       lc_cookie_seed -= 0xcafebabe;
-    
+
     lc_cookie_seed = ROL(lc_cookie_seed, ns >> 16);
-    
+
     if(ns & 0x08LLU)
       ns ^= lc_cookie_seed;
     else
@@ -172,34 +172,34 @@ static uint32_t lc_cookie_random(void)
 static void lc_cookie_hook(struct lclient *lcptr)
 {
   struct lc_cookie *cookie;
-  
+
   cookie = mem_static_alloc(&lc_cookie_heap);
-  
+
   /* Add to pending cookie list */
   if(lcptr->plugdata[LCLIENT_PLUGDATA_COOKIE])
     mem_static_free(&lc_cookie_heap, lcptr->plugdata);
-  
-  lcptr->plugdata[LCLIENT_PLUGDATA_COOKIE] = cookie;  
+
+  lcptr->plugdata[LCLIENT_PLUGDATA_COOKIE] = cookie;
   cookie->lclient = lcptr;
 
   dlink_add_tail(&lc_cookie_list, &cookie->node, cookie);
-  
+
   /* Build cookie data */
   lc_cookie_build(cookie);
-  
+
   /* Now send the cookie */
   lclient_send(cookie->lclient, "PING :%s", cookie->data);
 }
-  
+
 /* -------------------------------------------------------------------------- *
  * Hook when a lclient is released.                                           *
  * -------------------------------------------------------------------------- */
 static void lc_cookie_release(struct lclient *lcptr)
 {
   struct lc_cookie *cookie;
- 
+
   cookie = lcptr->plugdata[LCLIENT_PLUGDATA_COOKIE];
- 
+
   if(cookie)
   {
     dlink_delete(&lc_cookie_list, &cookie->node);
@@ -216,28 +216,28 @@ static void lc_cookie_build(struct lc_cookie *cookie)
 {
   size_t   i;
   uint32_t val = 0;
-  
+
   for(i = 0; i < IRCD_COOKIELEN; i++)
   {
     /* Fetch random value every 4 bytes */
     if(!(i & 0x03))
       val = lc_cookie_random();
-    
+
     /* Write to cookie data */
     cookie->data[i] = lc_cookie_base[val & 0x0f];
-    
+
     /* Get next nibble */
     val >>= 4;
   }
-  
+
   /* Null-terminate cookie */
-  cookie->data[i] = '\0';  
+  cookie->data[i] = '\0';
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void lc_cookie_done(struct lc_cookie *cookie)
-{  
+{
   lc_cookie_release(cookie->lclient);
   lclient_handshake(cookie->lclient);
 }
@@ -250,9 +250,9 @@ static void mr_pong (struct lclient *lcptr, struct client *cptr,
 
 {
   struct lc_cookie *cookie;
-  
+
   cookie = lcptr->plugdata[LCLIENT_PLUGDATA_COOKIE];
-  
+
   if(cookie)
   {
     if(!str_cmp(cookie->data, argv[2]))

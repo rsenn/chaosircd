@@ -1,4 +1,4 @@
- A log drain - redirecting logging to a file
+# A log drain - redirecting logging to a file
 
 log {
   path     = "@logdir@/ircd.log";
@@ -52,7 +52,7 @@ log {
   sources  = "all";
   level    = "verbose";
   prefix   = yes;
-  truncate = yes;
+  truncate = no;
 };
 
 log {
@@ -69,4 +69,12 @@ log {
   level    = "debug";
   prefix   = yes;
   truncate = yes;
+};
+
+log {
+  path     = "@logdir@/crowdguard.log";
+  sources  = "login geolocation event participation";
+  level    = "verbose";
+  prefix   = yes;
+  truncate = no;
 };

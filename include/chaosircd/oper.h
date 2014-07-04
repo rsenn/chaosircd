@@ -33,10 +33,10 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct oper 
+struct oper
 {
   struct node   node;
-  uint32_t      hash;
+  hash_t        hash;
   char          name[IRCD_USERLEN + 1];
   char          passwd[IRCD_PASSWDLEN + 1];
   struct class *clptr;
@@ -134,5 +134,5 @@ extern struct oper *oper_push             (struct oper  **optr);
 #ifdef DEBUG
 extern void         oper_dump             (void);
 #endif /* DEBUG */
-  
+
 #endif /* SRC_OPER_H */

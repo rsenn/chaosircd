@@ -81,7 +81,7 @@ int m_dump_load(void)
 {
   if(msg_register(&mo_dump_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -96,7 +96,7 @@ void m_dump_unload(void)
 static void m_dump_filter(char *arg)
 {
   struct filter *filter = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -104,7 +104,7 @@ static void m_dump_filter(char *arg)
     else
       filter = filter_find_name(arg);
   }
-  
+
   filter_dump(filter);
 }
 #endif /* HAVE_SOCKET_FILTER */
@@ -112,7 +112,7 @@ static void m_dump_filter(char *arg)
 static void m_dump_htmlp(char *arg)
 {
   struct htmlp *htmlp = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -120,14 +120,14 @@ static void m_dump_htmlp(char *arg)
     else
       htmlp = htmlp_find_name(arg);
   }
-  
+
   htmlp_dump(htmlp);
 }
 
 static void m_dump_httpc(char *arg)
 {
   struct httpc *httpc = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -135,7 +135,7 @@ static void m_dump_httpc(char *arg)
     else
       httpc = httpc_find_name(arg);
   }
-  
+
   httpc_dump(httpc);
 }
 
@@ -147,7 +147,7 @@ static void m_dump_dlink(char *arg)
 static void m_dump_slog(char *arg)
 {
   int id = -1;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -155,14 +155,14 @@ static void m_dump_slog(char *arg)
     else
       id = log_source_find(arg);
   }
-  
+
   log_source_dump(id);
 }
 
 static void m_dump_dlog(char *arg)
 {
   struct dlog *dlptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -177,53 +177,53 @@ static void m_dump_dlog(char *arg)
       dlptr = log_drain_find_path(arg);
     }
   }
-  
+
   log_drain_dump(dlptr);
 }
 
 static void m_dump_sheap(char *arg)
 {
   struct sheap *shptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
       shptr = mem_static_find(atoi(arg));
   }
-  
+
   mem_static_dump(shptr);
 }
 
 static void m_dump_dheap(char *arg)
 {
   struct dheap *dhptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
       dhptr = mem_dynamic_find(atoi(arg));
   }
-  
+
   mem_dynamic_dump(dhptr);
 }
 
 static void m_dump_io(char *arg)
 {
   int fd = -1;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
       fd = atoi(arg);
   }
-  
+
   io_dump(fd);
 }
 
 static void m_dump_ini(char *arg)
 {
   struct ini *ini = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -231,7 +231,7 @@ static void m_dump_ini(char *arg)
     else
       ini = ini_find_name(arg);
   }
-  
+
   ini_dump(ini);
 }
 
@@ -244,42 +244,42 @@ static void m_dump_timer(char *arg)
     if(chars_isdigit(*arg))
       tptr = timer_find_id(atoi(arg));
   }
-  
+
   timer_dump(tptr);
 }
 
 static void m_dump_user(char *arg)
 {
   struct user *uptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
       uptr = user_find_id(atoi(arg));
     else
       uptr = user_find_name(arg);
-    
+
     if(uptr == NULL)
       uptr = user_find_uid(arg);
   }
-  
+
   user_dump(uptr);
 }
 
 static void m_dump_umode(char *arg)
 {
   struct usermode *umptr = NULL;
-  
+
   if(arg != NULL)
     umptr = usermode_find(*arg);
-  
+
   usermode_dump(umptr);
 }
 
 static void m_dump_child(char *arg)
 {
   struct child *cdptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -287,14 +287,14 @@ static void m_dump_child(char *arg)
     else
       cdptr = child_find_name(arg);
   }
-  
+
   child_dump(cdptr);
 }
 
 static void m_dump_mfile(char *arg)
 {
   struct mfile *mfptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -302,7 +302,7 @@ static void m_dump_mfile(char *arg)
     else
       mfptr = mfile_find_name(arg);
   }
-  
+
   mfile_dump(mfptr);
 }
 
@@ -310,7 +310,7 @@ static void m_dump_mfile(char *arg)
 static void m_dump_server(char *arg)
 {
   struct server *sptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -318,7 +318,7 @@ static void m_dump_server(char *arg)
     else
       sptr = server_find_name(arg);
   }
-  
+
   server_dump(sptr);
 }
 
@@ -326,7 +326,7 @@ static void m_dump_server(char *arg)
 static void m_dump_client(char *arg)
 {
   struct client *cptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -334,7 +334,7 @@ static void m_dump_client(char *arg)
     else
       cptr = client_find_name(arg);
   }
-  
+
   client_dump(cptr);
 }
 
@@ -342,7 +342,7 @@ static void m_dump_client(char *arg)
 static void m_dump_lclient(char *arg)
 {
   struct lclient *lcptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -350,7 +350,7 @@ static void m_dump_lclient(char *arg)
     else
       lcptr = lclient_find_name(arg);
   }
-  
+
   lclient_dump(lcptr);
 }
 
@@ -358,7 +358,7 @@ static void m_dump_lclient(char *arg)
 static void m_dump_listen(char *arg)
 {
   struct listen *lptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -366,7 +366,7 @@ static void m_dump_listen(char *arg)
     else
       lptr = listen_find_name(arg);
   }
-  
+
   listen_dump(lptr);
 }
 
@@ -374,7 +374,7 @@ static void m_dump_listen(char *arg)
 static void m_dump_class(char *arg)
 {
   struct class *clptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -382,7 +382,7 @@ static void m_dump_class(char *arg)
     else
       clptr = class_find_name(arg);
   }
-  
+
   class_dump(clptr);
 }
 
@@ -390,7 +390,7 @@ static void m_dump_class(char *arg)
 static void m_dump_channel(char *arg)
 {
   struct channel *chptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -398,7 +398,7 @@ static void m_dump_channel(char *arg)
     else
       chptr = channel_find_name(arg);
   }
-  
+
   channel_dump(chptr);
 }
 
@@ -406,7 +406,7 @@ static void m_dump_channel(char *arg)
 static void m_dump_connect(char *arg)
 {
   struct connect *cnptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -414,7 +414,7 @@ static void m_dump_connect(char *arg)
     else
       cnptr = connect_find_name(arg);
   }
-  
+
   connect_dump(cnptr);
 }
 
@@ -422,7 +422,7 @@ static void m_dump_connect(char *arg)
 static void m_dump_module(char *arg)
 {
   struct module *mptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -435,7 +435,7 @@ static void m_dump_module(char *arg)
         mptr = module_find_path(arg);
     }
   }
-  
+
   module_dump(mptr);
 }
 
@@ -443,7 +443,7 @@ static void m_dump_module(char *arg)
 static void m_dump_msg(char *arg)
 {
   struct msg *mptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -451,7 +451,7 @@ static void m_dump_msg(char *arg)
     else
       mptr = msg_find(arg);
   }
-  
+
   msg_dump(mptr);
 }
 
@@ -459,13 +459,13 @@ static void m_dump_msg(char *arg)
 static void m_dump_net(char *arg)
 {
   struct protocol *nptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
       nptr = net_find_id(atoi(arg));
   }
-  
+
   net_dump(nptr);
 }
 
@@ -473,7 +473,7 @@ static void m_dump_net(char *arg)
 static void m_dump_ssl(char *arg)
 {
   struct ssl_context *scptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
@@ -481,7 +481,7 @@ static void m_dump_ssl(char *arg)
     else
       scptr = ssl_find_name(arg);
   }
-  
+
   ssl_dump(scptr);
 }
 
@@ -489,18 +489,18 @@ static void m_dump_ssl(char *arg)
 static void m_dump_sauth(char *arg)
 {
   struct sauth *saptr = NULL;
-  
+
   if(arg)
   {
     if(chars_isdigit(*arg))
       saptr = sauth_find(atoi(arg));
   }
-  
+
   sauth_dump(saptr);
 }
 
 typedef void (dump_cb_t)(char *);
-                         
+
 static struct {
   const char *name;
   dump_cb_t  *cb;
@@ -545,7 +545,7 @@ static void m_dump_callback(uint64_t        flag,  int         lvl,
                             const char     *date,  const char *msg,
                             struct client  *cptr)
 {
-  client_send(cptr, ":%S NOTICE %C :%s", 
+  client_send(cptr, ":%S NOTICE %C :%s",
               server_me, cptr, msg);
 }
 
@@ -561,7 +561,7 @@ static void mo_dump(struct lclient *lcptr, struct client *cptr,
 {
   size_t         i;
   struct dlog   *ldptr;
-  
+
   if(argc > 2)
   {
     if(argc == 3)
@@ -579,17 +579,17 @@ static void mo_dump(struct lclient *lcptr, struct client *cptr,
       if(server_relay_always(lcptr, cptr, 2, ":%C DUMP %s %s %s", &argc, argv))
         return;
     }
-  }  
-  
+  }
+
   if(argc == 2)
   {
     uint32_t sz;
-    
+
     client_send(cptr, ":%S NOTICE %C :modules available to dump:",
                 server_me, cptr);
-    
+
     sz = (sizeof(m_dump_table) / sizeof(m_dump_table[0])) - 1;
-    
+
     for(i = 0; i + 4 < sz; i += 4)
       client_send(cptr, ":%S NOTICE %C :%-10s %-10s %-10s %-10s",
                   server_me, cptr,
@@ -597,7 +597,7 @@ static void mo_dump(struct lclient *lcptr, struct client *cptr,
                   m_dump_table[i + 1].name,
                   m_dump_table[i + 2].name,
                   m_dump_table[i + 3].name);
-    
+
     if(sz - i == 3)
       client_send(cptr, ":%S NOTICE %C :%-10s %-10s %-10s",
                   server_me, cptr,
@@ -612,10 +612,10 @@ static void mo_dump(struct lclient *lcptr, struct client *cptr,
     else if(sz - i == 1)
       client_send(cptr, ":%S NOTICE %C :%-10s",
                   server_me, cptr,
-                  m_dump_table[i + 0].name);                  
+                  m_dump_table[i + 0].name);
     return;
   }
-  
+
   for(i = 0; m_dump_table[i].name; i++)
   {
     if(!str_icmp(m_dump_table[i].name, argv[2]))
@@ -623,9 +623,9 @@ static void mo_dump(struct lclient *lcptr, struct client *cptr,
       ldptr = log_drain_callback(m_dump_callback,
                                  log_sources[m_dump_table[i].sp()].flag,
                                  L_debug, cptr);
-  
+
       m_dump_table[i].cb(argv[3]);
-      
+
       log_drain_delete(ldptr);
     }
   }

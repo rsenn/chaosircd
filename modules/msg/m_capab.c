@@ -45,7 +45,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_capab(struct lclient *lcptr, struct client *cptr, 
+static void mr_capab(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -53,7 +53,7 @@ static void mr_capab(struct lclient *lcptr, struct client *cptr,
  * -------------------------------------------------------------------------- */
 static char *mr_capab_help[] = {
   "CAPAB <capabilities>",
-  "",   
+  "",
   "Informs the remote server about this servers capabilities.",
   NULL
 };
@@ -71,7 +71,7 @@ int m_capab_load(void)
 {
   if(msg_register(&mr_capab_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -85,14 +85,14 @@ void m_capab_unload(void)
  * argv[1] - 'capab'                                                          *
  * argv[2] - capabilities                                                     *
  * -------------------------------------------------------------------------- */
-static void mr_capab(struct lclient *lcptr, struct client *cptr, 
+static void mr_capab(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv)
 {
   char  *capv[64];
   int    capc;
   int    capi;
   size_t i;
-  
+
   /* Ooops, already got caps? */
   if(lcptr->caps)
   {
@@ -102,13 +102,13 @@ static void mr_capab(struct lclient *lcptr, struct client *cptr,
 
   /* Got caps :D */
   lcptr->caps |= CAP_CAP;
-  
+
   log(server_log, L_status, "Received capabilities from %s [%s]",
       (lcptr->name[0] ? lcptr->name : lcptr->host), argv[2]);
-  
+
   /* Parse capabilities */
   capc = str_tokenize(argv[2], capv, 63);
-  
+
   /* Loop through tokens */
   for(i = 0; i < capc; i++)
   {
@@ -121,10 +121,10 @@ static void mr_capab(struct lclient *lcptr, struct client *cptr,
     {
       /* Find the capab */
       capi = server_find_capab(capv[i]);
-      
+
       /* Set the flag */
       if(capi >= 0)
         lcptr->caps |= server_caps[capi].cap;
-    }    
+    }
   }
 }

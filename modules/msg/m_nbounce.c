@@ -54,7 +54,7 @@ static char *ms_nbounce_help[] =
   NULL
 };
 
-static struct msg ms_nbounce_msg = 
+static struct msg ms_nbounce_msg =
 {
   "NBOUNCE", 3, 3, MFLG_SERVER,
   { NULL, NULL, ms_nbounce, NULL },
@@ -68,7 +68,7 @@ int m_nbounce_load(void)
 {
   if(msg_register(&ms_nbounce_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -88,35 +88,35 @@ static void ms_nbounce(struct lclient *lcptr, struct client *cptr,
                        int             argc,  char         **argv)
 {
   struct client *acptr;
-  
+
   if(lcptr->caps & CAP_UID)
     acptr = client_find_uid(argv[2]);
   else
     acptr = client_find_nick(argv[2]);
-  
+
   if(acptr == NULL)
   {
     log(client_log, L_warning, "Dropping invalid NBOUNCE for user %s.",
         argv[2]);
     return;
   }
-  
+
   if(client_is_local(acptr))
   {
     client_send(acptr, ":%S NOTICE %C :*** Your nick has been bounced at %C",
                 server_me, acptr, cptr);
   }
-  
+
   acptr->ts = str_toul(argv[4], NULL, 10);
-  
+
   chanuser_send(NULL, acptr, ":%N!%U@%H NICK :%s",
                 acptr, acptr, acptr, argv[3]);
-  
+
   server_send(lcptr, NULL, CAP_UID, CAP_NONE,
-              ":%s NBOUNCE %s %s :%u", 
+              ":%s NBOUNCE %s %s :%u",
               cptr->name, acptr->user->uid, argv[3], acptr->ts);
   server_send(lcptr, NULL, CAP_NONE, CAP_UID,
-              ":%s NBOUNCE %s %s :%u", 
+              ":%s NBOUNCE %s %s :%u",
               cptr->name, acptr->name, argv[3], acptr->ts);
 
   client_set_name(acptr, argv[3]);

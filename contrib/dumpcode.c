@@ -2,7 +2,7 @@
  *
  * dumps netwide assembler objects to the famous shellcode strings.
  * note that the shellcode has to start at object entry point.
- * 
+ *
  * $Id: dumpcode.c,v 1.1.1.1 2006/09/27 10:08:58 roman Exp $
  */
 
@@ -28,22 +28,22 @@ int main(int argc, char *argv[])
   unsigned char codebuf[1024];
   size_t size;
   int index;
-  
+
   if(argc < 2)
     usage(argv[0]);
-  
+
   if(!(in = fopen(argv[1], "r")))
     {
       fprintf(stderr, "couldn't open file '%s'\n", argv[1]);
       exit(0x29a);
     }
-  
+
   fseek(in, 0x0130, SEEK_SET);
-  
+
   printf("static char shellcode[] = \"");
-  
+
   size = fread(codebuf, 1024, 1, in);
-  
+
   for(index = 0; codebuf[index]; index++)
     {
       if(!str_ncmp(&codebuf[index], "/bin/sh", 7))
@@ -55,18 +55,18 @@ int main(int argc, char *argv[])
         {
           if(index && !(index % LINE_SIZE))
             printf("\"\n                          \"");
-          
-          printf( 
+
+          printf(
 #if CODE_TYPE
                   "\\x%02x",
 #else
                   "\\%03o",
 #endif
            codebuf[index]);
-        }      
+        }
     }
-  
+
   printf("\";\n");
-  
+
   return 0;
 }

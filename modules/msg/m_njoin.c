@@ -53,10 +53,10 @@ static char *ms_njoin_help[] = {
   "",
   "Introduces the users in a channel to a remote server.",
   NULL
-};    
+};
 
 static struct msg ms_njoin_msg = {
-  "NJOIN", 3, 3, MFLG_SERVER, 
+  "NJOIN", 3, 3, MFLG_SERVER,
   { NULL, NULL, ms_njoin, NULL },
   ms_njoin_help
 };
@@ -68,7 +68,7 @@ int m_njoin_load(void)
 {
   if(msg_register(&ms_njoin_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -92,30 +92,30 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
   struct node     *nptr;
   unsigned long    ts;
   struct list      chanusers;
-  int              dropts = 0;
+//  int              dropts = 0;
   int              dropremote = 0;
-  
+
   if(!client_is_server(cptr))
     return;
-  
+
   /* Check for valid channel name */
   if(!chars_valid_chan(argv[2]))
   {
     log(channel_log, L_warning, "Dropping NJOIN for invalid channel %s.",
         argv[2]);
-    return;        
+    return;
   }
-  
+
   ts = str_toul(argv[3], NULL, 10);
-  
+
   /* Try to find the channel */
   chptr = channel_find_name(argv[2]);
-  
+
   if(chptr == NULL)
   {
     /* Add to channel list */
     chptr = channel_new(argv[2]);
-    
+
     chptr->ts = ts;
   }
   else
@@ -123,15 +123,15 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
     /* Check the TS */
     if(chptr->ts > ts)
     {
-      dropts = 1;
+//      dropts = 1;
       chptr->ts = ts;
-      
+
       log(channel_log, L_warning, "Dropping TS for channel %s.",
           chptr->name);
-      
+
       chanuser_drop(cptr, chptr);
       chanmode_drop(cptr, chptr);
-      
+
       if(chptr->topic[0])
       {
         chptr->topic[0] = '\0';
@@ -143,33 +143,33 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
     if(ts > chptr->ts)
       dropremote = 1;
   }
-  
+
   /* Uh, error adding channel */
   if(chptr == NULL)
   {
-    log(channel_log, L_warning, 
+    log(channel_log, L_warning,
         "Dropping NJOIN to %s, out of memory.",
         chptr->name);
     return;
   }
-  
+
   if(chptr->serial != cptr->server->cserial)
   {
     cptr->server->in.channels++;
     cptr->server->cserial = chptr->serial;
   }
-  
+
   /* Parse prefixed nick list */
   cptr->server->in.chanmodes +=
     chanuser_parse(lcptr, &chanusers, chptr, argv[4], !dropremote);
-  
+
   /* Send to servers */
   chanuser_introduce(lcptr, cptr, chanusers.head);
-  
+
   /* Send to channel */
   chanuser_send_joins(NULL, chanusers.head);
   chanuser_send_modes(NULL, cptr, chanusers.head);
-  
+
   /* Link users to the channel */
   dlink_foreach_data(&chanusers, nptr, cuptr)
   {
@@ -177,7 +177,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
     dlink_add_tail(&chptr->rchanusers, &cuptr->rnode, cuptr);
     dlink_add_tail(&cuptr->client->user->channels, &cuptr->unode, cuptr);
   }
-  
+
   /* Destroy temp. userlist */
   dlink_destroy(&chanusers);
 }

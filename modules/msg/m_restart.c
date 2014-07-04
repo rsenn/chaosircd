@@ -44,7 +44,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_restart(struct lclient *lcptr, struct client *cptr, 
+static void mo_restart(struct lclient *lcptr, struct client *cptr,
                        int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -71,7 +71,7 @@ int m_restart_load(void)
 {
   if(msg_register(&mo_restart_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -85,7 +85,7 @@ void m_restart_unload(void)
  * argv[1] - 'restart'                                                         *
  * argv[2] - name                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_restart(struct lclient *lcptr, struct client *cptr, 
+static void mo_restart(struct lclient *lcptr, struct client *cptr,
                       int             argc,  char         **argv)
 {
   if(argc == 3)

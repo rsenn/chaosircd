@@ -65,7 +65,7 @@ int m_squit_load(void)
 {
   if(msg_register(&mo_squit_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -97,18 +97,18 @@ static void mo_squit(struct lclient *lcptr, struct client *cptr,
   else
   {
     asptr = sptr;
-    
+
     if(client_is_remote(sptr->client))
       sptr = sptr->client->origin->server;
     else
       sptr = server_me;
   }
-  
+
   if(sptr == server_me)
   {
     if(!client_is_local(asptr->client) || asptr == server_me)
     {
-      log(server_log, L_warning, 
+      log(server_log, L_warning,
           "Dropping invalid SQUIT from %N (%U@%H) for remote server %S",
           cptr, cptr, cptr, asptr);
       client_send(cptr, ":%S NOTICE %C :*** Server %S is not my client.",
@@ -118,7 +118,7 @@ static void mo_squit(struct lclient *lcptr, struct client *cptr,
 
     client_exit(asptr->client->lclient, asptr->client, "SQUIT by %N (%U@%H)",
                 cptr, cptr, cptr);
-    
+
     return;
   }
 

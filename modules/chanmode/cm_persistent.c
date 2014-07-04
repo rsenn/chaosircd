@@ -1,37 +1,25 @@
-/* chaosircd - pi-networks irc server
+/* 
+ * Copyright (C) 2013-2014  CrowdGuard organisation
+ * All rights reserved.
  *
- * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * $Id: cm_persistent.c,v 1.2 2006/09/28 08:38:31 roman Exp $
+ * Author: Roman Senn <rls@crowdguard.org>
  */
 
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/hook.h>
+#include "libchaos/hook.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/chanuser.h>
+#include "chaosircd/ircd.h"
+#include "chaosircd/numeric.h"
+#include "chaosircd/channel.h"
+#include "chaosircd/chanmode.h"
+#include "chaosircd/chanuser.h"
+#include "chaosircd/crowdguard.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -45,17 +33,20 @@ static int cm_persistent_msg_hook(struct client   *cptr, struct channel *acptr,
 static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
                                    struct channel *chptr);
 
+static int cm_persistent_participation_log;
+static int cm_persistent_event_log;
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_persistent_help[] = 
+static const char *cm_persistent_help[] =
 {
   "+P              Persistent channel. The channel will not be closed when the",
   "                last user parts. Channel messages will be kept and shown to",
-  "                everyone who joins the channel.", 
+  "                everyone who joins the channel.",
   NULL
 };
 
-static struct chanmode cm_persistent_mode = 
+static struct chanmode cm_persistent_mode =
 {
   CM_PERSISTENT_CHAR,      /* Mode character */
   '\0',                    /* No prefix, because its not a privilege */
@@ -74,18 +65,32 @@ int cm_persistent_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_persistent_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_message, HOOK_DEFAULT, cm_persistent_msg_hook);
   hook_register(channel_join, HOOK_4TH, cm_persistent_join_hook);
-  
+
+  cm_persistent_participation_log = log_source_find("participation");
+  if(cm_persistent_participation_log == -1)
+    cm_persistent_participation_log = log_source_register("participation");
+
+  cm_persistent_event_log = log_source_find("event");
+  if(cm_persistent_event_log == -1)
+    cm_persistent_event_log = log_source_register("event");
+
   return 0;
 }
 
 void cm_persistent_unload(void)
 {
+  log_source_unregister(cm_persistent_event_log);
+  cm_persistent_event_log = -1;
+
+  log_source_unregister(cm_persistent_participation_log);
+  cm_persistent_participation_log = -1;
+
   /* unregister the channel mode */
   chanmode_unregister(&cm_persistent_mode);
-  
+
   hook_unregister(channel_join, HOOK_4TH, cm_persistent_join_hook);
   hook_unregister(channel_message, HOOK_DEFAULT, cm_persistent_msg_hook);
 }
@@ -97,7 +102,7 @@ static int cm_persistent_msg_hook(struct client   *cptr, struct channel *chptr,
 {
   const char *cmd = (type == CHANNEL_PRIVMSG ? "PRIVMSG" : "NOTICE");
 
-	if(chptr->server == server_me)
+	if(chptr->server == server_me && (chptr->modes & CHFLG(P)))
 	{
 		channel_backlog(chptr, cptr, cmd, text);
 	}
@@ -110,8 +115,27 @@ static int cm_persistent_msg_hook(struct client   *cptr, struct channel *chptr,
 static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
                                    struct channel *chptr)
 {
-	if(chptr->server == server_me && chptr->backlog.size)
-	{
+  int owner, created;
+
+  if(chptr->server != server_me)
+    return 0;
+
+  owner = (0 == str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])));
+  created = (chptr->chanusers.size <= 1);
+  
+  if(owner)
+  {
+    if(created)
+      log(cm_persistent_event_log, L_status, "%s created event %s", cptr->name, chptr->name);
+    else
+      log(cm_persistent_event_log, L_status, "%s rejoined event %s", cptr->name, chptr->name);
+  }
+  else if(channel_is_persistent(chptr))
+    log(cm_persistent_participation_log, L_status, "%s accepted to help on %s", cptr->name, chptr->name);
+  
+
+	if(chptr->server == server_me && (chptr->modes & CHFLG(P)))
+  {
 		struct logentry *e;
 
     dlink_foreach_down(&chptr->backlog, e)

@@ -8,7 +8,8 @@ CATEGORY             = lclient
 MODULES              = lc_clones \
                        lc_cookie \
                        lc_mflood \
-                       lc_sauth
+                       lc_sauth \
+                       lc_crowdguard
 
 INCLUDES             = -I$(top_srcdir)/libchaos/include \
                        -I$(top_srcdir)/include \

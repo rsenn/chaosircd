@@ -36,7 +36,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_lusers(struct lclient *lcptr, struct client *cptr, 
+static void m_lusers(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -52,7 +52,7 @@ static char *m_lusers_help[] = {
   "Also displays information about connected clients,",
   "number of online operators, and used channels.",
   NULL
-};  
+};
 
 static struct msg m_lusers_msg = {
   "LUSERS", 0, 1, MFLG_CLIENT,
@@ -67,7 +67,7 @@ int m_lusers_load(void)
 {
   if(msg_register(&m_lusers_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -80,7 +80,7 @@ void m_lusers_unload(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'lusers'                                                         *
  * -------------------------------------------------------------------------- */
-static void m_lusers(struct lclient *lcptr, struct client *cptr, 
+static void m_lusers(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv)
 {
   if(argc > 2)
@@ -88,6 +88,6 @@ static void m_lusers(struct lclient *lcptr, struct client *cptr,
     if(server_relay_always(lcptr, cptr, 2, ":%C LUSERS :%s", &argc, argv))
       return;
   }
-  
+
   client_lusers(cptr);
 }

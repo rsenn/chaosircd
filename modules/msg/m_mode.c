@@ -49,7 +49,7 @@ static void m_mode         (struct lclient *lcptr, struct client *cptr,
 static void m_mode_user    (struct lclient *lcptr, struct client *cptr,
                             int             argc,  char         **argv);
 static void m_mode_channel (struct lclient *lcptr, struct client *cptr,
-                            struct channel *chptr, int            argc, 
+                            struct channel *chptr, int            argc,
                             char          **argv);
 static void ms_mode        (struct lclient *lcptr, struct client *cptr,
                             int             argc,  char         **argv);
@@ -66,10 +66,10 @@ static char *m_mode_help[] = {
   "/quote help usermodes",
   "/quote help chanmodes",
   NULL
-};    
+};
 
 static struct msg m_mode_msg = {
-  "MODE", 1, 3, MFLG_CLIENT, 
+  "MODE", 1, 3, MFLG_CLIENT,
   { NULL, m_mode, ms_mode, m_mode },
   m_mode_help
 };
@@ -81,7 +81,7 @@ int m_mode_load(void)
 {
   if(msg_register(&m_mode_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -98,30 +98,30 @@ static void m_mode_user (struct lclient *lcptr, struct client *cptr,
 {
   struct msg *msg;
   char **p;
-  
+
   if((msg = msg_find("UMODE")) == NULL)
   {
     log(usermode_log, L_debug, "/umode ignored, module not loaded");
     return;
   }
-  
+
   /* remove the username argument to pass to umode handler */
   for(p = argv + 2; *p != NULL; p++)
     *p = *(p + 1);
-  
+
   if(msg->handlers[lcptr->type] != NULL)
     (msg->handlers[lcptr->type])(lcptr, cptr, argc - 1, argv);
-} 
+}
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void m_mode_channel (struct lclient *lcptr, struct client *cptr,
-                            struct channel *chptr, int            argc,  
+                            struct channel *chptr, int            argc,
                             char          **argv)
 {
   struct chanuser      *cuptr = NULL;
   struct list           list;
-  
+
   if(argc < 4)
   {
     chanmode_show(cptr, chptr);
@@ -131,7 +131,7 @@ static void m_mode_channel (struct lclient *lcptr, struct client *cptr,
   if(client_is_user(cptr))
   {
     cuptr = chanuser_find(chptr, cptr);
-    
+
     if(cuptr == NULL)
     {
       client_send(cptr, numeric_format(ERR_NOTONCHANNEL),
@@ -142,13 +142,13 @@ static void m_mode_channel (struct lclient *lcptr, struct client *cptr,
 
   chanmode_parse(lcptr, cptr, chptr, cuptr, &list, argv[3], argv[4],
                  client_is_user(cptr) ? IRCD_MODESPERLINE : CHANMODE_PER_LINE);
-  
+
   chanmode_apply(lcptr, cptr, chptr, cuptr, &list);
-  
-  chanmode_send_local(cptr, chptr, list.head, 
+
+  chanmode_send_local(cptr, chptr, list.head,
                       client_is_user(cptr) ? IRCD_MODESPERLINE : CHANMODE_PER_LINE);
   chanmode_send_remote(lcptr, cptr, chptr, list.head);
-  
+
   chanmode_change_destroy(&list);
 }
 
@@ -165,16 +165,16 @@ static void m_mode(struct lclient *lcptr, struct client *cptr,
   if(channel_is_valid(argv[2]))
   {
     struct channel *chptr;
-    
+
     chptr = channel_find_name(argv[2]);
-  
+
     if(chptr == NULL)
     {
       client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL),
                   client_me->name, cptr->name, argv[2]);
       return;
     }
-    
+
     m_mode_channel(lcptr, cptr, chptr, argc, argv);
   }
   else
@@ -196,17 +196,17 @@ static void ms_mode(struct lclient *lcptr, struct client *cptr,
   if(channel_is_valid(argv[2]))
   {
     struct channel *chptr;
-    
+
     chptr = channel_find_name(argv[2]);
-      
+
     if(chptr == NULL)
     {
-      log(chanmode_log, L_warning, 
+      log(chanmode_log, L_warning,
           "Dropping MODE from %s for unknown channel %s.",
           cptr->name, argv[2]);
       return;
     }
-    
+
     m_mode_channel(lcptr, cptr, chptr, argc, argv);
   }
 #ifdef DEBUG
