@@ -31,6 +31,7 @@ ${BISON_IRCD_PARSER_OUTPUTS}
 if(WIN32)
 
 add_library(ircd SHARED ${SOURCES})
+ set_target_properties(ircd PROPERTIES PREFIX "")
 target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
 add_executable(chaosircd main.c "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/config.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h")

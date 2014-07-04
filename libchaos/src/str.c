@@ -697,7 +697,7 @@ size_t str_copy(char *d, const char *s)
  * null-terminate it. Returns new string length of <d>.                     *
  * ------------------------------------------------------------------------ */
 #if !defined(HAVE_STRLCPY) //&& defined(NO_C99)
-size_t strlcpy(char *d, const char *s, size_t n)
+CHAOS_INLINE_IMPL(size_t strlcpy(char *d, const char *s, size_t n)
 {
   size_t i = 0;
 
@@ -718,7 +718,7 @@ size_t strlcpy(char *d, const char *s, size_t n)
   d[i] = '\0';
 
   return i;
-}
+})
 #endif
 
 /* ------------------------------------------------------------------------ *
@@ -726,7 +726,7 @@ size_t strlcpy(char *d, const char *s, size_t n)
  * and always null-terminate. Returns new string length of <dst>            *
  * ------------------------------------------------------------------------ */
 #if !defined(HAVE_STRLCAT) //&& defined(NO_C99)
-size_t strlcat(char *d, const char *s, size_t n)
+CHAOS_INLINE_IMPL(size_t strlcat(char *d, const char *s, size_t n)
 {
   size_t i = 0;
 
@@ -760,13 +760,13 @@ size_t strlcat(char *d, const char *s, size_t n)
   }
 
   return i;
-}
+})
 #endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-int str_cmp(const char *s1, const char *s2)
+CHAOS_INLINE_IMPL(int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
 
@@ -780,12 +780,12 @@ int str_cmp(const char *s1, const char *s2)
 
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-int str_icmp(const char *s1, const char *s2)
+CHAOS_INLINE_IMPL(int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
 
@@ -799,12 +799,12 @@ int str_icmp(const char *s1, const char *s2)
 
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-int str_ncmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_IMPL(int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
 
@@ -821,12 +821,12 @@ int str_ncmp(const char *s1, const char *s2, size_t n)
 
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-int str_nicmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_IMPL(int str_nicmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
 
@@ -843,12 +843,12 @@ int str_nicmp(const char *s1, const char *s2, size_t n)
 
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                *
  * ------------------------------------------------------------------------ */
-int str_snprintf(char *str, size_t n, const char *format, ...)
+CHAOS_INLINE_IMPL(int str_snprintf(char *str, size_t n, const char *format, ...)
 {
   int ret;
 
@@ -861,7 +861,7 @@ int str_snprintf(char *str, size_t n, const char *format, ...)
   va_end(args);
 
   return ret;
-}
+})
 
 int str_sprintf(char *str, const char *format, ...)
 {

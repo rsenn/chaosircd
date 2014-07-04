@@ -102,6 +102,9 @@ typedef uintptr_t hash_t;
 # endif
 # define CHAOS_INLINE_FN(function) CHAOS_API() function; CHAOS_INLINE function
 #endif
+#ifndef CHAOS_INLINE_IMPL
+# define CHAOS_INLINE_IMPL(function) function
+#endif
 
 #if defined(__clang__) || defined(_MSC_VER)
 #undef NO_C99

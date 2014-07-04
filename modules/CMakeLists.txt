@@ -35,6 +35,8 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
     
     target_compile_definitions("${MODULE_NAME}" PUBLIC "-DBUILD_MODULES=1")
+
+    add_dependencies("${MODULE_NAME}" ircd)
     
 if(WIN32)
       target_link_libraries("${MODULE_NAME}" ircd)
