@@ -18,10 +18,10 @@
 #
 #message(STATUS "Scanning for modules...")
 
-add_definitions(-DBUILD_MODULES=1)
+#add_definitions(-DBUILD_MODULES=1)
 
 file(GLOB ALL_MODULES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" */??_*.c)
-
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/../src" "../src" "${CMAKE_BINARY_DIR}/src")
 foreach(MODULE_SOURCE ${ALL_MODULES})
   message(STATUS "${MODULE_SOURCE}")
 
@@ -33,6 +33,12 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
 
     add_library("${MODULE_NAME}" MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
+    
+    target_compile_definitions("${MODULE_NAME}" PUBLIC "-DBUILD_MODULES=1")
+    
+if(WIN32)
+      target_link_libraries("${MODULE_NAME}" ircd)
+endif()
 
     install(TARGETS "${MODULE_NAME}"
             RUNTIME DESTINATION libexec/chaosircd

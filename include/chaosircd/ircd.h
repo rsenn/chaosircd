@@ -105,6 +105,9 @@
 #ifndef IRCD_DATA
 # define IRCD_DATA(type) extern type
 #endif
+#ifndef IRCD_DATA_DECL
+# define IRCD_DATA_DECL(type) __declspec(dllexport) type
+#endif
 
 #ifndef IRCD_API
 # define IRCD_API(type) type
@@ -117,6 +120,10 @@ extern const char *ircd_package;
 extern const char *ircd_version;
 extern const char *ircd_release;
 extern struct list ircd_support;
+IRCD_DATA(int)    ircd_argc;
+IRCD_DATA(char**) ircd_argv;
+IRCD_DATA(char**) ircd_envp;
+IRCD_DATA(char)   ircd_path[PATHLEN];
 
 typedef enum {
    false = 0,

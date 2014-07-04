@@ -451,7 +451,7 @@ proto:
    Gets the length of a domain in DNS style format
    ------------------------------------------------------------------------- */
 
-static __inline__ size_t dns_dn_len(const uint8_t *domain)
+CHAOS_INLINE_FN(size_t dns_dn_len(const uint8_t *domain))
 {
   const uint8_t *p;
   uint8_t c;
@@ -920,39 +920,38 @@ static int dns_read_conf(const char *filename)
    Returns positive value if DB was updated (number of servers in DB)
    otherwise 0.
    ------------------------------------------------------------------------- */
+int
+dns_updatedb(void){
+  int ret = 0;
 
-int dns_updatedb()
-{
   inst->server_count = 0;
-
 #ifdef WIN32
-  net_addr_t servers[256];
-  DWORD ret = sizeof(servers);
+/*	   long srvlist[256];
+  int ret = sizeof(srvlist);
 
-  memset(servers, 0, sizeof(servers));
-  int err;
-  err = DnsQueryConfig(DnsConfigDnsServerList, FALSE, NULL, NULL,
-                 servers, &ret);
+  memset(srvlist, 0, sizeof(srvlist));
+  int error;
+  error = DnsQueryConfig(DnsConfigDnsServerList, FALSE, NULL, NULL,
+                 srvlist, &ret);
 
-  if(err)
+  if(error)
   {
-    log(servauth_log, L_status, "DnsQueryConfig error: %i", err);
+    log(servauth_log, L_status, "DnsQueryConfig erroror: %i", error);
   }
   else
   {
-    ret /= sizeof(net_addr_t);
+    ret /= sizeof(IP4_ADDRESS);
     int i;
 
     for(i = 0; i < ret; i++)
     {
-      /* Skip network addresses (those with last octet set to 0) */
-      if(servers[i] && (net_ntohl(servers[i]) & 0xff) != 0)
-        dns_add_ns(net_ntoa(servers[i]));
+      // Skip network addresses (those with last octet set to 0) 
+      if(srvlist[i] && (net_ntohl(srvlist[i]) & 0xff) != 0)
+        dns_add_ns(net_ntoa(srvlist[i]));
     }
-  }
+  }*/
 
 #else
-  int ret = 0;
 
   /* Config file was supplied, read it */
   if(inst->options.config)

@@ -108,10 +108,10 @@ int          ircd_log;
 int          ircd_log_in;
 int          ircd_log_out;
 struct list  ircd_support;
-int          ircd_argc = 0;
-char       **ircd_argv = NULL;
-char       **ircd_envp = NULL;
-char         ircd_path[PATHLEN];
+IRCD_DATA_DECL(int)    ircd_argc = 0;
+IRCD_DATA_DECL(char**) ircd_argv = NULL;
+IRCD_DATA_DECL(char**) ircd_envp = NULL;
+IRCD_DATA_DECL(char)   ircd_path[PATHLEN];
 
 /* -------------------------------------------------------------------------- *
  * Install mmap()ed and mprotect()ed stack into ircd core                     *

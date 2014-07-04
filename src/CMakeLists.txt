@@ -6,18 +6,16 @@ include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigSharedLib.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
 
 
-add_definitions(-DBUILD_IRCD=1)
-
 bison_target(IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/y.tab.h")
 flex_target(IRCD_SCANNER ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
-add_executable(chaosircd 
-   ${BISON_IRCD_PARSER_OUTPUTS}
+set(SOURCES
+${BISON_IRCD_PARSER_OUTPUTS}
    ${FLEX_IRCD_SCANNER_OUTPUTS}
    chanmode.c channel.c chanuser.c chars.c
-   class.c client.c conf.c ircd.c
-   lclient.c main.c msg.c numeric.c oper.c
+   class.c client.c conf.c
+   lclient.c msg.c numeric.c oper.c ircd.c
    server.c service.c user.c usermode.c
    ${MSINTTYPES_HEADERS}
    "${CMAKE_SOURCE_DIR}/include/chaosircd/chanmode.h"
@@ -30,9 +28,25 @@ add_executable(chaosircd
    "${CMAKE_SOURCE_DIR}/include/chaosircd/server.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/service.h"
    "${CMAKE_SOURCE_DIR}/include/chaosircd/user.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/usermode.h") 
 
+if(WIN32)
+
+add_library(ircd SHARED ${SOURCES})
+target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
+
+add_executable(chaosircd main.c)
+target_link_libraries(ircd libchaos ${SOCKET_LIBRARIES})
+
+target_link_libraries(chaosircd ircd)
+
+else(WIN32)
+
+add_executable(chaosircd ${SOURCES} ircd.c)
+    
+
 link_directories("${LIBCHAOS_BINARY_DIR}")
    
 target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})
+endif(WIN32)
 
 install(TARGETS chaosircd 
         RUNTIME DESTINATION bin)

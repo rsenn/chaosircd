@@ -108,9 +108,9 @@ extern char linebuf[IRCD_BUFSIZE];
 IRCD_DATA(int)        yydebug;
 extern struct global globalopts;
 IRCD_DATA(int)        conf_fd;
-IRCD_API(void)       yyerror(char *);
-IRCD_API(int)        yyparse(void);
-IRCD_API(void)       yy_fatal_error(const char *);
+void       yyerror(char *);
+int        yyparse(void);
+void       yy_fatal_error(const char *);
 
 #undef stdin
 #undef stdout
