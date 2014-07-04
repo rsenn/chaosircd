@@ -177,12 +177,12 @@ IRCD_API(void)         ircd_shutdown     (void);
 /* -------------------------------------------------------------------------- *
  * Add a new support value                                                    *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_new  (void);
+IRCD_API(struct support *)ircd_support_new  (void);
 
 /* -------------------------------------------------------------------------- *
  * Find a support entry by name                                               *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_find (const char *name);
+IRCD_API(struct support *)ircd_support_find (const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Unset a support value                                                      *
@@ -192,7 +192,7 @@ IRCD_API(void)         ircd_support_unset(const char *name);
 /* -------------------------------------------------------------------------- *
  * Set a support value                                                        *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_set  (const char *name,
+IRCD_API(struct support *)ircd_support_set  (const char *name,
                                           const char *value, ...);
 
 /* -------------------------------------------------------------------------- *

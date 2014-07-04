@@ -86,7 +86,7 @@ IRCD_API(void)      oper_default          (struct oper   *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_add              (const char    *name,
+IRCD_API(struct oper *)oper_add              (const char    *name,
                                            const char    *passwd,
                                            struct class  *clptr,
                                            int            level,
@@ -108,7 +108,7 @@ IRCD_API(void)      oper_delete           (struct oper   *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_find             (const char    *name);
+IRCD_API(struct oper *)oper_find             (const char    *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -122,11 +122,11 @@ IRCD_API(void)      oper_down             (struct oper   *optr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_pop              (struct oper   *optr);
+IRCD_API(struct oper *)oper_pop              (struct oper   *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_push             (struct oper  **optr);
+IRCD_API(struct oper *)oper_push             (struct oper  **optr);
 
 /* -------------------------------------------------------------------------- *
  * Dump opers and oper heap.                                                  *

@@ -118,7 +118,7 @@ IRCD_API(void)          service_set_name     (struct service *svptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service_handler *service_register     (struct service     *svptr,
+IRCD_API(struct service_handler *)service_register     (struct service     *svptr,
                                               const char         *msg,
                                               service_callback_t *callback);
 
