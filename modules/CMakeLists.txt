@@ -21,7 +21,7 @@
 #add_definitions(-DBUILD_MODULES=1)
 
 file(GLOB ALL_MODULES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" */??_*.c)
-link_directories("${CMAKE_CURRENT_BINARY_DIR}/../src" "../src" "${CMAKE_BINARY_DIR}/src")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/../src" "${CMAKE_BINARY_DIR}/src")
 foreach(MODULE_SOURCE ${ALL_MODULES})
   message(STATUS "${MODULE_SOURCE}")
 

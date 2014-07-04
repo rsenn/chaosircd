@@ -45,7 +45,8 @@ char         *db_tmpbuf;
 /* ------------------------------------------------------------------------ *
  * Strip whitespace                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(char *db_trim(char *s)
+static char *
+db_trim(char *s)
 {
   uint32_t i;
   uint32_t len;
@@ -62,7 +63,7 @@ CHAOS_INLINE_FN(char *db_trim(char *s)
   }
 
   return s;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -114,7 +115,8 @@ static void db_notice_handler(void *arg, const char *message)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #if (defined HAVE_PGSQL) || (defined HAVE_MYSQL)
-static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t rows)
+static struct db_result *
+db_new_result(struct db *db, uint32_t fields, uint64_t rows)
 {
   struct db_result *result;
 
@@ -133,7 +135,8 @@ static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t 
 #endif
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void db_set_error(struct db *db)
+static void
+db_set_error(struct db *db)
 {
   if(db->handle.common)
   {

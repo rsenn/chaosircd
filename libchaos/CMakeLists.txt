@@ -3,9 +3,10 @@ set(PACKAGE_VERSION 2.2.1)
 set(PACKAGE_RELEASE "peace, love & hippie edition")
 set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
 
-set(DEFAULT_SHARED_LIB FALSE)
-
 project(${PACKAGE_NAME} C)
+
+#set(DEFAULT_SHARED_LIB TRUE)
+#set(BUILD_SHARED_LIBS TRUE)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -49,7 +50,6 @@ set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
-add_definitions(-DBUILD_LIBCHAOS=1)
 
 set(LIBCHAOS_HEADERS include/libchaos/cfg.h include/libchaos/child.h
    include/libchaos/connect.h include/libchaos/db.h include/libchaos/defs.h
@@ -71,15 +71,15 @@ set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/log.c src/mem.c src/mfile.c src/module.c src/net.c src/queue.c
    src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c ${DLFCN_SOURCES})
 
-add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+add_library(libchaos SHARED ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+
+target_compile_definitions(libchaos PUBLIC "-DBUILD_LIBCHAOS=1")
 
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
 set_target_properties(libchaos PROPERTIES
                       SOVERSION "${LIBRARY_VERSION}"
                       PREFIX "")
-target_compile_definitions(ircd PUBLIC "-DBUILD_LIBCHAOS=1")
-
 target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 
 install(TARGETS libchaos

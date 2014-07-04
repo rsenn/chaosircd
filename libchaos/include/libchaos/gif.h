@@ -185,6 +185,16 @@ enum gif_record {
   GIF_RECORD_EXTENSION   = 3,
   GIF_RECORD_TERMINATE   = 4
 };
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+CHAOS_DATA(int)           gif_log;
+CHAOS_DATA(struct sheap)  gif_heap;
+CHAOS_DATA(struct sheap)  gif_image_heap;
+CHAOS_DATA(struct dheap)  gif_palette_heap;
+CHAOS_DATA(struct dheap)  gif_data_heap;
+CHAOS_DATA(struct sheap)  gif_ht_heap;
+CHAOS_DATA(struct list)   gif_list;
+CHAOS_DATA(uint32_t)      gif_id;
 
 /* ------------------------------------------------------------------------ *
  * Initialize GIF code                                                        *

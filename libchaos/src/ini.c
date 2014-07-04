@@ -69,7 +69,7 @@ int ini_collect(void)
 /* ------------------------------------------------------------------------ *
  * Strip whitespace                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(void ini_strip(char *s)
+static void ini_strip(char *s)
 {
   uint32_t i;
   uint32_t len;
@@ -93,12 +93,12 @@ CHAOS_INLINE_FN(void ini_strip(char *s)
       break;
     }
   }
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Convert a hex digit to its value                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(uint8_t ini_get_hex(char c)
+static uint8_t ini_get_hex(char c)
 {
   uint8_t ret;
 
@@ -112,12 +112,12 @@ CHAOS_INLINE_FN(uint8_t ini_get_hex(char c)
     ret = 0;
 
   return ret;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Search a key in current section.                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(struct ini_key *ini_key_get(struct ini_section *section, const char *name)
+static struct ini_key *ini_key_get(struct ini_section *section, const char *name)
 {
   struct ini_key     *key;
   struct node    *node;
@@ -140,12 +140,12 @@ CHAOS_INLINE_FN(struct ini_key *ini_key_get(struct ini_section *section, const c
   }
 
   return NULL;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Create new key in current section.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(struct ini_key *ini_key_new(struct ini_section *section, const char *name)
+static struct ini_key *ini_key_new(struct ini_section *section, const char *name)
 {
   struct ini_key *key;
 
@@ -167,12 +167,12 @@ CHAOS_INLINE_FN(struct ini_key *ini_key_new(struct ini_section *section, const c
   dlink_add_tail(&section->keys, &key->node, key);
 
   return key;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Write key to file.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(int ini_key_write(struct ini *ini, struct ini_key *key)
+static int ini_key_write(struct ini *ini, struct ini_key *key)
 {
   if(key->name == NULL)
   {
@@ -190,12 +190,12 @@ CHAOS_INLINE_FN(int ini_key_write(struct ini *ini, struct ini_key *key)
   }
 
   return 0;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Free key.                                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(void ini_key_free(struct ini_key *key)
+static void ini_key_free(struct ini_key *key)
 {
   if(key->name)
     free(key->name);
@@ -204,12 +204,12 @@ CHAOS_INLINE_FN(void ini_key_free(struct ini_key *key)
     free(key->value);
 
   mem_static_free(&ini_key_heap, key);
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Free section.                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(void ini_section_free(struct ini_section *section)
+static void ini_section_free(struct ini_section *section)
 {
   struct node *node;
   struct node *next;
@@ -222,7 +222,7 @@ CHAOS_INLINE_FN(void ini_section_free(struct ini_section *section)
   }
 
   mem_static_free(&ini_sec_heap, section);
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */

@@ -47,17 +47,16 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int            gif_log;
-struct sheap   gif_heap;
-struct sheap   gif_image_heap;
-struct dheap   gif_palette_heap;
-struct dheap   gif_data_heap;
-struct sheap   gif_ht_heap;
-struct list    gif_list;
-uint32_t       gif_id;
+CHAOS_DATA_DECL(int)           gif_log;
+CHAOS_DATA_DECL(struct sheap)  gif_heap;
+CHAOS_DATA_DECL(struct sheap)  gif_image_heap;
+CHAOS_DATA_DECL(struct dheap)  gif_palette_heap;
+CHAOS_DATA_DECL(struct dheap)  gif_data_heap;
+CHAOS_DATA_DECL(struct sheap)  gif_ht_heap;
+CHAOS_DATA_DECL(struct list)   gif_list;
+CHAOS_DATA_DECL(uint32_t)      gif_id;
 
-
-/*static int gif_read(struct gif *gif, void *buf, size_t len);
+/*static)int gif_read(struct gif *gif, void *buf, size_t len);
 static int gif_write(struct gif *gif, const void *buf, size_t len);*/
 
 /* ------------------------------------------------------------------------ *
@@ -75,7 +74,7 @@ static uint32_t gif_decompress_masks[] = {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE int gif_bit_size(int n)
+int gif_bit_size(int n)
 {
   int i;
 
@@ -268,17 +267,20 @@ static int gif_verify(struct gif *gif)
 /* ------------------------------------------------------------------------ *
  * Hashtable functions for LZW                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(int gif_ht_mask(unsigned long item)
+static int
+gif_ht_mask(unsigned long item)
 {
   return ((item >> 12) ^ item) & GIF_HT_KEY_MASK;
-});
+}
 
-CHAOS_INLINE_FN(void gif_ht_clear(struct gif_hashtable *table)
+static void
+gif_ht_clear(struct gif_hashtable *table)
 {
   memset(table->htable, 0xff, GIF_HT_SIZE * sizeof(long));
-});
+}
 
-static struct gif_hashtable *gif_ht_new()
+static struct gif_hashtable *
+gif_ht_new()
 {
 
   struct gif_hashtable *table;
@@ -291,13 +293,15 @@ static struct gif_hashtable *gif_ht_new()
   return table;
 }
 
-static void gif_ht_free(struct gif_hashtable *table)
+static void
+gif_ht_free(struct gif_hashtable *table)
 {
   mem_static_free(&gif_ht_heap, table);
 }
 
-static void gif_ht_insert(struct gif_hashtable *table, unsigned long key,
-                          int                   code)
+static void
+gif_ht_insert(struct gif_hashtable *table, unsigned long key,
+              int                   code)
 {
   unsigned long *htable = table->htable;
   int hkey              = gif_ht_mask(key);
@@ -309,7 +313,8 @@ static void gif_ht_insert(struct gif_hashtable *table, unsigned long key,
                  GIF_HT_PUT_CODE(code);
 }
 
-static int gif_ht_exists(struct gif_hashtable *table, unsigned long key)
+static int
+gif_ht_exists(struct gif_hashtable *table, unsigned long key)
 {
   unsigned long *htable = table->htable;
   uint32_t       htkey;

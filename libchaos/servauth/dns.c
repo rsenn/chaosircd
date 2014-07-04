@@ -304,12 +304,12 @@ static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
    on systems where network byte order == host byte order.
    ------------------------------------------------------------------------- */
 
-CHAOS_INLINE_FN(void dns_uint16_unpack(const uint8_t *in, uint16_t *out))
+void dns_uint16_unpack(const uint8_t *in, uint16_t *out)
 {
   *out = ((uint16_t)(in[0] << 8)) | in[1];
 }
 
-CHAOS_INLINE_FN(void dns_uint16_pack(uint8_t *out, uint16_t in))
+void dns_uint16_pack(uint8_t *out, uint16_t in)
 {
   out[0] = in >> 8;
   out[1] = in & 255;
@@ -450,8 +450,7 @@ proto:
 /* -------------------------------------------------------------------------
    Gets the length of a domain in DNS style format
    ------------------------------------------------------------------------- */
-
-CHAOS_INLINE_FN(size_t dns_dn_len(const uint8_t *domain))
+ size_t dns_dn_len(const uint8_t *domain)
 {
   const uint8_t *p;
   uint8_t c;
