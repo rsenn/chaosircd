@@ -177,9 +177,13 @@ dnl esac
 
 dnl AC_SUBST([DLFCN_LDADD])
 
-[ "$HAVE_SSL" = yes ] && SSL_DISABLED='#' || SSL_ENABLED='#'
-AC_SUBST([SSL_ENABLED],[$SSL_ENABLED])
-AC_SUBST([SSL_DISABLED],[$SSL_DISABLED])
+if [ "$HAVE_SSL" = yes ]; then
+  SSL_DISABLED='#' 
+else
+ SSL_ENABLED='#'
+fi
+AC_SUBST([SSL_ENABLED])
+AC_SUBST([SSL_DISABLED])
 
 # set debugging stuff after compiler test (-Werror could fuck it up)
 # ---------------------------------------------------------------------------
