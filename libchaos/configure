@@ -629,6 +629,8 @@ DEBUG
 DEP
 NODEP
 DLFCN_LDADD
+SSL_DISABLED
+SSL_ENABLED
 plugindir
 ENDIAN
 MYSQL_CFLAGS
@@ -1686,7 +1688,7 @@ if eval \${$3+:} false; then :
   $as_echo_n "(cached) " >&6
 fi
 eval ac_res=\$$3
-	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo ${COLOR_DEFAULT}$ac_res${NC} >&6
+	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo -e ${COLOR_DEFAULT}$ac_res${NC} >&6
 
 else
   # Is the header compilable?
@@ -1704,9 +1706,9 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 if test "$ac_header_compiler" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5 ; echo ${COLOR_NO}$ac_header_compiler${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5 ; echo -e ${COLOR_NO}$ac_header_compiler${NC} >&6
   fi
 
 # Is the header present?
@@ -1723,9 +1725,9 @@ else
 fi
 rm -f conftest.err conftest.i conftest.$ac_ext
 if test "$ac_header_preproc" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5 ; echo ${COLOR_NO}$ac_header_preproc${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5 ; echo -e ${COLOR_NO}$ac_header_preproc${NC} >&6
   fi
 
 # So?  What about this header?
@@ -1757,7 +1759,7 @@ else
   eval "$3=\$ac_header_compiler"
 fi
 eval ac_res=\$$3
-	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo ${COLOR_DEFAULT}$ac_res${NC} >&6
+	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo -e ${COLOR_DEFAULT}$ac_res${NC} >&6
 
 fi
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
@@ -1831,7 +1833,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
 eval ac_res=\$$3
-	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo ${COLOR_DEFAULT}$ac_res${NC} >&6
+	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo -e ${COLOR_DEFAULT}$ac_res${NC} >&6
 
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
@@ -1898,7 +1900,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 fi
 eval ac_res=\$$3
-	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo ${COLOR_DEFAULT}$ac_res${NC} >&6
+	       $as_echo "$as_me:$LINENO: result: $ac_res" >&5 ; echo -e ${COLOR_DEFAULT}$ac_res${NC} >&6
 
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
@@ -2455,13 +2457,13 @@ then
   eval COLOR_DEFAULT="\$$NAME_DEFAULT"
 
 
-  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the chosen theme" >&5
 $as_echo_n "checking for the chosen theme... " >&6; }
-  $as_echo "$as_me:$LINENO: result: $THEME_SPLASH" >&5 ; echo ${COLOR_DEFAULT}$THEME_SPLASH${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $THEME_SPLASH" >&5 ; echo -e ${COLOR_DEFAULT}$THEME_SPLASH${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
 fi
 
 
@@ -2553,9 +2555,9 @@ fi
 fi
 CC=$ac_cv_prog_CC
 if test -n "$CC"; then
-  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo ${COLOR_PROG}$CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo -e ${COLOR_PROG}$CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -2591,9 +2593,9 @@ fi
 fi
 ac_ct_CC=$ac_cv_prog_ac_ct_CC
 if test -n "$ac_ct_CC"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo ${COLOR_PROG}$ac_ct_CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo -e ${COLOR_PROG}$ac_ct_CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_CC" = x; then
@@ -2642,9 +2644,9 @@ fi
 fi
 CC=$ac_cv_prog_CC
 if test -n "$CC"; then
-  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo ${COLOR_PROG}$CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo -e ${COLOR_PROG}$CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -2680,9 +2682,9 @@ fi
 fi
 ac_ct_CC=$ac_cv_prog_ac_ct_CC
 if test -n "$ac_ct_CC"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo ${COLOR_PROG}$ac_ct_CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo -e ${COLOR_PROG}$ac_ct_CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_CC" = x; then
@@ -2748,9 +2750,9 @@ fi
 fi
 CC=$ac_cv_prog_CC
 if test -n "$CC"; then
-  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo ${COLOR_PROG}$CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo -e ${COLOR_PROG}$CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -2788,9 +2790,9 @@ fi
 fi
 CC=$ac_cv_prog_CC
 if test -n "$CC"; then
-  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo ${COLOR_PROG}$CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo -e ${COLOR_PROG}$CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -2830,9 +2832,9 @@ fi
 fi
 ac_ct_CC=$ac_cv_prog_ac_ct_CC
 if test -n "$ac_ct_CC"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo ${COLOR_PROG}$ac_ct_CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo -e ${COLOR_PROG}$ac_ct_CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -2959,7 +2961,7 @@ else
   ac_file=''
 fi
 if test -z "$ac_file"; then :
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
@@ -2968,11 +2970,11 @@ $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error 77 "C compiler cannot create executables
 See \`config.log' for more details" "$LINENO" 5; }
 else
-  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C compiler default output file name" >&5
 $as_echo_n "checking for C compiler default output file name... " >&6; }
-$as_echo "$as_me:$LINENO: result: $ac_file" >&5 ; echo ${COLOR_FILE}$ac_file${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_file" >&5 ; echo -e ${COLOR_FILE}$ac_file${NC} >&6
 ac_exeext=$ac_cv_exeext
 
 rm -f a.out a.exe conftest$ac_cv_exeext b.out
@@ -3010,7 +3012,7 @@ as_fn_error $? "cannot compute suffix of executables: cannot compile and link
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 rm -f conftest conftest$ac_cv_exeext
-$as_echo "$as_me:$LINENO: result: $ac_cv_exeext" >&5 ; echo ${COLOR_FILE}$ac_cv_exeext${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_exeext" >&5 ; echo -e ${COLOR_FILE}$ac_cv_exeext${NC} >&6
 
 rm -f conftest.$ac_ext
 EXEEXT=$ac_cv_exeext
@@ -3073,11 +3075,11 @@ $as_echo_n "checking for dietlibc... " >&6; }
    if test -z "$DIETVERSION"
    then
      DIET=""
-     $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+     $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
    elif test "$CC" != "${CC%diet*cc}"
    then
      DIET=""
-     $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+     $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
    else
 
      LIBDIR="$DIETDIR/lib"
@@ -3098,7 +3100,7 @@ $as_echo_n "checking for dietlibc... " >&6; }
 #     LDFLAGS="$LDFLAGS -nostdlib -static -L$LIBDIR $LIBDIR/start.o"
      LDFLAGS="$LDFLAGS -nostdlib -static -L$LIBDIR"
      LIBS="$LIBS -lc -lgcc"
-     $as_echo "$as_me:$LINENO: result: $DIETVERSION" >&5 ; echo ${COLOR_FILE}$DIETVERSION${NC} >&6
+     $as_echo "$as_me:$LINENO: result: $DIETVERSION" >&5 ; echo -e ${COLOR_FILE}$DIETVERSION${NC} >&6
    fi
  fi
 
@@ -3119,10 +3121,10 @@ main ()
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
- $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+ $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
 else
 
- $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+ $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
  CFLAGS="$saved_CFLAGS"
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -3169,9 +3171,9 @@ fi
 fi
 CC=$ac_cv_prog_CC
 if test -n "$CC"; then
-  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo ${COLOR_PROG}$CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo -e ${COLOR_PROG}$CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3211,9 +3213,9 @@ fi
 fi
 ac_ct_CC=$ac_cv_prog_ac_ct_CC
 if test -n "$ac_ct_CC"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo ${COLOR_PROG}$ac_ct_CC${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_CC" >&5 ; echo -e ${COLOR_PROG}$ac_ct_CC${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3294,10 +3296,10 @@ fi
 fi
 AR_NOARG=$ac_cv_prog_AR_NOARG
 if test -n "$AR_NOARG"; then
-  $as_echo "$as_me:$LINENO: result: $AR_NOARG" >&5 ; echo ${COLOR_DEFAULT}$AR_NOARG${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $AR_NOARG" >&5 ; echo -e ${COLOR_DEFAULT}$AR_NOARG${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3333,9 +3335,9 @@ fi
 fi
 ac_ct_AR_NOARG=$ac_cv_prog_ac_ct_AR_NOARG
 if test -n "$ac_ct_AR_NOARG"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_AR_NOARG" >&5 ; echo ${COLOR_PROG}$ac_ct_AR_NOARG${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_AR_NOARG" >&5 ; echo -e ${COLOR_PROG}$ac_ct_AR_NOARG${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_AR_NOARG" = x; then
@@ -3385,10 +3387,10 @@ fi
 fi
 RANLIB=$ac_cv_prog_RANLIB
 if test -n "$RANLIB"; then
-  $as_echo "$as_me:$LINENO: result: $RANLIB" >&5 ; echo ${COLOR_DEFAULT}$RANLIB${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $RANLIB" >&5 ; echo -e ${COLOR_DEFAULT}$RANLIB${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3424,9 +3426,9 @@ fi
 fi
 ac_ct_RANLIB=$ac_cv_prog_ac_ct_RANLIB
 if test -n "$ac_ct_RANLIB"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_RANLIB" >&5 ; echo ${COLOR_PROG}$ac_ct_RANLIB${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_RANLIB" >&5 ; echo -e ${COLOR_PROG}$ac_ct_RANLIB${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_RANLIB" = x; then
@@ -3474,10 +3476,10 @@ fi
 fi
 INSTALL=$ac_cv_prog_INSTALL
 if test -n "$INSTALL"; then
-  $as_echo "$as_me:$LINENO: result: $INSTALL" >&5 ; echo ${COLOR_DEFAULT}$INSTALL${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $INSTALL" >&5 ; echo -e ${COLOR_DEFAULT}$INSTALL${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3513,9 +3515,9 @@ fi
 fi
 ac_ct_INSTALL=$ac_cv_prog_ac_ct_INSTALL
 if test -n "$ac_ct_INSTALL"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_INSTALL" >&5 ; echo ${COLOR_PROG}$ac_ct_INSTALL${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_INSTALL" >&5 ; echo -e ${COLOR_PROG}$ac_ct_INSTALL${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_INSTALL" = x; then
@@ -3564,10 +3566,10 @@ fi
 fi
 LN_NOARG=$ac_cv_prog_LN_NOARG
 if test -n "$LN_NOARG"; then
-  $as_echo "$as_me:$LINENO: result: $LN_NOARG" >&5 ; echo ${COLOR_DEFAULT}$LN_NOARG${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $LN_NOARG" >&5 ; echo -e ${COLOR_DEFAULT}$LN_NOARG${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3603,9 +3605,9 @@ fi
 fi
 ac_ct_LN_NOARG=$ac_cv_prog_ac_ct_LN_NOARG
 if test -n "$ac_ct_LN_NOARG"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_LN_NOARG" >&5 ; echo ${COLOR_PROG}$ac_ct_LN_NOARG${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_LN_NOARG" >&5 ; echo -e ${COLOR_PROG}$ac_ct_LN_NOARG${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_LN_NOARG" = x; then
@@ -3657,10 +3659,10 @@ fi
 fi
 DLLWRAP=$ac_cv_prog_DLLWRAP
 if test -n "$DLLWRAP"; then
-  $as_echo "$as_me:$LINENO: result: $DLLWRAP" >&5 ; echo ${COLOR_DEFAULT}$DLLWRAP${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $DLLWRAP" >&5 ; echo -e ${COLOR_DEFAULT}$DLLWRAP${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -3696,9 +3698,9 @@ fi
 fi
 ac_ct_DLLWRAP=$ac_cv_prog_ac_ct_DLLWRAP
 if test -n "$ac_ct_DLLWRAP"; then
-  $as_echo "$as_me:$LINENO: result: $ac_ct_DLLWRAP" >&5 ; echo ${COLOR_PROG}$ac_ct_DLLWRAP${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $ac_ct_DLLWRAP" >&5 ; echo -e ${COLOR_PROG}$ac_ct_DLLWRAP${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
   if test "x$ac_ct_DLLWRAP" = x; then
@@ -3754,7 +3756,7 @@ ac_cv_build=`$SHELL "$ac_aux_dir/config.sub" $ac_build_alias` ||
   as_fn_error $? "$SHELL $ac_aux_dir/config.sub $ac_build_alias failed" "$LINENO" 5
 
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_build" >&5 ; echo ${COLOR_INFO}$ac_cv_build${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_build" >&5 ; echo -e ${COLOR_INFO}$ac_cv_build${NC} >&6
 case $ac_cv_build in
 *-*-*) ;;
 *) as_fn_error $? "invalid value of canonical build" "$LINENO" 5;;
@@ -3786,7 +3788,7 @@ else
 fi
 
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_host" >&5 ; echo ${COLOR_INFO}$ac_cv_host${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_host" >&5 ; echo -e ${COLOR_INFO}$ac_cv_host${NC} >&6
 case $ac_cv_host in
 *-*-*) ;;
 *) as_fn_error $? "invalid value of canonical host" "$LINENO" 5;;
@@ -3948,16 +3950,16 @@ $as_echo "$as_me: WARNING: Your system is not supported for shared linking" >&2;
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking wheter to build a static library" >&5
 $as_echo_n "checking wheter to build a static library... " >&6; }
   if test "$A_ENABLE" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $A_ENABLE" >&5 ; echo ${COLOR_NO}$A_ENABLE${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $A_ENABLE" >&5 ; echo -e ${COLOR_NO}$A_ENABLE${NC} >&6
   fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking wheter to build a shared library" >&5
 $as_echo_n "checking wheter to build a shared library... " >&6; }
   if test "$PIE_ENABLE" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $PIE_ENABLE" >&5 ; echo ${COLOR_NO}$PIE_ENABLE${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $PIE_ENABLE" >&5 ; echo -e ${COLOR_NO}$PIE_ENABLE${NC} >&6
   fi
 
   case "$PIE_ENABLE,$A_ENABLE" in
@@ -4061,7 +4063,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_lib_dl_dlopen" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_lib_dl_dlopen${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_lib_dl_dlopen" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_lib_dl_dlopen${NC} >&6
 
 if test "x$ac_cv_lib_dl_dlopen" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -4201,7 +4203,7 @@ fi
 else
   ac_cv_prog_CPP=$CPP
 fi
-$as_echo "$as_me:$LINENO: result: $CPP" >&5 ; echo ${COLOR_PROG}$CPP${NC} >&6
+$as_echo "$as_me:$LINENO: result: $CPP" >&5 ; echo -e ${COLOR_PROG}$CPP${NC} >&6
 ac_preproc_ok=false
 for ac_c_preproc_warn_flag in '' yes
 do
@@ -4321,7 +4323,7 @@ else
 fi
 
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_path_GREP" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_path_GREP${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_path_GREP" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_path_GREP${NC} >&6
 
  GREP="$ac_cv_path_GREP"
 
@@ -4388,7 +4390,7 @@ fi
 
    fi
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_path_EGREP" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_path_EGREP${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_path_EGREP" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_path_EGREP${NC} >&6
 
  EGREP="$ac_cv_path_EGREP"
 
@@ -4498,9 +4500,9 @@ fi
 fi
 fi
 if test "$ac_cv_header_stdc" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $ac_cv_header_stdc" >&5 ; echo ${COLOR_NO}$ac_cv_header_stdc${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $ac_cv_header_stdc" >&5 ; echo -e ${COLOR_NO}$ac_cv_header_stdc${NC} >&6
   fi
 if test $ac_cv_header_stdc = yes; then
 
@@ -4525,7 +4527,7 @@ fi
 done
 
 
-for ac_header in fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h
+for ac_header in fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -4731,9 +4733,9 @@ fi
 
 fi
 if test "$ac_cv_func_mmap_fixed_mapped" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $ac_cv_func_mmap_fixed_mapped" >&5 ; echo ${COLOR_NO}$ac_cv_func_mmap_fixed_mapped${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $ac_cv_func_mmap_fixed_mapped" >&5 ; echo -e ${COLOR_NO}$ac_cv_func_mmap_fixed_mapped${NC} >&6
   fi
 if test $ac_cv_func_mmap_fixed_mapped = yes; then
 
@@ -4758,7 +4760,7 @@ if test "${with_ssl+set}" = set; then :
 
 fi
 
-$as_echo "$as_me:$LINENO: result: $ac_cv_ssl" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_ssl${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_ssl" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_ssl${NC} >&6
 
 
 SSL_LIBS=""
@@ -4801,7 +4803,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_ERR_load_crypto_strings" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_lib_crypto_ERR_load_crypto_strings${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_ERR_load_crypto_strings" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_lib_crypto_ERR_load_crypto_strings${NC} >&6
 
 if test "x$ac_cv_lib_crypto_ERR_load_crypto_strings" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -4859,7 +4861,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_lib_ssl_SSL_load_error_strings" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_lib_ssl_SSL_load_error_strings${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_lib_ssl_SSL_load_error_strings" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_lib_ssl_SSL_load_error_strings${NC} >&6
 
 if test "x$ac_cv_lib_ssl_SSL_load_error_strings" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -4912,13 +4914,13 @@ $as_echo_n "checking for the OpenSSL UI... " >&6; }
     if test -f /usr/bin/openssl
     then
       OPENSSL=/usr/bin/openssl
-      $as_echo "$as_me:$LINENO: result: $OPENSSL" >&5 ; echo ${COLOR_DEFAULT}$OPENSSL${NC} >&6
+      $as_echo "$as_me:$LINENO: result: $OPENSSL" >&5 ; echo -e ${COLOR_DEFAULT}$OPENSSL${NC} >&6
 
     else
-      $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+      $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
     fi
   else
-    $as_echo "$as_me:$LINENO: result: $OPENSSL" >&5 ; echo ${COLOR_DEFAULT}$OPENSSL${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $OPENSSL" >&5 ; echo -e ${COLOR_DEFAULT}$OPENSSL${NC} >&6
 
   fi
 
@@ -5001,10 +5003,10 @@ esac
 fi
 FREETYPE_CONFIG=$ac_cv_path_FREETYPE_CONFIG
 if test -n "$FREETYPE_CONFIG"; then
-  $as_echo "$as_me:$LINENO: result: $FREETYPE_CONFIG" >&5 ; echo ${COLOR_DEFAULT}$FREETYPE_CONFIG${NC} >&6
+  $as_echo "$as_me:$LINENO: result: $FREETYPE_CONFIG" >&5 ; echo -e ${COLOR_DEFAULT}$FREETYPE_CONFIG${NC} >&6
 
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -5071,7 +5073,7 @@ $as_echo_n "checking for PostgreSQL headers... " >&6; }
   if test ! -d "$PGSQL_INC_DIR"; then
     as_fn_error "$PGSQL_DIR $PGSQL_INC_DIR" "\"PostgreSQL header file (libpq-fe.h)\"" "$LINENO" 5
   else
-    $as_echo "$as_me:$LINENO: result: $MYSQL_INC_DIR" >&5 ; echo ${COLOR_DEFAULT}$MYSQL_INC_DIR${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $MYSQL_INC_DIR" >&5 ; echo -e ${COLOR_DEFAULT}$MYSQL_INC_DIR${NC} >&6
 
   fi
 
@@ -5092,10 +5094,10 @@ $as_echo_n "checking for PostgreSQL client library... " >&6; }
       if test "$postgresql_fail" != "no"; then
         as_fn_error "$PGSQL_DIR/lib $PGSQL_DIR/lib/pgsql" "\"PostgreSQL library libpq\"" "$LINENO" 5
       else
-        $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6;
+        $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6;
       fi
     else
-      $as_echo "$as_me:$LINENO: result: $PGSQL_LIB_DIR" >&5 ; echo ${COLOR_DEFAULT}$PGSQL_LIB_DIR${NC} >&6
+      $as_echo "$as_me:$LINENO: result: $PGSQL_LIB_DIR" >&5 ; echo -e ${COLOR_DEFAULT}$PGSQL_LIB_DIR${NC} >&6
 
       PSQL_LIBS="-L${PGSQL_LIB_DIR} -lpq"
       PSQL_CFLAGS="-I${PGSQL_INC_DIR}"
@@ -5148,11 +5150,11 @@ $as_echo_n "checking for MySQL headers... " >&6; }
   done
 
   if test ! -d "$MYSQL_INC_DIR"; then
-    $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+    $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
     with_mysql="no"
 #    FAIL_MESSAGE("MySQL Headers", "$MYSQL_DIR $MYSQL_INC_DIR")
   else
-    $as_echo "$as_me:$LINENO: result: $MYSQL_INC_DIR" >&5 ; echo ${COLOR_DEFAULT}$MYSQL_INC_DIR${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $MYSQL_INC_DIR" >&5 ; echo -e ${COLOR_DEFAULT}$MYSQL_INC_DIR${NC} >&6
 
   fi
 
@@ -5171,15 +5173,15 @@ $as_echo_n "checking for MySQL client library... " >&6; }
 
   if test -z "$MYSQL_LIB_DIR"; then
     if test "$mysql_fail" != "no"; then
-      $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+      $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
       with_mysql="no"
 #      FAIL_MESSAGE("mysqlclient library",
 #                   "$MYSQL_LIB_DIR")
     else
-      $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+      $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
     fi
   else
-    $as_echo "$as_me:$LINENO: result: $MYSQL_LIB_DIR" >&5 ; echo ${COLOR_DEFAULT}$MYSQL_LIB_DIR${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $MYSQL_LIB_DIR" >&5 ; echo -e ${COLOR_DEFAULT}$MYSQL_LIB_DIR${NC} >&6
 
     MYSQL_LIBS="-L${MYSQL_LIB_DIR} -Wl,-rpath,${MYSQL_LIB_DIR} -lmysqlclient"
     MYSQL_CFLAGS="-I${MYSQL_INC_DIR}"
@@ -5217,7 +5219,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_lib_z_compress" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_lib_z_compress${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_lib_z_compress" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_lib_z_compress${NC} >&6
 
 if test "x$ac_cv_lib_z_compress" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -5449,9 +5451,9 @@ fi
     fi
 fi
 if test "$ac_cv_c_bigendian" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $ac_cv_c_bigendian" >&5 ; echo ${COLOR_NO}$ac_cv_c_bigendian${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $ac_cv_c_bigendian" >&5 ; echo -e ${COLOR_NO}$ac_cv_c_bigendian${NC} >&6
   fi
  case $ac_cv_c_bigendian in #(
    yes)
@@ -5521,9 +5523,9 @@ WSAStartup(0,0)
 }
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
-  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
 else
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
   LIBS="$ac_cv_libs"
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -5623,7 +5625,7 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-$as_echo "$as_me:$LINENO: result: $ac_cv_lib_m_cos" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_lib_m_cos${NC} >&6
+$as_echo "$as_me:$LINENO: result: $ac_cv_lib_m_cos" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_lib_m_cos${NC} >&6
 
 if test "x$ac_cv_lib_m_cos" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -5633,6 +5635,12 @@ _ACEOF
   LIBS="-lm $LIBS"
 
 fi
+
+
+ "$HAVE_SSL" = yes  && SSL_DISABLED='#' || SSL_ENABLED='#'
+SSL_ENABLED=$SSL_ENABLED
+
+SSL_DISABLED=$SSL_DISABLED
 
 
 
@@ -5647,16 +5655,16 @@ if test "${enable_dep+set}" = set; then :
   enableval=$enable_dep; case $enableval in
   yes)
     DEP="yes"
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
     ;;
   *)
     DEP="no"
-    $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+    $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
     ;;
   esac
 else
   DEP="no"
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 if test "$DEP" = "yes"; then
@@ -5695,13 +5703,13 @@ if test "$ac_cv_debug" = "yes"; then
 #  CPPFLAGS="`echo $CPPFLAGS -DDEBUG -include assert.h`"
   CPPFLAGS="`echo $CPPFLAGS -DDEBUG`"
   DEBUG="yes"
-  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
 else
   CFLAGS="`echo $CFLAGS -Os -fexpensive-optimizations -fomit-frame-pointer -Wall`"
 #  CPPFLAGS="`echo $CPPFLAGS -DNDEBUG -include assert.h`"
   CPPFLAGS="`echo $CPPFLAGS -DNDEBUG`"
   DEBUG="no"
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -5726,11 +5734,11 @@ fi
 if test "$ac_cv_maintainer" = "yes"; then
   MAINTAINER=""
   NO_MAINTAINER="#"
-  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
 else
   MAINTAINER="#"
   NO_MAINTAINER=""
-  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
 fi
 
 
@@ -7408,43 +7416,43 @@ do
   case $ac_summarize_dir in     "prefix")
       eval prefix="$prefix" ; eval prefix="$prefix"
       printf "%20s: %s" "Prefix" ""
-      $as_echo "$as_me:$LINENO: result: $prefix" >&5 ; echo ${COLOR_DIR}$prefix${NC} >&6 ;;    "bindir")
+      $as_echo "$as_me:$LINENO: result: $prefix" >&5 ; echo -e ${COLOR_DIR}$prefix${NC} >&6 ;;    "bindir")
       eval bindir="$bindir" ; eval bindir="$bindir"
       printf "%20s: %s" "User executables" ""
-      $as_echo "$as_me:$LINENO: result: $bindir" >&5 ; echo ${COLOR_DIR}$bindir${NC} >&6 ;;    "sbindir")
+      $as_echo "$as_me:$LINENO: result: $bindir" >&5 ; echo -e ${COLOR_DIR}$bindir${NC} >&6 ;;    "sbindir")
       eval sbindir="$sbindir" ; eval sbindir="$sbindir"
       printf "%20s: %s" "System admin executables" ""
-      $as_echo "$as_me:$LINENO: result: $sbindir" >&5 ; echo ${COLOR_DIR}$sbindir${NC} >&6 ;;    "libexecdir")
+      $as_echo "$as_me:$LINENO: result: $sbindir" >&5 ; echo -e ${COLOR_DIR}$sbindir${NC} >&6 ;;    "libexecdir")
       eval libexecdir="$libexecdir" ; eval libexecdir="$libexecdir"
       printf "%20s: %s" "Program executables" ""
-      $as_echo "$as_me:$LINENO: result: $libexecdir" >&5 ; echo ${COLOR_DIR}$libexecdir${NC} >&6 ;;    "datadir")
+      $as_echo "$as_me:$LINENO: result: $libexecdir" >&5 ; echo -e ${COLOR_DIR}$libexecdir${NC} >&6 ;;    "datadir")
       eval datadir="$datadir" ; eval datadir="$datadir"
       printf "%20s: %s" "Read-only data" ""
-      $as_echo "$as_me:$LINENO: result: $datadir" >&5 ; echo ${COLOR_DIR}$datadir${NC} >&6 ;;    "sysconfdir")
+      $as_echo "$as_me:$LINENO: result: $datadir" >&5 ; echo -e ${COLOR_DIR}$datadir${NC} >&6 ;;    "sysconfdir")
       eval sysconfdir="$sysconfdir" ; eval sysconfdir="$sysconfdir"
       printf "%20s: %s" "Configuration files" ""
-      $as_echo "$as_me:$LINENO: result: $sysconfdir" >&5 ; echo ${COLOR_DIR}$sysconfdir${NC} >&6 ;;    "sharedstatedir")
+      $as_echo "$as_me:$LINENO: result: $sysconfdir" >&5 ; echo -e ${COLOR_DIR}$sysconfdir${NC} >&6 ;;    "sharedstatedir")
       eval sharedstatedir="$sharedstatedir" ; eval sharedstatedir="$sharedstatedir"
       printf "%20s: %s" "Portable data" ""
-      $as_echo "$as_me:$LINENO: result: $sharedstatedir" >&5 ; echo ${COLOR_DIR}$sharedstatedir${NC} >&6 ;;    "localstatedir")
+      $as_echo "$as_me:$LINENO: result: $sharedstatedir" >&5 ; echo -e ${COLOR_DIR}$sharedstatedir${NC} >&6 ;;    "localstatedir")
       eval localstatedir="$localstatedir" ; eval localstatedir="$localstatedir"
       printf "%20s: %s" "Binary data" ""
-      $as_echo "$as_me:$LINENO: result: $localstatedir" >&5 ; echo ${COLOR_DIR}$localstatedir${NC} >&6 ;;    "libdir")
+      $as_echo "$as_me:$LINENO: result: $localstatedir" >&5 ; echo -e ${COLOR_DIR}$localstatedir${NC} >&6 ;;    "libdir")
       eval libdir="$libdir" ; eval libdir="$libdir"
       printf "%20s: %s" "Libraries" ""
-      $as_echo "$as_me:$LINENO: result: $libdir" >&5 ; echo ${COLOR_DIR}$libdir${NC} >&6 ;;    "includedir")
+      $as_echo "$as_me:$LINENO: result: $libdir" >&5 ; echo -e ${COLOR_DIR}$libdir${NC} >&6 ;;    "includedir")
       eval includedir="$includedir" ; eval includedir="$includedir"
       printf "%20s: %s" "C header files" ""
-      $as_echo "$as_me:$LINENO: result: $includedir" >&5 ; echo ${COLOR_DIR}$includedir${NC} >&6 ;;    "oldincludedir")
+      $as_echo "$as_me:$LINENO: result: $includedir" >&5 ; echo -e ${COLOR_DIR}$includedir${NC} >&6 ;;    "oldincludedir")
       eval oldincludedir="$oldincludedir" ; eval oldincludedir="$oldincludedir"
       printf "%20s: %s" "C header files for non-gcc" ""
-      $as_echo "$as_me:$LINENO: result: $oldincludedir" >&5 ; echo ${COLOR_DIR}$oldincludedir${NC} >&6 ;;    "infodir")
+      $as_echo "$as_me:$LINENO: result: $oldincludedir" >&5 ; echo -e ${COLOR_DIR}$oldincludedir${NC} >&6 ;;    "infodir")
       eval infodir="$infodir" ; eval infodir="$infodir"
       printf "%20s: %s" "Info documentation" ""
-      $as_echo "$as_me:$LINENO: result: $infodir" >&5 ; echo ${COLOR_DIR}$infodir${NC} >&6 ;;    "mandir")
+      $as_echo "$as_me:$LINENO: result: $infodir" >&5 ; echo -e ${COLOR_DIR}$infodir${NC} >&6 ;;    "mandir")
       eval mandir="$mandir" ; eval mandir="$mandir"
       printf "%20s: %s" "Manual pages" ""
-      $as_echo "$as_me:$LINENO: result: $mandir" >&5 ; echo ${COLOR_DIR}$mandir${NC} >&6 ;;
+      $as_echo "$as_me:$LINENO: result: $mandir" >&5 ; echo -e ${COLOR_DIR}$mandir${NC} >&6 ;;
     *)
       # print an empty line
       echo
@@ -7472,7 +7480,7 @@ do
       host=`echo $host`
       if test "$host"; then
         printf "%20s: %s" "Host system" ""
-        $as_echo "$as_me:$LINENO: result: $host" >&5 ; echo ${COLOR_INFO}$host${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $host" >&5 ; echo -e ${COLOR_INFO}$host${NC} >&6
       fi
       ;;
 
@@ -7480,7 +7488,7 @@ do
       build=`echo $build`
       if test "$build"; then
         printf "%20s: %s" "Build system" ""
-        $as_echo "$as_me:$LINENO: result: $build" >&5 ; echo ${COLOR_INFO}$build${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $build" >&5 ; echo -e ${COLOR_INFO}$build${NC} >&6
       fi
       ;;
 
@@ -7488,7 +7496,7 @@ do
       target=`echo $target`
       if test "$target"; then
         printf "%20s: %s" "Target system" ""
-        $as_echo "$as_me:$LINENO: result: $target" >&5 ; echo ${COLOR_DEFAULT}$target${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $target" >&5 ; echo -e ${COLOR_DEFAULT}$target${NC} >&6
 
       fi
       ;;
@@ -7497,7 +7505,7 @@ do
       CC=`echo $CC`
       if test "$CC"; then
         printf "%20s: %s" "Compiler" ""
-        $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo ${COLOR_PROG}$CC${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $CC" >&5 ; echo -e ${COLOR_PROG}$CC${NC} >&6
       fi
       ;;
 
@@ -7505,7 +7513,7 @@ do
       CXX=`echo $CXX`
       if test "$CXX"; then
         printf "%20s: %s" "C++ compiler" ""
-        $as_echo "$as_me:$LINENO: result: $CXX" >&5 ; echo ${COLOR_DEFAULT}$CXX${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $CXX" >&5 ; echo -e ${COLOR_DEFAULT}$CXX${NC} >&6
 
       fi
       ;;
@@ -7514,7 +7522,7 @@ do
       CFLAGS=`echo $CFLAGS`
       if test "$CFLAGS"; then
         printf "%20s: %s" "Compiler flags" ""
-        $as_echo "$as_me:$LINENO: result: $CFLAGS" >&5 ; echo ${COLOR_ARGS}$CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7522,7 +7530,7 @@ do
       PIC_CFLAGS=`echo $PIC_CFLAGS`
       if test "$PIC_CFLAGS"; then
         printf "%20s: %s" "PIC compiler flags" ""
-        $as_echo "$as_me:$LINENO: result: $PIC_CFLAGS" >&5 ; echo ${COLOR_ARGS}$PIC_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $PIC_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$PIC_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7530,7 +7538,7 @@ do
       CXXFLAGS=`echo $CXXFLAGS`
       if test "$CXXFLAGS"; then
         printf "%20s: %s" "C++ compiler flags" ""
-        $as_echo "$as_me:$LINENO: result: $CXXFLAGS" >&5 ; echo ${COLOR_ARGS}$CXXFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $CXXFLAGS" >&5 ; echo -e ${COLOR_ARGS}$CXXFLAGS${NC} >&6
       fi
       ;;
 
@@ -7538,7 +7546,7 @@ do
       DEFS=`echo $DEFS`
       if test "$DEFS"; then
         printf "%20s: %s" "Preprocessor defines" ""
-        $as_echo "$as_me:$LINENO: result: $DEFS" >&5 ; echo ${COLOR_DEFAULT}$DEFS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $DEFS" >&5 ; echo -e ${COLOR_DEFAULT}$DEFS${NC} >&6
 
       fi
       ;;
@@ -7547,7 +7555,7 @@ do
       CPPFLAGS=`echo $CPPFLAGS`
       if test "$CPPFLAGS"; then
         printf "%20s: %s" "Preprocessor flags" ""
-        $as_echo "$as_me:$LINENO: result: $CPPFLAGS" >&5 ; echo ${COLOR_ARGS}$CPPFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $CPPFLAGS" >&5 ; echo -e ${COLOR_ARGS}$CPPFLAGS${NC} >&6
       fi
       ;;
 
@@ -7555,7 +7563,7 @@ do
       LDFLAGS=`echo $LDFLAGS`
       if test "$LDFLAGS"; then
         printf "%20s: %s" "Linker flags" ""
-        $as_echo "$as_me:$LINENO: result: $LDFLAGS" >&5 ; echo ${COLOR_ARGS}$LDFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $LDFLAGS" >&5 ; echo -e ${COLOR_ARGS}$LDFLAGS${NC} >&6
       fi
       ;;
 
@@ -7563,7 +7571,7 @@ do
       PIE_LDFLAGS=`echo $PIE_LDFLAGS`
       if test "$PIE_LDFLAGS"; then
         printf "%20s: %s" "PIE linker flags" ""
-        $as_echo "$as_me:$LINENO: result: $PIE_LDFLAGS" >&5 ; echo ${COLOR_ARGS}$PIE_LDFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $PIE_LDFLAGS" >&5 ; echo -e ${COLOR_ARGS}$PIE_LDFLAGS${NC} >&6
       fi
       ;;
 
@@ -7571,7 +7579,7 @@ do
       LIBS=`echo $LIBS`
       if test "$LIBS"; then
         printf "%20s: %s" "Libraries" ""
-        $as_echo "$as_me:$LINENO: result: $LIBS" >&5 ; echo ${COLOR_ARGS}$LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $LIBS" >&5 ; echo -e ${COLOR_ARGS}$LIBS${NC} >&6
       fi
       ;;
 
@@ -7580,9 +7588,9 @@ do
       if test "$A_ENABLE"; then
         printf "%20s: %s" "Build static library" ""
         if test "$A_ENABLE" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $A_ENABLE" >&5 ; echo ${COLOR_NO}$A_ENABLE${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $A_ENABLE" >&5 ; echo -e ${COLOR_NO}$A_ENABLE${NC} >&6
   fi
       fi
       ;;
@@ -7592,9 +7600,9 @@ do
       if test "$PIE_ENABLE"; then
         printf "%20s: %s" "Build shared library" ""
         if test "$PIE_ENABLE" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $PIE_ENABLE" >&5 ; echo ${COLOR_NO}$PIE_ENABLE${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $PIE_ENABLE" >&5 ; echo -e ${COLOR_NO}$PIE_ENABLE${NC} >&6
   fi
       fi
       ;;
@@ -7603,7 +7611,7 @@ do
       SSL_CFLAGS=`echo $SSL_CFLAGS`
       if test "$SSL_CFLAGS"; then
         printf "%20s: %s" "SSL includes" ""
-        $as_echo "$as_me:$LINENO: result: $SSL_CFLAGS" >&5 ; echo ${COLOR_ARGS}$SSL_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $SSL_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$SSL_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7611,7 +7619,7 @@ do
       SSL_LIBS=`echo $SSL_LIBS`
       if test "$SSL_LIBS"; then
         printf "%20s: %s" "SSL libs" ""
-        $as_echo "$as_me:$LINENO: result: $SSL_LIBS" >&5 ; echo ${COLOR_ARGS}$SSL_LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $SSL_LIBS" >&5 ; echo -e ${COLOR_ARGS}$SSL_LIBS${NC} >&6
       fi
       ;;
 
@@ -7619,7 +7627,7 @@ do
       FT2_CFLAGS=`echo $FT2_CFLAGS`
       if test "$FT2_CFLAGS"; then
         printf "%20s: %s" "Freetype 2 includes" ""
-        $as_echo "$as_me:$LINENO: result: $FT2_CFLAGS" >&5 ; echo ${COLOR_ARGS}$FT2_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $FT2_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$FT2_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7627,7 +7635,7 @@ do
       FT2_LIBS=`echo $FT2_LIBS`
       if test "$FT2_LIBS"; then
         printf "%20s: %s" "Freetype 2 libs" ""
-        $as_echo "$as_me:$LINENO: result: $FT2_LIBS" >&5 ; echo ${COLOR_ARGS}$FT2_LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $FT2_LIBS" >&5 ; echo -e ${COLOR_ARGS}$FT2_LIBS${NC} >&6
       fi
       ;;
 
@@ -7635,7 +7643,7 @@ do
       PSQL_CFLAGS=`echo $PSQL_CFLAGS`
       if test "$PSQL_CFLAGS"; then
         printf "%20s: %s" "PostgreSQL includes" ""
-        $as_echo "$as_me:$LINENO: result: $PSQL_CFLAGS" >&5 ; echo ${COLOR_ARGS}$PSQL_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $PSQL_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$PSQL_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7643,7 +7651,7 @@ do
       PSQL_LIBS=`echo $PSQL_LIBS`
       if test "$PSQL_LIBS"; then
         printf "%20s: %s" "PostgreSQL libs" ""
-        $as_echo "$as_me:$LINENO: result: $PSQL_LIBS" >&5 ; echo ${COLOR_ARGS}$PSQL_LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $PSQL_LIBS" >&5 ; echo -e ${COLOR_ARGS}$PSQL_LIBS${NC} >&6
       fi
       ;;
 
@@ -7651,7 +7659,7 @@ do
       MYSQL_CFLAGS=`echo $MYSQL_CFLAGS`
       if test "$MYSQL_CFLAGS"; then
         printf "%20s: %s" "MySQL includes" ""
-        $as_echo "$as_me:$LINENO: result: $MYSQL_CFLAGS" >&5 ; echo ${COLOR_ARGS}$MYSQL_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $MYSQL_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$MYSQL_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7659,7 +7667,7 @@ do
       MYSQL_LIBS=`echo $MYSQL_LIBS`
       if test "$MYSQL_LIBS"; then
         printf "%20s: %s" "MySQL libs" ""
-        $as_echo "$as_me:$LINENO: result: $MYSQL_LIBS" >&5 ; echo ${COLOR_ARGS}$MYSQL_LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $MYSQL_LIBS" >&5 ; echo -e ${COLOR_ARGS}$MYSQL_LIBS${NC} >&6
       fi
       ;;
 
@@ -7667,7 +7675,7 @@ do
       SDL_CFLAGS=`echo $SDL_CFLAGS`
       if test "$SDL_CFLAGS"; then
         printf "%20s: %s" "SDL includes" ""
-        $as_echo "$as_me:$LINENO: result: $SDL_CFLAGS" >&5 ; echo ${COLOR_ARGS}$SDL_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $SDL_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$SDL_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7675,7 +7683,7 @@ do
       SDL_LIBS=`echo $SDL_LIBS`
       if test "$SDL_LIBS"; then
         printf "%20s: %s" "SDL libs" ""
-        $as_echo "$as_me:$LINENO: result: $SDL_LIBS" >&5 ; echo ${COLOR_ARGS}$SDL_LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $SDL_LIBS" >&5 ; echo -e ${COLOR_ARGS}$SDL_LIBS${NC} >&6
       fi
       ;;
 
@@ -7683,7 +7691,7 @@ do
       LIBPNG_CFLAGS=`echo $LIBPNG_CFLAGS`
       if test "$LIBPNG_CFLAGS"; then
         printf "%20s: %s" "libpng includes" ""
-        $as_echo "$as_me:$LINENO: result: $LIBPNG_CFLAGS" >&5 ; echo ${COLOR_ARGS}$LIBPNG_CFLAGS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $LIBPNG_CFLAGS" >&5 ; echo -e ${COLOR_ARGS}$LIBPNG_CFLAGS${NC} >&6
       fi
       ;;
 
@@ -7691,7 +7699,7 @@ do
       LIBPNG_LIBS=`echo $LIBPNG_LIBS`
       if test "$LIBPNG_LIBS"; then
         printf "%20s: %s" "libpng libs" ""
-        $as_echo "$as_me:$LINENO: result: $LIBPNG_LIBS" >&5 ; echo ${COLOR_ARGS}$LIBPNG_LIBS${NC} >&6
+        $as_echo "$as_me:$LINENO: result: $LIBPNG_LIBS" >&5 ; echo -e ${COLOR_ARGS}$LIBPNG_LIBS${NC} >&6
       fi
       ;;
 
@@ -7700,9 +7708,9 @@ do
       if test "$DEP"; then
         printf "%20s: %s" "Dependency tracking" ""
         if test "$DEP" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $DEP" >&5 ; echo ${COLOR_NO}$DEP${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $DEP" >&5 ; echo -e ${COLOR_NO}$DEP${NC} >&6
   fi
       fi
       ;;
@@ -7712,9 +7720,9 @@ do
       if test "$COLOR"; then
         printf "%20s: %s" "Colorful makefile" ""
         if test "$COLOR" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $COLOR" >&5 ; echo ${COLOR_NO}$COLOR${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $COLOR" >&5 ; echo -e ${COLOR_NO}$COLOR${NC} >&6
   fi
       fi
       ;;
@@ -7724,9 +7732,9 @@ do
       if test "$DEBUG"; then
         printf "%20s: %s" "Debug build" ""
         if test "$DEBUG" = "yes"; then
-    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
-    $as_echo "$as_me:$LINENO: result: $DEBUG" >&5 ; echo ${COLOR_NO}$DEBUG${NC} >&6
+    $as_echo "$as_me:$LINENO: result: $DEBUG" >&5 ; echo -e ${COLOR_NO}$DEBUG${NC} >&6
   fi
       fi
       ;;

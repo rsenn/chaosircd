@@ -148,4 +148,4 @@ ag_configure_args="$ag_configure_args
                    --enable-debug 
                    --enable-maintainer"
 set -x
-exec "$ag_configure" $ag_configure_args "$@"
+#exec "$ag_configure" $ag_configure_args "$@"

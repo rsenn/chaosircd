@@ -6,7 +6,7 @@ ac_cv_ssl="auto"
 AC_ARG_WITH(ssl,
 [  --with-ssl[[=yes|no|auto]]   OpenSSL support [[auto]]],
 [
-  case "$withval" in
+  case "$enableval" in
     y*) ac_cv_ssl="yes" ;;
     n*) ac_cv_ssl="no" ;;
     *) ac_cv_ssl="auto" ;;
@@ -17,14 +17,14 @@ AC_MSG_RESULT($ac_cv_ssl)
 SSL_LIBS=""
 SSL_CFLAGS=""
 OPENSSL=""
-if test "$ac_cv_ssl" = "yes" -o "$ac_cv_ssl" = "auto"
+if test "$ac_cv_ssl" = "yes" || test "$ac_cv_ssl" = "auto"
 then
   saved_libs="$LIBS"
   AC_CHECK_LIB(crypto, ERR_load_crypto_strings)
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" -a "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" && test "$ac_cv_ssl" = "yes"
   then
-    AC_MSG_ERROR([could not find libcrypto, install openssl >= 0.9.7])
+    AC_MSG_ERROR(could not find libcrypto, install openssl >= 0.9.7)
     exit 1
   fi
 
@@ -36,9 +36,9 @@ then
   LIBS="$SSL_LIBS $saved_libs"
   AC_CHECK_LIB(ssl, SSL_load_error_strings)
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" -a "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" && test "$ac_cv_ssl" = "yes"
   then
-    AC_MSG_ERROR([could not find libssl, install openssl >= 0.9.7])
+    AC_MSG_ERROR(could not find libssl, install openssl >= 0.9.7)
     exit 1
   fi
 
@@ -52,7 +52,7 @@ then
 
   if test "$ac_cv_header_openssl_opensslv_h" = "no" && test "$ac_cv_ssl" = "yes"
   then
-    AC_MSG_ERROR([could not find openssl/opensslv.h, install openssl >= 0.9.7])
+    AC_MSG_ERROR(could not find openssl/opensslv.h, install openssl >= 0.9.7)
     exit 1
   fi
 
@@ -65,17 +65,17 @@ then
     if test -f /usr/bin/openssl
     then
       OPENSSL=/usr/bin/openssl
-      AC_MSG_RESULT([$OPENSSL])
+      AC_MSG_RESULT($OPENSSL)
     else
-      AC_MSG_RESULT([not found])
+      AC_MSG_RESULT(not found)
     fi
   else
-    AC_MSG_RESULT([$OPENSSL])
+    AC_MSG_RESULT($OPENSSL)
   fi
 
   if test "x$OPENSSL" = "x" && test "$ac_cv_ssl" = "yes"
   then
-    AC_MSG_ERROR([could not find OpenSSL command line tool, install openssl >= 0.9.7])
+    AC_MSG_ERROR(could not find OpenSSL command line tool, install openssl >= 0.9.7)
     exit 1
   fi
 
