@@ -111,8 +111,8 @@ DEVFILES             = CVS $(DISTFILES)
 
 DEFS += -DBUILD_MODULE
 
-@WIN32_TRUE@@SHARED_FALSE@LIBS += -L$(top_builddir)/src -lircd
-@WIN32_TRUE@@SHARED_FALSE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@WIN32_TRUE@@PIE_LIB@LIBS += -L$(top_builddir)/src -lircd
+@PIE_LIB@LIBS += -L$(top_builddir)/libchaos/src -lchaos
 @WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/src/ircd.dll
 @WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/libchaos/src/chaos.dll
 
