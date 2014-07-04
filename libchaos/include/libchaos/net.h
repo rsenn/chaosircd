@@ -29,15 +29,34 @@
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
 
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
 /* ------------------------------------------------------------------------ *
  * Constants                                                                *
  * ------------------------------------------------------------------------ */
 #define NET_SERVER 0
 #define NET_CLIENT 1
 
+#ifdef INADDR_ANY
+#define NET_ADDR_ANY		INADDR_ANY
+#else
 #define NET_ADDR_ANY       0x00000000
+#endif
+
+#ifdef INADDR_BROADCAST
+#define NET_ADDR_BROADCAST INADDR_BROADCAST
+#else
 #define NET_ADDR_BROADCAST 0xffffffff
+#endif
+
+#ifdef INADDR_LOOPBACK
+#define NET_ADDR_LOOPBACK  INADDR_LOOPBACK
+#else
 #define NET_ADDR_LOOPBACK  0x7f000001
+#endif
 
 #define NET_CLASSC_NET     0xffffff00
 #define NET_CLASSB_NET     0xffff0000

@@ -40,7 +40,7 @@
 #include <openssl/rand.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
-#include <sys/socket.h>
+//#include <sys/socket.h>
 #endif /* HAVE_SSL */
 
 /* ------------------------------------------------------------------------ *

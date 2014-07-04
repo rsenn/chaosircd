@@ -39,7 +39,7 @@
 
 #ifdef __CYGWIN__
 #include <cygwin/in.h>
-#else
+#elif !defined(WIN32)
 #include <netinet/in.h>
 #endif /* __CYGWIN__ */
 

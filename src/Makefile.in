@@ -37,7 +37,7 @@ MODULES              = ircd \
                        user \
                        usermode
                        
-DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\"
+DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\" -DBUILD_IRCD=1
 INCLUDES             = -I$(top_srcdir)/include \
                        -I$(srcdir) \
                        -I../include \

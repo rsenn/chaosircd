@@ -35,6 +35,10 @@
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #ifndef USE_DSO
 #define USE_DSO
 #endif
@@ -135,7 +139,7 @@ static struct module *module_new(const char *path)
 #ifdef WIN32
 
   /* FIXME: should convert forward slashes to backslashes first */
-  handle = LoadLibrary(path);
+  handle = LoadLibraryA(path);
 
 #else
 
