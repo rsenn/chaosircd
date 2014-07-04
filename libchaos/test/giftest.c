@@ -18,9 +18,9 @@ int giftest_write(void)
   };
   uint32_t        x,y,i;
   uint8_t         data;
-  
+
   gif = gif_new("test.gif", GIF_WRITE);
-  
+
   pal = gif_palette_make(4, colors);
   
   gif_screen_put(gif, GIFTEST_WIDTH, GIFTEST_HEIGHT, 2, 0, pal);
@@ -37,31 +37,31 @@ int giftest_write(void)
     gif_data_put(gif, &data, 1);
 	i++;
   }
-  
+
   gif_close(gif);
   gif_save(gif);
-  
+
   return 0;
 }
 
 int main()
 {
   printf("log_init\n");
-  
+
   log_init(STDOUT_FILENO, LOG_ALL, L_status);
   io_init_except(STDOUT_FILENO, STDOUT_FILENO, STDOUT_FILENO);
   mem_init();
   dlink_init();
   gif_init();
-  
+
   giftest_write();
-  
+
   gif_shutdown();
   dlink_shutdown();
   mem_shutdown();
   log_shutdown();
   io_shutdown();
-  
+
   return 0;
 }
- 
+

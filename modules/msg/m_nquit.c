@@ -35,7 +35,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void ms_nquit(struct lclient *lcptr, struct client *cptr,  
+static void ms_nquit(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -46,7 +46,7 @@ static char *ms_nquit_help[] = {
   "",
   "Notifies remote servers about a network split.",
   NULL
-};  
+};
 
 static struct msg ms_nquit_msg = {
   "NQUIT", 1, 2, MFLG_SERVER,
@@ -61,7 +61,7 @@ int m_nquit_load(void)
 {
   if(msg_register(&ms_nquit_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -76,25 +76,25 @@ void m_nquit_unload(void)
  * argv[2] - server                                                           *
  * argv[3] - reason                                                           *
  * -------------------------------------------------------------------------- */
-static void ms_nquit(struct lclient *lcptr, struct client *cptr, 
+static void ms_nquit(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv)
 {
   struct server *sptr;
-  
+
   if((sptr = server_find_name(argv[2])) == NULL)
   {
     log(server_log, L_warning, "Dropping NQUIT from %s for unknown server %s.",
         cptr->name, argv[2]);
     return;
   }
-  
+
   if(sptr == server_me)
   {
     log(server_log, L_warning, "I do not NQUIT myself!!! (from %s)",
         cptr->name);
     return;
   }
-  
+
   client_exit(lcptr, sptr->client, "%s", argv[3]);
 }
 

@@ -53,7 +53,7 @@ static char *m_list_help[] = {
   "Displays a list of channels, the number of users in them",
   "and also their topic.",
   NULL
-};    
+};
 
 static struct msg m_list_msg = {
   "LIST", 0, 0, MFLG_CLIENT,
@@ -70,14 +70,14 @@ int m_list_load(void)
     return -1;
 
   hook_register(channel_show, HOOK_DEFAULT, m_list_hook);
-  
+
   return 0;
 }
 
 void m_list_unload(void)
 {
   hook_unregister(channel_show, HOOK_DEFAULT, m_list_hook);
-  
+
   msg_unregister(&m_list_msg);
 }
 
@@ -85,7 +85,7 @@ void m_list_unload(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'list'                                                           *
  * -------------------------------------------------------------------------- */
-static void m_list(struct lclient *lcptr, struct client *cptr, 
+static void m_list(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
   channel_show(cptr);
@@ -100,7 +100,7 @@ static int m_list_hook(struct client *cptr, struct channel *chptr)
     if(!channel_is_member(chptr, cptr))
       return 1;
   }
-  
+
   return 0;
 }
 

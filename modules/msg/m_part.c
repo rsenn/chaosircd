@@ -44,9 +44,9 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_part (struct lclient *lcptr, struct client *cptr, 
+static void m_part (struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
-static void ms_part(struct lclient *lcptr, struct client *cptr, 
+static void ms_part(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -58,14 +58,26 @@ static char *m_part_help[] = {
   "This command causes you to leave the given channel",
   "or the given channels. The text can be shown to the",
   "channel when parting.",
-  NULL  
+  NULL
 };
 
 static struct msg m_part_msg = {
-  "PART", 1, 2, MFLG_CLIENT, 
+  "PART", 1, 2, MFLG_CLIENT,
   { m_unregistered, m_part, ms_part, m_part },
   m_part_help
 };
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+#define channel_owner_flags ((cuptr->flags & CHFLG(o)) | \
+                             (cuptr->flags & CHFLG(h)) | \
+                             (cuptr->flags & CHFLG(v)))
+
+#define chanuser_is_owner(cuptr) \
+  ((cuptr->flags & channel_owner_flags) == channel_owner_flags)
+
+#define channel_is_persistent(chptr) \
+  ((chptr)->modes & CHFLG(P))
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
@@ -74,7 +86,7 @@ int m_part_load(void)
 {
   if(msg_register(&m_part_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -94,29 +106,29 @@ static void m_part_send(struct lclient *lcptr, struct client *cptr,
  * argv[2] - channel                                                          *
  * argv[3] - reason                                                           *
  * -------------------------------------------------------------------------- */
-static void m_part(struct lclient *lcptr, struct client *cptr, 
+static void m_part(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
   char             reason[IRCD_TOPICLEN + 1];
   struct channel  *chptr;
   struct chanuser *cuptr;
-  
+
   reason[0] = '\0';
-  
+
   if(argc > 3)
     strlcpy(reason, argv[3], IRCD_TOPICLEN + 1);
-  
+
   chptr = channel_find_name(argv[2]);
-  
+
   if(chptr == NULL)
   {
     client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL),
                 client_me->name, cptr->name, argv[2]);
     return;
   }
-  
+
   cuptr = chanuser_find(chptr, cptr);
-  
+
   if(cuptr == NULL)
   {
     client_send(cptr, numeric_format(ERR_NOTONCHANNEL),
@@ -124,14 +136,22 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
+  if(chanuser_is_owner(cuptr) && client_is_local(cptr) && channel_is_persistent(chptr))
+//     !str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])))
+  {
+    client_send(cptr, ":%s NOTICE %N :*** You need to /OPART if you really want to leave %s.",
+                server_me->name, cptr, chptr->name);
+    return;
+  }
+
   m_part_send(NULL, cptr, chptr, reason);
-  
+
   /* send server PART */
   chanuser_discharge(NULL, cuptr, argv[3]);
-  
+
   chanuser_delete(cuptr);
-  
-  if(chptr->chanusers.size == 0)
+
+  if(chptr->chanusers.size == 0 && !channel_is_persistent(chptr))
     channel_delete(chptr);
 }
 
@@ -141,19 +161,19 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
  * argv[2] - channel                                                          *
  * argv[3] - reason                                                           *
  * -------------------------------------------------------------------------- */
-static void ms_part(struct lclient *lcptr, struct client *cptr, 
+static void ms_part(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   struct channel  *chptr;
   struct chanuser *cuptr;
-  
+
   if((chptr = channel_find_name(argv[2])) == NULL)
   {
     log(channel_log, L_warning, "Dropping PART for invalid channel %s.",
         argv[2]);
     return;
   }
-  
+
   if((cuptr = chanuser_find(chptr, cptr)) == NULL)
   {
     log(channel_log, L_warning, "Dropping PART because user %s is not on %s.",
@@ -162,12 +182,12 @@ static void ms_part(struct lclient *lcptr, struct client *cptr,
   }
 
   m_part_send(lcptr, cptr, chptr, argv[3]);
-  
+
   /* send server PART */
   chanuser_discharge(lcptr, cuptr, argv[3]);
 
   chanuser_delete(cuptr);
-  
+
   if(chptr->chanusers.size == 0)
     channel_delete(chptr);
 }

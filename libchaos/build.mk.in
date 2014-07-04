@@ -60,11 +60,11 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 #  keeping themselves up to date)
 #
 makefiles: $(SUBMAKE:%=%/Makefile)
-$(SUBMAKE:%=%/Makefile):
-	@if test ! -f "$@" ; then \
-	  $(ECHO_CONFIG) ; \
-  	(cd $(top_builddir) && ./config.status $(thisdir)$@) > /dev/null ; \
-  fi
+@NODEP@$(SUBMAKE:%=%/Makefile):
+@NODEP@	@if test ! -f "$@" ; then \
+@NODEP@	  $(ECHO_CONFIG) ; \
+@NODEP@  	(cd $(top_builddir) && $(SHELL) config.status $(thisdir)$@) > /dev/null ; \
+@NODEP@  fi
   
 # common recursive targets
 # ---------------------------------------------------------------------------
@@ -187,40 +187,40 @@ $(ARCHIVE): $(OBJECTS)
 
 # global rule for all makefiles
 # ---------------------------------------------------------------------------
-Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(top_builddir)/config.mk $(top_builddir)/build.mk
-	@$(ECHO_CONFIG)
-#	echo '@QUIET@cd $(top_builddir) && ./config.status $(thisdir)Makefile $(REDIR)'
-	@QUIET@cd $(top_builddir) && ./config.status $(thisdir)Makefile $(REDIR)
+@NODEP@Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(top_builddir)/config.mk $(top_builddir)/build.mk
+@NODEP@	@$(ECHO_CONFIG)
+@NODEP@#	echo '@QUIET@cd $(top_builddir) && $(SHELL) config.status $(thisdir)Makefile $(REDIR)'
+@NODEP@	@QUIET@cd $(top_builddir) && $(SHELL) config.status $(thisdir)Makefile $(REDIR)
 
-Doxyfile: $(top_builddir)/config.status $(srcdir)/Doxyfile.in $(top_builddir)/config.mk $(top_builddir)/build.mk
-	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./config.status $(thisdir)Doxyfile $(REDIR)
+@NODEP@Doxyfile: $(top_builddir)/config.status $(srcdir)/Doxyfile.in $(top_builddir)/config.mk $(top_builddir)/build.mk
+@NODEP@	@$(ECHO_CONFIG)
+@NODEP@	@QUIET@cd $(top_builddir) && $(SHELL) config.status $(thisdir)Doxyfile $(REDIR)
 
 # rule for build.mk
 # ---------------------------------------------------------------------------
-$(top_builddir)/build.mk: $(top_builddir)/config.status $(top_srcdir)/build.mk.in
-	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./config.status build.mk $(REDIR)
+@NODEP@$(top_builddir)/build.mk: $(top_builddir)/config.status $(top_srcdir)/build.mk.in
+@NODEP@	@$(ECHO_CONFIG)
+@NODEP@	@QUIET@cd $(top_builddir) && $(SHELL) config.status build.mk $(REDIR)
                                 
 # rule for config.mk
 # ---------------------------------------------------------------------------
-$(top_builddir)/config.mk: $(top_builddir)/config.status $(top_srcdir)/config.mk.in
-	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./config.status config.mk $(REDIR)
+@NODEP@$(top_builddir)/config.mk: $(top_builddir)/config.status $(top_srcdir)/config.mk.in
+@NODEP@	@$(ECHO_CONFIG)
+@NODEP@	@QUIET@cd $(top_builddir) && $(SHELL) config.status config.mk $(REDIR)
 
 # rule for config.status
 # ---------------------------------------------------------------------------
-$(top_builddir)/config.status: $(top_srcdir)/configure
-	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./configure $(ac_configure_args)
+@NODEP@$(top_builddir)/config.status: $(top_srcdir)/configure
+@NODEP@	@$(ECHO_CONFIG)
+@NODEP@	@QUIET@cd $(top_builddir) && ./configure $(ac_configure_args)
 
 # rule for config.h
 # ---------------------------------------------------------------------------
-$(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
-	@$(ECHO_CONFIG)
-	@QUIET@test -z $(CONFIG_H_TOP) || { cd $(top_builddir) && \
-	rm -f $(CONFIG_H_TOP) && \
-	./config.status $(CONFIG_H_TOP) $(REDIR); }
+@NODEP@$(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
+@NODEP@	@$(ECHO_CONFIG)
+@NODEP@	@QUIET@test -z $(CONFIG_H_TOP) || { cd $(top_builddir) && \
+@NODEP@	rm -f $(CONFIG_H_TOP) && \
+@NODEP@	$(SHELL) config.status $(CONFIG_H_TOP) $(REDIR); }
 
 # targets for maintainer generated files
 # ---------------------------------------------------------------------------
@@ -351,7 +351,7 @@ install-libexecEXEC: $(libexec_EXEC)
 install-libEXEC: $(lib_EXEC)
 	@-if test ! -d $(DESTDIR)$(libdir)$(lib_PREFIX) && test "$(lib_EXEC)"; then \
 		$(ECHO_MKDIR)$(DESTDIR)$(libdir)$(lib_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(libdir)$(lib_PREFIX) >& /dev/null ; \
+		$(INSTALL_DIR) $(DESTDIR)$(libdir)$(lib_PREFIX) >/dev/null ; \
 	fi
 	@-if test ! -d $(DESTDIR)$(libdir)$(lib_PREFIX); then \
 		$(ECHO_MKDIR)$(DESTDIR)$(libdir)$(lib_PREFIX) ; \
@@ -361,7 +361,7 @@ install-libEXEC: $(lib_EXEC)
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f="`echo $$p | sed -e 's|^.*/||'`"; \
 		$(ECHO_INSTALL)$(libdir)$(lib_PREFIX)/$$f; \
-		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(libdir)$(lib_PREFIX)/$$f >& /dev/null; \
+		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(libdir)$(lib_PREFIX)/$$f >/dev/null; \
 	done
         
 # install shared libraries into libdir
@@ -369,7 +369,7 @@ install-libEXEC: $(lib_EXEC)
 install-slibEXEC: $(slib_EXEC)
 	@-if test ! -d $(DESTDIR)$(slibdir)$(slib_PREFIX) && test "$(slib_EXEC)"; then \
 		$(ECHO_MKDIR)$(DESTDIR)$(slibdir)$(slib_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(slibdir)$(slib_PREFIX) >& /dev/null ; \
+		$(INSTALL_DIR) $(DESTDIR)$(slibdir)$(slib_PREFIX) >/dev/null ; \
 	fi
 	@-if test ! -d $(DESTDIR)$(slibdir)$(slib_PREFIX); then \
 		$(ECHO_MKDIR)$(DESTDIR)$(slibdir)$(slib_PREFIX) ; \
@@ -379,7 +379,7 @@ install-slibEXEC: $(slib_EXEC)
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f="`echo $$p | sed -e 's|^.*/||'`"; \
 		$(ECHO_INSTALL)$(slibdir)$(slib_PREFIX)/$$f; \
-		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(slibdir)$(slib_PREFIX)/$$f >& /dev/null; \
+		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(slibdir)$(slib_PREFIX)/$$f >/dev/null; \
 	done
         
 # install plugins into plugindir
@@ -387,7 +387,7 @@ install-slibEXEC: $(slib_EXEC)
 install-pluginEXEC: $(plugin_EXEC)
 	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX) && test "$(plugin_EXEC)"; then \
 		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) >& /dev/null ; \
+		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) >/dev/null ; \
 	fi
 	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX); then \
 		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
@@ -397,7 +397,7 @@ install-pluginEXEC: $(plugin_EXEC)
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f="`echo $$p | sed -e 's|^.*/||'`"; \
 		$(ECHO_INSTALL)$(plugindir)$(plugin_PREFIX)/$$f; \
-		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(plugindir)$(plugin_PREFIX)/$$f >& /dev/null; \
+		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(plugindir)$(plugin_PREFIX)/$$f >/dev/null; \
 	done
         
 # install libraries into libdir
@@ -405,7 +405,7 @@ install-pluginEXEC: $(plugin_EXEC)
 install-libDATA: $(lib_DATA)
 	@-if test ! -d $(DESTDIR)$(libdir)$(lib_PREFIX) && test "$(lib_DATA)"; then \
 		$(ECHO_MKDIR)$(DESTDIR)$(libdir)$(lib_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(libdir)$(lib_PREFIX) >& /dev/null ; \
+		$(INSTALL_DIR) $(DESTDIR)$(libdir)$(lib_PREFIX) >/dev/null ; \
 	fi
 	@-if test ! -d $(DESTDIR)$(libdir)$(lib_PREFIX); then \
 		$(ECHO_MKDIR)$(DESTDIR)$(libdir)$(lib_PREFIX) ; \
@@ -415,7 +415,7 @@ install-libDATA: $(lib_DATA)
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f="`echo $$p | sed -e 's|^.*/||'`"; \
 		$(ECHO_INSTALL)$(libdir)$(lib_PREFIX)/$$f; \
-		$(INSTALL_DATA) $$d$$p $(DESTDIR)$(libdir)$(lib_PREFIX)/$$f >& /dev/null; \
+		$(INSTALL_DATA) $$d$$p $(DESTDIR)$(libdir)$(lib_PREFIX)/$$f >/dev/null; \
 	done
 @PIE_LIB@	@prev='$(PIE_LIBRARY)'; for link in $(PIE_LINKS); do \
 @PIE_LIB@	  if test -f "$$prev" ; then \

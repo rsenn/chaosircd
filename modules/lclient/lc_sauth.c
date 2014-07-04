@@ -85,13 +85,13 @@ static void             lc_sauth_auth        (struct sauth    *sauth,
                                               struct lc_sauth *arg);
 static void             lc_sauth_proxy       (struct sauth    *sauth,
                                               struct lc_sauth *arg);
-static struct node     *m_proxy_add          (uint16_t         port, 
+static struct node     *m_proxy_add          (uint16_t         port,
                                               int              service);
-static struct node     *m_proxy_find         (uint16_t         port, 
+static struct node     *m_proxy_find         (uint16_t         port,
                                               int              service);
-static void             mo_proxy             (struct lclient  *lcptr, 
+static void             mo_proxy             (struct lclient  *lcptr,
                                               struct client   *cptr,
-                                              int              argc, 
+                                              int              argc,
                                               char           **argv);
 static int              m_proxy_cleanup      (void);
 static int              m_proxy_save         (void);
@@ -114,7 +114,7 @@ static struct timer *m_proxy_timer;
 static char *mo_proxy_help[] = {
   "PROXY [server] <list|add|delete> [port] [type]",
   "",
-  "Manages ports the proxy scanner tests.",
+  "Manages ports for the proxy scanner tests.",
   "",
   "list        Lists all scanned ports.",
   "add         Adds a port/service pair.",
@@ -129,7 +129,7 @@ static char *mo_proxy_help[] = {
   "/PROXY add 23 cisco",
   NULL
 };
- 
+
 static struct msg m_proxy_msg = {
   "PROXY", 1, 4, MFLG_OPER,
   { NULL, NULL, mo_proxy, mo_proxy },
@@ -143,33 +143,33 @@ int lc_sauth_load(void)
 {
   if(hook_register(lclient_handshake, HOOK_DEFAULT, lc_sauth_handshake) == NULL)
     return -1;
-  
+
   hook_register(lclient_release, HOOK_DEFAULT, lc_sauth_release);
   hook_register(lclient_register, HOOK_DEFAULT, lc_sauth_register);
 
-  mem_static_create(&lc_sauth_heap, sizeof(struct lc_sauth), 
+  mem_static_create(&lc_sauth_heap, sizeof(struct lc_sauth),
                     SAUTH_BLOCK_SIZE / 2);
   mem_static_note(&lc_sauth_heap, "lclient resolver heap");
-  
+
   dlink_list_zero(&lc_sauth_list);
   dlink_list_zero(&m_proxy_list);
-  
+
   msg_register(&m_proxy_msg);
 
   if((m_proxy_ini = ini_find_name(M_PROXY_INI)) == NULL)
   {
     log(lclient_log, L_warning,
         "Could not find proxy checklist, add '"M_PROXY_INI
-        "' to your config file.");               
+        "' to your config file.");
   }
-  
+
   if(m_proxy_ini)
     ini_callback(m_proxy_ini, m_proxy_callback);
-  
+
   m_proxy_timer = timer_start(m_proxy_cleanup, M_PROXY_INTERVAL);
-  
+
   timer_note(m_proxy_timer, "m_proxy cleaup timer");
-  
+
   return 0;
 }
 
@@ -178,17 +178,17 @@ void lc_sauth_unload(void)
   struct lc_sauth *arg = NULL;
   struct node     *node;
   struct node     *next;
-  
+
   msg_unregister(&m_proxy_msg);
-  
+
   /* Remove all pending sauth stuff */
   dlink_foreach_safe_data(&lc_sauth_list, node, next, arg)
     lc_sauth_done(arg);
-  
+
   hook_unregister(lclient_register, HOOK_DEFAULT, lc_sauth_register);
   hook_unregister(lclient_release, HOOK_DEFAULT, lc_sauth_release);
   hook_unregister(lclient_handshake, HOOK_DEFAULT, lc_sauth_handshake);
-  
+
   mem_static_destroy(&lc_sauth_heap);
 }
 
@@ -197,10 +197,10 @@ void lc_sauth_unload(void)
 static void lc_sauth_handshake(struct lclient *lcptr)
 {
   struct lc_sauth *arg;
-  
+
   /* Keep track of the lclient if the module gets unloaded */
   arg = mem_static_alloc(&lc_sauth_heap);
-  
+
   arg->lclient = lclient_pop(lcptr);
   arg->done_dns = 0;
   arg->done_auth = 0;
@@ -208,9 +208,9 @@ static void lc_sauth_handshake(struct lclient *lcptr)
   arg->sauth_auth = NULL;
 
   dlink_add_tail(&lc_sauth_list, &arg->node, arg);
-  
+
   lcptr->shut = 1;
-  
+
   /* Start DNS lookup */
   lc_sauth_lookup_dns(arg);
 }
@@ -221,9 +221,9 @@ static void lc_sauth_handshake(struct lclient *lcptr)
 static void lc_sauth_release(struct lclient *lcptr)
 {
   struct lc_sauth *sauth;
-  
+
   sauth = lcptr->plugdata[LCLIENT_PLUGDATA_SAUTH];
-  
+
   if(sauth)
   {
     timer_cancel(&sauth->timer_reg);
@@ -237,15 +237,15 @@ static void lc_sauth_release(struct lclient *lcptr)
 static int lc_sauth_register(struct lclient *lcptr)
 {
   struct lc_sauth *sauth;
-  
+
   sauth = lcptr->plugdata[LCLIENT_PLUGDATA_SAUTH];
-  
+
   if(sauth)
   {
     lc_sauth_done(sauth);
     lcptr->plugdata[LCLIENT_PLUGDATA_SAUTH] = NULL;
   }
-  
+
   return 0;
 }
 
@@ -254,13 +254,13 @@ static int lc_sauth_register(struct lclient *lcptr)
 static void lc_sauth_done(struct lc_sauth *arg)
 {
   struct node *nptr;
-  
+
   if(arg->timer_reg)
   {
     lclient_register(arg->lclient);
     timer_cancel(&arg->timer_reg);
   }
- 
+
   timer_cancel(&arg->timer_auth);
 
   if(arg->sauth_dns)
@@ -268,23 +268,23 @@ static void lc_sauth_done(struct lc_sauth *arg)
     sauth_delete(arg->sauth_dns);
     arg->sauth_dns = NULL;
   }
-  
+
   if(arg->sauth_auth)
   {
     sauth_delete(arg->sauth_auth);
     arg->sauth_auth = NULL;
   }
-  
+
   if(arg->sauth_proxy.size)
   {
     dlink_foreach(&arg->sauth_proxy, nptr)
       sauth_delete(nptr->data);
-    
+
     dlink_destroy(&arg->sauth_proxy);
   }
-  
+
   dlink_delete(&lc_sauth_list, &arg->node);
-  
+
   mem_static_free(&lc_sauth_heap, arg);
 }
 
@@ -294,11 +294,11 @@ static void lc_sauth_done(struct lc_sauth *arg)
 static void lc_sauth_lookup_dns(struct lc_sauth *arg)
 {
   uint8_t *ip = (uint8_t *)&arg->lclient->addr_remote;
-  
+
   /* Start reverse lookup */
   arg->sauth_dns = sauth_dns_reverse(arg->lclient->addr_remote,
                                      lc_sauth_dns, arg);
-  
+
   /* Report start of the dns lookup */
   if(arg->sauth_dns)
   {
@@ -315,9 +315,9 @@ static void lc_sauth_lookup_dns(struct lc_sauth *arg)
                  lclient_me->name, arg->lclient->name);
     lc_sauth_lookup_auth(arg);
   }
-  
+
 }
- 
+
 /* -------------------------------------------------------------------------- *
  * Start an AUTH lookup for a local client                                    *
  * -------------------------------------------------------------------------- */
@@ -326,7 +326,7 @@ static int lc_sauth_lookup_auth(struct lc_sauth *arg)
   /* Start AUTH query */
   arg->sauth_auth = sauth_auth(arg->lclient->addr_remote,
                                arg->lclient->port_remote,
-                               arg->lclient->port_local, 
+                               arg->lclient->port_local,
                                lc_sauth_auth, arg);
 
   /* Report start of the auth lookup */
@@ -345,7 +345,7 @@ static int lc_sauth_lookup_auth(struct lc_sauth *arg)
 
     lclient_register(arg->lclient);
   }
-  
+
   return 0;
 }
 
@@ -358,22 +358,22 @@ static int lc_sauth_check_proxy(struct lc_sauth *arg)
   struct node *node;
   uint16_t     port;
   int          type;
-  
+
   dlink_foreach(&m_proxy_list, nptr)
   {
     size_t val = (size_t)nptr->data & 0xfffffffflu;
     port = val >> 16;
     type = val & 0xffff;
-    
+
     node = dlink_node_new();
-    
+
     node->data = sauth_proxy(type,
                              arg->lclient->addr_remote,
                              port,
                              arg->lclient->addr_local,
                              arg->lclient->port_local,
                              lc_sauth_proxy, arg);
-    
+
     if(node->data)
       dlink_add_tail(&arg->sauth_proxy, node, node->data);
     else
@@ -396,7 +396,7 @@ static int lc_sauth_check_proxy(struct lc_sauth *arg)
 
     lclient_register(arg->lclient);
   }
-  
+
   return 0;
 }
 
@@ -404,13 +404,13 @@ static int lc_sauth_check_proxy(struct lc_sauth *arg)
  * DNS lookup callback, called upon DNS failure or completion                 *
  * -------------------------------------------------------------------------- */
 void lc_sauth_dns(struct sauth *sauth, struct lc_sauth *arg)
-{  
+{
   if(sauth->host[0])
   {
     /* We got a reply, copy it to lclient struct and report success */
     strlcpy(arg->lclient->host, sauth->host, sizeof(arg->lclient->host));
-    
-    lclient_send(arg->lclient, 
+
+    lclient_send(arg->lclient,
                  ":%s NOTICE %s :(dns) resolved your address to %s.",
                  lclient_me->name, arg->lclient->name,
                  arg->lclient->host);
@@ -418,7 +418,7 @@ void lc_sauth_dns(struct sauth *sauth, struct lc_sauth *arg)
   else
   {
     /* Report failure */
-    lclient_send(arg->lclient, 
+    lclient_send(arg->lclient,
                  ":%s NOTICE %s :(dns) could not resolve your address.",
                  lclient_me->name, arg->lclient->name,
                  arg->lclient->host);
@@ -440,10 +440,10 @@ void lc_sauth_auth(struct sauth *sauth, struct lc_sauth *arg)
   {
     /* We got a reply, copy it to lclient struct and report success */
     strlcpy(arg->lclient->user->name, sauth->ident, sizeof(arg->lclient->user->name));
-    
+
     lclient_send(arg->lclient, ":%s NOTICE %s :(auth) got ident response: %s",
                  lclient_me->name,
-                 arg->lclient->name, 
+                 arg->lclient->name,
                  arg->lclient->user->name);
   }
   else
@@ -452,7 +452,7 @@ void lc_sauth_auth(struct sauth *sauth, struct lc_sauth *arg)
     lclient_send(arg->lclient, ":%s NOTICE %s :(auth) no ident response.",
                  lclient_me->name, arg->lclient->name);
   }
-  
+
   lc_sauth_check_proxy(arg);
 
   sauth_push(&arg->sauth_auth);
@@ -471,49 +471,49 @@ void lc_sauth_deny(struct lc_sauth *arg, uint16_t port, int type)
   
   str_snprintf(msg, sizeof(msg), "open %s proxy on port %u",
            sauth_types[type], (uint32_t)port);
-  
+
   lclient_set_type(arg->lclient, LCLIENT_USER);
   lclient_exit(arg->lclient, "%s", msg);
-  
+
   mptr = msg_find("GLINE");
-  
+
   mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
-  
+
   arg->lclient = NULL;
 }
-                    
+
 /* -------------------------------------------------------------------------- *
  * AUTH lookup callback, called upon AUTH failure or completion               *
  * -------------------------------------------------------------------------- */
 void lc_sauth_proxy(struct sauth *sauth, struct lc_sauth *arg)
 {
   struct node *nptr;
-  
+
   lclient_send(arg->lclient, ":%s NOTICE %s :(proxy) %u/%s : %s",
                lclient_me->name,
                arg->lclient->name,
                sauth->remote,
-               sauth_types[sauth->ptype], 
+               sauth_types[sauth->ptype],
                sauth_replies[sauth->reply]);
-  
+
   nptr = dlink_find_delete(&arg->sauth_proxy, sauth);
-  
+
   if(sauth->reply == SAUTH_PROXY_OPEN)
   {
     lc_sauth_done(arg);
     lc_sauth_deny(arg, sauth->remote, sauth->ptype);
-  } 
-  else if(arg->sauth_proxy.size == 0) 
+  }
+  else if(arg->sauth_proxy.size == 0)
   {
     lclient_register(arg->lclient);
     lc_sauth_done(arg);
   }
-  
+
   if(nptr)
   {
     sauth_push((struct sauth **)(void *)&nptr->data);
     dlink_node_free(nptr);
-  }  
+  }
 }
 
 /* -------------------------------------------------------------------------- *
@@ -521,15 +521,15 @@ void lc_sauth_proxy(struct sauth *sauth, struct lc_sauth *arg)
 static struct node *m_proxy_find(uint16_t port, int service)
 {
   struct node *node;
-  
+
   dlink_foreach(&m_proxy_list, node)
   {
     size_t val = (size_t)node->data & 0xfffffffflu;
 
-    if((val > 16) == port && (val & 0xffff) == service)
+    if((val >> 16) == port && (val & 0xffff) == service)
       return node;
   }
-  
+
   return NULL;
 }
 
@@ -538,12 +538,12 @@ static struct node *m_proxy_add(uint16_t port, int service)
   struct node *node;
   struct node *nptr;
   uint32_t     data;
-  
+
   data = (uint32_t)port << 16;
   data |= service & 0xffff;
-  
+
   nptr = dlink_node_new();
-      
+
   dlink_foreach(&m_proxy_list, node)
   {
     if((size_t)node->data > (size_t)data)
@@ -554,9 +554,9 @@ static struct node *m_proxy_add(uint16_t port, int service)
       return nptr;
     }
   }
-  
+
   dlink_add_tail(&m_proxy_list, nptr, (void *)(size_t)data);
-  
+
   return NULL;
 }
 
@@ -569,9 +569,9 @@ static int m_proxy_save(void)
   uint16_t            port;
   int                 type;
   char                namebuf[32];
-  
+
   ini_clear(m_proxy_ini);
-  
+
   dlink_foreach(&m_proxy_list, nptr)
   {
     size_t val = (size_t)nptr->data & 0xfffffffflu;
@@ -581,15 +581,15 @@ static int m_proxy_save(void)
     str_snprintf(namebuf, sizeof(namebuf), "%u", (uint32_t)port);
     
     isptr = ini_section_new(m_proxy_ini, namebuf);
-    
+
     ini_write_str(isptr, "type", sauth_types[type]);
   }
-  
+
   ini_open(m_proxy_ini, INI_WRITE);
   io_queue_control(m_proxy_ini->fd, OFF, OFF, OFF);
   ini_save(m_proxy_ini);
   ini_close(m_proxy_ini);
-  
+
   return 0;
 }
 
@@ -599,20 +599,20 @@ static int m_proxy_load(void)
   uint16_t            port;
   int                 type;
   char                typestr[32];
-  
+
   if(m_proxy_ini == NULL)
     return -1;
-  
+
   if((isptr = ini_section_first(m_proxy_ini)))
   {
     do
     {
       port = str_toul(isptr->name, NULL, 10);
-      
+
       if(!ini_get_str(isptr, "type", typestr, 32))
       {
         type = sauth_proxy_type(typestr);
-        
+
         if(type >= 0)
         {
           if(m_proxy_find(port, type) == NULL)
@@ -625,7 +625,7 @@ static int m_proxy_load(void)
 
   /* Close the INI file */
   ini_close(m_proxy_ini);
-  
+
   return 0;
 }
 
@@ -648,14 +648,14 @@ int m_proxy_cleanup(void)
     else
       log(lclient_log, L_status, "Found proxy checklist: %s", m_proxy_ini->path);
   }
-  
+
   return 0;
 }
 
 void m_proxy_callback(struct ini *ini)
 {
   log(lclient_log, L_warning, "parsing proxy ini!!!!!!!!!!");
-  
+
   if(m_proxy_load())
   {
     log(client_log, L_warning, "Failed loading proxy checklist '%s'.",
@@ -670,7 +670,7 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
   uint16_t     port = 0;
   int          type = 0;
   struct node *nptr;
-  
+
   if(argc > 3)
   {
     if(argv[5])
@@ -683,21 +683,21 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
       if(server_relay_maybe(lcptr, cptr, 2, ":%C PROXY %s %s :%s", &argc, argv))
         return;
     }
-    else 
+    else
     {
       if(server_relay_maybe(lcptr, cptr, 1, ":%C PROXY %s :%s", &argc, argv))
         return;
-    }    
+    }
   }
-  
+
   if(argv[3])
   {
     port = (uint16_t)str_toul(argv[3], NULL, 10);
-    
+
     if(argv[4])
     {
       type = sauth_proxy_type(argv[4]);
-      
+
       if(type == -1)
       {
         client_send(cptr, ":%C NOTICE %C :*** invalid proxy type: %s",
@@ -706,59 +706,59 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
       }
     }
   }
-  
+
   if(!str_icmp(argv[2], "list"))
   {
     struct node *node;
-    
+
     client_send(cptr, ":%C NOTICE %C : ======= proxy checklist ======== ",
                 client_me, cptr);
     client_send(cptr, ":%C NOTICE %C :  port service",
                 client_me, cptr);
     client_send(cptr, ":%C NOTICE %C : ---------------------------- ",
                 client_me, cptr);
-    
+
     dlink_foreach(&m_proxy_list, node)
     {
       client_send(cptr, ":%C NOTICE %C : %5u %s",
-                  client_me, cptr, 
+                  client_me, cptr,
                   ((uint32_t)(size_t)node->data) >> 16,
                   sauth_types[((uint32_t)(size_t)node->data) & 0xffff]);
     }
-    
+
     client_send(cptr, ":%C NOTICE %C : ==== end of proxy checklist ==== ",
                 client_me, cptr);
-    
+
     return;
-  } 
-  
+  }
+
   if(argc < 5)
   {
     numeric_send(cptr, ERR_NEEDMOREPARAMS, "PROXY");
     return;
   }
-  
+
   if(!str_icmp(argv[2], "add")) {
 
     if(m_proxy_find(port, type))
       return;
-    
+
     m_proxy_add(port, type);
-    
+
     client_send(cptr, ":%C NOTICE %C :*** added proxy check for %u/%s",
                 client_me, cptr,
                 (uint32_t)port, sauth_types[type]);
-    
+
   } else if(!str_nicmp(argv[2], "del", 3)) {
-    
+
     if(argc < 5)
     {
       numeric_send(cptr, ERR_NEEDMOREPARAMS, "PROXY");
       return;
     }
-    
+
     nptr = m_proxy_find(port, type);
-    
+
     if(nptr == NULL)
     {
       client_send(cptr, ":%C NOTICE %C :*** no such proxy check: %u/%s",
@@ -774,10 +774,10 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc, char 
                   client_me, cptr,
                   (uint32_t)port, sauth_types[type]);
     }
-    
+
   } else {
     client_send(cptr, ":%C NOTICE %C :*** invalid command: %s",
                 client_me, cptr, argv[2]);
-  }  
+  }
 }
 

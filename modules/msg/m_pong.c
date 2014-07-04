@@ -67,7 +67,7 @@ int m_pong_load(void)
 {
   if(msg_register(&m_pong_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -80,14 +80,14 @@ void m_pong_unload(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'pong'                                                           *
  * -------------------------------------------------------------------------- */
-static void m_pong(struct lclient *lcptr, struct client *cptr, 
+static void m_pong(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
   struct server *asptr;
   struct client *acptr;
-  
+
   /* do pings on server-server links */
-  if(client_is_server(cptr) && client_is_local(cptr) && 
+  if(client_is_server(cptr) && client_is_local(cptr) &&
      argv[2] && chars_isdigit(argv[2][0]))
   {
     lcptr->ping = str_toull(argv[2], NULL, 10);
@@ -95,9 +95,9 @@ static void m_pong(struct lclient *lcptr, struct client *cptr,
 
     return;
   }
-  
+
   asptr = server_find_name(argv[2]);
-  
+
   if(asptr == NULL)
   {
     if(lcptr->caps & CAP_UID)
@@ -109,13 +109,13 @@ static void m_pong(struct lclient *lcptr, struct client *cptr,
   {
     acptr = asptr->client;
   }
-  
+
   if(acptr == NULL)
   {
     numeric_send(cptr, ERR_NOSUCHSERVER, argv[2]);
     return;
   }
-  
+
   if(acptr == client_me)
   {
     if(client_is_user(cptr) && client_is_local(cptr))

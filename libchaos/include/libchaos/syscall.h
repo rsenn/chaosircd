@@ -324,7 +324,7 @@ psyscall0(int,              syscall_fork);
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -339,7 +339,7 @@ psyscall0(int,              syscall_setsid);
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -354,7 +354,7 @@ psyscall0(pid_t,            syscall_getpid);
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -370,7 +370,7 @@ psyscall1(int,              syscall_close,     /* non-negative on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -387,7 +387,7 @@ psyscall1(int,              syscall_unlink,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -404,7 +404,7 @@ psyscall1(int,              syscall_pipe,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -421,7 +421,7 @@ psyscall1(int,              syscall_exit,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -438,7 +438,7 @@ psyscall1(int,               syscall_chdir,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -456,7 +456,7 @@ psyscall2(int,                  syscall_kill,  /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -475,7 +475,7 @@ psyscall2(int,                  syscall_gettimeofday,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -494,7 +494,7 @@ psyscall2(int,                  syscall_munmap,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -513,7 +513,7 @@ psyscall2(int,                  syscall_stat,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -532,7 +532,7 @@ psyscall2(int,                  syscall_fstat,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -551,7 +551,7 @@ psyscall2(int,               syscall_dup2,  /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -570,7 +570,7 @@ psyscall2(int,               syscall_signal,        /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -589,7 +589,7 @@ psyscall2(int,                   syscall_setrlimit,     /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -609,7 +609,7 @@ psyscall3(int,               syscall_execve,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -630,7 +630,7 @@ psyscall3(int,               syscall_waitpid,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -651,7 +651,7 @@ psyscall3(ssize_t,              syscall_read,  /* 0 on EOF, -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -672,7 +672,7 @@ psyscall3(ssize_t,              syscall_write, /* -1 on error, else bytes writte
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -694,7 +694,7 @@ psyscall3(int,                  syscall_poll,  /* -1 on error, else active fds *
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -715,7 +715,7 @@ psyscall3(int,                  syscall_open,  /* -1 on error, else valid fd */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -760,7 +760,7 @@ psyscall3(int,                  syscall_fcntl,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -804,7 +804,7 @@ psyscall3(int,                  syscall_readlink,   /* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -825,7 +825,7 @@ psyscall3(int,                  syscall_mprotect,/* -1 on error */
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -849,7 +849,7 @@ psyscall5(int,                  syscall_select,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -876,7 +876,7 @@ poldmmapcall(void *,               syscall_mmap,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -900,7 +900,7 @@ psocketcall3(int,               syscall_socket,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -922,7 +922,7 @@ psocketcall3(int,                     syscall_bind,
 #endif /* PIC */
              
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -944,7 +944,7 @@ psocketcall3(int,                     syscall_connect,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -965,7 +965,7 @@ psocketcall3(int,                     syscall_getsockname,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -986,7 +986,7 @@ psocketcall3(int,                     syscall_getpeername,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1007,7 +1007,7 @@ psocketcall2(int,               syscall_listen,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1028,7 +1028,7 @@ psocketcall3(int,               syscall_accept,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1051,7 +1051,7 @@ psocketcall4(int,               syscall_send,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1075,7 +1075,7 @@ psocketcall4(int,               syscall_recv,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1099,7 +1099,7 @@ psocketcall4(int,               syscall_socketpair,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1124,7 +1124,7 @@ psocketcall5(int,               syscall_getsockopt,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif
@@ -1150,7 +1150,7 @@ psocketcall5(int,               syscall_setsockopt,
 #endif /* PIC */
 
 #ifndef PIC
-extern inline
+CHAOS_INLINE_FN 
 #else
 static inline
 #endif

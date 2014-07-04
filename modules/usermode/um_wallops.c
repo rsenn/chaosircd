@@ -32,7 +32,7 @@
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_wallops = 
+static struct usermode um_wallops =
 {
   'w',
   USERMODE_LIST_OFF,
@@ -48,7 +48,7 @@ int um_wallops_load(void)
 {
   if(usermode_register(&um_wallops))
     return -1;
-  
+
   return 0;
 }
 

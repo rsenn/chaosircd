@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: module.c,v 1.4 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -35,6 +35,10 @@
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #ifndef USE_DSO
 #define USE_DSO
 #endif
@@ -45,7 +49,7 @@
 
 #ifndef USE_DSO
 #include <../modules/module_import.h>
-#endif  
+#endif
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -87,7 +91,7 @@ const char   *module_table[][2] = {
   { "sv", "service"  },
   { "st", "stats"    },
   { NULL, NULL       }
-};  
+};
 
 int module_dlopen(struct module *mptr);
 
@@ -109,24 +113,24 @@ static struct module *module_new(const char *path)
 #ifndef USE_DSO
   uint32_t       i;
 #endif /* USE_DSO */
-  
+
   /* cut path in front of module.so */
   p = strrchr(path, '/');
-  
+
   strlcpy(name, (p ? p + 1 : path), sizeof(name));
 
   /* cut the .so */
   p = str_chr(name, '.');
-  
+
   if(p)
     *p = '\0';
-  
+
   /* now open the DSO */
 #ifndef USE_DSO
   handle = NULL;
-  
+
   load = NULL; unload = NULL;
-  
+
   for(i = 0; i < sizeof(module_imports) / sizeof(module_imports[0]); i++)
   {
     if(!str_cmp(module_imports[i].name, name))
@@ -137,21 +141,21 @@ static struct module *module_new(const char *path)
   }
 #else
 #ifdef WIN32
-  
+
   /* FIXME: should convert forward slashes to backslashes first */
-  handle = LoadLibrary(path);
-  
+  handle = LoadLibraryA(path);
+
 #else
 
   handle = dlopen(path, RTLD_NOW);
-  
+
 #endif /* WIN32 */
-  
+
   if(handle == NULL)
   {
 #ifdef USE_DSO
     log(module_log, L_warning, "DL error in %s: %s", path, dlerror());
-#endif  
+#endif
     return NULL;
   }
 
@@ -159,8 +163,8 @@ static struct module *module_new(const char *path)
   load = dlsym(handle, fn);
   str_snprintf(fn, sizeof(fn), "%s_unload", name);
   unload = dlsym(handle, fn);
-  
-#endif  
+
+#endif
   if(load == NULL || unload == NULL)
   {
 #ifdef USE_DSO
@@ -169,21 +173,21 @@ static struct module *module_new(const char *path)
 #endif
     return NULL;
   }
-  
+
   ret = mem_static_alloc(&module_heap);
 
   strlcpy(ret->path, path, sizeof(ret->path));
   strlcpy(ret->name, name, sizeof(ret->name));
-  
+
   ret->phash = str_hash(ret->path);
   ret->nhash = str_ihash(ret->name);
-    
+
   ret->handle = handle;
   ret->load = load;
   ret->unload = unload;
   ret->id = module_id++;
   ret->refcount = 1;
-  
+
   if(ret->load(ret))
   {
     log(module_log, L_warning, "module load() failed.");
@@ -210,15 +214,15 @@ void module_setpath(const char *path)
 int module_reload(struct module *mptr)
 {
   char fn[64];
-  
+
   /* Unload old module */
   mptr->unload(mptr);
-#ifdef USE_DSO  
+#ifdef USE_DSO
   dlclose(mptr->handle);
-  
+
   /* now open the DSO */
   mptr->handle = dlopen(mptr->path, RTLD_NOW);
-  
+
   if(mptr->handle == NULL)
   {
     log(module_log, L_warning, "DL error: %s", dlerror());
@@ -230,7 +234,7 @@ int module_reload(struct module *mptr)
   mptr->load = dlsym(mptr->handle, fn);
   str_snprintf(fn, sizeof(fn), "%s_unload", mptr->name);
   mptr->unload = dlsym(mptr->handle, fn);
-  
+
   if(mptr->load == NULL || mptr->unload == NULL)
   {
     log(module_log, L_warning, "DL error: %s", dlerror());
@@ -238,20 +242,20 @@ int module_reload(struct module *mptr)
     module_delete(mptr);
     return -1;
   }
-#endif /* USE_DSO */  
+#endif /* USE_DSO */
   if(mptr->load(mptr))
   {
     log(module_log, L_warning, "module load() failed.");
-    
-#ifdef USE_DSO  
+
+#ifdef USE_DSO
     if(mptr->handle)
       dlclose(mptr->handle);
-#endif /* USE_DSO */  
-    
+#endif /* USE_DSO */
+
     module_delete(mptr);
     return -1;
-  }  
-  
+  }
+
   return 0;
 }
 /* ------------------------------------------------------------------------ *
@@ -262,9 +266,9 @@ const char *module_expand(const char *name)
   static char lala[32];
   uint32_t    i;
   char       *p = NULL;
-  
+
   strlcpy(ret, name, sizeof(ret));
-  
+
   if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_')));
   {
     for(i = 0; module_table[i][0]; i++)
@@ -272,12 +276,12 @@ const char *module_expand(const char *name)
       if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret))
       {
         *p++ = '\0';
-        
+
         strlcpy(lala, p, sizeof(lala));
-        
+
         if((p = str_chr(lala, '.')))
           *p = '\0';
-        
+
         strlcpy(ret, module_path, sizeof(lala));
         strlcat(ret, "/", sizeof(ret));
 /*        strlcat(ret, module_table[i][1], sizeof(ret));
@@ -287,12 +291,12 @@ const char *module_expand(const char *name)
         strlcat(ret, lala, sizeof(ret));
         strlcat(ret, ".", sizeof(ret));
         strlcat(ret, DLLEXT, sizeof(ret));
-        
+
         break;
       }
     }
   }
-  
+
   return ret;
 }
 
@@ -302,11 +306,11 @@ const char *module_expand(const char *name)
 void module_init(void)
 {
   module_log = log_source_register("module");
-  
+
   dlink_list_zero(&module_list);
 
   module_id = 0;
-  
+
   mem_static_create(&module_heap, sizeof(struct module), MODULE_BLOCK_SIZE);
   mem_static_note(&module_heap, "module block heap");
 }
@@ -318,12 +322,12 @@ void module_shutdown(void)
 {
   struct module *module;
   struct module *next;
-  
+
   dlink_foreach_safe(&module_list, module, next)
     module_delete(module);
-  
+
   mem_static_destroy(&module_heap);
-  
+
   log_source_unregister(module_log);
 }
 
@@ -333,24 +337,24 @@ void module_shutdown(void)
 struct module *module_add(const char *path)
 {
   struct module *module;
- 
+
   /* Already loaded? */
   if(module_find_name(path))
     return NULL;
-  
+
   /* Already loaded? */
   if(module_find_path(module_expand(path)))
     return NULL;
-  
+
   module = module_new(module_expand(path));
-  
+
   if(module == NULL)
     return NULL;
-  
-  dlink_add_head(&module_list, &module->node, module); 
+
+  dlink_add_head(&module_list, &module->node, module);
 
   log(module_log, L_status, "Loaded module: %s", module->path);
-  
+
   return module;
 }
 
@@ -367,7 +371,7 @@ int module_update(struct module *mptr)
 void module_delete(struct module *module)
 {
   log(module_log, L_status, "Unloading module: %s", module->path);
-  
+
   if(module->unload)
     module->unload(module);
 
@@ -375,9 +379,9 @@ void module_delete(struct module *module)
   if(module->handle)
     dlclose(module->handle);
 #endif /* USE_DSO */
-  
+
   dlink_delete(&module_list, &module->node);
-  
+
   mem_static_free(&module_heap, module);
 }
 
@@ -386,10 +390,10 @@ void module_delete(struct module *module)
 struct module *module_find_path(const char *path)
 {
   struct module *module;
-  uint32_t       hash;
+  hash_t         hash;
     
   hash = str_hash(path);
-  
+
   dlink_foreach(&module_list, module)
   {
     if(module->phash == hash)
@@ -398,19 +402,19 @@ struct module *module_find_path(const char *path)
         return module;
     }
   }
-  
+
   return NULL;
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 struct module *module_find_name(const char *name)
 {
   struct module *module;
-  uint32_t       hash;
+  hash_t         hash;
     
   hash = str_hash(name);
-  
+
   dlink_foreach(&module_list, module)
   {
     if(module->nhash == hash)
@@ -419,22 +423,22 @@ struct module *module_find_name(const char *name)
         return module;
     }
   }
-  
+
   return NULL;
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 struct module *module_find_id(uint32_t id)
 {
   struct module *module;
-  
+
   dlink_foreach(&module_list, module)
   {
     if(module->id == id)
       return module;
   }
-  
+
   return NULL;
 }
 
@@ -447,7 +451,7 @@ struct module *module_pop(struct module *module)
     if(!module->refcount)
       log(module_log, L_warning, "Poping deprecated module: %s",
           module->name);
-    
+
     module->refcount++;
   }
 
@@ -473,7 +477,7 @@ struct module *module_push(struct module **moduleptr)
       (*moduleptr) = NULL;
     }
   }
-  
+
   return *moduleptr;
 }
 
@@ -485,7 +489,7 @@ void module_dump(struct module *mptr)
   if(mptr == NULL)
   {
     dump(module_log, "[================ module summary ================]");
-    
+
     dlink_foreach_up(&module_list, mptr)
     {
       dump(module_log, " #%u: [%u] %-20s (%p)",
@@ -497,7 +501,7 @@ void module_dump(struct module *mptr)
   else
   {
     dump(module_log, "[================= module dump ==================]");
-    
+
     dump(module_log, "         id: #%u", mptr->id);
     dump(module_log, "   refcount: %u", mptr->refcount);
     dump(module_log, "      nhash: %p", mptr->nhash);
@@ -507,7 +511,7 @@ void module_dump(struct module *mptr)
     dump(module_log, "     unload: %p", mptr->unload);
     dump(module_log, "       name: %s", mptr->name);
     dump(module_log, "       path: %s", mptr->path);
-    
+
     dump(module_log, "[============== end of module dump ==============]");
   }
 }
@@ -528,20 +532,20 @@ int module_dlopen(struct module *mptr)
   size_t      minvma = 0xffffffff;
   size_t      maxvma = 0x00000000;
   int         flags;
-  
+
   /* Open shared object */
   if((mptr->fd = syscall_open(mptr->path, O_RDONLY)) == -1)
   {
     log(module_log, L_warning, "unable to open shared object: %s", mptr->name);
-    
+
     return -1;
   }
-  
+
   /* Read ELF header */
   syscall_read(mptr->fd, header, sizeof(header));
-  
+
   ehdr = (Elf32_Ehdr *)header;
-  
+
   /* Check for ELF signature */
   if(ehdr->e_ident[0] != 0x7f ||
      ehdr->e_ident[1] != 'E' ||
@@ -551,7 +555,7 @@ int module_dlopen(struct module *mptr)
     log(module_log, L_warning, "is not a valid ELF file: %s", mptr->name);
     return -1;
   }
-  
+
   /* Check for i386 architecture */
   if(ehdr->e_type != ET_DYN ||
      ehdr->e_machine != EM_386)
@@ -559,10 +563,10 @@ int module_dlopen(struct module *mptr)
     log(module_log, L_warning, "is not a valid ELF file: %s", mptr->name);
     return -1;
   }
-    
+
   phdr = (Elf32_Phdr *)&header[ehdr->e_phoff];
   piclib = 1;
-  
+
   for(i = 0; i < ehdr->e_phnum; i++, phdr++)
   {
     /* Get dynamic section location and size */
@@ -571,7 +575,7 @@ int module_dlopen(struct module *mptr)
       dynamic_addr = (void *)phdr->p_vaddr;
       dynamic_size = phdr->p_filesz;
     }
-    
+
     /* Get bottom and top of virtual memory */
     if(phdr->p_type == PT_LOAD)
     {
@@ -580,41 +584,41 @@ int module_dlopen(struct module *mptr)
         piclib = 0;
         minvma = phdr->p_vaddr;
       }
-      
+
       if(piclib && phdr->p_vaddr < minvma)
         minvma = phdr->p_vaddr;
-       
+
       if(((size_t)phdr->p_vaddr + phdr->p_memsz) > maxvma)
         maxvma = phdr->p_vaddr + phdr->p_memsz;
     }
   }
-  
+
   /* Pad addresses */
   maxvma = (maxvma + 0x0fff) & 0xfffff000;
   minvma = minvma & 0xffff0000;
-  
+
   /* Set mapping flags */
   flags = MAP_PRIVATE;
-  
+
   if(!piclib)
     flags |= MAP_FIXED;
-  
+
   /* Map header to memory */
-  libaddr = syscall_mmap((piclib ? NULL : (void *)minvma), 
+  libaddr = syscall_mmap((piclib ? NULL : (void *)minvma),
                          maxvma - minvma, PROT_NONE, flags, mptr->fd, 0);
-  
+
   /* Now map all PT_LOAD segments to memory */
   phdr = (Elf32_Phdr *)&header[ehdr->e_phoff];
-  
+
   for(i = 0; i < ehdr->e_phnum; i++, phdr++)
   {
     if(phdr->p_type == PT_LOAD)
     {
-      syscall_mmap(libaddr + (phdr->p_vaddr & 0xfffff000), 
+      syscall_mmap(libaddr + (phdr->p_vaddr & 0xfffff000),
                    (phdr->p_vaddr & 0x0fff) + phdr->p_filesz,
                    PROT_READ|PROT_WRITE|PROT_EXEC,
                    flags, mptr->fd,
-                   phdr->p_offset & 0x7ffff000);      
+                   phdr->p_offset & 0x7ffff000);
     }
   }
 

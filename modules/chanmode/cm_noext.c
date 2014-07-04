@@ -39,18 +39,18 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_noext_hook(struct lclient *lcptr, struct client   *cptr,
-                         struct channel *chptr, struct chanuser *cuptr);
+static int cm_noext_hook(struct client  *cptr, struct channel *chptr,
+	                 intptr_t        type, const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_noext_help[] = 
+static const char *cm_noext_help[] =
 {
   "+n              No external messages. Only members can send to the channel.",
   NULL
 };
 
-static struct chanmode cm_noext_mode = 
+static struct chanmode cm_noext_mode =
 {
   CM_NOEXT_CHAR,           /* mode character */
   '\0',                    /* no prefix, because its not a privilege */
@@ -69,9 +69,9 @@ int cm_noext_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_noext_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_message, HOOK_DEFAULT, cm_noext_hook);
-  
+
   return 0;
 }
 
@@ -79,21 +79,23 @@ void cm_noext_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_noext_mode);
-  
+
   hook_unregister(channel_message, HOOK_DEFAULT, cm_noext_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_noext_hook(struct lclient *lcptr, struct client   *cptr,
-                         struct channel *chptr, struct chanuser *cuptr)
+static int cm_noext_hook(struct client *cptr, struct channel *chptr,
+	                 intptr_t       type, const char     *text)
 {
+  struct chanuser *cuptr = chanuser_find(chptr, cptr);
+
   if(cuptr == NULL && (chptr->modes & CHFLG(n)))
   {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);
     return 1;
   }
-  
+
   return 0;
 }
 

@@ -68,7 +68,7 @@ int m_cap_load(void)
 {
   if(msg_register(&mr_cap_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -83,12 +83,12 @@ void m_cap_unload(void)
  * argv[2] - subcommand                                                       *
  * argv[3] - arguments                                                        *
  * -------------------------------------------------------------------------- */
-static void mr_cap(struct lclient *lcptr, struct client *cptr, 
+static void mr_cap(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
 /*  Mitchell, et al.       Expires September 5, 2005               [Page 16]
  *
- *   
+ *
  *  Internet-Draft                  IRC CAP                       March 2005
  *
  *  Appendix A. Examples

@@ -90,7 +90,7 @@ ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
  # detection
  # the --automake argument is added so libtoolize doesn't
  # complain about missing AC_PROG_LIBTOOL
- $ag_libtoolize --copy --force --automake &&
+ $ag_libtoolize --copy --automake &&
  for guess in config.guess ../config.guess; do
    if test -f $ag_srcdir/$guess; then
      # so this one is for proper target detection on cygwin 

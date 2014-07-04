@@ -37,7 +37,7 @@ MODULES              = ircd \
                        user \
                        usermode
                        
-DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\"
+DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\" -DBUILD_IRCD=1
 INCLUDES             = -I$(top_srcdir)/include \
                        -I$(srcdir) \
                        -I../include \
@@ -103,12 +103,12 @@ main.o: CPPFLAGS += -DBUILD_MAIN=1
 
 ircd.c:
 
-$(LEXERSRC): ircd.l y.tab.h
+$(LEXERSRC): $(srcdir)/ircd.l $(PARSERINC)
 	@$(ECHO_LEX)
 	@$(LEX) -o$@ ircd.l
-lex.yy.o: lex.yy.c y.tab.h
-y.tab.o: y.tab.c y.tab.h
-$(PARSERINC): ircd.y
+$(LEXEROBJ): $(LEXERSRC) $(PARSERINC)
+$(PARSEROBJ): $(PARSERSRC) $(PARSERINC)
+$(PARSERINC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
 	$(YACC) -d -o $(PARSERSRC) ircd.y
 #.y.c:

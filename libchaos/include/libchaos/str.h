@@ -93,7 +93,7 @@ CHAOS_API(size_t )str_len(const char *s);
 #if 1
 CHAOS_API(char *)str_chr(const char *s, int c);
 
-CHAOS_INLINE(char *str_chr(const char *s, int c)
+CHAOS_INLINE_FN(char *str_chr(const char *s, int c)
 {
   size_t i = 0;
  
@@ -114,7 +114,7 @@ CHAOS_INLINE(char *str_chr(const char *s, int c)
  * ------------------------------------------------------------------------ */
 CHAOS_API(char *)str_cat(char *d, const char *s);
 
-CHAOS_INLINE(char *str_cat(char *d, const char *s)
+CHAOS_INLINE_FN(char *str_cat(char *d, const char *s)
 {
   size_t i;
   
@@ -144,7 +144,7 @@ CHAOS_INLINE(char *str_cat(char *d, const char *s)
  * ------------------------------------------------------------------------ */
 CHAOS_API(size_t )str_copy(char *d, const char *s);
 
-CHAOS_INLINE(size_t str_copy(char *d, const char *s)
+CHAOS_INLINE_FN(size_t str_copy(char *d, const char *s)
 {
   size_t i = 0;
   
@@ -167,7 +167,7 @@ CHAOS_INLINE(size_t str_copy(char *d, const char *s)
 #ifndef HAVE_STRLCPY
 CHAOS_API(size_t )strlcpy(char *d, const char *s, size_t n);
 
-CHAOS_INLINE(size_t strlcpy(char *d, const char *s, size_t n)
+CHAOS_INLINE_FN(size_t strlcpy(char *d, const char *s, size_t n)
 {
   size_t i = 0;
   
@@ -198,7 +198,7 @@ CHAOS_INLINE(size_t strlcpy(char *d, const char *s, size_t n)
 #ifndef HAVE_STRLCAT
 CHAOS_API(size_t )strlcat(char *d, const char *s, size_t n);
   
-CHAOS_INLINE(size_t strlcat(char *d, const char *s, size_t n)
+CHAOS_INLINE_FN(size_t strlcat(char *d, const char *s, size_t n)
 {
   size_t i = 0;
   
@@ -240,7 +240,7 @@ CHAOS_INLINE(size_t strlcat(char *d, const char *s, size_t n)
  * ------------------------------------------------------------------------ */
 CHAOS_API(int )str_cmp(const char *s1, const char *s2);
 
-CHAOS_INLINE(int str_cmp(const char *s1, const char *s2)
+CHAOS_INLINE_FN(int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
   
@@ -261,7 +261,7 @@ CHAOS_INLINE(int str_cmp(const char *s1, const char *s2)
  * ------------------------------------------------------------------------ */
 CHAOS_API(int )str_icmp(const char *s1, const char *s2);
 
-CHAOS_INLINE(int str_icmp(const char *s1, const char *s2)
+CHAOS_INLINE_FN(int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
   
@@ -283,7 +283,7 @@ CHAOS_INLINE(int str_icmp(const char *s1, const char *s2)
 //#undef str_ncmp
 CHAOS_API(int )str_ncmp(const char *s1, const char *s2, size_t n);
 
-CHAOS_INLINE(int str_ncmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_FN(int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
   
@@ -307,7 +307,7 @@ CHAOS_INLINE(int str_ncmp(const char *s1, const char *s2, size_t n)
  * ------------------------------------------------------------------------ */
 CHAOS_API(int )str_nicmp(const char *s1, const char *s2, size_t n);
 
-CHAOS_INLINE(int str_incmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_FN(int str_incmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
   
@@ -345,7 +345,7 @@ CHAOS_API(int) str_toi(const char *s);
 //#define str_snprintf str_snprintf
 CHAOS_API(int) str_snprintf(char *str, size_t n, const char *format, ...);
 
-CHAOS_INLINE(int str_snprintf(char *str, size_t n, const char *format, ...)
+CHAOS_INLINE_FN(int str_snprintf(char *str, size_t n, const char *format, ...)
 {
   int ret;
   
@@ -366,7 +366,7 @@ CHAOS_INLINE(int str_snprintf(char *str, size_t n, const char *format, ...)
 CHAOS_API(int) str_toi(const char *s);
 
 #define ISNUM(c) ((c) >= '0' && (c) <= '9')
-CHAOS_INLINE(int str_toi(const char *s)
+CHAOS_INLINE_FN(int str_toi(const char *s)
 {
   register uint32_t i = 0;
   register uint32_t sign = 0;
@@ -421,7 +421,7 @@ CHAOS_INLINE(int str_toi(const char *s)
 CHAOS_API(size_t )str_tokenize(char *s, char **v, size_t maxtok);
 
 #if 1
-CHAOS_INLINE(size_t str_tokenize(char *s, char **v, size_t maxtok)
+CHAOS_INLINE_FN(size_t str_tokenize(char *s, char **v, size_t maxtok)
 {
   size_t c = 0;
   
@@ -490,7 +490,7 @@ CHAOS_API(size_t)str_tokenize_s(char       *s,
 //#define str_dup str_strdup
 CHAOS_API(char *)str_dup(const char *s);
 
-CHAOS_INLINE(char *str_dup(const char *s)
+CHAOS_INLINE_FN(char *str_dup(const char *s)
 {
   char *r;
   
@@ -508,7 +508,7 @@ CHAOS_API(uint32_t )str_hash(const char *s);
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-CHAOS_INLINE(uint32_t str_hash(const char *s)
+CHAOS_INLINE_FN(uint32_t str_hash(const char *s)
 {
   uint32_t ret = 0xcafebabe;
   uint32_t temp;
@@ -537,7 +537,7 @@ CHAOS_API(uint32_t)str_ihash(const char *s);
 
 #define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
 #define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-CHAOS_INLINE(uint32_t str_ihash(const char *s)
+CHAOS_INLINE_FN(uint32_t str_ihash(const char *s)
 {
   uint32_t ret = 0xcafebabe;
   uint32_t temp;

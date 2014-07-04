@@ -26,6 +26,10 @@
 #include <windows.h>
 #endif
 
+
+#ifndef PATH_MAX
+#define PATH_MAX MAX_PATH 
+#endif
 //#include "dlfcn_win32.h"
 
 static void dl_convert_path(char *buf, size_t n, const char *path)
@@ -35,17 +39,17 @@ static void dl_convert_path(char *buf, size_t n, const char *path)
     *buf++ = (*path == '/' ? '\\' : *path);
     path++;
   }
-  
-  *buf = '\0'; 
+
+  *buf = '\0';
 }
 
 void *dlopen(const char *filename, int flag)
 {
   void *handle;
   char path[PATH_MAX];
-  
+
   dl_convert_path(path, PATH_MAX, filename);
-  
+
   return LoadLibrary(path);
 }
 
@@ -63,10 +67,10 @@ const char *dlerror()
 {
   static char msg[256];
   DWORD error = GetLastError();
-  
+
   if(error == 0)
     return NULL;
-  
+
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL, error,

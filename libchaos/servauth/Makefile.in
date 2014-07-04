@@ -54,6 +54,7 @@ $(PROGRAM): $(OBJECTS)
 
 # build config
 # ---------------------------------------------------------------------------
+LIBS     += $(DLFCN_LIBS)
 LIBS     += -L$(top_builddir)/src -lchaos
 LIB      += $(SSL_LIBS)
 CPPFLAGS += -DHAVE_CONFIG_H
@@ -62,7 +63,10 @@ INCLUDES += -I$(srcdir) \
             -I$(top_srcdir)/include \
             -I$(builddir) \
             -I$(top_builddir) \
-            -I$(top_builddir)/include
+            -I$(top_builddir)/include \
+            -I. \
+            -I.. \
+            -I../include
 
 # include global make targets
 # ---------------------------------------------------------------------------

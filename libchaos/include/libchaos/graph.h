@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2004-2005  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: graph.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -32,8 +32,8 @@
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *
  * ------------------------------------------------------------------------ */
-#define GRAPH_TYPE_LINE   0        
-#define GRAPH_TYPE_COLUMN 1        
+#define GRAPH_TYPE_LINE   0
+#define GRAPH_TYPE_COLUMN 1
 
 #define GRAPH_COLOR_DARK   0            /* dark palette style */
 #define GRAPH_COLOR_BRIGHT 1            /* bright palette style */
@@ -69,7 +69,7 @@ struct graph {
   struct node            node;        /* linking node for graph_list */
   uint32_t               id;
   uint32_t               refcount;    /* times this block is referenced */
-  uint32_t               hash;
+  hash_t                 hash;
   uint16_t               width;
   uint16_t               height;
   uint16_t               grid_width;
@@ -99,42 +99,42 @@ struct graph {
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int                      )graph_log;
-CHAOS_API(struct sheap             )graph_heap;      /* heap containing graph blocks */
-CHAOS_API(struct dheap             )graph_data_heap; /* heap containing graph data */
-CHAOS_API(struct list              )graph_list;      /* list linking graph blocks */
-CHAOS_API(uint32_t                 )graph_id;
-CHAOS_API(int                      )graph_dirty;
+CHAOS_API(int)                      graph_log;
+CHAOS_API(struct sheap)             graph_heap;      /* heap containing graph blocks */
+CHAOS_API(struct dheap)             graph_data_heap; /* heap containing graph data */
+CHAOS_API(struct list)              graph_list;      /* list linking graph blocks */
+CHAOS_API(uint32_t)                 graph_id;
+CHAOS_API(int)                      graph_dirty;
 
 /* ------------------------------------------------------------------------ *
  * Initialize graph heap and add garbage collect timer.                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_init            (void);
+CHAOS_API(void)              graph_init            (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy graph heap and cancel timer.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_shutdown        (void);
+CHAOS_API(void)              graph_shutdown        (void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int               )graph_collect         (void);
+CHAOS_API(int)               graph_collect         (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_default         (struct graph  *iptr);
+CHAOS_API(void)              graph_default         (struct graph  *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct graph     *)graph_new             (const char    *name,
+CHAOS_API(struct graph *)    graph_new             (const char    *name,
                                                     uint16_t       width,
                                                     uint16_t       height,
                                                     int            type);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_source_add      (struct graph  *graph,
+CHAOS_API(void)              graph_source_add      (struct graph  *graph,
                                                     int            measure,
                                                     int            type,
                                                     void          *data,
@@ -142,71 +142,71 @@ CHAOS_API(void              )graph_source_add      (struct graph  *graph,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_drain_add       (struct graph  *graph,
+CHAOS_API(void)              graph_drain_add       (struct graph  *graph,
                                                     int            type);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_colorize        (struct graph  *graph, 
+CHAOS_API(void)              graph_colorize        (struct graph  *graph,
                                                     int            how);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_drain_render    (struct graph  *graph, 
+CHAOS_API(void)              graph_drain_render    (struct graph  *graph,
                                                     int            i);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_drain_save      (struct graph  *graph, 
-                                                    int            i);    
+CHAOS_API(void)              graph_drain_save      (struct graph  *graph,
+                                                    int            i);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_delete          (struct graph  *iptr);
+CHAOS_API(void)              graph_delete          (struct graph  *iptr);
 
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_release         (struct graph  *iptr);
-  
+CHAOS_API(void)              graph_release         (struct graph  *iptr);
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_set             (struct graph  *graph,
+CHAOS_API(void)              graph_set             (struct graph  *graph,
                                                     uint32_t       resolution,
                                                     uint32_t       samples,
                                                     uint32_t       mdiv,
                                                     uint32_t       unit);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_feed            (struct graph  *graph,
-                                                    time_t         t, 
+CHAOS_API(void)              graph_feed            (struct graph  *graph,
+                                                    time_t         t,
                                                     double         value);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_calc            (struct graph  *graph);  
+CHAOS_API(void)              graph_calc            (struct graph  *graph);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_draw            (struct graph  *graph);  
+CHAOS_API(void)              graph_draw            (struct graph  *graph);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void              )graph_set_name        (struct graph  *iptr,
+CHAOS_API(void)              graph_set_name        (struct graph  *iptr,
                                                     const char    *name);
- 
-/* ------------------------------------------------------------------------ *
- * ------------------------------------------------------------------------ */
-CHAOS_API(const char       *)graph_get_name        (struct graph  *iptr);
-  
-/* ------------------------------------------------------------------------ *
- * ------------------------------------------------------------------------ */
-CHAOS_API(struct graph     *)graph_find_name       (const char    *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct graph     *)graph_find_id         (uint32_t       id);
+CHAOS_API(const char *)      graph_get_name        (struct graph  *iptr);
+
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+CHAOS_API(struct graph *)    graph_find_name       (const char    *name);
+
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+CHAOS_API(struct graph *)    graph_find_id         (uint32_t       id);
 
 /* ------------------------------------------------------------------------ *
  * Dump graphers and graph heap.                                              *

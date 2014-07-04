@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: query.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -40,13 +40,13 @@
 static void query_dns_forward_done(struct dns_resolver *res)
 {
   struct servauth_query *q;
-  
+
   q = dns_get_userarg(res);
-  
+
   q->remote_addr = net_addr_any;
-  
+
   dns_get_addr(res, NET_ADDRESS_IPV4, &q->remote_addr);
-  
+
   if(q->remote_addr != net_addr_any)
   {
     /* reply address */
@@ -57,7 +57,7 @@ static void query_dns_forward_done(struct dns_resolver *res)
     /* reply failure */
     control_send(&servauth_control, "dns forward %s", q->id);
   }
-  
+
   query_free(q);
 }
 
@@ -66,11 +66,11 @@ static void query_dns_forward_done(struct dns_resolver *res)
 static void query_dns_reverse_done(struct dns_resolver *res)
 {
   struct servauth_query *q;
-  
+
   q = dns_get_userarg(res);
-  
+
   q->host = dns_dup_name(res);
-  
+
   if(q->host != NULL)
   {
     /* Reply name */
@@ -81,11 +81,11 @@ static void query_dns_reverse_done(struct dns_resolver *res)
     /* Reply failure */
     control_send(&servauth_control, "dns reverse %s", q->id);
   }
-  
+
   /* Add to cache */
-  cache_dns_put(&servauth_dnscache, CACHE_DNS_REVERSE, 
+  cache_dns_put(&servauth_dnscache, CACHE_DNS_REVERSE,
                 q->remote_addr, q->host, timer_systime);
-  
+
   query_free(q);
 }
 
@@ -94,29 +94,29 @@ static void query_dns_reverse_done(struct dns_resolver *res)
 static void query_auth_done(struct auth_client *auth)
 {
   struct servauth_query *q;
-  
+
   q = auth_get_userarg(auth);
-  
+
   if(auth->reply[0])
     q->ident = str_dup(auth->reply);
   else
     q->ident = NULL;
-  
+
   if(q->ident != NULL)
-  {    
+  {
     /* reply username */
     control_send(&servauth_control, "auth %s %s", q->id, q->ident);
   }
   else
   {
     int status;
-    
+
     /* reply failure */
     control_send(&servauth_control, "auth %s", q->id);
-    
+
     status = (q->auth.status == AUTH_ST_TIMEOUT ?
               CACHE_AUTH_TIMEOUT : CACHE_AUTH_RESET);
-    
+
     /* add to cache */
     cache_auth_put(&servauth_authcache, status, q->remote_addr, timer_systime);
   }
@@ -129,12 +129,12 @@ static void query_auth_done(struct auth_client *auth)
 static void query_proxy_done(struct proxy_check *proxy)
 {
   struct servauth_query *q;
-  
+
   q = proxy_get_userarg(proxy);
-  
+
   /* reply  */
   control_send(&servauth_control, "proxy %s %s", q->id, proxy_replies[q->proxy.reply]);
-  
+
   /* add to cache */
   cache_proxy_put(&servauth_proxycache, q->proxy.reply, q->remote_addr, q->remote_port, q->ptype, timer_systime);
 
@@ -166,7 +166,7 @@ void query_zero(struct servauth_query *q)
 /* -------------------------------------------------------------------------- *
  * set values necessary for an authentication query                           *
  * -------------------------------------------------------------------------- */
-int query_set_auth(struct servauth_query *q, const char *id, 
+int query_set_auth(struct servauth_query *q, const char *id,
                    const char *ip, const char *l, const char *r)
 {
   /* convert address */
@@ -185,38 +185,38 @@ int query_set_auth(struct servauth_query *q, const char *id,
 /* -------------------------------------------------------------------------- *
  * set values necessary for a proxy query                                     *
  * -------------------------------------------------------------------------- */
-int query_set_proxy(struct servauth_query *q, const char *id, 
+int query_set_proxy(struct servauth_query *q, const char *id,
                     const char *r, const char *l, const char *t)
 {
   char *ptr;
   char  addrbuf[32];
-  
+
   q->id = str_dup(id);
 
   /* parse remote address:port */
   strlcpy(addrbuf, r, sizeof(addrbuf));
-  
+
   if((ptr = str_chr(addrbuf, ':')))
     *ptr++ = '\0';
-  
+
   if(net_aton(addrbuf, &q->remote_addr) <= 0)
     return -1;
 
   q->remote_port = str_toul(ptr, NULL, 10);
-  
+
   /* parse local address:port */
   strlcpy(addrbuf, l, sizeof(addrbuf));
-  
+
   if((ptr = str_chr(addrbuf, ':')))
     *ptr++ = '\0';
-  
+
   if(net_aton(addrbuf, &q->local_addr) <= 0)
     return -1;
-  
+
   q->local_port = str_toul(ptr, NULL, 10);
-    
+
   q->ptype = proxy_parse_type(t);
-  
+
   if(q->ptype == -1)
     return -1;
 
@@ -279,7 +279,7 @@ int query_start(struct servauth_query *q, int type, uint64_t t)
       dns_zero(&q->res);
       dns_set_userarg(&q->res, q);
       dns_set_callback(&q->res, query_dns_reverse_done, DNS_TIMEOUT);
-      
+
       ret = dns_ptr_lookup(&q->res, NET_ADDRESS_IPV4, &q->remote_addr, t);
     }
 
@@ -289,7 +289,7 @@ int query_start(struct servauth_query *q, int type, uint64_t t)
       dns_zero(&q->res);
       dns_set_userarg(&q->res, q);
       dns_set_callback(&q->res, query_dns_forward_done, DNS_TIMEOUT);
-      
+
       ret = dns_name_lookup(&q->res, NET_ADDRESS_IPV4, q->host, t);
     }
 
@@ -299,10 +299,10 @@ int query_start(struct servauth_query *q, int type, uint64_t t)
       auth_zero(&q->auth);
       auth_set_userarg(&q->auth, q);
       auth_set_callback(&q->auth, query_auth_done, AUTH_TIMEOUT);
-      
-      ret = auth_lookup(&q->auth, 
+
+      ret = auth_lookup(&q->auth,
                         q->remote_addr,
-                        q->local_port, 
+                        q->local_port,
                         q->remote_port, t);
     }
 

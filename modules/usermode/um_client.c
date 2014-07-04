@@ -42,7 +42,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int  um_client_bounce     (struct user           *uptr, 
+static int  um_client_bounce     (struct user           *uptr,
                                   struct usermodechange *umcptr,
                                   uint32_t               flags);
 static void um_client_reg        (struct lclient        *lcptr);
@@ -70,7 +70,7 @@ int um_client_load(void)
 
   hook_register(lclient_register, HOOK_2ND, um_client_reg);
   hook_register(client_exit, HOOK_DEFAULT, um_client_quit);
-  
+
   return 0;
 }
 
@@ -78,7 +78,7 @@ void um_client_unload(void)
 {
   hook_unregister(client_exit, HOOK_DEFAULT, um_client_quit);
   hook_unregister(lclient_register, HOOK_2ND, um_client_reg);
-  
+
   usermode_unregister(&um_client);
 }
 
@@ -101,7 +101,7 @@ static int um_client_bounce(struct user *uptr, struct usermodechange *umcptr,
       }
     }
   }
-  
+
   return 0;
 }
 
@@ -110,18 +110,18 @@ static void um_client_reg(struct lclient *lcptr)
   struct usermode *umptr;
   struct node     *nptr;
   struct user     *uptr = NULL;
-  
+
   if(lcptr->client == NULL)
     return;
-  
+
   if((umptr = usermode_find(UM_CLIENT_CHAR)) == NULL)
     return;
-  
+
   dlink_foreach_data(&umptr->list, nptr, uptr)
   {
     if(uptr->client == NULL)
       continue;
-    
+
     client_send(uptr->client, ":%S NOTICE %N :*** client connecting: %N (%U@%s)",
                 server_me, uptr->client, lcptr->client, lcptr->client, lcptr->client->hostreal);
   }
@@ -132,18 +132,18 @@ static void um_client_quit(struct lclient *lcptr, struct client *cptr)
   struct usermode *umptr;
   struct node     *nptr;
   struct user     *uptr = NULL;
-  
+
   if(!client_is_local(cptr) || cptr->user == NULL)
     return;
-  
+
   if((umptr = usermode_find(UM_CLIENT_CHAR)) == NULL)
     return;
-  
+
   dlink_foreach_data(&umptr->list, nptr, uptr)
   {
     if(uptr->client == NULL)
       continue;
-    
+
     client_send(uptr->client, ":%S NOTICE %N :*** client exiting: %N (%U@%s)",
                 server_me, uptr->client, cptr, cptr, cptr->hostreal);
   }

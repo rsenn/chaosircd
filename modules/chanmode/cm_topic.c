@@ -45,13 +45,13 @@ static int cm_topic_hook(struct lclient *lcptr, struct client   *cptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_topic_help[] = 
+static const char *cm_topic_help[] =
 {
   "+t              Topiclock. Lets only ops change the topic.",
   NULL
 };
 
-static struct chanmode cm_topic_mode = 
+static struct chanmode cm_topic_mode =
 {
   CM_TOPIC_CHAR,           /* mode character */
   '\0',                    /* no prefix, because its not a privilege */
@@ -70,9 +70,9 @@ int cm_topic_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_topic_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_topic, HOOK_DEFAULT, cm_topic_hook);
-  
+
   return 0;
 }
 
@@ -80,7 +80,7 @@ void cm_topic_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_topic_mode);
-  
+
   hook_unregister(channel_topic, HOOK_DEFAULT, cm_topic_hook);
 }
 
@@ -101,6 +101,6 @@ static int cm_topic_hook(struct lclient *lcptr, struct client   *cptr,
       }
     }
   }
-  
+
   return 0;
 }

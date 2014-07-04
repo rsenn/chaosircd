@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: cache.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -39,7 +39,7 @@
 
 #ifdef __CYGWIN__
 #include <cygwin/in.h>
-#else
+#elif !defined(WIN32)
 #include <netinet/in.h>
 #endif /* __CYGWIN__ */
 
@@ -81,7 +81,7 @@ cache_auth_entry_oldest(struct cache_auth *cache, int status)
 /* -------------------------------------------------------------------------- *
  * get oldest entry with specified status                                     *
  * -------------------------------------------------------------------------- */
-static struct cache_entry_dns * 
+static struct cache_entry_dns *
 cache_dns_entry_oldest(struct cache_dns *cache, int status)
 {
   uint32_t i;
@@ -221,7 +221,7 @@ cache_proxy_entry_new(struct cache_proxy *cache)
     entry = cache_proxy_entry_oldest(cache, CACHE_PROXY_TIMEOUT);
 
   entry->status = CACHE_PROXY_NONE;
-  
+
   return entry;
 }
 
@@ -358,7 +358,7 @@ int cache_auth_pick(struct cache_auth *cache, net_addr_t addr, uint64_t t)
 /* -------------------------------------------------------------------------- *
  * pick a reverse dns query from cache.                                       *
  * -------------------------------------------------------------------------- */
-int cache_dns_pick_reverse(struct cache_dns *cache, net_addr_t addr, 
+int cache_dns_pick_reverse(struct cache_dns *cache, net_addr_t addr,
                            const char **namep, uint64_t t)
 {
   uint32_t i;
@@ -382,7 +382,7 @@ int cache_dns_pick_reverse(struct cache_dns *cache, net_addr_t addr,
 /* -------------------------------------------------------------------------- *
  * pick a reverse dns query from cache.                                       *
  * -------------------------------------------------------------------------- */
-net_addr_t cache_dns_pick_forward(struct cache_dns *cache, 
+net_addr_t cache_dns_pick_forward(struct cache_dns *cache,
                                       const char *name, uint64_t t)
 {
   uint32_t i;
@@ -408,7 +408,7 @@ net_addr_t cache_dns_pick_forward(struct cache_dns *cache,
 /* -------------------------------------------------------------------------- *
  * pick a proxy query from cache.                                             *
  * -------------------------------------------------------------------------- */
-int cache_proxy_pick(struct cache_proxy *cache, net_addr_t addr, 
+int cache_proxy_pick(struct cache_proxy *cache, net_addr_t addr,
                      uint16_t port, int type, uint64_t t)
 {
   uint32_t i;

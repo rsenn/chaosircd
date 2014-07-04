@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: dns.h,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -121,13 +121,13 @@ struct dns_resolver
 };
 
 /* -----------------------------------------------------------------
-   DNS options 
-  
+   DNS options
+
    Type Option            Description
    -----------------------------------------------------------------
    bool DNS_IPV6_SUPPORT  Compiled with IPv6 support (read-only).
                           This flag is for binary compatiblity.
-   
+
    bool DNS_IPV6_SOCK     IPv6 address/socket support. Is hardcoded
                           to 0 if DNS_IPV6_SUPPORT is 0. Will be
                           cleared if an IPv6 socket operation returned
@@ -135,50 +135,50 @@ struct dns_resolver
                           back). After a fallback all servers without
                           an IPv4 address will be ignored.
                           You can set this to 0 only.
-   
+
    str  DNS_CONFIG        Config file, defaults to "/etc/resolv.conf"
-   
+
    str  DNS_ENV           Environment variable, defaults to "DNSCACHE"
-  
+
    int  DNS_CONNECT       Timeout for socket connection,
                           defaults to 5 seconds.
-  
+
    int  DNS_TIMEOUT       Timeout for DNS query, defaults to 10 seconds.
-   
-   int  DNS_RETRIES       Number of retries. 
+
+   int  DNS_RETRIES       Number of retries.
                           -1 == try each server once.
                           -2 == never give up.
-   
+
    int  DNS_PARANOID      Will not give up after receving NXDOMAIN
                           until each server in the list has been tried.
-   
+
    int  DNS_RR_TIME       Will reread DNS_CONFIG and DNS_ENV every n
                           seconds.
                           0 == disable
-   
+
    int  DNS_RR_USES       Will reread DNS_CONFIG and DNS_ENV every n
                           queries.
- 
+
    int  DNS_BIND_LOW      Bottom of random source port range.
    int  DNS_BIND_HIGH     Top of random source port range.
- 
+
    -----------------------------------------------------------------
-  
+
    String options:
-  
+
      void dns_set_option(int, const char *);
      void dns_get_option(int, const char **);
-   
+
    Numeric options:
-   
+
      void dns_set_option(int, int);
      void dns_get_option(int, int *);
-   
+
    Examples:
-   
+
      dns_set_option(DNS_CONFIG, "/etc/dns.conf");
      dns_get_option(DNS_TIMEOUT, &timeout);
- 
+
    ----------------------------------------------------------------- */
 
 /* The actual options */
@@ -262,9 +262,9 @@ extern int                  dns_updatedb     (void);
 extern void                 dns_dump         (void);
 extern int                  dns_errno        (void);
 extern const char          *dns_errstr       (void);
-extern void                 dns_vset_option  (int                  opt, 
+extern void                 dns_vset_option  (int                  opt,
                                               va_list              arg);
-extern void                 dns_vget_option  (int                  opt, 
+extern void                 dns_vget_option  (int                  opt,
                                               va_list              arg);
 extern void                *dns_get_userarg  (struct dns_resolver *res);
 extern void                 dns_set_userarg  (struct dns_resolver *res,
@@ -275,27 +275,27 @@ extern void                 dns_zero         (struct dns_resolver *res);
 extern struct dns_resolver *dns_new          (void);
 extern void                 dns_free         (struct dns_resolver *res);
 extern void                 dns_set_callback (struct dns_resolver *res,
-                                              dns_callback_t      *callback, 
+                                              dns_callback_t      *callback,
                                               uint64_t             timeout);
 extern void                 dns_forall_begin (void);
 extern struct dns_resolver *dns_forall_next  (void);
 extern int                  dns_name_lookup  (struct dns_resolver *res,
                                               int                  at,
-                                              const char          *name, 
+                                              const char          *name,
                                               uint64_t             t);
 extern int                  dns_ptr_lookup   (struct dns_resolver *res,
-                                              int                  at, 
-                                              void                *ip, 
+                                              int                  at,
+                                              void                *ip,
                                               uint64_t             t);
-extern int                  dns_get_addr     (struct dns_resolver *res, 
-                                              int                  at, 
+extern int                  dns_get_addr     (struct dns_resolver *res,
+                                              int                  at,
                                               void                *addr);
 extern int                  dns_get_addr_x   (struct dns_resolver *res,
-                                              int                  at, 
+                                              int                  at,
                                               void                *addr,
                                               size_t               nelem);
 extern int                  dns_get_name     (struct dns_resolver *res,
-                                              char                *buf, 
+                                              char                *buf,
                                               size_t               n);
 extern char                *dns_dup_name     (struct dns_resolver *res);
 

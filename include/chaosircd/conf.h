@@ -45,7 +45,7 @@ struct option {
  * section structures                                                         *
  * -------------------------------------------------------------------------- */
 struct conf_global {
-  uint32_t hash;
+  hash_t hash;
   char     name[IRCD_HOSTLEN + 1];
   char     info[IRCD_INFOLEN + 1];
   char     configfile[IRCD_PATHLEN + 1];
@@ -65,7 +65,7 @@ struct conf_connect {
   char     cipher[IRCD_CIPHERLEN + 1];
   char     key[IRCD_PATHLEN + 1];
   int      cryptlink;
-  int      ziplink;  
+  int      ziplink;
 };
 
 /* -------------------------------------------------------------------------- *
@@ -89,8 +89,8 @@ struct config {
  * -------------------------------------------------------------------------- */
 extern struct config conf_current;
 extern struct config conf_new;
-extern int           conf_fd;
-extern int           conf_log;
+IRCD_DATA(int)        conf_fd;
+IRCD_DATA(int)        conf_log;
 
 /* -------------------------------------------------------------------------- *
  * some declarations for flex/bison                                           *
@@ -105,12 +105,12 @@ extern int  lineno;
 extern char linebuf[IRCD_BUFSIZE];
 
 /* exporting to parser */
-extern int           yydebug;
+IRCD_DATA(int)        yydebug;
 extern struct global globalopts;
-extern int           conf_fd;
-extern void          yyerror(char *);
-extern int           yyparse(void);
-extern void          yy_fatal_error(const char *);
+IRCD_DATA(int)        conf_fd;
+IRCD_API(void)       yyerror(char *);
+IRCD_API(int)        yyparse(void);
+IRCD_API(void)       yy_fatal_error(const char *);
 
 #undef stdin
 #undef stdout
@@ -125,34 +125,34 @@ extern void          yy_fatal_error(const char *);
 /* -------------------------------------------------------------------------- *
  * Getopt and configfile coldstart.                                           *
  * -------------------------------------------------------------------------- */
-extern void               conf_init         (int            argc,
+IRCD_API(void)            conf_init         (int            argc,
                                              char         **argv,
                                              char         **envp);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown config code.                                                      *
  * -------------------------------------------------------------------------- */
-extern void               conf_shutdown     (void);
+IRCD_API(void)            conf_shutdown     (void);
 
 /* -------------------------------------------------------------------------- *
  * Read the config file(s).                                                   *
  * -------------------------------------------------------------------------- */
-extern void               conf_read         (void);
+IRCD_API(void)            conf_read         (void);
 
 /* -------------------------------------------------------------------------- *
  * This is called when a config file is read successfully.                    *
  * -------------------------------------------------------------------------- */
-extern void               conf_done         (void);
+IRCD_API(void)            conf_done         (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void               conf_rehash       (void);
+IRCD_API(void)            conf_rehash       (void);
 
 /* -------------------------------------------------------------------------- *
  * Dump a config structure.                                                   *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-extern void               conf_dump         (struct config *cfgptr);
+IRCD_API(void)            conf_dump         (struct config *cfgptr);
 #endif /* DEBUG */
 
 /* -------------------------------------------------------------------------- *

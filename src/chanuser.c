@@ -61,7 +61,7 @@ void chanuser_init(void)
   chanuser_log = log_source_register("chanuser");
 
   chanuser_serial = 0;
-  
+
   mem_static_create(&chanuser_heap, sizeof(struct chanuser),
                     CHANUSER_BLOCK_SIZE);
   mem_static_note(&chanuser_heap, "chanuser heap");
@@ -75,9 +75,9 @@ void chanuser_init(void)
 void chanuser_shutdown(void)
 {
   log(chanuser_log, L_status, "Shutting down [chanuser] module...");
-  
+
   mem_static_destroy(&chanuser_heap);
-  
+
   log_source_unregister(chanuser_log);
 }
 
@@ -87,15 +87,15 @@ void chanuser_shutdown(void)
 struct chanuser *chanuser_new(struct channel *chptr, struct client *cptr)
 {
   struct chanuser *cuptr;
-  
+
   cuptr = mem_static_alloc(&chanuser_heap);
-  
+
   cuptr->channel = channel_pop(chptr);
   cuptr->client = client_pop(cptr);
   cuptr->flags = 0ull;
   cuptr->serial = chanuser_serial;
   cuptr->local = 0;
-  
+
   cuptr->prefix[0] = '\0';
 
   return cuptr;
@@ -108,27 +108,27 @@ struct chanuser *chanuser_new(struct channel *chptr, struct client *cptr)
 struct chanuser *chanuser_add(struct channel *chptr, struct client *cptr)
 {
   struct chanuser *cuptr = NULL;
-  
+
   if(client_is_user(cptr) || client_is_service(cptr))
   {
     /* Get a chanuser block */
     cuptr = chanuser_new(chptr, cptr);
-    
+
     /* Add to global member list */
     dlink_add_tail(&chptr->chanusers, &cuptr->gnode, cuptr);
-    
+
     /* If the client is local then add to local member list */
     cuptr->local = client_is_local(cptr);
-    
+
     if(cuptr->local)
       dlink_add_tail(&chptr->lchanusers, &cuptr->lnode, cuptr);
     else
       dlink_add_tail(&chptr->rchanusers, &cuptr->rnode, cuptr);
-    
+
     /* Add to the users channel list */
-    dlink_add_tail(&cptr->user->channels, &cuptr->unode, cuptr);    
+    dlink_add_tail(&cptr->user->channels, &cuptr->unode, cuptr);
   }
-  
+
   return cuptr;
 }
 
@@ -138,8 +138,8 @@ struct chanuser *chanuser_add(struct channel *chptr, struct client *cptr)
 struct chanuser *chanuser_find(struct channel *chptr, struct client *cptr)
 {
   struct chanuser *cuptr;
-  
-  /* We search the client->user->channels list because this 
+
+  /* We search the client->user->channels list because this
      list is usually smaller than the channel member list */
   if(client_is_user(cptr) || client_is_service(cptr))
   {
@@ -148,9 +148,9 @@ struct chanuser *chanuser_find(struct channel *chptr, struct client *cptr)
       if(cuptr->channel == chptr)
         return cuptr;
   }
-  
+
   return NULL;
-}                                  
+}
 
 /* -------------------------------------------------------------------------- *
  * Find a chanuser block and warn                                             *
@@ -160,12 +160,12 @@ struct chanuser *chanuser_find_warn(struct client  *cptr,
                                     struct client  *acptr)
 {
   struct chanuser *cuptr;
-  
+
   cuptr = chanuser_find(chptr, acptr);
-  
+
   if(cuptr)
     return cuptr;
-  
+
   if(client_is_user(cptr))
   {
     if(acptr == cptr)
@@ -173,7 +173,7 @@ struct chanuser *chanuser_find_warn(struct client  *cptr,
     else
       numeric_send(cptr, ERR_USERNOTINCHANNEL, chptr->name, acptr->name);
   }
-  
+
   return NULL;
 }
 
@@ -187,15 +187,15 @@ struct chanuser *chanuser_find_warn(struct client  *cptr,
 void chanuser_delete(struct chanuser *cuptr)
 {
   struct channel *chptr;
-  
+
   chptr = cuptr->channel;
-  
+
   /* Unlink from the users channel links */
   dlink_delete(&cuptr->client->user->channels, &cuptr->unode);
 
   /* Unlink from global memberlist */
   dlink_delete(&cuptr->channel->chanusers, &cuptr->gnode);
-  
+
   /* If the client is local then unlink from local memberlist */
   if(cuptr->local)
     dlink_delete(&cuptr->channel->lchanusers, &cuptr->lnode);
@@ -203,13 +203,13 @@ void chanuser_delete(struct chanuser *cuptr)
     dlink_delete(&cuptr->channel->rchanusers, &cuptr->rnode);
 
   /* Now free the block */
-  mem_static_free(&chanuser_heap, cuptr);  
+  mem_static_free(&chanuser_heap, cuptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * Show all chanusers to a client                                             *
  * -------------------------------------------------------------------------- */
-void chanuser_show(struct client   *cptr,  struct channel *chptr, 
+void chanuser_show(struct client   *cptr,  struct channel *chptr,
                    struct chanuser *cuptr, int             eon)
 {
   struct chanuser *cu2ptr;
@@ -226,9 +226,9 @@ void chanuser_show(struct client   *cptr,  struct channel *chptr,
     cptr = cuptr->client;
     chptr = cuptr->channel;
   }
-  
+
   dlink_list_zero(&list);
-  
+
   /* Don't assembe list when channel is secret and the user is not member */
   if(!((chptr->modes & CHFLG(s)) && cuptr == NULL))
   {
@@ -241,28 +241,28 @@ void chanuser_show(struct client   *cptr,  struct channel *chptr,
       dlink_add_tail(&list, nptr, cu2ptr);
     }
   }
-  
+
   /* Reply names list */
   nptr = list.head;
-  
+
   if(nptr)
   {
     len = str_snprintf(buf, sizeof(buf), numeric_format(RPL_NAMREPLY),
                    client_me->name, cptr->name,
-                   (chptr->modes & CHFLG(s) ? "@" : "="), chptr->name);    
+                   (chptr->modes & CHFLG(s) ? "@" : "="), chptr->name);
     do
     {
       nptr = chanuser_assemble(&buf[len], nptr,  sizeof(buf) - len, 1, 0);
-            
+
       client_send(cptr, "%s ", buf);
     }
     while(nptr);
-    
+
     dlink_destroy(&list);
-    
+
     did_send = 1;
   }
-  
+
   /* End of names reply? */
   if(eon == 1 || (eon == 2 && did_send))
     numeric_send(cptr, RPL_ENDOFNAMES, chptr->name);
@@ -272,7 +272,7 @@ void chanuser_show(struct client   *cptr,  struct channel *chptr,
  * Parse chanusers                                                            *
  * -------------------------------------------------------------------------- */
 uint32_t chanuser_parse(struct lclient *lcptr,  struct list *lptr,
-                        struct channel *chptr,  char        *args, 
+                        struct channel *chptr,  char        *args,
                         int             prefix)
 {
   struct chanuser *cuptr;
@@ -285,72 +285,72 @@ uint32_t chanuser_parse(struct lclient *lcptr,  struct list *lptr,
   char            *uv[CHANUSER_PER_LINE + 1];
   char            *pfx;
   char            *usr;
-  
+
   dlink_list_zero(lptr);
-  
+
   n = str_tokenize(args, uv, CHANUSER_PER_LINE);
-  
+
   for(i = 0; i < n; i++)
   {
     pfx = uv[i];
     usr = uv[i];
-    
+
     while(*usr && !chars_isnickchar(*usr) && !chars_isuidchar(*usr))
       usr++;
-    
+
     if(usr == pfx)
       pfx = NULL;
-    
+
     if(prefix && pfx)
       flags = chanmode_prefix_parse(pfx);
     else
-      flags = 0ull;
+      flags = 0ULL;
     
     if(pfx)
       modes += usr - pfx;
-    
+
     if(lcptr->caps & CAP_UID)
       acptr = client_find_uid(usr);
     else
       acptr = client_find_nick(usr);
-    
+
     if(acptr == NULL)
     {
       log(chanuser_log, L_warning, "Invalid user '%s' in NJOIN.",
           usr);
       continue;
     }
-    
+
     if(client_is_local(acptr))
     {
       log(chanuser_log, L_warning, "Local user '%s' in NJOIN.",
           acptr->name);
       continue;
     }
-    
+
     if(!channel_is_member(chptr, acptr))
     {
       cuptr = chanuser_new(chptr, acptr);
       nptr = dlink_node_new();
-      
+
       dlink_add_tail(lptr, nptr, cuptr);
 
       cuptr->local = client_is_local(acptr);
       cuptr->flags = flags;
-      
+
       if(flags)
         chanmode_prefix_make(cuptr->prefix, flags);
       else
         cuptr->prefix[0] = '\0';
     }
   }
-  
+
   return modes;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct node *chanuser_assemble(char  *buf, struct node *nptr, 
+struct node *chanuser_assemble(char  *buf, struct node *nptr,
                                size_t n,   int          of,
                                int    uid)
 {
@@ -361,12 +361,12 @@ struct node *chanuser_assemble(char  *buf, struct node *nptr,
   size_t           nlen = 0;
   size_t           plen = 0;
   size_t           len;
-  
+
   buf[i] = '\0';
-  
+
   if(nptr == NULL)
     return NULL;
-    
+
   do
   {
     cuptr = nptr->data;
@@ -374,13 +374,13 @@ struct node *chanuser_assemble(char  *buf, struct node *nptr,
     nlen = str_len(name);
     plen = (of ? 1 : str_len(cuptr->prefix));
     len = nlen + (cuptr->flags ? plen : 0);
-    
+
     if(i + 2 + len > n)
       break;
 
     if(i)
       buf[i++] = ' ';
-    
+
     if(cuptr->flags)
     {
       if(plen == 1)
@@ -399,13 +399,13 @@ struct node *chanuser_assemble(char  *buf, struct node *nptr,
     {
       strcpy(&buf[i], name);
     }
-      
+
     i += nlen;
-    
+
     count++;
   }
   while((nptr = nptr->next) && count < CHANUSER_PER_LINE);
-  
+
   return nptr;
 }
 
@@ -421,13 +421,13 @@ void chanuser_introduce(struct lclient *lcptr, struct client *cptr,
   size_t           len;
   char             buf[IRCD_LINELEN - 1];
   struct node     *node;
-  
+
   if(nptr == NULL)
     return;
-  
+
   cuptr = nptr->data;
   chptr = cuptr->channel;
-  
+
   debug(chanuser_log, "introducing new members to %s", chptr->name);
 
   if(cptr == NULL || cptr == client_me)
@@ -440,18 +440,18 @@ void chanuser_introduce(struct lclient *lcptr, struct client *cptr,
   for(node = nptr; node;)
   {
     cuptr = node->data;
-    
+
     node = chanuser_assemble(&buf[len], node, sizeof(buf) - len - 1, 0, 1);
-    
+
     server_send(lcptr, NULL, CAP_UID, CAP_NONE, "%s", buf);
   }
-  
+
   for(node = nptr; node;)
   {
     cuptr = node->data;
-    
+
     node = chanuser_assemble(&buf[len], node, sizeof(buf) - len - 1, 0, 0);
-    
+
     server_send(lcptr, NULL, CAP_NONE, CAP_UID, "%s", buf);
   }
 }
@@ -466,19 +466,19 @@ size_t chanuser_burst(struct lclient *lcptr, struct channel *chptr)
   size_t           len;
   size_t           ret = 0;
   char             buf[IRCD_LINELEN - 1];
-  
+
   len = str_snprintf(buf, sizeof(buf), "NJOIN %s %lu :",
                  chptr->name, (unsigned long)(chptr->ts));
-  
+
   for(nptr = chptr->chanusers.head; nptr;)
   {
     cuptr = nptr->data;
-    
+
     nptr = chanuser_assemble(&buf[len], nptr, sizeof(buf) - len - 1,
                              0, lcptr->caps & CAP_UID);
 
     lclient_send(lcptr, "%s", buf);
-    
+
     ret += str_len(cuptr->prefix);
   }
 
@@ -513,7 +513,7 @@ void chanuser_discharge(struct lclient *lcptr, struct chanuser *cuptr,
                 ":%s PART %s",
                 cuptr->client->name,
                 cuptr->channel->name);
-  }  
+  }
 }
 
 /* -------------------------------------------------------------------------- *
@@ -522,17 +522,17 @@ void chanuser_send_joins(struct lclient *lcptr, struct node *nptr)
 {
   struct chanuser *cuptr;
   struct channel  *chptr;
-  
+
   if(nptr == NULL)
     return;
-  
+
   cuptr = nptr->data;
   chptr = cuptr->channel;
-  
+
   do
   {
     cuptr = nptr->data;
-    
+
     channel_send(lcptr, chptr, CHFLG(NONE), CHFLG(NONE),
                  ":%N!%U@%H JOIN %s",
                  cuptr->client,
@@ -545,64 +545,64 @@ void chanuser_send_joins(struct lclient *lcptr, struct node *nptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void chanuser_send_modes(struct lclient *lcptr, struct client *cptr, 
+void chanuser_send_modes(struct lclient *lcptr, struct client *cptr,
                          struct node    *nptr)
 {
   struct chanuser *cuptr;
   struct channel  *chptr;
   struct list      modes;
-  
+
   if(nptr == NULL)
     return;
-  
+
   cuptr = nptr->data;
   chptr = cuptr->channel;
-  
+
   dlink_list_zero(&modes);
-  
+
   do
   {
     cuptr = nptr->data;
-    
+
     chanmode_changes_make(&modes, CHANMODE_ADD, cuptr);
   }
   while((nptr = nptr->next));
 
   chanmode_send_local(cptr, chptr, modes.head, IRCD_MODESPERLINE);
-  
+
   chanmode_change_destroy(&modes);
 }
 
 /* -------------------------------------------------------------------------- *
  * Walk through all channels a client is in and message all members           *
  * -------------------------------------------------------------------------- */
-void chanuser_vsend(struct lclient *lcptr,  struct client *cptr,   
+void chanuser_vsend(struct lclient *lcptr,  struct client *cptr,
                     const char     *format, va_list        args)
 {
   struct chanuser *cuptr;
   struct chanuser *cu2ptr;
   struct client   *acptr;
   struct fqueue    multi;
-  struct node     *node;  
+  struct node     *node;
   size_t           n;
   char             buf[IRCD_LINELEN + 1];
-  
+
   if(!client_is_user(cptr))
     return;
 
   client_serial++;
-  
+
   /* Formatted print */
   n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
-  
+
   /* Add line separator */
   buf[n++] = '\r';
   buf[n++] = '\n';
-  
+
   /* Start a multicast queue */
   io_multi_start(&multi);
   io_multi_write(&multi, buf, n);
-  
+
   /* Walk through the channels the user is in */
   dlink_foreach(&cptr->user->channels, cuptr)
   {
@@ -614,22 +614,22 @@ void chanuser_vsend(struct lclient *lcptr,  struct client *cptr,
 
       if(acptr->lclient == NULL)
         continue;
-      
+
       /* Huh? What the hell does a remote user on local chanuser list? */
       if(!client_is_local(acptr))
         continue;
-      
+
       /* The lcptr we shouldn't send to */
       if(acptr->lclient == lcptr)
         continue;
-      
+
       /* Did we already send to this client? */
       if(acptr->serial == client_serial)
         continue;
-      
+
       /* Mark as sent */
       acptr->serial = client_serial;
-      
+
       /* Link it to the local queue */
       io_multi_link(&multi, acptr->lclient->fds[1]);
       lclient_update_sendb(acptr->lclient, n);
@@ -639,7 +639,7 @@ void chanuser_vsend(struct lclient *lcptr,  struct client *cptr,
 #endif /* DEBUG */
     }
   }
-  
+
   if(client_is_local(cptr))
   {
     if(cptr->source != lcptr && cptr->serial != client_serial)
@@ -652,19 +652,19 @@ void chanuser_vsend(struct lclient *lcptr,  struct client *cptr,
 #endif /* DEBUG */
     }
   }
-  
+
   /* End multicasting */
   io_multi_end(&multi);
 }
 
-void chanuser_send(struct lclient *lcptr,  struct client *cptr,   
+void chanuser_send(struct lclient *lcptr,  struct client *cptr,
                    const char     *format, ...)
 {
   va_list args;
-  
+
   va_start(args, format);
   chanuser_vsend(lcptr, cptr, format, args);
-  va_end(args);  
+  va_end(args);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -673,7 +673,7 @@ void chanuser_mode_set(struct chanuser *cuptr, uint64_t flags)
 {
   cuptr->flags = flags;
   chanmode_prefix_make(cuptr->prefix, cuptr->flags);
-  
+
   debug(chanuser_log, "new prefix for %s on %s: %s",
         cuptr->client->name, cuptr->channel->name, cuptr->prefix);
 }
@@ -681,29 +681,29 @@ void chanuser_mode_set(struct chanuser *cuptr, uint64_t flags)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 int chanuser_mode_bounce(struct lclient *lcptr, struct client         *cptr,
-                         struct channel *chptr, struct chanuser       *cuptr, 
+                         struct channel *chptr, struct chanuser       *cuptr,
                          struct list    *lptr,  struct chanmodechange *cmcptr)
 {
   struct chanuser *target = cmcptr->target;
   struct chanmode *mode   = cmcptr->mode;
-  
+
   /* Now apply the changes */
   if(cmcptr->what == CHANMODE_DEL)
   {
     /* Target has not op, bounce the change */
     if(!(target->flags & mode->flag))
       return 1;
-    
+
     /* Clear the flag */
     chanuser_mode_set(target, target->flags & ~mode->flag);
   }
-  
+
   if(cmcptr->what == CHANMODE_ADD)
   {
     /* Target already has op, bounce the change */
     if((target->flags & mode->flag))
       return 1;
-    
+
     /* Set the flag */
     chanuser_mode_set(target, target->flags | mode->flag);
   }
@@ -718,23 +718,23 @@ void chanuser_drop(struct client *cptr, struct channel *chptr)
   struct chanuser *cuptr;
   struct node     *node;
   struct list      modelist;
-  
+
   dlink_list_zero(&modelist);
-  
+
   dlink_foreach_data(&chptr->chanusers, node, cuptr)
   {
     chanmode_changes_make(&modelist, CHANMODE_DEL, cuptr);
-    
+
     cuptr->prefix[0] = '\0';
     cuptr->flags = 0ull;
   }
-  
-#ifdef DEBUG 
+
+#ifdef DEBUG
   chanmode_changes_dump(&modelist);
 #endif /* DEBUG */
-  
+
   chanmode_send_local(cptr, chptr, modelist.head, IRCD_MODESPERLINE);
-  
+
   chanmode_change_destroy(&modelist);
 }
 
@@ -750,70 +750,69 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
   size_t           len;
 
   channel_serial++;
-    
   rpllen = str_snprintf(rplbuf, IRCD_LINELEN, ":%s %03u %s %s :",
                     client_me->name, RPL_WHOISCHANNELS,
                     client_is_local(cptr) ? cptr->name : cptr->user->uid,
                     auptr->client->name);
   rplidx = 0;
-  
+
   /* common channels first */
   dlink_foreach(&cptr->user->channels, cuptr)
-  { 
+  {
     acuptr = chanuser_find(cuptr->channel, auptr->client);
-    
+
     if(acuptr)
-    { 
+    {
       len = str_len(acuptr->channel->name) + str_len(acuptr->prefix);
-      
+
       if(len + rpllen + rplidx + 1 > IRCD_LINELEN - 2)
       {
         client_send(cptr, "%s", rplbuf);
         rplidx = 0;
       }
-      
+
       if(rplidx != 0)
         rplbuf[rpllen + rplidx++] = ' ';
-      
+
       str_copy(&rplbuf[rpllen + rplidx], acuptr->prefix);
       str_cat(&rplbuf[rpllen + rplidx], acuptr->channel->name);
-      
+
       rplidx += len;
-      
+
       acuptr->channel->serial = channel_serial;
     }
   }
-  
+
   /* now all non-secret channels */
   dlink_foreach(&auptr->channels, acuptr)
   {
     if(acuptr->channel->serial == channel_serial)
       continue;
-    
+
     if(hooks_call(chanuser_whois, HOOK_DEFAULT, cptr, auptr->client, acuptr))
       continue;
-    
+
     len = str_len(acuptr->channel->name) + str_len(acuptr->prefix);
-    
+
     if(len + rpllen + rplidx + 1 > IRCD_LINELEN - 2)
     {
       client_send(cptr, "%s", rplbuf);
       rplidx = 0;
     }
-    
+
     if(rplidx != 0)
       rplbuf[rpllen + rplidx++] = ' ';
-    
+
     strcpy(&rplbuf[rpllen + rplidx], acuptr->prefix);
     strcat(&rplbuf[rpllen + rplidx], acuptr->channel->name);
-    
+
     rplidx += len;
   }
-  
+
   if(rplidx)
   {
     client_send(cptr, "%s", rplbuf);
-  }   
+  }
 }
 
 /* -------------------------------------------------------------------------- *
@@ -828,7 +827,7 @@ void chanuser_kick(struct lclient *lcptr,   struct client   *cptr,
   {
     struct chanuser *acuptr;
     struct client   *acptr;
-    
+
     if(lcptr->caps & CAP_UID)
     {
       if((acptr = client_find_uid(targetv[i])) == NULL)
@@ -839,23 +838,23 @@ void chanuser_kick(struct lclient *lcptr,   struct client   *cptr,
       if((acptr = client_find_nickhw(cptr, targetv[i])) == NULL)
         continue;
     }
-    
+
     if((acuptr = chanuser_find_warn(cptr, chptr, acptr)) == NULL)
       continue;
-    
+
     if(hooks_call(chanuser_kick, HOOK_DEFAULT,
                   lcptr, cptr, chptr, cuptr, acuptr, reason) == 0)
     {
       numeric_send(cptr, ERR_CHANOPRIVSNEEDED, chptr->name);
       continue;
     }
-  
+
     if(client_is_user(cptr))
     {
       channel_send(NULL, chptr, CHFLG(NONE), CHFLG(NONE),
                    ":%N!%U@%H KICK %s %N :%s",
                    cptr, cptr, cptr, chptr->name, acptr, reason);
-      
+
       server_send(lcptr, NULL, CAP_UID, CAP_NONE,
                   ":%s KICK %s %s :%s",
                   cptr->user->uid, chptr->name, acptr->user->uid, reason);
@@ -868,7 +867,7 @@ void chanuser_kick(struct lclient *lcptr,   struct client   *cptr,
       channel_send(NULL, chptr, CHFLG(NONE), CHFLG(NONE),
                    ":%N KICK %s %N :%s",
                    cptr, chptr->name, acptr, reason);
-      
+
       server_send(lcptr, NULL, CAP_UID, CAP_NONE,
                   ":%s KICK %s %s :%s",
                   cptr->name, chptr->name, acptr->user->uid, reason);
@@ -876,7 +875,7 @@ void chanuser_kick(struct lclient *lcptr,   struct client   *cptr,
                   ":%s KICK %s %s :%s",
                   cptr->name, chptr->name, acptr->name, reason);
     }
-    
+
     chanuser_delete(acuptr);
   }
 }
@@ -887,9 +886,9 @@ void chanuser_support(void)
 {
   char prefixes[65];
   char modes[65];
-  
+
   chanmode_prefix_make(prefixes, CHFLG(ALL));
   chanmode_flags_build(modes, CHANMODE_TYPE_ALL, CHFLG(ALL));
-  
+
   ircd_support_set("PREFIX", "(%s)%s", modes, prefixes);
 }

@@ -6,6 +6,7 @@ thisdir              = modules/chanmode/
 
 CATEGORY             = chanmode
 MODULES              = cm_ahalfop \
+                       cm_alarm \
                        cm_aop \
                        cm_avoice \
                        cm_ban \
@@ -19,6 +20,7 @@ MODULES              = cm_ahalfop \
                        cm_moderated \
                        cm_noext \
                        cm_op \
+                       cm_persistent \
                        cm_secret \
                        cm_topic \
                        cm_voice
