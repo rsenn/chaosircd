@@ -137,12 +137,20 @@ bison_target(IRCD_PARSER src/ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_parser.
 flex_target(IRCD_SCANNER src/ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/src/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
-add_executable(chaosircd 
+set(IRCD_SOURCES
    ${BISON_IRCD_PARSER_OUTPUTS}
    ${FLEX_IRCD_SCANNER_OUTPUTS}
    src/chanmode.c src/channel.c src/chanuser.c src/chars.c
-   src/class.c src/client.c src/conf.c src/ircd.c
+   src/class.c src/client.c src/conf.c
    src/lclient.c src/main.c src/msg.c src/numeric.c src/oper.c
    src/server.c src/service.c src/user.c src/usermode.c)
+   
+if(WIN32 OR CYGWIN)
+add_library(libircd  ${IRCD_SOURCES})
+add_executable(chaosircd src/ircd.c)
+target_link_libraries(chaosircd libircd)
+else(WIN32 OR CYGWIN)
+add_executable(chaosircd  ${IRCD_SOURCES}  src/ircd.c)
+endif(WIN32 OR CYGWIN)
    
 target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})

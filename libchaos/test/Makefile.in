@@ -19,7 +19,6 @@ include $(top_builddir)/config.mk
 # configuration for this directory
 # ---------------------------------------------------------------------------
 TESTS = cfgtest \
-        dbtest \
         giftest \
         graphtest \
         imagetest \
