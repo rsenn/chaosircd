@@ -510,7 +510,7 @@ CHAOS_API(hash_t )str_hash(const char *s);
 
 #define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
 #define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
-CHAOS_INLINE hash_t str_hash(const char *s)
+extern inline hash_t str_hash(const char *s)
 {
   hash_t ret = 0xdefaced;
   hash_t temp;
@@ -521,7 +521,7 @@ CHAOS_INLINE hash_t str_hash(const char *s)
   
   if(s == NULL)
     return ret;
-
+  
   for(i = 0; s[i]; i++)
   {
     temp = ret;
@@ -542,7 +542,7 @@ CHAOS_API(hash_t)str_ihash(const char *s);
 
 #define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
 #define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
-CHAOS_INLINE hash_t str_ihash(const char *s)
+extern inline hash_t str_ihash(const char *s)
 {
   hash_t ret = 0xdefaced;
   hash_t temp;
@@ -553,7 +553,7 @@ CHAOS_INLINE hash_t str_ihash(const char *s)
   
   if(s == NULL)
     return ret;
-
+  
   for(i = 0; s[i]; i++)
   {
     temp = ret;

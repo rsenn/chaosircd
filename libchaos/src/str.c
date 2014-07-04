@@ -1175,7 +1175,7 @@ hash_t str_hash(const char *s)
   
   if(s == NULL)
     return ret;
-
+  
   for(i = 0; s[i]; i++)
   {
     temp = ret;
@@ -1187,11 +1187,10 @@ hash_t str_hash(const char *s)
 
   return ret;
 }
-#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
+
 hash_t str_ihash(const char *s)
 {  
   hash_t ret = 0xdefaced;
@@ -1217,7 +1216,6 @@ hash_t str_ihash(const char *s)
 }
 #undef ROL
 #undef ROR
-#endif
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                    *
@@ -1227,7 +1225,7 @@ unsigned long int str_toul(const char *nptr, char **endptr, int base)
 {
   int neg = 0;
   unsigned long int v = 0;
-
+          
   while(str_isspace(*nptr))
     ++nptr;
 
@@ -1261,11 +1259,11 @@ skip0x:
   {
     register unsigned char c = *nptr;
 
-    c = (c >= 'a' ?
-         c - 'a' + 10 :
-         c >= 'A' ?
-         c - 'A' + 10 :
-         c <= '9' ?
+    c = (c >= 'a' ? 
+         c - 'a' + 10 : 
+         c >= 'A' ? 
+         c - 'A' + 10 : 
+         c <= '9' ? 
          c - '0' : 0xff);
 
     if(c >= base)
@@ -1278,7 +1276,7 @@ skip0x:
         syscall_errno = ERANGE;
         return ULONG_MAX;
       }
-
+      
       v = w + c;
     }
     ++nptr;
@@ -1310,7 +1308,7 @@ long int str_tol(const char *nptr, char **endptr, int base)
   }
 
   v = str_toul(nptr, endptr, base);
-
+  
   if(v >= ABS_LONG_MIN)
   {
     if(v == ABS_LONG_MIN && neg)
@@ -1318,11 +1316,11 @@ long int str_tol(const char *nptr, char **endptr, int base)
       syscall_errno = 0;
       return v;
     }
-
+  
     syscall_errno = ERANGE;
     return (neg ? LONG_MIN : LONG_MAX);
   }
-
+      
   return (neg ? -v : v);
 }
 #endif /* __i386__ */
