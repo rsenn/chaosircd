@@ -4753,9 +4753,9 @@ ac_cv_ssl="auto"
 # Check whether --with-ssl was given.
 if test "${with_ssl+set}" = set; then :
   withval=$with_ssl;
-  case "$enableval" in
-    y*) ac_cv_ssl="yes" ;;
-    n*) ac_cv_ssl="no" ;;
+  case "$withval" in
+    y*) ac_cv_ssl=yes ;;
+    n*) ac_cv_ssl=no ;;
     *) ac_cv_ssl="auto" ;;
   esac
 
@@ -4767,7 +4767,7 @@ $as_echo "$as_me:$LINENO: result: $ac_cv_ssl" >&5 ; echo -e ${COLOR_DEFAULT}$ac_
 SSL_LIBS=""
 SSL_CFLAGS=""
 OPENSSL=""
-if test "$ac_cv_ssl" = "yes" || test "$ac_cv_ssl" = "auto"
+if test "$ac_cv_ssl" = yes -o "$ac_cv_ssl" = "auto"
 then
   saved_libs="$LIBS"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ERR_load_crypto_strings in -lcrypto" >&5
@@ -4816,13 +4816,13 @@ _ACEOF
 fi
 
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" && test "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = no -a "$ac_cv_ssl" = yes
   then
-    as_fn_error install openssl >= 0.9.7 "could not find libcrypto" "$LINENO" 5
+    as_fn_error $? "could not find libcrypto, install openssl >= 0.9.7" "$LINENO" 5
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes"
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes
   then
     SSL_LIBS="-lcrypto"
   fi
@@ -4874,13 +4874,13 @@ _ACEOF
 fi
 
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" && test "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = no -a "$ac_cv_ssl" = yes
   then
-    as_fn_error install openssl >= 0.9.7 "could not find libssl" "$LINENO" 5
+    as_fn_error $? "could not find libssl, install openssl >= 0.9.7" "$LINENO" 5
     exit 1
   fi
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes"
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = yes
   then
     SSL_LIBS="-lssl $SSL_LIBS"
   fi
@@ -4899,9 +4899,9 @@ fi
 done
 
 
-  if test "$ac_cv_header_openssl_opensslv_h" = "no" && test "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_header_openssl_opensslv_h" = no -a "$ac_cv_ssl" = yes
   then
-    as_fn_error install openssl >= 0.9.7 "could not find openssl/opensslv.h" "$LINENO" 5
+    as_fn_error $? "could not find openssl/opensslv.h, install openssl >= 0.9.7" "$LINENO" 5
     exit 1
   fi
 
@@ -4910,7 +4910,7 @@ $as_echo_n "checking for the OpenSSL UI... " >&6; }
 
   OPENSSL=`which openssl 2>/dev/null`
 
-  if test "x$OPENSSL" = "x"
+  if test "x$OPENSSL" = x
   then
     if test -f /usr/bin/openssl
     then
@@ -4925,13 +4925,13 @@ $as_echo_n "checking for the OpenSSL UI... " >&6; }
 
   fi
 
-  if test "x$OPENSSL" = "x" && test "$ac_cv_ssl" = "yes"
+  if test "x$OPENSSL" = x -a "$ac_cv_ssl" = yes
   then
-    as_fn_error install openssl >= 0.9.7 "could not find OpenSSL command line tool" "$LINENO" 5
+    as_fn_error $? "could not find OpenSSL command line tool, install openssl >= 0.9.7" "$LINENO" 5
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes" && test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes" && test "$ac_cv_header_openssl_opensslv_h" = "yes"
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes -a "$ac_cv_lib_ssl_SSL_load_error_strings" = yes -a "$ac_cv_header_openssl_opensslv_h" = yes
   then
     HAVE_SSL=yes
 

@@ -28,9 +28,9 @@ pidfile = @pidfile@
 
 install: install-data
 	@$(ECHO_MKDIR)$(logdir)
-	@-mkdir -p $(logdir)
+	@-mkdir -p $(DESTDIR)$(logdir)
 	@$(ECHO_MKDIR)$$(dirname $(pidfile))
-	@-mkdir -p $$(dirname $(pidfile))
+	@-mkdir -p $(DESTDIR)$$(dirname $(pidfile))
 
 CLEANFILES = *~ children.conf classes.conf inis.conf ircd.conf logs.conf modules.conf opers.conf ssl.conf
 DISTCLEANFILES = Makefile $(CLEANFILES) 
