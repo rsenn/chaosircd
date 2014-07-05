@@ -3,12 +3,14 @@ host=$(gcc -dumpmachine)
 make -i distclean >/dev/null 2>/dev/null
 
 ./configure \
-	--disable-dep \
-	--disable-maintainer \
+	--disable-dependency-tracking \
+	--disable-maintainer-mode \
 	--enable-static \
+	--disable-shared \
+	--enable-loadable-modules \
 	--with-ssl \
 	--disable-color \
-	--disable-quiet \
+	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
 	"$@" 
 

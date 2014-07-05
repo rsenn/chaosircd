@@ -2,12 +2,12 @@ host=arm-linux-androideabi
 
 ./configure \
 	--prefix=/system \
-	--disable-dep \
-	--disable-maintainer \
+	--disable-dependency-tracking \
+	--disable-maintainer-mode \
 	--enable-shared \
 	--with-ssl \
 	--disable-color \
-	--disable-quiet \
+	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
 	"$@" \
 	CC="${host}-gcc -I$ANDROID_NDK_ROOT/platforms/android-16/arch-arm/usr/include -L$ANDROID_NDK_ROOT/platforms/android-16/arch-arm/usr/lib"

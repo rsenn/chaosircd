@@ -11,8 +11,8 @@ AC_DEFUN([AC_CHECK_DEP],
 [AC_MSG_CHECKING([whether to enable dependencies])
 
 AC_ARG_ENABLE([dep],
-[  --enable-dep             dependency tracking
-  --disable-dep            no dependency tracking (default)],
+[  --enable-dependency-tracking             dependency tracking
+  --disable-dependency-tracking            no dependency tracking (default)],
 [case $enableval in
   yes)
     DEP="yes"

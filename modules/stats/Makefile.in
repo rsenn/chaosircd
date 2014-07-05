@@ -19,12 +19,12 @@ DEPS                 = $(MODULES:%=%.d)
 SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
-@PIE_LIB@lib_EXEC = $(SHOBJECTS)
-@PIE_LIB@all: shobjects
-@PIE_LIB@install: install-pluginEXEC
+@DLM_TRUE@lib_EXEC = $(SHOBJECTS)
+@DLM_TRUE@all: shobjects
+@DLM_TRUE@install: install-pluginEXEC
 
-@NO_PIE_LIB@all: $(CATEGORY).a
-@NO_PIE_LIB@install:
+@DLM_FALSE@all: $(CATEGORY).a
+@DLM_FALSE@install:
 
 plugin_PREFIX = /stats
 plugin_EXEC = $(SHOBJECTS)
@@ -52,6 +52,6 @@ DEVFILES             = CVS $(DISTFILES)
 DEFS += -DBUILD_MODULE
 
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
-@PIE_LIB@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
 
 include $(top_builddir)/build.mk

@@ -83,19 +83,19 @@ DSO                  = @DSO@
 plugin_EXEC = $(SHOBJECTS)
 plugin_PREFIX = /msg
 
-@PIE_TRUE@lib_EXEC = $(SHOBJECTS)
-@PIE_TRUE@all: shobjects
-@PIE_TRUE@install: install-pluginEXEC
+@DLM_TRUE@lib_EXEC = $(SHOBJECTS)
+@DLM_TRUE@all: shobjects
+@DLM_TRUE@install: install-pluginEXEC
 
-@PIE_FALSE@all: $(CATEGORY).a
-@PIE_FALSE@install:
+@DLM_FALSE@all: $(CATEGORY).a
+@DLM_FALSE@install:
 
-@PIE_FALSE@$(CATEGORY).a: $(OBJECTS)
-@PIE_FALSE@	$(ECHO_AR)
-@PIE_FALSE@	$(RM) -f $@
-@PIE_FALSE@	$(AR) $@ $^
-@PIE_FALSE@	$(ECHO_RANLIB)
-@PIE_FALSE@	$(RANLIB) $@
+@DLM_FALSE@$(CATEGORY).a: $(OBJECTS)
+@DLM_FALSE@	$(ECHO_AR)
+@DLM_FALSE@	$(RM) -f $@
+@DLM_FALSE@	$(AR) $@ $^
+@DLM_FALSE@	$(ECHO_RANLIB)
+@DLM_FALSE@	$(RANLIB) $@
 
 shobjects: $(SHOBJECTS)
 
@@ -112,8 +112,8 @@ DEVFILES             = CVS $(DISTFILES)
 
 DEFS += -DBUILD_MODULE
 
-@WIN32_TRUE@@PIE_LIB@LIBS += -L$(top_builddir)/src -lircd
-@PIE_LIB@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@WIN32_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/src -lircd
+@DLM_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
 #@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/src/ircd.dll
 #@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/libchaos/src/libchaos.dll
 

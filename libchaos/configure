@@ -670,6 +670,8 @@ PIC_CFLAGS
 A_EXEEXT
 NO_PIE_LIB
 PIE_LIB
+DLM_FALSE
+DLM_TRUE
 A_FALSE
 A_TRUE
 PIE_FALSE
@@ -801,11 +803,12 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-enable_quiet
+enable_silent_rules
 enable_color
 with_dietlibc
 enable_static
 enable_shared
+enable_loadable_modules
 with_ssl
 with_ft2
 with_pgsql
@@ -1438,8 +1441,8 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --disable-quiet         echo commands while compiling (automake style)
-  --enable-quiet          do not echo commands while compiling, print
+  --disable-silent-rules         echo commands while compiling (automake style)
+  --enable-silent-rules          do not echo commands while compiling, print
                           variable-like name of program used (linux style)
   --disable-color         black and white compiling
   --enable-color[=THEME]  colored compiling (default)
@@ -1450,12 +1453,15 @@ Optional Features:
     --disable-static   do not build static library
   --enable-shared    build shared library (default)
     --disable-shared   do not build shared library
-  --enable-dep             dependency tracking
-  --disable-dep            no dependency tracking (default)
+  --enable-loadable-modules    build runtime-loadable modules (default)
+  --disable-loadable-modules
+
+  --enable-dependency-tracking             dependency tracking
+  --disable-dependency-tracking            no dependency tracking (default)
   --enable-debug           debugging mode
   --disable-debug          production mode (default)
-  --enable-maintainer      maintainer mode
-  --disable-maintainer     no maintainer mode (default)
+  --enable-maintainer-mode      maintainer mode
+  --disable-maintainer-mode     no maintainer mode (default)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2274,23 +2280,23 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable colored compiling" >&5
 $as_echo_n "checking whether to enable colored compiling... " >&6; }
 
-ac_cv_quiet="yes"
-# Check whether --enable-quiet was given.
-if test "${enable_quiet+set}" = set; then :
-  enableval=$enable_quiet; case "$enableval" in
+ac_cv_silent_rules="yes"
+# Check whether --enable-silent-rules was given.
+if test "${enable_silent_rules+set}" = set; then :
+  enableval=$enable_silent_rules; case "$enableval" in
   no)
-    ac_cv_quiet="no"
+    ac_cv_silent_rules="no"
     ;;
   *)
-    ac_cv_quiet="yes"
+    ac_cv_silent_rules="yes"
     ;;
 esac
 fi
 
-if test "$ac_cv_quiet" = "yes"; then
+if test "$ac_cv_silent_rules" = "yes"; then
 #  MAKEFLAGS=""
   MAKEFLAGS="-s"
-  QUIET="--quiet"
+  QUIET="--silent-rules"
   ECHO="echo"
   REDIR=">/dev/null"
   REDIR2="2>/dev/null"
@@ -3831,9 +3837,9 @@ ac_objext=$OBJEXT
 
 
   # both are enabled by default
-  A_ENABLE='auto'
-  PIE_ENABLE='auto'
-
+  A_ENABLE=auto
+  PIE_ENABLE=auto
+  DLM_ENABLE=auto
 
   # check for --*-static argument
   # Check whether --enable-static was given.
@@ -3856,13 +3862,21 @@ fi
   # check for --*-shared argument
   # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
-  enableval=$enable_shared;
-   PIE_ENABLE=auto
+  enableval=$enable_shared; PIE_ENABLE=auto
     case $enableval in
-    no|yes)  PIE_ENABLE=$enableval ;;
-    *) PIE_ENABLE="auto" ;;
-   esac
+      no|yes)  PIE_ENABLE=$enableval ;; *) PIE_ENABLE="auto" ;;
+    esac
 
+fi
+
+
+  # check for --*-loadable* argument
+  # Check whether --enable-loadable-modules was given.
+if test "${enable_loadable_modules+set}" = set; then :
+  enableval=$enable_loadable_modules; DLM_ENABLE=auto
+    case $enableval in
+      no|yes)  DLM_ENABLE=$enableval ;; *) DLM_ENABLE="auto" ;;
+    esac
 
 fi
 
@@ -3881,9 +3895,9 @@ fi
     *-freebsd*) FREEBSD='true' ;;
   esac
 
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-    PIE_ENABLE=no
-  fi
+  #if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+  #  PIE_ENABLE=no
+  #fi
 
   if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
     PIE_ENABLE=yes
@@ -3915,10 +3929,11 @@ fi
   case $host in
 
     *linux*|*freebsd*)
-      if test "$PIE_ENABLE" = "yes"; then
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='pio'
         PIC_DEPEXT='pd'
+
+      if test "$PIE_ENABLE" = "yes"; then
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
@@ -3930,10 +3945,11 @@ fi
       ;;
 
     *darwin*)
-      if test "$PIE_ENABLE" = "yes"; then
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='dyobj'
         PIC_DEPEXT='dydep'
+
+      if test "$PIE_ENABLE" = "yes"; then
         PIE_LIBEXT='dylib'
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
@@ -3989,6 +4005,13 @@ $as_echo_n "checking wheter to build a shared library... " >&6; }
     $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
   else
     $as_echo "$as_me:$LINENO: result: $PIE_ENABLE" >&5 ; echo -e ${COLOR_NO}$PIE_ENABLE${NC} >&6
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking wheter to build loadable modules" >&5
+$as_echo_n "checking wheter to build loadable modules... " >&6; }
+  if test "$DLM_ENABLE" = "yes"; then
+    $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
+  else
+    $as_echo "$as_me:$LINENO: result: $DLM_ENABLE" >&5 ; echo -e ${COLOR_NO}$DLM_ENABLE${NC} >&6
   fi
 
   case "$PIE_ENABLE,$A_ENABLE" in
@@ -4137,6 +4160,14 @@ fi
 else
   A_TRUE='#'
   A_FALSE=
+fi
+
+   if test "$DLM_ENABLE" = yes; then
+  DLM_TRUE=
+  DLM_FALSE='#'
+else
+  DLM_TRUE='#'
+  DLM_FALSE=
 fi
 
 
@@ -6094,6 +6125,10 @@ if test -z "${A_TRUE}" && test -z "${A_FALSE}"; then
   as_fn_error $? "conditional \"A\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${DLM_TRUE}" && test -z "${DLM_FALSE}"; then
+  as_fn_error $? "conditional \"DLM\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 
 if test -z "${SSL_TRUE}" && test -z "${SSL_FALSE}"; then
   as_fn_error $? "conditional \"SSL\" was never defined.
@@ -7300,7 +7335,7 @@ if test "$no_create" != yes; then
   ac_cs_success=:
   ac_config_status_args="Makefile config.mk build.mk"
   test "$silent" = yes &&
-    ac_config_status_args="$ac_config_status_args --quiet"
+    ac_config_status_args="$ac_config_status_args --silent-rules"
   exec 5>/dev/null
   $SHELL $CONFIG_STATUS $ac_config_status_args || ac_cs_success=false
   exec 5>>config.log

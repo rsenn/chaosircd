@@ -10,9 +10,9 @@
 AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # both are enabled by default 
-  A_ENABLE='auto'
-  PIE_ENABLE='auto'
-
+  A_ENABLE=auto
+  PIE_ENABLE=auto
+  DLM_ENABLE=auto
 
   # check for --*-static argument 
   AC_ARG_ENABLE([static],[  --enable-static    build static library (default)
@@ -27,14 +27,21 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # check for --*-shared argument 
   AC_ARG_ENABLE([shared],[  --enable-shared    build shared library (default)
-    --disable-shared   do not build shared library],[
-   PIE_ENABLE=auto 
+    --disable-shared   do not build shared library],[PIE_ENABLE=auto 
     case $enableval in
-    no|yes)  PIE_ENABLE=$enableval ;;
-    *) PIE_ENABLE="auto" ;;
-   esac
-   
-   ])
+      no|yes)  PIE_ENABLE=$enableval ;; *) PIE_ENABLE="auto" ;;
+    esac
+    ])
+
+  # check for --*-loadable* argument 
+  AC_ARG_ENABLE([loadable-modules],
+[  --enable-loadable-modules    build runtime-loadable modules (default)
+  --disable-loadable-modules    
+],[DLM_ENABLE=auto 
+    case $enableval in
+      no|yes)  DLM_ENABLE=$enableval ;; *) DLM_ENABLE="auto" ;;
+    esac
+    ])
 
   WIN32='false'
   LINUX='false'
@@ -50,9 +57,9 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     *-freebsd*) FREEBSD='true' ;;
   esac
         
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-    PIE_ENABLE=no
-  fi
+  #if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+  #  PIE_ENABLE=no
+  #fi
 
   if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
     PIE_ENABLE=yes
@@ -84,10 +91,11 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   case $host in
 
     *linux*|*freebsd*)
-      if test "$PIE_ENABLE" = "yes"; then
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='pio'
         PIC_DEPEXT='pd'
+
+      if test "$PIE_ENABLE" = "yes"; then
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
@@ -99,10 +107,11 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       ;;
 
     *darwin*)
-      if test "$PIE_ENABLE" = "yes"; then
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='dyobj'
         PIC_DEPEXT='dydep'
+
+      if test "$PIE_ENABLE" = "yes"; then
         PIE_LIBEXT='dylib'
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
@@ -147,6 +156,8 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   AC_MSG_RESULT([$A_ENABLE])
   AC_MSG_CHECKING([wheter to build a shared library])
   AC_MSG_RESULT([$PIE_ENABLE])
+  AC_MSG_CHECKING([wheter to build loadable modules])
+  AC_MSG_RESULT([$DLM_ENABLE])
 
   case "$PIE_ENABLE,$A_ENABLE" in
     no,no)
@@ -195,6 +206,7 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   fi
   AM_CONDITIONAL([PIE],[test "$PIE_ENABLE" = yes])
   AM_CONDITIONAL([A],[test "$A_ENABLE" = yes])
+  AM_CONDITIONAL([DLM],[test "$DLM_ENABLE" = yes])
 
   AC_SUBST([PIE_LIB])
   AC_SUBST([NO_PIE_LIB])

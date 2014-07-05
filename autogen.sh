@@ -143,9 +143,9 @@ fi
 # now configure
 ag_configure_args="$ag_configure_args
                    --prefix=$ag_prefix
-                   --enable-dep
+                   --enable-dependency-tracking
                    --enable-color 
                    --enable-debug 
-                   --enable-maintainer"
+                   --enable-maintainer-mode"
 set -x
 #exec "$ag_configure" $ag_configure_args "$@"
