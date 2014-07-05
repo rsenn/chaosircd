@@ -23,8 +23,6 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 
-include(FindBISON)
-include(FindFLEX)
 include(FindOpenSSL)
 include(FindFreetype)
 include(FindPostgreSQL)

@@ -15,7 +15,7 @@ set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
 
 add_subdirectory(libchaos)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libchaos/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
 
 include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/PlatformChecks.cmake")
 include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/ConfigBuildType.cmake")
