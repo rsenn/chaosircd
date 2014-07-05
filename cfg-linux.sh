@@ -5,7 +5,7 @@ make -i distclean >/dev/null 2>/dev/null
 ./configure \
 	--disable-dep \
 	--disable-maintainer \
-	--enable-shared \
+	--enable-static \
 	--with-ssl \
 	--disable-color \
 	--disable-quiet \

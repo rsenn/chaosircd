@@ -42,7 +42,7 @@ MODULES              = chanmode \
                        
 DEFS                 = -DPREFIX=\"$(prefix)\"
 DEFS += -DSYSCONFDIR=\"$(relsysconfdir)\"
-DEFS += -DPLUGINDIR=\"$(relplugindir)\" 
+DEFS += -DPLUGINDIR=\"$(plugindir)\" 
 DEFS += -DINIDIR=\"$(relinidir)\" 
 DEFS += -DLOGDIR=\"$(rellogdir)\" 
 DEFS += -DRUNDIR=\"$(relrundir)\"
@@ -77,16 +77,15 @@ DEPS                 = $(MODULES:%=%.d)
 @NO_PIE_LIB@                       $(top_builddir)/modules/stats/stats.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/service/service.a
 
-@STATIC_TRUE@LDADD +=  $(A_LIBRARY)
+#@STATIC_TRUE@LDADD +=  $(A_LIBRARY)
+#@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
 
-@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
+#@STATIC_TRUE@ifeq ($(LINKFLAGS), -static)
+#@STATIC_TRUE@LDADD                = $(top_builddir)/libchaos/src/.libs/libchaos.a
+#@STATIC_TRUE@endif
 
-@STATIC_TRUE@ifeq ($(LINKFLAGS), -static)
-@STATIC_TRUE@LDADD                = $(top_builddir)/libchaos/src/.libs/libchaos.a
-@STATIC_TRUE@endif
-
-@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
-@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
+#@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@SHARED_FALSE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
 #@SHARED_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.dll
 
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \

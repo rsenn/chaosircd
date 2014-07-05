@@ -227,12 +227,13 @@ AC_CHECK_DEBUG
 AC_CHECK_MAINTAINER
 
 # ---------------------------------------------------------------------------
-case $libdir in
-  /lib | /usr/lib) ;;
+
+eval "case $libdir in
+  /lib | /usr/lib | /usr/local/lib) ;;
   *)
-    LDFLAGS="${LDFLAGS:+$LDFLAGS }-Wl,-rpath,\$(libdir)"
+    LDFLAGS=\"\${LDFLAGS:+\$LDFLAGS }-Wl,-rpath=\\\${libdir}\"
     ;;
-esac
+esac"
 
 case $host in
   *-linux*)
