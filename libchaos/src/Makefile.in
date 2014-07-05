@@ -21,7 +21,7 @@ include $(top_builddir)/config.mk
 LIBNAME     = $(PACKAGE)
 A_LIBRARY   = $(LIBNAME).$(A_EXEEXT)
 #PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_LIBEXT)$(PIE_VERSION_SUFFIX)
-@SHARED_TRUE@PIE_LIBRARY = $(PIE_NAME).$(PIE_LIBEXT)
+@SHARED_TRUE@PIE_LIBRARY = libchaos.$(PIE_LIBEXT)
 MODULES     = cfg \
               child \
               connect \
@@ -69,16 +69,17 @@ CONFIG_H_TOP = include/libchaos/config.h
 #PIE_DEF = libchaos.def
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,--out-implib,lib$(PIE_NAME).a
 
-@WIN32_TRUE@@SHARED_TRUE@bin_EXEC = chaos.dll
+@WIN32_TRUE@@SHARED_TRUE@bin_EXEC = libchaos.dll
 
 LIBS     += $(DLFCN_LIBS)
-
 LIBS     += $(SSL_LIBS)
+LIBS     += $(MYSQL_LIBS)
 INCLUDES += $(SSL_CFLAGS)
+INCLUDES += $(MYSQL_CFLAGS)
 
 # targets for this directory
 # ---------------------------------------------------------------------------
-all: Makefile a-library pie-library
+all: Makefile $(A_LIBRARY) $(PIE_LIBRARY)
 
 install: install-exec install-data
 
@@ -101,9 +102,9 @@ INCLUDES += -I$(thisdir) \
             -I. \
             -I$(top_builddir)/include 
 
-CFLAGS   += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
+CFLAGS += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
 
-@STATIC_TRUE@$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
+$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 
 # include global make targets
 # ---------------------------------------------------------------------------
