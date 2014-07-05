@@ -25,6 +25,7 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
+#include "libchaos/config.h"
 #include "libchaos/defs.h"
 #include "libchaos/syscall.h"
 #include "libchaos/timer.h"

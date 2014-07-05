@@ -61,7 +61,7 @@ PIE_DEF              = ircd.def
 OBJEXT               = o
 HEADERS              = y.tab.h
 DEPS                 = $(MODULES:%=%.d)
-@SHARED_TRUE@LDADD                = $(top_builddir)/libchaos/src/lib@PIE_PREPEND@chaos.@PIE_LIBEXT@
+@SHARED_TRUE@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
 @NO_PIE_LIB@LDADD                = $(top_builddir)/modules/lclient/lclient.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/msg/msg.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/usermode/usermode.a \

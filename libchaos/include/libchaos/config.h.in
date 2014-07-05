@@ -1,6 +1,9 @@
 /* Use select() for i/o multiplexing */
 #undef USE_SELECT
 
+/* Use poll() for i/o multiplexing */
+#undef USE_POLL
+
 /* Support for SSL encrypted connections */
 #undef HAVE_SSL
 

@@ -92,7 +92,20 @@ AC_CHECK_HEADER([winsock2.h])
 dnl AC_CHECK_LIB([ws2_32], [WSAStartup])
 dnl AC_CHECK_LIB([wsock32], [WSAStartup])
 
+
+AC_MSG_CHECKING([for poll])
+AC_TRY_COMPILE([], 
+  [poll()],
+  AC_MSG_RESULT([yes]),
+  [AC_MSG_RESULT([no])
+  HAVE_POLL=yes])
+
+if test "$HAVE_POLL" = yes ; then
+AC_DEFINE_UNQUOTED([USE_POLL], [1], [Use poll() for i/o multiplexing])
+else
 AC_DEFINE_UNQUOTED([USE_SELECT], [1], [Use select() for i/o multiplexing])
+fi
+
 
 ac_cv_LIBS="$LIBS"
 LIBS="$LIBS -lws2_32"
