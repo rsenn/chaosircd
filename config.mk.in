@@ -57,7 +57,7 @@ EXEEXT          = @EXEEXT@
 OBJEXT          = @OBJEXT@
 A_EXEEXT        = @A_EXEEXT@
 PIC_OBJEXT      = @PIC_OBJEXT@
-PIE_EXEEXT      = @PIE_EXEEXT@
+PIE_LIBEXT      = @PIE_LIBEXT@
 
 # package info
 # ---------------------------------------------------------------------------
@@ -134,7 +134,7 @@ PIE_LINKS       = @PIE_LINKS@
 @WIN32_TRUE@MOD_LDFLAGS     = $(patsubst %.dll,%.def,$@)
 MOD_LDFLAGS     += -shared
 PIE_LDFLAGS     = @PIE_LDFLAGS@
-PIE_EXEEXT      = @PIE_EXEEXT@
+PIE_LIBEXT      = @PIE_LIBEXT@
 PIE_NAME        = @PIE_NAME@
 PIE_LOADER      = @PIE_LOADER@
 

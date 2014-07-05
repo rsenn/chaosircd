@@ -17,7 +17,7 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 # file suffixes we may encounter
 # ---------------------------------------------------------------------------
 .SUFFIXES:
-.SUFFIXES: .c .h .o .s .in .d .@PIE_EXEEXT@ .@PIC_OBJEXT@ .@PIC_DEPEXT@
+.SUFFIXES: .c .h .o .s .in .d .@PIE_LIBEXT@ .@PIC_OBJEXT@ .@PIC_DEPEXT@
 
 # compilation rules by file extension
 # ---------------------------------------------------------------------------
@@ -33,11 +33,11 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 @PIC@	@$(ECHO_PIC_CC)
 @PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
 
-#.c.@PIE_EXEEXT@:
+#.c.@PIE_LIBEXT@:
 #	@$(ECHO_CCLD)
 #	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(PIE_LDFLAGS) -MD -o $@ $< $(LIBS)
 
-%.@PIE_EXEEXT@: %.c %.def
+%.@PIE_LIBEXT@: %.c %.def
 	@$(ECHO_CCLD)
 	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(PIE_LDFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
 

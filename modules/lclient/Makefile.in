@@ -20,7 +20,7 @@ SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)
 OBJEXT               = so
 DEPS                 = $(MODULES:%=%.d)
-SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
 plugin_EXEC = $(SHOBJECTS)

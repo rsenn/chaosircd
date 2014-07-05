@@ -34,7 +34,7 @@ SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)
 OBJEXT               = so
 DEPS                 = $(MODULES:%=%.d)
-SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
 @PIE_LIB@lib_EXEC = $(SHOBJECTS)

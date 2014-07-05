@@ -13,7 +13,6 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   A_ENABLE='auto'
   PIE_ENABLE='auto'
 
-  AC_MSG_CHECKING([wheter to build static libraries])
 
   # check for --*-static argument 
   AC_ARG_ENABLE([static],[  --enable-static    build static library (default)
@@ -26,7 +25,6 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
    
    ])
 
-  AC_MSG_CHECKING([wheter to build shared libraries])
   # check for --*-shared argument 
   AC_ARG_ENABLE([shared],[  --enable-shared    build shared library (default)
     --disable-shared   do not build shared library],[
@@ -35,22 +33,15 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     no|yes)  PIE_ENABLE=$enableval ;;
     *) PIE_ENABLE="auto" ;;
    esac
-  AC_MSG_RESULT([$PIE_ENABLE])
    
    ])
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-    PIE_ENABLE=no
-  fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
-    PIE_ENABLE=yes
-  fi
 
   WIN32='false'
   LINUX='false'
   FREEBSD='false'
   DARWIN='false'
+
+  PIE_LIBEXT='so'
 
   case $host in
     *-mingw32 | *-cygwin) WIN32='true' ;;
@@ -79,6 +70,14 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       ;;
   esac
 
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+    PIE_ENABLE=no
+  fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
+    PIE_ENABLE=yes
+  fi
+
   # do some checks for PIC/PIE
 
   # PIC compiling and PIE linking is host dependant
@@ -89,13 +88,12 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='pio'
         PIC_DEPEXT='pd'
-        PIE_EXEEXT='so'
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
-        PIE_LDFLAGS="-shared -Wl,-soname -Wl,${PACKAGE_NAME}.${PIE_EXEEXT}.${VERSION_MAJOR}"
+        PIE_LDFLAGS="-shared -Wl,-soname -Wl,${PACKAGE_NAME}.${PIE_LIBEXT}.${VERSION_MAJOR}"
         PIE_VERSION_SUFFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
-        PIE_LINKS='$(PIE_NAME).$(PIE_EXEEXT).$(VERSION_MAJOR).$(VERSION_MINOR) $(PIE_NAME).$(PIE_EXEEXT).$(VERSION_MAJOR) $(PIE_NAME).$(PIE_EXEEXT)'
+        PIE_LINKS='$(PIE_NAME).$(PIE_LIBEXT).$(VERSION_MAJOR).$(VERSION_MINOR) $(PIE_NAME).$(PIE_LIBEXT).$(VERSION_MAJOR) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LIBDIR='$(libdir)'
       fi
       ;;
@@ -105,13 +103,13 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='dyobj'
         PIC_DEPEXT='dydep'
-        PIE_EXEEXT='dylib'
+        PIE_LIBEXT='dylib'
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
-        PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$PACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_EXEEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
+        PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$PACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_LIBEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
         PIE_VERSION_PREFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
-        PIE_LINKS='$(PIE_NAME).$(VERSION_MAJOR).$(VERSION_MINOR).$(PIE_EXEEXT) $(PIE_NAME).$(VERSION_MAJOR).$(PIE_EXEEXT) $(PIE_NAME).$(PIE_EXEEXT)'
+        PIE_LINKS='$(PIE_NAME).$(VERSION_MAJOR).$(VERSION_MINOR).$(PIE_LIBEXT) $(PIE_NAME).$(VERSION_MAJOR).$(PIE_LIBEXT) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LOADER='dlfcn_darwin'
         PIE_LIBDIR='$(libdir)'
       fi
@@ -126,7 +124,7 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
         PIE_NAME='$(LIBNAME:lib%=%)'
         PIE_LINK='$(CC)'
         PIE_LDFLAGS='-shared'
-        PIE_EXEEXT='dll'
+        PIE_LIBEXT='dll'
         PIE_LIBDIR='$(bindir)'
       fi
       
@@ -145,10 +143,10 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       ;;
   esac
 
-dnl  AC_MSG_CHECKING([wheter to build a static library])
-dnl  AC_MSG_RESULT([$A_ENABLE])
-dnl  AC_MSG_CHECKING([wheter to build a shared library])
-dnl  AC_MSG_RESULT([$PIE_ENABLE])
+  AC_MSG_CHECKING([wheter to build a static library])
+  AC_MSG_RESULT([$A_ENABLE])
+  AC_MSG_CHECKING([wheter to build a shared library])
+  AC_MSG_RESULT([$PIE_ENABLE])
 
   case "$PIE_ENABLE,$A_ENABLE" in
     no,no)
@@ -212,7 +210,7 @@ dnl  AC_MSG_RESULT([$PIE_ENABLE])
   AC_SUBST([PIE_LINK])
   AC_SUBST([PIE_LINKS])
   AC_SUBST([PIE_LDFLAGS])
-  AC_SUBST([PIE_EXEEXT],[$PIE_EXEEXT])
+  AC_SUBST([PIE_LIBEXT])
   AC_SUBST([PIE_VERSION_PREFIX])
   AC_SUBST([PIE_VERSION_SUFFIX])
   AC_SUBST([PIE_PREPEND])

@@ -1,51 +1,51 @@
 # SSL context for incoming connections (SSLv23_server_method)
 
-@SSL_ENABLED@ssl {
-@SSL_ENABLED@
-@SSL_ENABLED@  name    = "listen";                 # The name is used in listen{} and connect{} 
-@SSL_ENABLED@                                      # blocks to reference this context.
-@SSL_ENABLED@
-@SSL_ENABLED@  context = server;                   # Using SSLv23_server_method
-@SSL_ENABLED@    
-@SSL_ENABLED@  cert    = "@sysconfdir@/ircd.crt";  # Location of the x509 certificate
-@SSL_ENABLED@  
-@SSL_ENABLED@  key     = "@sysconfdir@/ircd.key";  # Location of the RSA private key
-@SSL_ENABLED@    
-@SSL_ENABLED@    # Allowed ciphers for this context.
-@SSL_ENABLED@    # RSA        - all ciphers used in conjuncation with RSA keyexchange
-@SSL_ENABLED@    # HIGH       - all ciphers having a key size of more than 128bit.
-@SSL_ENABLED@    # MEDIUM     - all ciphers having a key size of 128bit.
-@SSL_ENABLED@    # @STRENGH   - sort them by strenght
-@SSL_ENABLED@    # RSA+HIGH   - all ciphers which match RSA and HIGH
-@SSL_ENABLED@    # RSA+MEDIUM - all ciphers which match RSA and HIGH
-@SSL_ENABLED@    #
-@SSL_ENABLED@    # The ':' separator simply adds ciphers
-@SSL_ENABLED@
-@SSL_ENABLED@  ciphers = "RSA+HIGH:RSA+MEDIUM:@STRENGTH";  
-@SSL_ENABLED@};
-@SSL_ENABLED@
-@SSL_ENABLED@# SSL context for outgoing connections (SSLv3_client_method)
-@SSL_ENABLED@
-@SSL_ENABLED@ssl {
-@SSL_ENABLED@  name    = "connect";                # The name is used in listen{} and connect{} blocks to 
-@SSL_ENABLED@                                      # reference this context.
-@SSL_ENABLED@  
-@SSL_ENABLED@  context = client;                   # Using SSLv23_server_method
-@SSL_ENABLED@  
-@SSL_ENABLED@  cert    = "@sysconfdir@/ircd.crt";  # Location of the x509 certificate
-@SSL_ENABLED@  
-@SSL_ENABLED@  key     = "@sysconfdir@/ircd.key";  # Location of the RSA private key
-@SSL_ENABLED@  
-@SSL_ENABLED@    # Allowed ciphers for this context.
-@SSL_ENABLED@    # RSA        - all ciphers used in conjuncation with RSA keyexchange
-@SSL_ENABLED@    # HIGH       - all ciphers having a key size of more than 128bit.
-@SSL_ENABLED@    # MEDIUM     - all ciphers having a key size of 128bit.
-@SSL_ENABLED@    # @STRENGH   - sort them by strenght
-@SSL_ENABLED@    # RSA+HIGH   - all ciphers which match RSA and HIGH
-@SSL_ENABLED@    # RSA+MEDIUM - all ciphers which match RSA and HIGH
-@SSL_ENABLED@    # 
-@SSL_ENABLED@    # The ':' separator simply adds ciphers
-@SSL_ENABLED@
-@SSL_ENABLED@  ciphers = "RSA+HIGH:@STRENGTH";
-@SSL_ENABLED@};
-@SSL_ENABLED@
+@SSL_TRUE@ssl {
+@SSL_TRUE@
+@SSL_TRUE@  name    = "listen";                 # The name is used in listen{} and connect{} 
+@SSL_TRUE@                                      # blocks to reference this context.
+@SSL_TRUE@
+@SSL_TRUE@  context = server;                   # Using SSLv23_server_method
+@SSL_TRUE@    
+@SSL_TRUE@  cert    = "@sysconfdir@/ircd.crt";  # Location of the x509 certificate
+@SSL_TRUE@  
+@SSL_TRUE@  key     = "@sysconfdir@/ircd.key";  # Location of the RSA private key
+@SSL_TRUE@    
+@SSL_TRUE@    # Allowed ciphers for this context.
+@SSL_TRUE@    # RSA        - all ciphers used in conjuncation with RSA keyexchange
+@SSL_TRUE@    # HIGH       - all ciphers having a key size of more than 128bit.
+@SSL_TRUE@    # MEDIUM     - all ciphers having a key size of 128bit.
+@SSL_TRUE@    # @STRENGH   - sort them by strenght
+@SSL_TRUE@    # RSA+HIGH   - all ciphers which match RSA and HIGH
+@SSL_TRUE@    # RSA+MEDIUM - all ciphers which match RSA and HIGH
+@SSL_TRUE@    #
+@SSL_TRUE@    # The ':' separator simply adds ciphers
+@SSL_TRUE@
+@SSL_TRUE@  ciphers = "RSA+HIGH:RSA+MEDIUM:@STRENGTH";  
+@SSL_TRUE@};
+@SSL_TRUE@
+@SSL_TRUE@# SSL context for outgoing connections (SSLv3_client_method)
+@SSL_TRUE@
+@SSL_TRUE@ssl {
+@SSL_TRUE@  name    = "connect";                # The name is used in listen{} and connect{} blocks to 
+@SSL_TRUE@                                      # reference this context.
+@SSL_TRUE@  
+@SSL_TRUE@  context = client;                   # Using SSLv23_server_method
+@SSL_TRUE@  
+@SSL_TRUE@  cert    = "@sysconfdir@/ircd.crt";  # Location of the x509 certificate
+@SSL_TRUE@  
+@SSL_TRUE@  key     = "@sysconfdir@/ircd.key";  # Location of the RSA private key
+@SSL_TRUE@  
+@SSL_TRUE@    # Allowed ciphers for this context.
+@SSL_TRUE@    # RSA        - all ciphers used in conjuncation with RSA keyexchange
+@SSL_TRUE@    # HIGH       - all ciphers having a key size of more than 128bit.
+@SSL_TRUE@    # MEDIUM     - all ciphers having a key size of 128bit.
+@SSL_TRUE@    # @STRENGH   - sort them by strenght
+@SSL_TRUE@    # RSA+HIGH   - all ciphers which match RSA and HIGH
+@SSL_TRUE@    # RSA+MEDIUM - all ciphers which match RSA and HIGH
+@SSL_TRUE@    # 
+@SSL_TRUE@    # The ':' separator simply adds ciphers
+@SSL_TRUE@
+@SSL_TRUE@  ciphers = "RSA+HIGH:@STRENGTH";
+@SSL_TRUE@};
+@SSL_TRUE@

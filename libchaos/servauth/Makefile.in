@@ -54,8 +54,8 @@ $(PROGRAM): $(OBJECTS)
 
 # build config
 # ---------------------------------------------------------------------------
-@SSL_ENABLED@CFLAGS   += $(SSL_CFLAGS)
-@SSL_ENABLED@LIBS     += $(SSL_LIBS)
+@SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
+@SSL_TRUE@LIBS     += $(SSL_LIBS)
 LIBS     += $(DLFCN_LIBS)
 LIBS     += -L$(top_builddir)/src -lchaos
 CPPFLAGS += -DHAVE_CONFIG_H

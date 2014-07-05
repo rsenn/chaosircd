@@ -28,20 +28,20 @@ mfiles {
 .include "@sysconfdir@/ssl.conf"          # SSL contexts
 
 # Listen for incoming SSL connections on port 9200
-@SSL_ENABLED@listen {
-@SSL_ENABLED@  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-@SSL_ENABLED@  port     = 9200;                         # Port to listen to
-@SSL_ENABLED@  protocol = "irc";                       # Protocol handler for this port
-@SSL_ENABLED@  class    = "clients";                   # Class for client connects
-@SSL_ENABLED@  ssl      = yes;                         # Use OpenSSL encryption?
-@SSL_ENABLED@  context  = "listen";                    # SSL context to use 
-@SSL_ENABLED@                                          # (must be of 'server' type)
-@SSL_ENABLED@  backlog  = 5;                           # Backlog argument for listen(),
-@SSL_ENABLED@                                          # this defines how many incoming
-@SSL_ENABLED@                                          # connections can be buffered before
-@SSL_ENABLED@                                          # accept() is called.
-@SSL_ENABLED@};
-@SSL_ENABLED@
+@SSL_TRUE@listen {
+@SSL_TRUE@  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
+@SSL_TRUE@  port     = 9200;                         # Port to listen to
+@SSL_TRUE@  protocol = "irc";                       # Protocol handler for this port
+@SSL_TRUE@  class    = "clients";                   # Class for client connects
+@SSL_TRUE@  ssl      = yes;                         # Use OpenSSL encryption?
+@SSL_TRUE@  context  = "listen";                    # SSL context to use 
+@SSL_TRUE@                                          # (must be of 'server' type)
+@SSL_TRUE@  backlog  = 5;                           # Backlog argument for listen(),
+@SSL_TRUE@                                          # this defines how many incoming
+@SSL_TRUE@                                          # connections can be buffered before
+@SSL_TRUE@                                          # accept() is called.
+@SSL_TRUE@};
+@SSL_TRUE@
 # Listen for incoming connections on port 9990
 listen {
   address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
@@ -74,7 +74,7 @@ listen {
 #  port     = 7007;                        # Port to listen to
 #  protocol = "irc";                       # Protocol handler for this port
 #  class    = "clients";                   # Class for client connects
-@SSL_ENABLED@#  ssl      = yes;                         # Use OpenSSL encryption?
+@SSL_TRUE@#  ssl      = yes;                         # Use OpenSSL encryption?
 #  context  = "listen";                    # SSL context to use
 #                                          # (must be of 'server' type)
 #  backlog  = 5;                           # Backlog argument for listen(),
