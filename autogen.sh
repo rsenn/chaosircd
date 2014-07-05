@@ -57,7 +57,7 @@ do
   esac
 done
 
-touch $ag_srcdir/configure.in $ag_srcdir/libchaos/m4/*
+touch $ag_srcdir/configure.in $ag_srcdir/m4/*
 ag_package="$(grep AC_INIT $ag_srcdir/configure.in | sed -e 's,^AC_INIT(\[,,;;s,\].*$,,')"
 ag_configure="$ag_srcdir/configure"
 ag_configure_in="$ag_configure.in"
@@ -72,17 +72,17 @@ ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
 
 # execute the stuff
 (cd "$ag_srcdir"
-# $ag_aclocal --acdir=$ag_srcdir/libchaos/m4
+# $ag_aclocal --acdir=m4
 #  cat $ag_srcdir/m4/*.m4 > $ag_srcdir/aclocal.m4
  rm -f aclocal.m4
- $ag_aclocal -I $ag_srcdir/libchaos/m4
+ $ag_aclocal -I m4
  if test "$ag_headers"; then
    set -x
    $ag_autoheader
  else
    set -x
  fi
- $ag_autoconf -B $ag_srcdir/libchaos/m4 &&
+ $ag_autoconf -B m4 &&
  sed -i 's/###ESCAPE###/\[/' $ag_configure
   
  # ok, we don't really use libtool nor automake, but
@@ -90,7 +90,7 @@ ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
  # detection
  # the --automake argument is added so libtoolize doesn't
  # complain about missing AC_PROG_LIBTOOL
- $ag_libtoolize --copy --automake &&
+ $ag_libtoolize --copy --force --automake &&
  for guess in config.guess ../config.guess; do
    if test -f $ag_srcdir/$guess; then
      # so this one is for proper target detection on cygwin 
