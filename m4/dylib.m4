@@ -22,7 +22,7 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     *) A_ENABLE="yes" ;;
    esac
    
-  AC_MSG_RESULT([$enableval])
+  AC_MSG_RESULT([$A_ENABLE])
    
    ])
 
@@ -35,7 +35,7 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     no|yes)  PIE_ENABLE=$enableval ;;
     *) PIE_ENABLE="yes" ;;
    esac
-  AC_MSG_RESULT([$enableval])
+  AC_MSG_RESULT([$PIE_ENABLE])
    
    ])
 
