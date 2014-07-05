@@ -3840,9 +3840,9 @@ $as_echo_n "checking wheter to build static libraries... " >&6; }
   # check for --*-static argument
   # Check whether --enable-static was given.
 if test "${enable_static+set}" = set; then :
-  enableval=$enable_static; case $enableval in
+  enableval=$enable_static; A_ENABLE=auto; case $enableval in
     no|yes)  A_ENABLE=$enableval ;;
-    *) A_ENABLE="yes" ;;
+    *) A_ENABLE="auto" ;;
    esac
 
   if test "$A_ENABLE" = "yes"; then
@@ -3861,10 +3861,10 @@ $as_echo_n "checking wheter to build shared libraries... " >&6; }
   # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
   enableval=$enable_shared;
-
+   PIE_ENABLE=auto
     case $enableval in
     no|yes)  PIE_ENABLE=$enableval ;;
-    *) PIE_ENABLE="yes" ;;
+    *) PIE_ENABLE="auto" ;;
    esac
   if test "$PIE_ENABLE" = "yes"; then
     $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo -e ${COLOR_YES}yes${NC} >&6
@@ -3875,6 +3875,14 @@ if test "${enable_shared+set}" = set; then :
 
 fi
 
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+    PIE_ENABLE=no
+  fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
+    PIE_ENABLE=yes
+  fi
 
   WIN32='false'
   LINUX='false'

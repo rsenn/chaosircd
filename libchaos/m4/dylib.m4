@@ -17,9 +17,9 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # check for --*-static argument 
   AC_ARG_ENABLE([static],[  --enable-static    build static library (default)
-    --disable-static   do not build static library],[case $enableval in
+    --disable-static   do not build static library],[A_ENABLE=auto; case $enableval in
     no|yes)  A_ENABLE=$enableval ;;
-    *) A_ENABLE="yes" ;;
+    *) A_ENABLE="auto" ;;
    esac
    
   AC_MSG_RESULT([$A_ENABLE])
@@ -30,14 +30,22 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   # check for --*-shared argument 
   AC_ARG_ENABLE([shared],[  --enable-shared    build shared library (default)
     --disable-shared   do not build shared library],[
-    
+   PIE_ENABLE=auto 
     case $enableval in
     no|yes)  PIE_ENABLE=$enableval ;;
-    *) PIE_ENABLE="yes" ;;
+    *) PIE_ENABLE="auto" ;;
    esac
   AC_MSG_RESULT([$PIE_ENABLE])
    
    ])
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+    PIE_ENABLE=no
+  fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
+    PIE_ENABLE=yes
+  fi
 
   WIN32='false'
   LINUX='false'
