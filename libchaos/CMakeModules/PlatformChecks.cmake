@@ -1,9 +1,9 @@
 include(CheckFunctionExists)
 
-  include(ConfigStdIncludes)
-  include(ConfigSockets)
-  include(ConfigDlFcn)
-  include(ConfigIntTypes)
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigStdIncludes.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSockets.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigDlFcn.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigIntTypes.cmake")
 
 
 if(NOT HAVE_DLFCN)
