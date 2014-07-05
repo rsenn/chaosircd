@@ -75,7 +75,7 @@ listen {
 #  protocol = "irc";                       # Protocol handler for this port
 #  class    = "clients";                   # Class for client connects
 @SSL_TRUE@#  ssl      = yes;                         # Use OpenSSL encryption?
-#  context  = "listen";                    # SSL context to use
+@SSL_TRUE@#  context  = "listen";                    # SSL context to use
 #                                          # (must be of 'server' type)
 #  backlog  = 5;                           # Backlog argument for listen(),
 #                                          # this defines how many incoming
