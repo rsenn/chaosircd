@@ -26,7 +26,6 @@ rm -rf "\$DESTDIR"
 make
 make DESTDIR="\$DESTDIR" install
 
-cmd='tar -C "\$DESTDIR" -c . |xz -v -e -6 -f -c >"\${DESTDIR##*/}.txz"'
-eval "echo \"\$cmd\"; \$cmd"
+#cmd='tar -C "\$DESTDIR" -c . |xz -v -e -6 -f -c >"\${DESTDIR##*/}.txz"'; eval "echo \"\$cmd\"; \$cmd"
 
 EOF

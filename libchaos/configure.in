@@ -163,8 +163,6 @@ AC_SUBST([DEFS])
 
 AC_CHECK_LIB([m], [cos])
 
-AM_CONDITIONAL([SSL], [test "$HAVE_SSL" = yes])
-
 AC_SUBST([DLFCN_LDADD])
 
 # set debugging stuff after compiler test (-Werror could fuck it up)

@@ -632,8 +632,6 @@ DEP_ENABLED
 DEPS_FALSE
 DEPS_TRUE
 DLFCN_LDADD
-SSL_FALSE
-SSL_TRUE
 plugindir
 ENDIAN
 MYSQL_CFLAGS
@@ -645,6 +643,11 @@ FT2_CFLAGS
 FREETYPE_CONFIG
 SSL_CFLAGS
 SSL_LIBS
+SSL_PREFIX
+SSL_FALSE
+SSL_TRUE
+SSL_STATIC_FALSE
+SSL_STATIC_TRUE
 EGREP
 GREP
 CPP
@@ -810,6 +813,7 @@ enable_static
 enable_shared
 enable_loadable_modules
 with_ssl
+with_ssl_prefix
 with_ft2
 with_pgsql
 with_mysql
@@ -1468,7 +1472,8 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-dietlibc=[PREFIX] compile with dietlibc (default)
   --without-dietlibc       do not compile with dietlibc
-  --with-ssl[=yes|no|auto]   OpenSSL support [auto]
+  --with-ssl[=yes|no|PATH]   OpenSSL support [auto]
+  --with-ssl-prefix=PATH   OpenSSL installation
   --with-ft2[=prefix]      Support for FreeType 2 fonts
   --with-pgsql=DIR        support for PostgreSQL
   --with-mysql=DIR        support for MySQL
@@ -4825,29 +4830,54 @@ fi
 rm -f conftest.mmap conftest.txt
 
 
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to compile with SSL support" >&5
 $as_echo_n "checking whether to compile with SSL support... " >&6; }
-ac_cv_ssl="auto"
+ac_cv_ssl=auto
+ac_cv_ssl_link=shared
+eval "ac_cv_ssl_prefix=\"${prefix}\""
 
 # Check whether --with-ssl was given.
 if test "${with_ssl+set}" = set; then :
   withval=$with_ssl;
-  case "$enableval" in
-    y*) ac_cv_ssl="yes" ;;
-    n*) ac_cv_ssl="no" ;;
-    *) ac_cv_ssl="auto" ;;
+  case "$withval" in
+    y*) ac_cv_ssl=yes ;;
+    n*) ac_cv_ssl=no ;;
+    shared) ac_cv_ssl=yes ac_cv_ssl_link=shared ;;
+    static) ac_cv_ssl=yes ac_cv_ssl_link=static ;;
+    /*) ac_cv_ssl=yes ac_cv_ssl_prefix=$withval ;;
+    *) ac_cv_ssl=auto ;;
   esac
 
 fi
 
-$as_echo "$as_me:$LINENO: result: $ac_cv_ssl" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_ssl${NC} >&6
 
+if test "$ac_cv_ssl" != no; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL location" >&5
+$as_echo_n "checking for OpenSSL location... " >&6; }
+
+
+# Check whether --with-ssl-prefix was given.
+if test "${with_ssl_prefix+set}" = set; then :
+  withval=$with_ssl_prefix;
+      case "$withval" in
+	/*) ac_cv_ssl=yes ac_cv_ssl_prefix=$withval ;;
+	*) ac_cv_ssl=yes ;;
+      esac
+
+fi
+
+    $as_echo "$as_me:$LINENO: result: $ac_cv_ssl_prefix" >&5 ; echo -e ${COLOR_DEFAULT}$ac_cv_ssl_prefix${NC} >&6
+
+
+fi
 
 SSL_LIBS=""
 SSL_CFLAGS=""
+eval "SSL_PREFIX=\"$ac_cv_ssl_prefix\""
+
 OPENSSL=""
-if test "$ac_cv_ssl" = "yes" || test "$ac_cv_ssl" = "auto"
-then
+if test "$ac_cv_ssl" = yes -o "$ac_cv_ssl" = auto; then
   saved_libs="$LIBS"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ERR_load_crypto_strings in -lcrypto" >&5
 $as_echo_n "checking for ERR_load_crypto_strings in -lcrypto... " >&6; }
@@ -4895,14 +4925,12 @@ _ACEOF
 fi
 
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" && test "$ac_cv_ssl" = "yes"
-  then
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = no -a "$ac_cv_ssl" = yes; then
     as_fn_error install openssl >= 0.9.7 "could not find libcrypto" "$LINENO" 5
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes"
-  then
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes; then
     SSL_LIBS="-lcrypto"
   fi
 
@@ -4953,14 +4981,12 @@ _ACEOF
 fi
 
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" && test "$ac_cv_ssl" = "yes"
-  then
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = no -a "$ac_cv_ssl" = yes;  then
     as_fn_error install openssl >= 0.9.7 "could not find libssl" "$LINENO" 5
     exit 1
   fi
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes"
-  then
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = yes; then
     SSL_LIBS="-lssl $SSL_LIBS"
   fi
 
@@ -4978,8 +5004,7 @@ fi
 done
 
 
-  if test "$ac_cv_header_openssl_opensslv_h" = "no" && test "$ac_cv_ssl" = "yes"
-  then
+  if test "$ac_cv_header_openssl_opensslv_h" = no -a "$ac_cv_ssl" = yes; then
     as_fn_error install openssl >= 0.9.7 "could not find openssl/opensslv.h" "$LINENO" 5
     exit 1
   fi
@@ -4989,10 +5014,8 @@ $as_echo_n "checking for the OpenSSL UI... " >&6; }
 
   OPENSSL=`which openssl 2>/dev/null`
 
-  if test "x$OPENSSL" = "x"
-  then
-    if test -f /usr/bin/openssl
-    then
+  if test "x$OPENSSL" = "x"; then
+    if test -f /usr/bin/openssl; then
       OPENSSL=/usr/bin/openssl
       $as_echo "$as_me:$LINENO: result: $OPENSSL" >&5 ; echo -e ${COLOR_DEFAULT}$OPENSSL${NC} >&6
 
@@ -5004,15 +5027,15 @@ $as_echo_n "checking for the OpenSSL UI... " >&6; }
 
   fi
 
-  if test "x$OPENSSL" = "x" && test "$ac_cv_ssl" = "yes"
+  if test "x$OPENSSL" = "x" -a "$ac_cv_ssl" = yes
   then
     as_fn_error install openssl >= 0.9.7 "could not find OpenSSL command line tool" "$LINENO" 5
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes" && test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes" && test "$ac_cv_header_openssl_opensslv_h" = "yes"
-  then
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes -a "$ac_cv_lib_ssl_SSL_load_error_strings" = yes -a "$ac_cv_header_openssl_opensslv_h" = yes; then
     HAVE_SSL=yes
+
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_SSL 1
@@ -5026,10 +5049,31 @@ _ACEOF
   fi
 fi
 
+if test "$ac_cv_ssl_link" = static; then
+  SSL_LIBS="${SSL_PREFIX}/lib/libssl.a ${SSL_PREFIX}/lib/libcrypto.a"
+fi
+
+ if test "$ac_cv_ssl_link" = static; then
+  SSL_STATIC_TRUE=
+  SSL_STATIC_FALSE='#'
+else
+  SSL_STATIC_TRUE='#'
+  SSL_STATIC_FALSE=
+fi
+
+ if test "$ac_cv_ssl" = true; then
+  SSL_TRUE=
+  SSL_FALSE='#'
+else
+  SSL_TRUE='#'
+  SSL_FALSE=
+fi
 
 
 
-HAVE_FT2="no"
+
+
+HAVE_FT2=no
 
 # Check whether --with-ft2 was given.
 if test "${with_ft2+set}" = set; then :
@@ -5091,7 +5135,7 @@ fi
 
 
      no_ft2=""
-     if test "$FREETYPE_CONFIG" = "no" ; then
+     if test "$FREETYPE_CONFIG" = no ; then
        as_fn_error $? "
        *** Unable to find FreeType2 library (http://www.freetype.org/)
        " "$LINENO" 5
@@ -5105,7 +5149,7 @@ cat >>confdefs.h <<_ACEOF
 #define HAVE_FT2 "1"
 _ACEOF
 
-      HAVE_FT2="yes"
+      HAVE_FT2=yes
      fi
 fi
 
@@ -5122,16 +5166,16 @@ else
 fi
 
 
-if test "$with_pgsql" != "no"; then
-  if test "$with_pgsql" = "yes"; then
+if test "$with_pgsql" != no; then
+  if test "$with_pgsql" = yes; then
     pgsql_directory="$default_directory "
-    pgsql_fail="yes"
+    pgsql_fail=yes
   elif test -d $withval; then
     pgsql_directory="$withval $default_directory"
-    pgsql_fail="yes"
+    pgsql_fail=yes
   elif test "$with_pgsql" = ""; then
     pgsql_directory="$default_directory"
-    pgsql_fail="no"
+    pgsql_fail=no
   fi
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL headers" >&5
@@ -5171,7 +5215,7 @@ $as_echo_n "checking for PostgreSQL client library... " >&6; }
   done
 
     if test -z "$PGSQL_LIB_DIR"; then
-      if test "$postgresql_fail" != "no"; then
+      if test "$postgresql_fail" != no; then
         as_fn_error "$PGSQL_DIR/lib $PGSQL_DIR/lib/pgsql" "\"PostgreSQL library libpq\"" "$LINENO" 5
       else
         $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6;
@@ -5194,7 +5238,7 @@ fi
 
 default_directory="/usr /usr/local /usr/mysql /opt/mysql"
 
-with_mysql="yes"
+with_mysql=yes
 
 # Check whether --with-mysql was given.
 if test "${with_mysql+set}" = set; then :
@@ -5204,16 +5248,16 @@ else
 fi
 
 
-if test "$with_mysql" != "no"; then
-  if test "$with_mysql" = "yes"; then
+if test "$with_mysql" != no; then
+  if test "$with_mysql" = yes; then
     mysql_directory="$default_directory";
-    mysql_fail="yes"
+    mysql_fail=yes
   elif test -d $withval; then
     mysql_directory="$withval"
-    mysql_fail="no"
+    mysql_fail=no
   elif test "$with_mysql" = ""; then
     mysql_directory="$default_directory";
-    mysql_fail="no"
+    mysql_fail=no
   fi
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MySQL headers" >&5
@@ -5231,7 +5275,7 @@ $as_echo_n "checking for MySQL headers... " >&6; }
 
   if test ! -d "$MYSQL_INC_DIR"; then
     $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
-    with_mysql="no"
+    with_mysql=no
 #    FAIL_MESSAGE("MySQL Headers", "$MYSQL_DIR $MYSQL_INC_DIR")
   else
     $as_echo "$as_me:$LINENO: result: $MYSQL_INC_DIR" >&5 ; echo -e ${COLOR_DEFAULT}$MYSQL_INC_DIR${NC} >&6
@@ -5252,9 +5296,9 @@ $as_echo_n "checking for MySQL client library... " >&6; }
   done
 
   if test -z "$MYSQL_LIB_DIR"; then
-    if test "$mysql_fail" != "no"; then
+    if test "$mysql_fail" != no; then
       $as_echo "$as_me:$LINENO: result: no" >&5 ; echo -e ${COLOR_NO}no${NC} >&6
-      with_mysql="no"
+      with_mysql=no
 #      FAIL_MESSAGE("mysqlclient library",
 #                   "$MYSQL_LIB_DIR")
     else
@@ -6127,6 +6171,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DLM_TRUE}" && test -z "${DLM_FALSE}"; then
   as_fn_error $? "conditional \"DLM\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${SSL_STATIC_TRUE}" && test -z "${SSL_STATIC_FALSE}"; then
+  as_fn_error $? "conditional \"SSL_STATIC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${SSL_TRUE}" && test -z "${SSL_FALSE}"; then
+  as_fn_error $? "conditional \"SSL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

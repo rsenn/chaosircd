@@ -1,11 +1,14 @@
-host=arm-linux-androideabi
+sysroot="/opt/arm-linux-androideabi-4.8/sysroot"
+host="arm-linux-androideabi"
 
 ./configure \
 	--prefix=/system \
 	--disable-dependency-tracking \
 	--disable-maintainer-mode \
-	--enable-shared \
-	--with-ssl \
+	--disable-shared \
+	--enable-loadable-modules \
+	--with-ssl="static" \
+	--with-ssl-prefix="$sysroot/usr" \
 	--disable-color \
 	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
@@ -19,12 +22,11 @@ DESTDIR="\$PWD-android"
 
 rm -rf "\$DESTDIR"
 
-make clean
+#make clean
 ./config.status
 make
 make DESTDIR="\$DESTDIR" install
 
-cmd='tar -C "\$DESTDIR" -c . |xz -v -e -6 -f -c >"\${DESTDIR##*/}.txz"'
-eval "echo \"\$cmd\"; \$cmd"
+cmd='tar -C "\$DESTDIR" -c . |xz -v -e -6 -f -c >"\${DESTDIR##*/}.txz"'; eval "echo \"\$cmd\"; \$cmd"
 
 EOF
