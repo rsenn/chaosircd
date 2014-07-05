@@ -71,6 +71,7 @@ case $prefix in
     plugindir=${libdir}/chaosircd
     ;;
 esac
+relplugindir=${plugindir##*/lib/}
 AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/chaosircd]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
