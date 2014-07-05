@@ -10,22 +10,22 @@ global {
                                 # configfile coldstart
   hub    = yes;                  # Hub mode: server forwards messages
                                 # between two or more servers
-  pid    = "@pidfile@";
+  pid    = "@relpidfile@";
 };
 
 # Message files
 mfiles {
-  load "@sysconfdir@/ircd.motd";  # Message of the day 
+  load "@relsysconfdir@/ircd.motd";  # Message of the day 
                                   # (used by the m_motd module) 
 };
 
-.include "@sysconfdir@/logs.conf"         # Log files
-.include "@sysconfdir@/inis.conf"         # INI databases
-.include "@sysconfdir@/modules.conf"      # Loadable modules
-.include "@sysconfdir@/children.conf"     # Child processes
-.include "@sysconfdir@/classes.conf"      # Connection classes
-.include "@sysconfdir@/opers.conf"        # IRC Operators
-.include "@sysconfdir@/ssl.conf"          # SSL contexts
+.include "@relsysconfdir@/logs.conf"         # Log files
+.include "@relsysconfdir@/inis.conf"         # INI databases
+.include "@relsysconfdir@/modules.conf"      # Loadable modules
+.include "@relsysconfdir@/children.conf"     # Child processes
+.include "@relsysconfdir@/classes.conf"      # Connection classes
+.include "@relsysconfdir@/opers.conf"        # IRC Operators
+.include "@relsysconfdir@/ssl.conf"          # SSL contexts
 
 # Listen for incoming SSL connections on port 9200
 @SSL_TRUE@listen {

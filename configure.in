@@ -51,6 +51,16 @@ case $sysconfdir in
   *) sysconfdir=${sysconfdir}/chaosircd ;;
 esac
 
+relsysconfdir=${sysconfdir#$tmp_prefix/}
+test "$relsysconfdir" = "$sysconfdir" && relsysconfdir=etc${sysconfdir##*/etc}
+AC_SUBST([relsysconfdir])
+
+
+eval "rellibexecdir=\"${libexecdir}\""
+rellibexecdir=${rellibexecdir#$tmp_prefix/}
+test "$rellibexecdir" = "$libexecdir" && rellibexecdir=libexec${libexecdir##*libexec}
+AC_SUBST([rellibexecdir])
+
 eval libexecdir=${libexecdir}
 eval localstatedir=${localstatedir}
 
@@ -82,33 +92,13 @@ AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LI
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
 AC_SUBST([relplugindir])
-
 case $tmp_prefix in
-  *ircd*)
-    eval "logdir=${prefix}/logs"
-    ;;
-  *)
-    eval "logdir=${localstatedir}/log"
-    ;;
-esac
-rellogdir=${logdir#$tmp_prefix/}
-test "$rellogdir" = "$logdir" && rellogdir=var/${logdir##*/var/}
-AC_ARG_WITH([logdir], [  --with-logdir=PATH   location of the logs [[LOCALSTATEDIR/log]]],
-[if test "$withval" != "yes" && test "$withval" != "no"; then eval logdir=$withval; fi])
-AC_SUBST([logdir])
-AC_SUBST([rellogdir])
-
-case $tmp_prefix in
-  *ircd*)
-    eval "inidir=${localstatedir}/lib"
-    ;;
-  *)
-    eval "inidir=${localstatedir}/lib/chaosircd"
-    ;;
+  *ircd*) eval "inidir=${localstatedir}/lib"  ;;
+  *) eval "inidir=${localstatedir}/lib/chaosircd"  ;;
 esac
 relinidir=${inidir#$tmp_prefix/}
 if test "$relinidir" = "$inidir"; then
-   relinidir=var${inidir##*var}
+   relinidir=${localstatedir##*/}${inidir##*${localstatedir##*/}}
 fi 
 AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval inidir=$withval; fi])
@@ -117,6 +107,30 @@ AC_MSG_CHECKING([For .ini directory])
 AC_SUBST([inidir])
 AC_SUBST([relinidir])
 AC_MSG_RESULT([$inidir $relinidir])
+
+case $tmp_prefix in
+  *ircd*) eval "logdir=${localstatedir}/log" ;; 
+  *) eval "logdir=${localstatedir}/log/chaosircd" ;;
+esac
+rellogdir=${logdir#$tmp_prefix/}
+test "$rellogdir" = "$logdir" && rellogdir=${localstatedir##*/}${logdir##*${localstatedir##*/}}
+AC_ARG_WITH([logdir], [  --with-logdir=PATH   location of the logs [[LOCALSTATEDIR/log]]],
+[if test "$withval" != "yes" && test "$withval" != "no"; then eval logdir=$withval; fi])
+AC_SUBST([logdir])
+AC_SUBST([rellogdir])
+
+eval "rundir=${localstatedir}/run"
+relrundir=${rundir#$tmp_prefix/}
+test "$relrundir" = "$rundir" && relrundir=${localstatedir##*/}${rundir##*${localstatedir##*/}}
+AC_ARG_WITH([rundir], [  --with-rundir=PATH   location of the runs [[LOCALSTATEDIR/run]]],
+[if test "$withval" != "yes" && test "$withval" != "no"; then eval rundir=$withval; fi])
+AC_SUBST([rundir])
+AC_SUBST([relrundir])
+
+pidfile="$rundir/\$(PACKAGE_NAME).pid"
+relpidfile="$relrundir/\$(PACKAGE_NAME).pid"
+AC_SUBST([pidfile])
+AC_SUBST([relpidfile])
 
 # set extensions and flags
 # ---------------------------------------------------------------------------
@@ -216,7 +230,7 @@ AC_CHECK_MAINTAINER
 case $libdir in
   /lib | /usr/lib) ;;
   *)
-    LDFLAGS="${LDFLAGS:+$LDFLAGS }-Xlinker -rpath=\$(libdir)"
+    LDFLAGS="${LDFLAGS:+$LDFLAGS }-Wl,-rpath,\$(libdir)"
     ;;
 esac
 

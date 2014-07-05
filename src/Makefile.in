@@ -45,7 +45,8 @@ DEFS += -DSYSCONFDIR=\"$(relsysconfdir)\"
 DEFS += -DPLUGINDIR=\"$(relplugindir)\" 
 DEFS += -DINIDIR=\"$(relinidir)\" 
 DEFS += -DLOGDIR=\"$(rellogdir)\" 
-DEFS += -DPID=\"$(PID)\"
+DEFS += -DRUNDIR=\"$(relrundir)\"
+DEFS += -DPID=\"$(relrundir)/$(PACKAGE_NAME).pid\"
 
 INCLUDES             = -I$(top_srcdir)/include \
                        -I$(srcdir) \

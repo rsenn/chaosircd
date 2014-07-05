@@ -389,7 +389,7 @@ install-slibEXEC: $(slib_EXEC)
         
 # install plugins into plugindir
 # ---------------------------------------------------------------------------
-#install-pluginEXEC: $(plugin_EXEC)
+install-pluginEXEC: $(plugin_EXEC)
 #	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX) && test "$(plugin_EXEC)"; then \
 #		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
 #		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) >/dev/null ; \

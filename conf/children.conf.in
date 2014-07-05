@@ -4,7 +4,7 @@ child {
 name      = "-sauth";                 # Name MUST be "-sauth" so the 
                                       # [sauth] module can find it!!!
 
-path      = "@libexecdir@/servauth";  # Path to the servauth executable
+path      = "@rellibexecdir@/servauth";  # Path to the servauth executable
 
 channels  = 1;                        # Number of bidirectional channels 
                                       # to the child (pipes/socketpairs)
@@ -22,7 +22,7 @@ auto      = no;                       # Auto-launch the child?
 ################# UNIMPLEMENTED ###############
 #child {
 #  name      = "-slink";
-#  path      = "@libexecdir@/servlink";
+#  path      = "@rellibexecdir@/servlink";
 #  channels  = 2;
 #  argv      = "%r0 %w0 %r1 %w1";
 #  interval  = 10000;

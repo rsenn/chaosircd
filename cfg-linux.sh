@@ -1,5 +1,7 @@
 host=$(gcc -dumpmachine)
 
+make -i distclean >/dev/null 2>/dev/null
+
 ./configure \
 	--disable-dep \
 	--disable-maintainer \
@@ -10,6 +12,8 @@ host=$(gcc -dumpmachine)
 	--build=`gcc -dumpmachine` \
 	"$@" 
 
+./config.status
+
 cat <<EOF | tee build-linux.sh |sed -u "s|^|build-linux.sh: |"
 #!/bin/sh
 
@@ -17,8 +21,6 @@ DESTDIR="\$PWD-linux"
 
 rm -rf "\$DESTDIR"
 
-make clean
-./config.status
 make
 make DESTDIR="\$DESTDIR" install
 

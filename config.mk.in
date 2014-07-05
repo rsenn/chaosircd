@@ -17,9 +17,11 @@ DEP             = @DEP@
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 sysconfdir      = @sysconfdir@
+relsysconfdir   = @relsysconfdir@
 bindir          = @bindir@
 sbindir         = @sbindir@
 libexecdir      = @libexecdir@
+rellibexecdir   = @rellibexecdir@
 datadir         = @datadir@
 datarootdir     = @datarootdir@
 sysconfdir      = @sysconfdir@
@@ -37,6 +39,8 @@ inidir          = @inidir@
 relinidir       = @relinidir@
 logdir          = @logdir@
 rellogdir       = @rellogdir@
+rundir          = @rundir@
+relrundir       = @relrundir@
 
 # autoconf related stuff
 # ---------------------------------------------------------------------------
