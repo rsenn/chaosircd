@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: httpc.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -53,7 +53,7 @@ typedef void (httpc_cb_t)(struct httpc *, void *, void *, void *, void *);
 
 struct httpc_var {
   struct node node;
-  uint32_t    hash;
+  hash_t      hash;
   char        name[64];
   char        value[128];
 };
@@ -64,7 +64,7 @@ struct httpc {
   uint32_t           refcount;
   int                fd;
   int                type;
-  uint32_t           nhash;
+  hash_t             nhash;
   int                status;
   uint16_t           port;
   int                ssl;
@@ -91,12 +91,12 @@ struct httpc {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )httpc_log;
-CHAOS_API(struct sheap  )httpc_heap;
-CHAOS_API(struct sheap  )httpc_var_heap;
-CHAOS_API(struct dheap  )httpc_dheap;
-CHAOS_API(struct list   )httpc_list;
-CHAOS_API(uint32_t      )httpc_id;
+CHAOS_API(int)           httpc_log;
+CHAOS_API(struct sheap)  httpc_heap;
+CHAOS_API(struct sheap)  httpc_var_heap;
+CHAOS_API(struct dheap)  httpc_dheap;
+CHAOS_API(struct list)   httpc_list;
+CHAOS_API(uint32_t)      httpc_id;
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) httpc_get_log(void);
@@ -104,12 +104,12 @@ CHAOS_API(int) httpc_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize httpc heap.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_init      (void);
+CHAOS_API(void)          httpc_init      (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy httpc heap.                                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_shutdown  (void);
+CHAOS_API(void)          httpc_shutdown  (void);
 
 /* ------------------------------------------------------------------------ *
  * Add a httpc.                                                               *
@@ -118,52 +118,52 @@ CHAOS_API(struct httpc *)httpc_add       (const char    *url);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )httpc_vconnect  (struct httpc  *hcptr,
-                                          void          *cb, 
+CHAOS_API(int)           httpc_vconnect  (struct httpc  *hcptr,
+                                          void          *cb,
                                           va_list        args);
-CHAOS_API(int           )httpc_connect   (struct httpc  *hcptr, 
-                                          void          *cb, 
+CHAOS_API(int)           httpc_connect   (struct httpc  *hcptr,
+                                          void          *cb,
                                           ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )httpc_url_parse (struct httpc  *hcptr);
+CHAOS_API(int)           httpc_url_parse (struct httpc  *hcptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t        )httpc_url_encode(char          *to,
+CHAOS_API(size_t)        httpc_url_encode(char          *to,
                                           const char    *from,
-                                          size_t         n, 
+                                          size_t         n,
                                           int            loc);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )httpc_url_build (struct httpc  *hcptr);
+CHAOS_API(int)           httpc_url_build (struct httpc  *hcptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )httpc_update    (struct httpc  *httpc);
+CHAOS_API(int)           httpc_update    (struct httpc  *httpc);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_clear     (struct httpc  *httpc);
+CHAOS_API(void)          httpc_clear     (struct httpc  *httpc);
 
 /* ------------------------------------------------------------------------ *
  * Remove a httpc.                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_delete    (struct httpc  *httpc);
+CHAOS_API(void)          httpc_delete    (struct httpc  *httpc);
 
 /* ------------------------------------------------------------------------ *
  * Send HTTP request                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_send      (struct httpc  *hcptr);
+CHAOS_API(void)          httpc_send      (struct httpc  *hcptr);
 
 /* ------------------------------------------------------------------------ *
  * Receive HTTP data                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_recv      (int            fd,
+CHAOS_API(void)          httpc_recv      (int            fd,
                                           struct httpc  *hcptr);
-    
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct httpc *)httpc_find_name (const char    *name);
@@ -174,36 +174,36 @@ CHAOS_API(struct httpc *)httpc_find_id   (uint32_t       id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_vset_args (struct httpc  *httpc, 
+CHAOS_API(void)          httpc_vset_args (struct httpc  *httpc,
                                           va_list        args);
-CHAOS_API(void          )httpc_set_args  (struct httpc  *httpc, 
+CHAOS_API(void)          httpc_set_args  (struct httpc  *httpc,
                                           ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_var_set   (struct httpc  *hcptr, const char *name,
+CHAOS_API(void)          httpc_var_set   (struct httpc  *hcptr, const char *name,
                                           const char    *value, ...);
 
-CHAOS_API(void          )httpc_var_vset  (struct httpc  *hcptr, const char *name,
+CHAOS_API(void)          httpc_var_vset  (struct httpc  *hcptr, const char *name,
                                           const char    *value, va_list     args);
 
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_var_build (struct httpc  *hcptr);
+CHAOS_API(void)          httpc_var_build (struct httpc  *hcptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )httpc_set_name  (struct httpc  *hcptr, 
+CHAOS_API(void)          httpc_set_name  (struct httpc  *hcptr,
                                           const char    *name);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct httpc *)httpc_pop       (struct httpc  *httpc);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct httpc *)httpc_push      (struct httpc **httpcptr);    
+CHAOS_API(struct httpc *)httpc_push      (struct httpc **httpcptr);
 
 /* ------------------------------------------------------------------------ *
  * Dump httpcs.                                                               *

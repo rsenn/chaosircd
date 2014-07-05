@@ -32,12 +32,12 @@
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_invisible = 
+static struct usermode um_invisible =
 {
-  'i', 
-  USERMODE_LIST_OFF, 
-  USERMODE_LIST_LOCAL, 
-  USERMODE_ARG_DISABLE, 
+  'i',
+  USERMODE_LIST_OFF,
+  USERMODE_LIST_LOCAL,
+  USERMODE_ARG_DISABLE,
   NULL
 };
 
@@ -48,7 +48,7 @@ int um_invisible_load(void)
 {
   if(usermode_register(&um_invisible))
     return -1;
-  
+
   return 0;
 }
 

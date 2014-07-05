@@ -44,7 +44,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_kill(struct lclient *lcptr, struct client *cptr, 
+static void mo_kill(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -71,7 +71,7 @@ int m_kill_load(void)
 {
   if(msg_register(&mo_kill_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -85,12 +85,12 @@ void m_kill_unload(void)
  * argv[1] - 'kill'                                                           *
  * argv[2] - name                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_kill(struct lclient *lcptr, struct client *cptr, 
+static void mo_kill(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   int            ret;
   struct client *acptr;
-  
+
   if(argc > 3)
   {
     if((ret = client_relay_always(lcptr, cptr, &acptr, 2, ":%C KILL %s :%s", &argc, argv)) == -1)
@@ -101,7 +101,7 @@ static void mo_kill(struct lclient *lcptr, struct client *cptr,
     if((ret = client_relay_always(lcptr, cptr, &acptr, 2, ":%C KILL %s", &argc, argv)) == -1)
       return;
   }
-  
+
   if(argc > 3)
   {
     if(cptr->user)
@@ -111,7 +111,7 @@ static void mo_kill(struct lclient *lcptr, struct client *cptr,
           argv[3]);
     else
       log(ircd_log, L_status, "%s killed %s (%s@%s): %s",
-          cptr->name, 
+          cptr->name,
           acptr->name, acptr->user->name, acptr->host,
           argv[3]);
   }
@@ -123,18 +123,18 @@ static void mo_kill(struct lclient *lcptr, struct client *cptr,
           acptr->name, acptr->user->name, acptr->host);
     else
       log(ircd_log, L_status, "%s killed %s (%s@%s).",
-          cptr->name, 
+          cptr->name,
           acptr->name, acptr->user->name, acptr->host);
   }
-  
+
   if(ret == 1)
     return;
-  
+
   if(argc > 3)
   {
     if(cptr->user)
-      client_exit(NULL, acptr, 
-                  "killed by %s (%s@%s): %s", 
+      client_exit(NULL, acptr,
+                  "killed by %s (%s@%s): %s",
                   cptr->name, cptr->user->name, cptr->host, argv[3]);
     else
       client_exit(NULL, acptr, "killed by %s: %s", cptr->name, argv[3]);
@@ -143,7 +143,7 @@ static void mo_kill(struct lclient *lcptr, struct client *cptr,
   {
     if(cptr->user)
       client_exit(NULL, acptr,
-                  "killed by %s (%s@%s)", 
+                  "killed by %s (%s@%s)",
                   cptr->name, cptr->user->name, cptr->host);
     else
       client_exit(NULL, acptr, "killed by %s", cptr->name);

@@ -51,39 +51,39 @@ static struct graph *st_traffic_server;
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static struct graph *st_traffic_setup(const char    *name, unsigned long *out, 
+static struct graph *st_traffic_setup(const char    *name, unsigned long *out,
                                       unsigned long *in)
 {
   struct graph *graph = NULL;
-  
+
 /*  graph = graph_new(name, 400, 160, GRAPH_TYPE_OPS);
-  
+
   graph_colorize(graph, GRAPH_COLOR_DARK);
-  
+
   graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, GRAPH_SOURCE_ULONG, out, "out");
   graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, GRAPH_SOURCE_ULONG, in, "in");
-  
+
   graph_drain_add(graph, GRAPH_DATA_HOURLY);*/
 /*  graph_drain_add(graph, GRAPH_DATA_DAILY);
   graph_drain_add(graph, GRAPH_DATA_WEEKLY);
   graph_drain_add(graph, GRAPH_DATA_MONTHLY);
   graph_drain_add(graph, GRAPH_DATA_YEARLY);*/
-  
+
 /*  graph_drain_render(graph, GRAPH_DATA_HOURLY);
   graph_drain_save(graph, GRAPH_DATA_HOURLY);*/
-  
+
   return graph;
 }
-                               
+
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
 int st_traffic_load(void)
 {
-  st_traffic_client = st_traffic_setup("client", 
+  st_traffic_client = st_traffic_setup("client",
                                        &lclient_sendb[CLIENT_USER],
                                        &lclient_recvb[CLIENT_USER]);
-  st_traffic_server = st_traffic_setup("server", 
+  st_traffic_server = st_traffic_setup("server",
                                        &lclient_sendb[CLIENT_SERVER],
                                        &lclient_recvb[CLIENT_SERVER]);
   return 0;

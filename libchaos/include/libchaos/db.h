@@ -37,10 +37,10 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct db_result 
+struct db_result
 {
   struct db  *db;
-  union 
+  union
   {
 #ifdef HAVE_PGSQL
     PGresult  *pg;
@@ -50,7 +50,7 @@ struct db_result
 #endif /* HAVE_MYSQL */
     void      *common;
   } res;
-  
+
   uint64_t    row;
   uint64_t    rows;
   uint32_t    fields;
@@ -58,14 +58,14 @@ struct db_result
   char      **fdata;
 };
 
-struct db 
+struct db
 {
   struct node              node;
   uint32_t                 id;
   uint32_t                 refcount;
   int                      type;
-  
-  union 
+
+  union
   {
 #ifdef HAVE_PGSQL
     PGconn                *pg;
@@ -90,12 +90,12 @@ extern uint32_t            db_serial;
  * Initialize DB heap                                                       *
  * ------------------------------------------------------------------------ */
 extern void                db_init              (void);
-  
+
 /* ------------------------------------------------------------------------ *
  * Destroy DB heap                                                          *
  * ------------------------------------------------------------------------ */
 extern void                db_shutdown          (void);
-  
+
 /* ------------------------------------------------------------------------ *
  * Destroy DB instance                                                      *
  * ------------------------------------------------------------------------ */
@@ -112,13 +112,13 @@ extern int                 db_connect           (struct db  *db,
                                                  char       *user,
                                                  char       *pass,
                                                  char       *dbname);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern struct db_result   *db_query             (struct db  *db,
-                                                 const char *format, 
+                                                 const char *format,
                                                  ...);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern void                db_close             (struct db  *db);
@@ -133,11 +133,11 @@ extern size_t              db_escape_string     (struct db  *db,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern void                db_free_result       (struct db_result *result);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern char              **db_fetch_row         (struct db_result *result);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern uint64_t            db_num_rows          (struct db_result *result);
@@ -149,5 +149,5 @@ extern uint32_t            db_num_fields        (struct db_result *result);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern uint64_t            db_affected_rows     (struct db *db);
-  
+
 #endif /* LIB_DB_H */

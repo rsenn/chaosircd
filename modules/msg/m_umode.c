@@ -58,7 +58,7 @@ static char *m_umode_help[] = {
 };
 
 static struct msg m_umode_msg = {
-  "UMODE", 0, 0, MFLG_CLIENT, 
+  "UMODE", 0, 0, MFLG_CLIENT,
   { NULL, m_umode, ms_umode, m_umode },
   m_umode_help
 };
@@ -70,7 +70,7 @@ int m_umode_load(void)
 {
   if(msg_register(&m_umode_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -100,7 +100,7 @@ static void m_umode(struct lclient *lcptr, struct client *cptr,
   {
     /* let the user know his changes */
     usermode_change_send(lcptr, cptr, USERMODE_SEND_LOCAL);
-  
+
     /* and the whole network */
     usermode_change_send(lcptr, cptr, USERMODE_SEND_REMOTE);
   }
@@ -117,9 +117,9 @@ static void ms_umode(struct lclient *lcptr, struct client *cptr,
   if(usermode_make(cptr->user, argv + 2, cptr, 0UL))
   {
     usermode_change_send(lcptr, cptr, USERMODE_SEND_REMOTE);
-    
+
     return;
   }
-  
+
   log(usermode_log, L_warning, "UMODE from server with no change");
 }

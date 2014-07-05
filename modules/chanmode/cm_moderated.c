@@ -39,18 +39,18 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_moderated_hook(struct lclient *lcptr, struct client   *cptr,
-                             struct channel *chptr, struct chanuser *cuptr);
+static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
+	                     intptr_t         type, const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_moderated_help[] = 
+static const char *cm_moderated_help[] =
 {
   "+m              Moderated. Lets only ops and voices send to the channel.",
   NULL
 };
 
-static struct chanmode cm_moderated_mode = 
+static struct chanmode cm_moderated_mode =
 {
   CM_MODERATED_CHAR,       /* Mode character */
   '\0',                    /* No prefix, because its not a privilege */
@@ -69,9 +69,9 @@ int cm_moderated_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_moderated_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_message, HOOK_DEFAULT, cm_moderated_hook);
-  
+
   return 0;
 }
 
@@ -79,22 +79,24 @@ void cm_moderated_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_moderated_mode);
-  
+
   hook_unregister(channel_message, HOOK_DEFAULT, cm_moderated_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_moderated_hook(struct lclient *lcptr, struct client   *cptr,
-                             struct channel *chptr, struct chanuser *cuptr)
+static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
+	                     intptr_t         type, const char     *text)
 {
+  struct chanuser *cuptr = chanuser_find(chptr, cptr);
+
   if(chptr->modes & CHFLG(m) &&
      (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0LLU))
   {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);
     return 1;
   }
-  
+
   return 0;
 }
 

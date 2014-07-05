@@ -59,7 +59,7 @@ static char *mo_module_help[] = {
   "load        Load a module.",
   "unload      Unload a module.",
   "reload      Reload a module.",
-  NULL  
+  NULL
 };
 
 static struct msg m_module_msg = {
@@ -75,16 +75,16 @@ int m_module_load(struct module *module)
 {
   if(msg_register(&m_module_msg) == NULL)
     return -1;
-  
+
   m_module_module = module;
-  
+
   return 0;
 }
 
 void m_module_unload(void)
 {
   m_module_module = NULL;
-  
+
   msg_unregister(&m_module_msg);
 }
 
@@ -113,23 +113,23 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
         return;
     }
   }
-  
+
   if(!str_icmp(argv[2], "list"))
   {
     client_send(cptr, ":%C NOTICE %C : ======= module list ======== ",
                 client_me, cptr);
-    
+
     client_send(cptr, ":%C NOTICE %C :  id name",
                 client_me, cptr);
     client_send(cptr, ":%C NOTICE %C : ---------------------------- ",
                 client_me, cptr);
-    
+
     dlink_foreach_up(&module_list, module)
     {
       client_send(cptr, ":%C NOTICE %C : %3u %s",
                   client_me, cptr, module->id, module->name);
     }
-    
+
     client_send(cptr, ":%C NOTICE %C : ==== end of module list ==== ",
                 client_me, cptr);
   }
@@ -141,9 +141,9 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
                   client_me, cptr);
       return;
     }
-    
+
     module = module_add(argv[3]);
-    
+
     if(module)
     {
       client_send(cptr, ":%C NOTICE %C : loaded module '%s'.",
@@ -158,26 +158,26 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
                   client_me, cptr);
       return;
     }
-    
+
     module = module_find_name(argv[3]);
-    
+
     if(module == NULL && chars_isdigit(argv[3][0]))
       module = module_find_id(atoi(argv[3]));
-    
+
     if(module == NULL)
-    {      
+    {
       client_send(cptr, ":%C NOTICE %C : module '%s' not found.",
                   client_me, cptr, argv[3]);
       return;
     }
-    
+
     if(module == m_module_module)
-    {      
+    {
       client_send(cptr, ":%C NOTICE %C : can not unload myself!",
                   client_me, cptr);
       return;
     }
-    
+
     client_send(cptr, ":%C NOTICE %C : unloaded module '%s'.",
                 client_me, cptr, module->name);
 
@@ -191,26 +191,26 @@ static void mo_module(struct lclient *lcptr, struct client *cptr,
                   client_me, cptr);
       return;
     }
-    
+
     module = module_find_name(argv[3]);
-    
+
     if(module == NULL && chars_isdigit(argv[3][0]))
       module = module_find_id(atoi(argv[3]));
-    
+
     if(module == NULL)
-    {      
+    {
       client_send(cptr, ":%C NOTICE %C : module '%s' not found.",
                   client_me, cptr, argv[3]);
       return;
     }
-    
+
     if(module == m_module_module)
-    {      
+    {
       client_send(cptr, ":%C NOTICE %C : can not reload myself!",
                   client_me, cptr);
       return;
     }
-    
+
     if(module_reload(module))
       client_send(cptr, ":%C NOTICE %C : failed reloading module '%s'.",
                   client_me, cptr, module->name);

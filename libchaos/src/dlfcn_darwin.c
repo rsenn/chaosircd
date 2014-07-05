@@ -68,7 +68,7 @@ static const char *error(int setget, const char *str, ...)
 			fprintf(stderr,"dyld: %s\n",dylderrstr);
 			if (dylderrstr && str_len(dylderrstr))
 				strncpy(errstr,dylderrstr,ERR_STR_LEN);
-		}		
+		}
 		err_filled = 1;
 		retval = NULL;
 	}
@@ -114,7 +114,7 @@ void *dlopen(const char *path, int mode)
 			{
 			  if (!make_private_module_public)
 			  {
-			    _dyld_func_lookup("__dyld_NSMakePrivateModulePublic", 
+			    _dyld_func_lookup("__dyld_NSMakePrivateModulePublic",
 				(unsigned long *)&make_private_module_public);
 			  }
 			  make_private_module_public(module);
@@ -135,7 +135,7 @@ void *dlopen(const char *path, int mode)
 			return 0;
 		case NSObjectFileImageAccess:
 			error(0,"Can't read object file :  \"%s\"", path);
-			return 0;		
+			return 0;
 	}
 	if (!module)
 		error(0, "Can not open \"%s\"", path);
@@ -199,7 +199,7 @@ void *dlsym(void *handle, const char *symbol)
 												  NSLOOKUPSYMBOLINIMAGE_OPTION_BIND
 												  | NSLOOKUPSYMBOLINIMAGE_OPTION_RETURN_ON_ERROR);
 				}
-	
+
 			}
 			else
 			{

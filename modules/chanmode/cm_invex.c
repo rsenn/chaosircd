@@ -74,11 +74,11 @@ int cm_invex_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_invex_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_join, HOOK_1ST, cm_invex_hook);
-  
+
   ircd_support_set("INVEX", NULL);
-  
+
   return 0;
 }
 
@@ -86,9 +86,9 @@ void cm_invex_unload(void)
 {
   /* unregister the channel mode */
   ircd_support_unset("INVEX");
-  
+
   chanmode_unregister(&cm_invex_mode);
-  
+
   hook_unregister(channel_join, HOOK_1ST, cm_invex_hook);
 }
 
@@ -99,19 +99,19 @@ static void cm_invex_hook(struct client *cptr, struct channel *chptr,
 {
   struct list   *mlptr;
   struct invite *ivptr;
-  
+
   /* client is already denied and not banned */
-  if((*reply > 0 && *reply != ERR_INVITEONLYCHAN && 
+  if((*reply > 0 && *reply != ERR_INVITEONLYCHAN &&
       *reply != ERR_CHANNELISFULL && *reply != ERR_BADCHANNELKEY) || *reply == -CM_INVITE_CHAR)
     return;
-  
+
   /* get the mode list for +I */
   mlptr = &chptr->modelists[chanmode_index(CM_INVEX_CHAR)];
-  
+
   if(chanmode_match_ban(cptr, chptr, mlptr))
   {
     *reply = -CM_INVEX_CHAR;
-    
+
     dlink_foreach(&cptr->user->invites, ivptr)
     {
       if(ivptr->channel == chptr)

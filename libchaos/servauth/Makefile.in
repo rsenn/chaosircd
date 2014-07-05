@@ -43,27 +43,36 @@ install: install-exec
 
 # dependencies
 # ---------------------------------------------------------------------------
--include $(DEPS)
+@DEPS_TRUE@-include $(DEPS)
 
 # install config
 # ---------------------------------------------------------------------------
 @WIN32_FALSE@libexec_EXEC += $(PROGRAM)
 @WIN32_TRUE@bin_EXEC += $(PROGRAM)
 
-$(PROGRAM): $(OBJECTS)
-
 # build config
 # ---------------------------------------------------------------------------
-LIBS     += $(DLFCN_LIBS)
 LIBS     += -L$(top_builddir)/src -lchaos
-LIB      += $(SSL_LIBS)
+@STATIC_TRUE@LDADD     += $(top_builddir)/src/libchaos.a
+@WIN32_TRUE@@SHARED_TRUE@LIBS     += $(top_builddir)/src/libchaos.dll
+@SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
+@SSL_TRUE@LIBS     += $(SSL_LIBS)
+LIBS     += $(DLFCN_LIBS)
 CPPFLAGS += -DHAVE_CONFIG_H
+@STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
+
 INCLUDES += -I$(srcdir) \
-            -I$(top_srcdir) \
             -I$(top_srcdir)/include \
             -I$(builddir) \
-            -I$(top_builddir) \
-            -I$(top_builddir)/include
+            -I$(top_builddir)/include \
+            -I. \
+            -I../include
+
+#$(PROGRAM): CFLAGS += -I$(srcdir)/../include
+$(PROGRAM): $(OBJECTS)
+$(PROGRAM): $(LDADD)
+	@$(ECHO_CCLD)
+	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LIBS)
 
 # include global make targets
 # ---------------------------------------------------------------------------

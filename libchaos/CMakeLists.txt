@@ -9,99 +9,24 @@ project(${PACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
-include(CheckIncludeFile)
-include(CheckIncludeFiles)
-include(FindBISON)
-include(FindFLEX)
+if(NOT LIBCHAOS_SOURCE_DIR)
+  set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
+if(NOT LIBCHAOS_BINARY_DIR)
+  set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
+#set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
+#set(CMAKE_CURRENT_LIST_DIR "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
+
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
+
 include(FindOpenSSL)
 include(FindFreetype)
-include(FindPostgreSQL)
-include(CheckLibraryExists)
-include(CheckFunctionExists)
-include(CheckTypeSize)
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
 
-check_include_file(unistd.h HAVE_UNISTD_H)
-check_include_file(signal.h HAVE_SIGNAL_H)
-check_include_file(sys/types.h HAVE_SYS_TYPES_H)
-check_include_file(sys/time.h HAVE_SYS_TIME_H)
-check_include_file(sys/ioctl.h HAVE_SYS_IOCTL_H)
-check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
-check_include_file(sys/socket.h HAVE_SYS_SOCKET_H)
-check_include_file(sys/timeb.h HAVE_SYS_TIMEB_H)
-check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
-check_include_file(sys/select.h HAVE_SYS_SELECT_H)
-check_include_file(sys/poll.h HAVE_SYS_POLL_H)
-check_include_file(fcntl.h HAVE_FCNTL_H)
-check_include_file(io.h HAVE_IO_H)
-check_include_file(netinet/in.h HAVE_NETINET_IN_H)
-check_include_file(linux/filter.h HAVE_LINUX_FILTER_H)
-check_include_file(linux/types.h HAVE_LINUX_TYPES_H)
-check_include_file(net/bpf.h HAVE_NET_BPF_H)
-check_include_file(net/ethernet.h HAVE_NET_ETHERNET_H)
-check_include_file(cygwin/in.h HAVE_CYGWIN_IN_H)
-check_include_file(dlfcn.h HAVE_DLFCN_H)
-check_include_file(elf.h HAVE_ELF_H)
-
-if(CMAKE_HOST_WIN32)
-#  check_include_file(winsock.h HAVE_WINSOCK2_H)
-  check_include_file(winsock2.h HAVE_WINSOCK2_H)
-  check_include_file(ws2tcpip.h HAVE_WS2TCPIP_H)
-endif(CMAKE_HOST_WIN32)
-
-check_include_file(limits.h HAVE_LIMITS_H)
-check_include_file(stdint.h HAVE_STDINT_H)
-check_include_file(inttypes.h HAVE_INTTYPES_H)
-
-check_library_exists(dl dlsym "" HAVE_DLFCN)
-
-if(NOT HAVE_DLFCN)
-  if(CMAKE_HOST_WIN32)
-    set(DLFCN_SOURCES src/dlfcn_win32.c)
-  endif(CMAKE_HOST_WIN32)  
-endif(NOT HAVE_DLFCN)
-
-
-if(HAVE_SYS_SOCKET_H)
-  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} sys/socket.h)
-endif(HAVE_SYS_SOCKET_H)
-
-if(HAVE_WINSOCK2_H)
-  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} winsock2.h)
-endif(HAVE_WINSOCK2_H)
-
-if(HAVE_WS2TCPIP_H)
-  set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} ws2tcpip.h)
-endif(HAVE_WS2TCPIP_H)
-
-check_type_size(socklen_t SOCKLEN_T)
-
-check_function_exists(select HAVE_SELECT)
-
-
-if(CMAKE_HOST_WIN32)
-  if(NOT HAVE_SELECT)
-    if(HAVE_WINSOCK2_H)
-      set(SOCKET_LIBRARIES ws2_32)
-    else(HAVE_WINSOCK2_H)
-      set(SOCKET_LIBRARIES wsock32)
-    endif(HAVE_WINSOCK2_H)
-  endif(NOT HAVE_SELECT)
-  set(USE_SELECT TRUE)
-else(CMAKE_HOST_WIN32)
-
-  check_function_exists(poll HAVE_POLL)
-
-  if(HAVE_POLL)
-    set(USE_POLL TRUE)
-  elseif(HAVE_SELECT)
-    set(USE_SELECT TRUE)
-  endif(HAVE_SELECT)
-
-endif(CMAKE_HOST_WIN32)
-
-
- 
-set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
   set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
@@ -110,28 +35,17 @@ endif(NOT DEFINED BUILD_SHARED_LIBS)
 if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED_LIBS)
+ 
+set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
-if(HAVE_POLL)
-  set(USE_POLL 1)
-else(HAVE_POLL)
-  set(USE_SELECT 1)
-endif(HAVE_POLL)
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
+substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
+
+	       
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
-
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/libchaos
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/libchaos/config.h.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/include/libchaos/config.h)
-               
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 add_definitions(-DBUILD_LIBCHAOS=1)
 
@@ -146,7 +60,8 @@ set(LIBCHAOS_HEADERS include/libchaos/cfg.h include/libchaos/child.h
    include/libchaos/mem.h include/libchaos/mfile.h include/libchaos/module.h
    include/libchaos/net.h include/libchaos/queue.h include/libchaos/sauth.h
    include/libchaos/ssl.h include/libchaos/str.h include/libchaos/syscall.h
-   include/libchaos/template.h include/libchaos/timer.h include/libchaos/ttf.h)
+   include/libchaos/template.h include/libchaos/timer.h include/libchaos/ttf.h
+   ${MSINTTYPES_HEADERS})
 
 set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/divdi3.c src/dlink.c src/filter.c src/gif.c src/graph.c src/hook.c
@@ -158,6 +73,18 @@ add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
-set_target_properties(libchaos PROPERTIES SOVERSION ${LIBRARY_VERSION})
+set_target_properties(libchaos PROPERTIES
+                      SOVERSION "${LIBRARY_VERSION}"
+                      PREFIX "")
 
-target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES})
+target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+
+install(TARGETS libchaos
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+
+install(FILES ${LIBCHAOS_HEADERS} DESTINATION include/libchaos)
+
+add_subdirectory(servauth)
+add_subdirectory(test)

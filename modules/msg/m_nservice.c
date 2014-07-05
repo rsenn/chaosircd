@@ -53,7 +53,7 @@ static void ms_nservice(struct lclient *lcptr, struct client *cptr,
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *ms_nservice_help[] =
-{ 
+{
   "NSERVICE <nick> <user> <host> <uid> :<info>",
   "",
   "Introduces a client to a remote server.",
@@ -61,7 +61,7 @@ static char *ms_nservice_help[] =
 };
 
 static struct msg ms_nservice_msg = {
-  "NSERVICE", 5, 5, MFLG_SERVER, 
+  "NSERVICE", 5, 5, MFLG_SERVER,
   { NULL, NULL, ms_nservice, NULL },
   ms_nservice_help
 };
@@ -73,7 +73,7 @@ int m_nservice_load(void)
 {
   if(msg_register(&ms_nservice_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -95,16 +95,16 @@ static void ms_nservice(struct lclient *lcptr, struct client *cptr,
                         int             argc,  char         **argv)
 {
   struct user    *uptr;
-  struct service *svptr;
-  
+//  struct service *svptr;
+
   if(!client_is_server(cptr))
     return;
-  
+
   /* Check UID collision */
   if((uptr = user_find_uid(argv[5])))
   {
     log(server_log, L_warning, "UID collision");
-    
+
     client_send(cptr, "KILL %s :UID collision", argv[5]);
     return;
   }
@@ -114,42 +114,42 @@ static void ms_nservice(struct lclient *lcptr, struct client *cptr,
   {
     log(server_log, L_warning, "service has invalid nickname: %s",
         argv[2]);
-    
+
     client_send(cptr, "KILL %s :Invalid nickname", argv[5]);
     return;
   }
-  
+
   /* Validate username */
   if(!chars_valid_user(argv[3]))
   {
     log(server_log, L_warning, "service %s has invalid username: %s",
         argv[2], argv[5]);
-    
+
     client_send(cptr, "KILL %s :Invalid username", argv[10]);
     return;
   }
-  
+
   /* Check nick collision */
 /*  if((acptr = client_find_nick(argv[2])))
   {
     if(acptr->ts <= ts)
     {
       ts = timer_systime;
-      
+
       if(client_nick_rotate(argv[2], newnick))
         client_nick_random(newnick);
-      
+
       client_send(cptr, ":%S NBOUNCE %s %s :%lu",
                   server_me, argv[10], newnick, ts);
-      
+
       argv[2] = newnick;
     }
   }*/
-  
+
   /* ...*/
-  
+
   /* Register and introduce the remote client */
-  svptr = service_new(argv[2], argv[3], argv[4], argv[6]);
+  /*svptr = */service_new(argv[2], argv[3], argv[4], argv[6]);
 
 }
 

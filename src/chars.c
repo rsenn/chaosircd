@@ -294,24 +294,24 @@ const uint32_t chars[] = {
 int chars_valid_host(const char *s)
 {
   uint32_t dot = 0;
-  
+
   if(s == NULL)
     return 0;
-  
+
   if(*s == '.')
     return 0;
-  
+
   while(*s)
   {
     if(!chars_ishostchar(*s))
       return 0;
-    
+
     if(*s == '.')
       dot++;
-    
+
     s++;
   }
-  
+
   return (dot > 0);
 }
 
@@ -322,18 +322,18 @@ int chars_valid_user(const char *s)
 {
   if(s == NULL)
     return 0;
-  
+
   if(*s == '~')
     s++;
-  
+
   while(*s)
   {
     if(!chars_isuserchar(*s))
       return 0;
-    
+
     s++;
   }
-  
+
   return 1;
 }
 
@@ -344,18 +344,18 @@ int chars_valid_nick(const char *s)
 {
   if(s == NULL)
     return 0;
-  
+
   if(chars_isdigit(*s) || *s == '-')
     return 0;
-  
+
   while(*s)
   {
     if(!chars_isnickchar(*s))
       return 0;
-    
+
     s++;
   }
-  
+
   return 1;
 }
 
@@ -366,15 +366,15 @@ int chars_valid_chan(const char *s)
 {
   if(s == NULL)
     return 0;
-  
+
   while(*s)
   {
     if(!chars_ischanchar(*s))
       return 0;
-    
+
     s++;
   }
-  
+
   return 1;
 }
 

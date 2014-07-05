@@ -19,22 +19,22 @@
  * $Id: m_nclock.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-/* 
+/*
  * - server a is connecting to server b
  * - server a sends pass/capab/server
  * - server b receives pass/capab/server and sends it itself
  * - server a sends nclock stage 1
- * 
+ *
  * NCLOCK <mtime/l>
  * NCLOCK <mtime/l
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 /* -------------------------------------------------------------------------- *
@@ -86,20 +86,20 @@ int m_nclock_load(void)
 {
   if(msg_register(&ms_nclock_msg) == NULL)
     return -1;
-  
+
   hook_register(server_login, HOOK_DEFAULT, ms_nclock_hook);
 
   server_default_caps |= CAP_CLK;
-  
+
   return 0;
 }
 
 void m_nclock_unload(void)
 {
   server_default_caps &= ~CAP_CLK;
-  
+
   msg_unregister(&ms_nclock_msg);
-  
+
   hook_unregister(server_login, HOOK_DEFAULT, ms_nclock_hook);
 }
 
@@ -107,7 +107,7 @@ void m_nclock_unload(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'NCLOCK'                                                         *
  * -------------------------------------------------------------------------- */
-static void ms_nclock(struct lclient *lcptr, struct client *cptr, 
+static void ms_nclock(struct lclient *lcptr, struct client *cptr,
                       int             argc,  char         **argv)
 {
   uint64_t clk;
@@ -117,46 +117,46 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
     server_register(lcptr, lcptr->class);
     return;
   }
-  
+
   clk = str_toull(argv[2], NULL, 10);
-  
+
   if(argc == 3)
   {
     log(server_log, L_status, "Time synchronisation request from %s.", lcptr->name);
     
-    lclient_send(lcptr, "NCLOCK %I64u %lli", clk, clk - timer_mtime - timer_offset);
+    lclient_send(lcptr, "NCLOCK %I64u %I64d", clk, clk - timer_mtime - timer_offset);
     
-    log(server_log, L_status, "Replying time delta %lli.", clk - timer_mtime - timer_offset);
+    log(server_log, L_status, "Replying time delta %I64d.", clk - timer_mtime - timer_offset);
   }
   else if(argc == 4)
   {
     lcptr->lag = timer_mtime + timer_offset - clk;
     
-    lclient_send(lcptr, "NCLOCK %I64u %lli :%I64u",
+    lclient_send(lcptr, "NCLOCK %I64u %I64d :%I64u",
                  timer_mtime + timer_offset, lcptr->lag >> 1, timer_mtime + timer_offset + (lcptr->lag >> 1));
   }
   else if(argc == 5)
   {
     uint64_t tm;
     int64_t  delta;
-    
+
     tm = str_toull(argv[4], NULL, 10);
-    
+
     delta = tm - timer_mtime - timer_offset;
-    
+
     timer_offset += delta;
     timer_mtime += delta;
     timer_otime += delta;
     timer_shift(delta);
     timer_offset += delta;
 /*    timer_mtime += timer_offset;*/
-    
-    log(server_log, L_status, "Timer delta: %lli New offset: %lli",
+
+    log(server_log, L_status, "Timer delta: %I64d New offset: %I64d",
         delta, timer_offset);
-    
+
     if(delta > 500LL || delta < -500LL)
     {
-      lclient_send(lcptr, "NCLOCK %I64u %lli", clk, delta);
+      lclient_send(lcptr, "NCLOCK %I64u %I64d", clk, delta);
     }
     else
     {
@@ -169,7 +169,7 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
         lclient_send(lcptr, "NCLOCK");
         server_register(lcptr, lcptr->class);
       }
-    }    
+    }
   }
 }
 
@@ -185,9 +185,9 @@ static int ms_nclock_hook(struct lclient *lcptr, struct class  *clptr)
       
       lclient_send(lcptr, "NCLOCK :%I64u", timer_mtime + timer_offset);
     }
-    
+
     return 1;
   }
-  
+
   return 0;
 }

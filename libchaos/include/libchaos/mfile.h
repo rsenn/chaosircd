@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: mfile.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -39,8 +39,8 @@ struct mfile {
   uint32_t    id;
   uint32_t    refcount;
   struct list lines;
-  uint32_t    nhash;
-  uint32_t    phash;
+  hash_t      nhash;
+  hash_t      phash;
   int         fd;
   char        path[256];
   char        name[32];
@@ -60,12 +60,12 @@ CHAOS_API(int) mfile_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize mfile heap.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )mfile_init      (void);
+CHAOS_API(void)          mfile_init      (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy mfile heap.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )mfile_shutdown  (void);
+CHAOS_API(void)          mfile_shutdown  (void);
 
 /* ------------------------------------------------------------------------ *
  * Add a mfile.                                                              *
@@ -74,12 +74,12 @@ CHAOS_API(struct mfile *)mfile_add       (const char    *path);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int           )mfile_update    (struct mfile  *mfile);
+CHAOS_API(int)           mfile_update    (struct mfile  *mfile);
 
 /* ------------------------------------------------------------------------ *
  * Remove a mfile.                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void          )mfile_delete    (struct mfile *mfile);
+CHAOS_API(void)          mfile_delete    (struct mfile *mfile);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -99,7 +99,7 @@ CHAOS_API(struct mfile *)mfile_pop       (struct mfile  *mfile);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_push      (struct mfile **mfileptr);    
+CHAOS_API(struct mfile *)mfile_push      (struct mfile **mfileptr);
 
 /* ------------------------------------------------------------------------ *
  * Dump mfiles.                                                              *

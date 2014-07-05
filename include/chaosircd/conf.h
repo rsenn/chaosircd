@@ -45,7 +45,7 @@ struct option {
  * section structures                                                         *
  * -------------------------------------------------------------------------- */
 struct conf_global {
-  uint32_t hash;
+  hash_t hash;
   char     name[IRCD_HOSTLEN + 1];
   char     info[IRCD_INFOLEN + 1];
   char     configfile[IRCD_PATHLEN + 1];
@@ -65,7 +65,7 @@ struct conf_connect {
   char     cipher[IRCD_CIPHERLEN + 1];
   char     key[IRCD_PATHLEN + 1];
   int      cryptlink;
-  int      ziplink;  
+  int      ziplink;
 };
 
 /* -------------------------------------------------------------------------- *

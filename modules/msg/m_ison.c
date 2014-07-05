@@ -50,7 +50,7 @@ static char *m_ison_help[] = {
   "",
   "Shows, whether the given nickname are on IRC.",
   NULL
-};    
+};
 
 static struct msg m_ison_msg = {
   "ISON", 1, 1, MFLG_CLIENT,
@@ -65,7 +65,7 @@ int m_ison_load(void)
 {
   if(msg_register(&m_ison_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -91,29 +91,29 @@ static void m_ison(struct lclient *lcptr, struct client *cptr,
   size_t         n;
   size_t         i;
   int            first = 1;
-  
+
   len = str_snprintf(result, sizeof(result), ":%s 303 %s :",
                  client_me->name, cptr->name);
-  
+
   n = str_tokenize(argv[2], av, 63);
-  
+
   for(i = 0; i < n; i++)
   {
     acptr = client_find_nick(av[i]);
-    
+
     if(acptr == NULL)
       continue;
-    
+
     if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
-    
+
     if(!first)
       result[len++] = ' ';
-    
+
     len += strlcpy(&result[len], acptr->name, IRCD_LINELEN - 1 - len);
-    
+
     first = 0;
   }
-  
+
   client_send(cptr, "%s", result);
 }

@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: defs.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -49,6 +49,8 @@
 
  */
 
+typedef uintptr_t hash_t;
+
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
@@ -66,6 +68,20 @@
 #endif
 #ifndef CHAOS_DATA
 # define CHAOS_DATA(type) extern type
+#endif
+
+#ifndef CHAOS_INLINE
+#ifdef __clang__
+#define CHAOS_INLINE static inline
+#else
+#define CHAOS_INLINE extern inline
+#endif
+#endif
+
+#ifdef __clang__
+#undef NO_C99
+#else
+#define NO_C99 1
 #endif
 
 /*#ifdef HAVE_SYS_TYPES_H
@@ -99,14 +115,14 @@
 
 /* dynamic heap blocks are 128kb */
 #define DYNAMIC_BLOCK_SIZE (1024 * 128)
-                                
+
 /* garbage collect heaps every 5 minutes */
 #define GARBAGE_COLLECT_INTERVAL (300 * 1000LL)
 #define GC_INTERVAL GARBAGE_COLLECT_INTERVAL
-                            
+
 /* timers per heap block */
 #define TIMER_BLOCK_SIZE 16
- 
+
 /* queue chunks per heap block */
 #define QUEUE_BLOCK_SIZE 256
 
@@ -183,19 +199,19 @@
 #define WAV_BLOCK_SIZE 4
 
 /*
- * Warn if system time differs more than +/-TIMER_WARN_DELTA 
+ * Warn if system time differs more than +/-TIMER_WARN_DELTA
  * from expected system time.
  */
 #define TIMER_MAX_DRIFT  10000LL
 
-/* 
- * Warn if a timer gets executed TIMER_WARN_DELTA 
+/*
+ * Warn if a timer gets executed TIMER_WARN_DELTA
  * miliseconds too early or too late.
  */
 #define TIMER_WARN_DELTA  10LL
 
 /*
- * Warn if expected return from poll() drifts 
+ * Warn if expected return from poll() drifts
  * from real time by more than these msecs.
  */
 #define POLL_WARN_DELTA 10LL

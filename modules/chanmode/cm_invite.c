@@ -42,13 +42,13 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_invite_hook   (struct client         *cptr,  
+static void cm_invite_hook   (struct client         *cptr,
                               struct channel        *chptr,
-                              const char            *key,   
+                              const char            *key,
                               int                   *reply);
-static int  cm_invite_bounce (struct lclient        *lcptr, 
+static int  cm_invite_bounce (struct lclient        *lcptr,
                               struct client         *cptr,
-                              struct channel        *chptr, 
+                              struct channel        *chptr,
                               struct chanuser       *cuptr,
                               struct list           *lptr,
                               struct chanmodechange *cmcptr);
@@ -59,7 +59,7 @@ static void cm_invite_clean  (struct channel        *chptr);
 static const char *cm_invite_help[] = {
   "+i              Invite only channel. Users must be /INVITE'd to join the channel.",
   NULL
-}; 
+};
 
 static struct chanmode cm_invite_mode = {
   CM_INVITE_CHAR,          /* Mode character */
@@ -79,9 +79,9 @@ int cm_invite_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_invite_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_join, HOOK_1ST, cm_invite_hook);
-  
+
   return 0;
 }
 
@@ -89,21 +89,21 @@ void cm_invite_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_invite_mode);
-  
+
   hook_unregister(channel_join, HOOK_1ST, cm_invite_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_invite_hook(struct client *cptr, struct channel *chptr, 
+static void cm_invite_hook(struct client *cptr, struct channel *chptr,
                            const char    *key,  int            *reply)
 {
   struct invite *ivptr;
-  
+
   /* We're already denied or an invex matched */
   if((*reply > 0 || *reply == -CM_INVEX_CHAR) && *reply != ERR_CHANNELISFULL && *reply != ERR_BADCHANNELKEY)
     return;
-  
+
   dlink_foreach(&cptr->user->invites, ivptr)
   {
     if(ivptr->channel == chptr)
@@ -115,7 +115,7 @@ static void cm_invite_hook(struct client *cptr, struct channel *chptr,
       return;
     }
   }
-  
+
   if(chptr->modes & CHFLG(i))
     *reply = ERR_INVITEONLYCHAN;
 }
@@ -130,7 +130,7 @@ int cm_invite_bounce(struct lclient *lcptr, struct client         *cptr,
   {
     if(!(chptr->modes & cmcptr->mode->flag))
       return 1;
-   
+
     cm_invite_clean(chptr);
   }
 
@@ -143,7 +143,7 @@ void cm_invite_clean(struct channel *chptr)
 {
   struct node *node;
   struct node *next;
-  
+
   dlink_foreach_safe(&chptr->invites, node, next)
     user_uninvite(node->data);
 }

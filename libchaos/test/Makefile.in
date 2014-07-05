@@ -19,12 +19,10 @@ include $(top_builddir)/config.mk
 # configuration for this directory
 # ---------------------------------------------------------------------------
 TESTS = cfgtest \
-        dbtest \
         giftest \
         graphtest \
         imagetest \
-        ttftest \
-				strtest
+        ttftest
 
 SOURCES = $(TESTS:%=%.c)
 OBJECTS = $(TESTS:%=%.o)
@@ -37,16 +35,21 @@ install: install-exec
 
 # build config
 # ---------------------------------------------------------------------------
-LDADD    += $(top_builddir)/src/libchaos.a
-LIB      += $(SSL_LIBS) $(PSQL_LIBS) $(MYSQL_LIBS) $(FT2_LIBS) $(LIBS)
+@STATIC_TRUE@LDADD    += $(top_builddir)/src/libchaos.a
+@SHARED_TRUE@LIB     += -L$(top_builddir)/src -lchaos
+LIB      += $(SSL_LIBS)
+#LIB      += $(PSQL_LIBS)
+#LIB      += $(MYSQL_LIBS)
+ttftest: LIB      += $(FT2_LIBS)
+LIB      += $(LIBS)
 CFLAGS   += $(SSL_CFLAGS) $(PSQL_CFLAGS) $(MYSQL_CFLAGS) $(FT2_CFLAGS)
 INCLUDES += -I$(top_srcdir)/include -I$(top_builddir)/include
 
 # local make targets
 # ---------------------------------------------------------------------------
-%: %.c $(LDADD)
+$(TESTS): $(LDADD)
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
+	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $(@:%=%.c) $^ $(LIB)
 
 # include global make targets
 # ---------------------------------------------------------------------------

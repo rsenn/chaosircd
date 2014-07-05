@@ -58,7 +58,7 @@ static char *m_help_help[] = {
   "HELP [topic]",
   "",
   "Displays help about the given topic.",
-  NULL    
+  NULL
 };
 
 static struct msg m_help_msg = {
@@ -74,7 +74,7 @@ int m_help_load(void)
 {
   if(msg_register(&m_help_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -96,10 +96,10 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
 
   if(!client_is_user(cptr))
     return;
-  
+
   if(argv[2] == NULL || !str_icmp(argv[2], M_HELP_INDEX))
   {
-    numeric_send(cptr, RPL_HELPSTART, M_HELP_INDEX, 
+    numeric_send(cptr, RPL_HELPSTART, M_HELP_INDEX,
                  "---------------- Help topics ----------------");
     numeric_send(cptr, RPL_HELPTXT, M_HELP_INDEX, "Client commands:");
     m_help_index(cptr, MFLG_UNREG | MFLG_CLIENT);
@@ -112,7 +112,7 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
     numeric_send(cptr, RPL_ENDOFHELP, M_HELP_INDEX);
     return;
   }
-  
+
 /*  if(!str_icmp(argv[2], "usermodes") || !str_icmp(argv[2], "umodes"))
   {
     m_help_usermodes(cptr);
@@ -124,21 +124,21 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
     m_help_chanmodes(cptr);
     return;
   }
-  
+
   if((mptr = msg_find(argv[2])) == NULL)
   {
     numeric_send(cptr, ERR_HELPNOTFOUND, argv[2]);
-    return;    
+    return;
   }
-  
+
   if(mptr->help == NULL || mptr->help[0] == NULL)
   {
-    log(msg_log, L_fatal, 
+    log(msg_log, L_fatal,
         "The developer was too lazy to write a help for %s. This must be sued.",
         mptr->cmd);
     ircd_shutdown();
   }
-  
+
   for(i = 0; mptr->help[i]; i++)
   {
     if(i == 0)
@@ -159,16 +159,16 @@ static void m_help_index(struct client *cptr, int flags)
   uint32_t     msgi = 0;
   char        *msgs[4];
   uint32_t     i;
- 
+
   for(i = 0; i < MSG_HASH_SIZE; i++)
   {
     dlink_foreach_data(&msg_table[i], node, mptr)
     {
       if((mptr->flags & flags) == 0)
         continue;
-      
+
       msgs[msgi++] = mptr->cmd;
-      
+
       if(msgi == 4)
       {
         client_send(cptr, ":%S 705 %C %s :%-12s %-12s %-12s %s",
@@ -178,7 +178,7 @@ static void m_help_index(struct client *cptr, int flags)
       }
     }
   }
-  
+
   if(msgi == 3)
   {
     client_send(cptr, ":%S 705 %C %s :%-12s %-12s %s",
@@ -209,17 +209,17 @@ static void m_help_chanmodes(struct client  *cptr)
 {
   uint32_t i;
   uint32_t j;
-  
+
   numeric_send(cptr, RPL_HELPSTART, M_HELP_CHANMODES, "Supported channel modes:");
   numeric_send(cptr, RPL_HELPTXT, M_HELP_CHANMODES, "");
-  
+
   for(i = 0; i < 0x40; i++)
   {
     if(chanmode_table[i].type == 0)
       continue;
-    
+
     for(j = 0; chanmode_table[i].help[j]; j++)
-      numeric_send(cptr, RPL_HELPTXT, M_HELP_CHANMODES, 
+      numeric_send(cptr, RPL_HELPTXT, M_HELP_CHANMODES,
                    chanmode_table[i].help[j]);
   }
 }

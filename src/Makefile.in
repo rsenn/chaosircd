@@ -8,26 +8,29 @@ plugindir            = @plugindir@
 EXEEXT               = @EXEEXT@
 PROGRAM              = chaosircd$(EXEEXT)
 LIBNAME              = ircd
+#@WIN32_FALSE@PIE_LIBRARY          =
+A_LIBRARY          = libircd.a
 @WIN32_TRUE@PIE_LIBRARY          = ircd.dll
-@WIN32_FALSE@PIE_LIBRARY          =
+
+
 
 bin_EXEC = chaosircd$(EXEEXT)
-@WIN32_TRUE@bin_EXEC += ircd.dll
-
+@SHARED_TRUE@@WIN32_TRUE@bin_EXEC += $(PIE_LIBRARY)
+@STATIC_TRUE@@WIN32_TRUE@lib_DATA += $(A_LIBRARY)
 
 all: Makefile $(lib_EXEC) $(bin_EXEC)
 install: install-exec 
 
 include $(top_builddir)/config.mk
 
-MODULES              = ircd \
-                       chanmode \
+MODULES              = chanmode \
                        chanuser \
                        channel \
                        chars \
                        class \
                        client \
                        conf \
+                       ircd \
                        lclient \
                        msg \
                        numeric \
@@ -58,22 +61,25 @@ PIE_DEF              = ircd.def
 OBJEXT               = o
 HEADERS              = y.tab.h
 DEPS                 = $(MODULES:%=%.d)
-@PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_EXEEXT@
-@NO_PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/libchaos.a \
-@NO_PIE_LIB@                       $(top_builddir)/modules/lclient/lclient.a \
+@SHARED_TRUE@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
+@NO_PIE_LIB@LDADD                = $(top_builddir)/modules/lclient/lclient.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/msg/msg.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/usermode/usermode.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/chanmode/chanmode.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/stats/stats.a \
 @NO_PIE_LIB@                       $(top_builddir)/modules/service/service.a
 
-ifeq ($(LINKFLAGS), -static)
-LDADD                = $(top_builddir)/libchaos/src/.libs/libchaos.a
-endif
+@STATIC_TRUE@LDADD +=  $(A_LIBRARY)
 
-#@SHARED_TRUE@@STATIC_TRUE@LDADD += -L$(top_builddir)/libchaos/src -lchaos
-#@STATIC_TRUE@@SHARED_FALSE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
-#@SHARED_TRUE@@STATIC_FALSE@LDADD += $(top_builddir)/libchaos/src/chaos.dll
+@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
+
+@STATIC_TRUE@ifeq ($(LINKFLAGS), -static)
+@STATIC_TRUE@LDADD                = $(top_builddir)/libchaos/src/.libs/libchaos.a
+@STATIC_TRUE@endif
+
+@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
+#@SHARED_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.dll
 
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
                        $(OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
@@ -86,14 +92,17 @@ DEVFILES             = CVS $(FILES)
 
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 main.o: CPPFLAGS += -DBUILD_MAIN=1
+#@STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
+
+@SSL_TRUE@LIBS += $(SSL_LIBS) -ldl
 
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
 
 @WIN32_FALSE@OBJECTS += main.o
-#@WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): ircd.dll
-#@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
-#@WIN32_TRUE@@SHARED_TRUE@chaosircd: ircd.dll
-#@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
+@WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): ircd.dll
+@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
+@WIN32_TRUE@@SHARED_TRUE@chaosircd: ircd.dll
+@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
 @WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 
@@ -103,12 +112,12 @@ main.o: CPPFLAGS += -DBUILD_MAIN=1
 
 ircd.c:
 
-$(LEXERSRC): ircd.l y.tab.h
+$(LEXERSRC): $(srcdir)/ircd.l $(PARSERINC)
 	@$(ECHO_LEX)
 	@$(LEX) -o$@ ircd.l
-lex.yy.o: lex.yy.c y.tab.h
-y.tab.o: y.tab.c y.tab.h
-$(PARSERINC): ircd.y
+$(LEXEROBJ): $(LEXERSRC) $(PARSERINC)
+$(PARSEROBJ): $(PARSERSRC) $(PARSERINC)
+$(PARSERINC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
 	$(YACC) -d -o $(PARSERSRC) ircd.y
 #.y.c:
@@ -118,10 +127,16 @@ $(PARSERSRC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
 	$(YACC) -d -o $(srcdir)/y.tab.c $(PARSER)
 
-$(PROGRAM): $(OBJECTS) $(LDADD)
-	@$(ECHO_LD)
-	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+@STATIC_TRUE@$(PROGRAM): main.o $(LDADD)
+@STATIC_TRUE@	@$(ECHO_LD)
+@STATIC_TRUE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+@SHARED_TRUE@$(PROGRAM): $(OBJECTS) $(LDADD)
+@SHARED_TRUE@	@$(ECHO_LD)
+@SHARED_TRUE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
         
+$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
+$(A_LIBRARY): $(MODULES:%=%.o) $(LEXEROBJ) $(PARSEROBJ)
+
 
 #dep: Makefile $(DEPS)
 

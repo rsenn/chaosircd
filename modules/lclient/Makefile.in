@@ -8,7 +8,8 @@ CATEGORY             = lclient
 MODULES              = lc_clones \
                        lc_cookie \
                        lc_mflood \
-                       lc_sauth
+                       lc_sauth \
+                       lc_crowdguard
 
 INCLUDES             = -I$(top_srcdir)/libchaos/include \
                        -I$(top_srcdir)/include \
@@ -19,7 +20,7 @@ SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)
 OBJEXT               = so
 DEPS                 = $(MODULES:%=%.d)
-SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
 plugin_EXEC = $(SHOBJECTS)
@@ -34,7 +35,7 @@ plugin_EXEC = $(SHOBJECTS)
 $(CATEGORY).a: $(OBJECTS)
 	@$(ECHO_AR)
 	@$(RM) -f $@
-	@$(AR) cru $@ $^
+	@$(AR) $@ $^
 	@$(ECHO_RANLIB)
 	@$(RANLIB) $@
 
@@ -52,6 +53,6 @@ DISTFILES            = Makefile.in $(SOURCES)
 DEVFILES             = CVS $(DISTFILES)
 
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
-@WIN32_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@WIN32_TRUE@@PIE_LIB@LIBS += -L$(top_builddir)/libchaos/src -lchaos
 
 include $(top_builddir)/build.mk

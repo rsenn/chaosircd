@@ -129,10 +129,12 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CONFIG_DYLIB
 
-AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
-AC_FUNC_MMAP
+dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
+AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.h])
 
-dnl AC_CHECK_SSL
+dnl AC_FUNC_MMAP
+
+AC_CHECK_SSL
 dnl AC_CHECK_FT2
 dnl AC_CHECK_PSQL
 dnl AC_CHECK_MYSQL
@@ -176,6 +178,14 @@ dnl     ;;
 dnl esac
 
 dnl AC_SUBST([DLFCN_LDADD])
+
+if test "$HAVE_SSL" = yes; then
+  SSL_FALSE='#' 
+else
+ SSL_TRUE='#'
+fi
+AC_SUBST([SSL_TRUE])
+AC_SUBST([SSL_FALSE])
 
 # set debugging stuff after compiler test (-Werror could fuck it up)
 # ---------------------------------------------------------------------------

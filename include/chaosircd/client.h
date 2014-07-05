@@ -62,7 +62,7 @@ struct slink_reply {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct client 
+struct client
 {
   struct node      node;
   struct node      lnode;
@@ -71,7 +71,7 @@ struct client
   struct node      dnode;
   uint32_t         id;          /* a unique id */
   uint32_t         refcount;    /* how many times this block is referenced */
-  uint32_t         hash;
+  hash_t           hash;
   uint32_t         type;
   uint32_t         location;
   struct lclient  *lclient;     /* if its a local client */
@@ -88,9 +88,9 @@ struct client
   time_t           lastread;
   time_t           ts;
   net_addr_t       ip;
-  uint32_t         hhash;
-  uint32_t         ihash;
-  uint32_t         rhash;
+  hash_t           hhash;
+  hash_t           ihash;
+  hash_t           rhash;
   char             name    [IRCD_HOSTLEN + 1];
   char             host    [IRCD_HOSTLEN + 1];   /* client's hostname */
   char             hostreal[IRCD_HOSTLEN + 1];
@@ -100,7 +100,7 @@ struct client
 
 struct history {
   struct node    node;
-  uint32_t       hash;
+  hash_t         hash;
   struct client *client;
   char           nick[IRCD_NICKLEN + 1];
 };
@@ -150,7 +150,7 @@ extern struct client  *client_new_local      (int             type,
 extern struct client  *client_new_remote     (int             type,
                                               struct lclient *lcptr,
                                               struct user    *uptr,
-                                              struct client  *origin, 
+                                              struct client  *origin,
                                               const char     *name,
                                               int             hops,
                                               const char     *host,
@@ -196,8 +196,8 @@ extern struct history *client_history_find   (const char     *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct history *client_history_add    (struct client  *cptr, 
-                                              const char     *nick);  
+extern struct history *client_history_add    (struct client  *cptr,
+                                              const char     *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -217,27 +217,27 @@ extern struct client  *client_find_uid       (const char     *uid);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client  *client_find_nickw     (struct client  *cptr, 
+extern struct client  *client_find_nickw     (struct client  *cptr,
                                               const char     *nick);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern struct client  *client_find_nickh     (const char     *nick);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client  *client_find_nickhw    (struct client  *cptr, 
+extern struct client  *client_find_nickhw    (struct client  *cptr,
                                               const char     *nick);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void            client_set_name       (struct client  *cptr, 
+extern void            client_set_name       (struct client  *cptr,
                                               const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern int             client_register_local (struct client  *cptr);
-  
+
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -246,11 +246,11 @@ extern int             client_welcome        (struct client  *cptr);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void            client_lusers         (struct client  *cptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern int             client_nick           (struct lclient *lcptr,
-                                              struct client  *cptr, 
+                                              struct client  *cptr,
                                               char           *nick);
 
 /* -------------------------------------------------------------------------- *
@@ -271,7 +271,7 @@ extern int             client_nick_rotate    (const char     *name,
 extern void            client_introduce      (struct lclient *lcptr,
                                               struct client  *cptr,
                                               struct client  *acptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * burst acptr to cptr                                                        *
  * -------------------------------------------------------------------------- */
@@ -302,9 +302,9 @@ extern void            client_send           (struct client  *cptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int             client_relay          (struct lclient *lcptr, 
+extern int             client_relay          (struct lclient *lcptr,
                                               struct client  *cptr,
-                                              struct client  *acptr, 
+                                              struct client  *acptr,
                                               const char     *format,
                                               char          **argv);
 
@@ -313,9 +313,9 @@ extern int             client_relay          (struct lclient *lcptr,
 extern int             client_relay_always   (struct lclient *lcptr,
                                               struct client  *cptr,
                                               struct client **acptrptr,
-                                              uint32_t        cindex, 
+                                              uint32_t        cindex,
                                               const char     *format,
-                                              int            *argc,   
+                                              int            *argc,
                                               char          **argv);
 
 extern void            client_message        (struct lclient *lcptr,
@@ -323,20 +323,20 @@ extern void            client_message        (struct lclient *lcptr,
                                               struct client  *acptr,
                                               int             type,
                                               const char     *text);
-  
+
 /* -------------------------------------------------------------------------- *
  * Get a reference to a client block                                          *
  * -------------------------------------------------------------------------- */
 extern struct client  *client_pop            (struct client  *cptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * Push back a reference to a client block                                    *
  * -------------------------------------------------------------------------- */
 extern struct client  *client_push           (struct client **cptrptr);
-  
+
 /* -------------------------------------------------------------------------- *
  * Dump clients and client heap.                                              *
  * -------------------------------------------------------------------------- */
 extern void            client_dump           (struct client  *cptr);
-  
+
 #endif /* SRC_CLIENT_H */

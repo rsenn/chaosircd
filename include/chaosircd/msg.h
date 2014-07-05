@@ -60,7 +60,7 @@ struct lclient;
 /* -------------------------------------------------------------------------- *
  * Callback function type for message handlers                                *
  * -------------------------------------------------------------------------- */
-typedef void (msg_handler_t)(struct lclient *, struct client *, 
+typedef void (msg_handler_t)(struct lclient *, struct client *,
                              int,              char          **);
 
 /* -------------------------------------------------------------------------- *
@@ -73,7 +73,7 @@ struct msg {
   size_t         flags;
   msg_handler_t *handlers[MSG_LAST];
   char         **help;
-  uint32_t       hash;
+  hash_t         hash;
   uint32_t       counts[MSG_LAST];
   size_t         bytes;
   uint32_t       id;
@@ -121,28 +121,28 @@ extern void        msg_unregister (struct msg     *msg);
  * -------------------------------------------------------------------------- */
 extern void        m_unregistered (struct lclient *lcptr,
                                    struct client  *cptr,
-                                   int             argc, 
+                                   int             argc,
                                    char          **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void        m_registered   (struct lclient *lcptr, 
+extern void        m_registered   (struct lclient *lcptr,
                                    struct client  *cptr,
-                                   int             argc, 
+                                   int             argc,
                                    char          **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void        m_ignore       (struct lclient *lcptr,
                                    struct client  *cptr,
-                                   int             argc, 
+                                   int             argc,
                                    char          **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 extern void        m_not_oper     (struct lclient *lcptr,
                                    struct client  *cptr,
-                                   int             argc, 
+                                   int             argc,
                                    char          **argv);
 
 /* -------------------------------------------------------------------------- *

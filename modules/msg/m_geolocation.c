@@ -1,53 +1,41 @@
-/* chaosircd - pi-networks irc server
+/* 
+ * Copyright (C) 2013-2014  CrowdGuard organisation
+ * All rights reserved.
  *
- * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * $Id: m_geolocation.c,v 1.2 2006/09/28 08:38:31 roman Exp $
+ * Author: Roman Senn <rls@crowdguard.org>
  */
 
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/log.h>
-#include <libchaos/str.h>
-#include <libchaos/timer.h>
-#include <libchaos/dlink.h>
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/chanmode.h>
+#include "chaosircd/msg.h"
+#include "chaosircd/user.h"
+#include "chaosircd/chars.h"
+#include "chaosircd/client.h"
+#include "chaosircd/server.h"
+#include "chaosircd/lclient.h"
+#include "chaosircd/numeric.h"
+#include "chaosircd/channel.h"
+#include "chaosircd/chanuser.h"
+#include "chaosircd/chanmode.h"
+#include "chaosircd/crowdguard.h"
+#include "chaosircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
 static void m_geolocation  (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+                            int             argc,  char         **argv);
 static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+                            int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
@@ -65,7 +53,9 @@ static struct msg m_geolocation_msg = {
   m_geolocation_help
 };
 
-static const char base32[] = { 
+static int m_geolocation_log;
+
+static const char base32[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8',
   '9', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j',
   'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u',
@@ -93,9 +83,9 @@ static int check_hashes(int nhashes, char *hasharray[], const char *hash)
   for(i = 0; i < nhashes; i++)
   {
     size_t len = str_len(hasharray[i]);
-   
+
     //debug(ircd_log, "checking hash[%d](%s) against %s", i, hasharray[i], hash);
-    
+
     if(!str_ncmp(hasharray[i], hash, len))
       return 1;
   }
@@ -109,12 +99,17 @@ int m_geolocation_load(void)
 {
   if(msg_register(&m_geolocation_msg) == NULL)
     return -1;
-  
+
+  if((m_geolocation_log = log_source_register("geolocation")) == -1)
+    return -1;
+
   return 0;
 }
 
 void m_geolocation_unload(void)
 {
+  log_source_unregister(m_geolocation_log);
+
   msg_unregister(&m_geolocation_msg);
 }
 
@@ -129,16 +124,61 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 {
   if(!str_icmp(argv[2], "SET"))
   {
-     
+  //  char channame[IRCD_CHANNELLEN+1];
 
     if(client_is_user(cptr))
     {
+      int first_location = (cptr->user->name[0] == '~');
+      int changed_location = strcmp(cptr->user->name, argv[3]);
+      int do_log = 0;
+      struct chanuser *cuptr;
+      struct channel *chptr = NULL;
+      struct node *nptr;
+
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
 
-     cptr->lastmsg = timer_systime;
-      //log(user_log, L_debug, "Set geolocation for %s to %s", cptr->name, cptr->user->name);    
-    }
+      cptr->lastmsg = timer_systime;
+
+      /*channame[0] = '#';
+      strlcpy(&channame[1], cptr->name, sizeof(channame)-1);
+*/
+      dlink_foreach_data(&cptr->user->channels, nptr, cuptr)
+      {
+        chptr = cuptr->channel;
+
+        // if this server is responsible for that channel and the channel is persistent, then log
+        if(chptr->server == server_me && (chptr->modes & CHFLG(P)))
+        {
+          do_log = 1;
+          break;
+        }
+      }  
    
+      if(!(cptr->user->modes & (1ll << ((int)'g' - 0x40)))) 
+      {
+        char umodestr[] = "+g"; 
+        char *umodelist[] = { umodestr, NULL };
+
+        if(usermode_make(cptr->user, umodelist, cptr, USERMODE_OPTION_PERMISSION))                                                                                                                           
+        {                                                                                                                                                                       
+          /* let the user know his changes */                                                                                                                                   
+          usermode_change_send(lcptr, cptr, USERMODE_SEND_LOCAL);                                                                                                               
+                                                                                                                                                                                
+          /* and the whole network */                                                                                                                                           
+          usermode_change_send(lcptr, cptr, USERMODE_SEND_REMOTE);                                                                                                              
+        }                                                                   
+      } 
+
+      // Log the geolocation if there's a channel for this user (user has been set to sharp)
+    //  if((chptr = channel_find_name(channame)))
+      if(do_log && changed_location)
+      {
+        // CrowdGuard functionality requires a persistent (+P) channel
+    //    if(chptr->modes & CHFLG(P))
+          log(m_geolocation_log, L_verbose, "%s geolocation for %s to %s", (first_location ? "Set" : "Changed"), cptr->name, cptr->user->name);
+      }
+    }
+
     server_send(lcptr, NULL, CAP_NONE, CAP_NONE, ":%C GEOLOCATION SET :%s", argv[3]);
   }
 }
@@ -244,8 +284,8 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
      if(dlen)
        client_send(cptr, "%s", buffer);
 
-     client_send(cptr, ":%S 601 %s :end of /GEOLOCATION query", server_me, argv[3]);
-     
+     client_send(cptr, ":%S 601 %s %u :end of /GEOLOCATION query", server_me, argv[3], count);
+
      if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
        lclient_send(lcptr, ":%S NOTICE %N :--- end of /geolocation (%d replies)", server_me, cptr, count);
   }

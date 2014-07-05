@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: filter.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -51,7 +51,7 @@
 /* ------------------------------------------------------------------------ *
  * filter block structure.                                                    *
  * ------------------------------------------------------------------------ */
-struct filter_rule 
+struct filter_rule
 {
   struct node         node;
   int                 type;
@@ -61,15 +61,14 @@ struct filter_rule
   uint64_t            ts;
 };
 
-struct filter 
+struct filter
 {
   struct node         node;                 /* linking node for filter_list */
   uint32_t            id;
   uint32_t            refcount;             /* times this block is referenced */
-  uint32_t            hash;
- 
+  hash_t              hash;
   void               *prog;                 /* pointer to filter program struct */
-  
+
   /* externally initialised */
   struct list         rules;
   struct list         sockets;      /* the sockets the filter is attached to */
@@ -123,7 +122,7 @@ CHAOS_API(void)           filter_delete          (struct filter  *fptr);
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           filter_release         (struct filter  *fptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct filter *)filter_pop             (struct filter  *fptr);
@@ -131,7 +130,7 @@ CHAOS_API(struct filter *)filter_pop             (struct filter  *fptr);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct filter *)filter_push            (struct filter **fptrptr);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct filter *)filter_find            (const char     *name);
@@ -140,11 +139,11 @@ CHAOS_API(struct filter *)filter_find            (const char     *name);
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           filter_set_name        (struct filter  *fptr,
                                                   const char     *name);
- 
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char *)   filter_get_name        (struct filter  *fptr);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct filter *)filter_find_name       (const char     *name);
@@ -157,10 +156,10 @@ CHAOS_API(struct filter *)filter_find_id         (uint32_t        id);
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           filter_rule_add        (struct filter  *fptr,
                                                   int             type,
-                                                  int             action, 
-                                                  uint32_t        data1,  
+                                                  int             action,
+                                                  uint32_t        data1,
                                                   uint32_t        data2,
-                                                  uint64_t        lifetime);  
+                                                  uint64_t        lifetime);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -177,7 +176,7 @@ CHAOS_API(void)           filter_rule_delete     (struct filter  *fptr,
                                                   int             type,
                                                   int             action,
                                                   uint32_t        data1,
-                                                  uint32_t        data2);  
+                                                  uint32_t        data2);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -186,7 +185,7 @@ CHAOS_API(void)           filter_rule_compile    (struct filter  *fptr);
 /* ------------------------------------------------------------------------ *
  * Attach a filter to a socket                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            filter_attach_socket   (struct filter  *fptr, 
+CHAOS_API(int)            filter_attach_socket   (struct filter  *fptr,
                                                   int             fd);
 
 /* ------------------------------------------------------------------------ *
@@ -198,19 +197,19 @@ CHAOS_API(int)            filter_detach_socket   (struct filter  *fptr,
 /* ------------------------------------------------------------------------ *
  * Attach a filter to a listener                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            filter_attach_listener (struct filter  *fptr, 
+CHAOS_API(int)            filter_attach_listener (struct filter  *fptr,
                                                   struct listen  *liptr);
 
 /* ------------------------------------------------------------------------ *
  * Detach filter from listener                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            filter_detach_listener (struct filter  *fptr, 
+CHAOS_API(int)            filter_detach_listener (struct filter  *fptr,
                                                   struct listen  *liptr);
-      
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)           filter_reattach_all    (struct filter  *fptr);
-      
+
 /* ------------------------------------------------------------------------ *
  * Dump filterers and filter heap.                                            *
  * ------------------------------------------------------------------------ */

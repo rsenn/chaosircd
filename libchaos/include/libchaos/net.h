@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: net.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -26,6 +26,7 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
+#include "libchaos/config.h"
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
 
@@ -74,7 +75,7 @@ struct protocol
   struct node     node;
   uint32_t        id;
   int             refcount;
-  uint32_t        hash;
+  hash_t          hash;
   int             type;
   char            name[PROTOLEN + 1];
   net_callback_t *handler;
@@ -106,10 +107,10 @@ static inline net_port_t net_htons(uint16_t n)
     uint8_t c[2];
     uint16_t i;
   } u;
-  
+
   u.c[0] = (n >> 8) & 0xff;
   u.c[1] =  n       & 0xff;
-  
+
   return u.i;
 }
 
@@ -122,10 +123,10 @@ static inline uint16_t net_ntohs(net_port_t n)
     uint16_t i;
     uint8_t c[2];
   } u;
-  
+
   u.i = n;
-  
-  
+
+
   return ((uint16_t)(u.c[0] << 8)) | ((uint16_t)u.c[1]);
 }
 
@@ -138,12 +139,12 @@ static inline net_addr_t net_htonl(uint32_t n)
     uint8_t c[4];
     uint32_t i;
   } u;
-  
+
   u.c[0] = (n >> 24) & 0xff;
   u.c[1] = (n >> 16) & 0xff;
   u.c[2] = (n >>  8) & 0xff;
   u.c[3] =  n        & 0xff;
-  
+
   return u.i;
 }
 
@@ -156,30 +157,30 @@ static inline uint32_t net_ntohl(net_addr_t n)
     uint32_t i;
     uint8_t c[4];
   } u;
-  
+
   u.i = n;
-  
+
   return (u.c[0] << 24) |
          (u.c[1] << 16) |
-         (u.c[2] <<  8) | 
+         (u.c[2] <<  8) |
           u.c[3];
 }
 
 /* ------------------------------------------------------------------------ *
  * Convert from network address to string (re-entrant). (AF_INET)             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char       *)net_ntoa_r   (net_addr_t      in,
+CHAOS_API(char *)      net_ntoa_r   (net_addr_t      in,
                                      char           *buf);
 
 /* ------------------------------------------------------------------------ *
  * Convert from network address to string. (AF_INET)                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char       *)net_ntoa     (net_addr_t      in);
+CHAOS_API(char *)      net_ntoa     (net_addr_t      in);
 
 /* ------------------------------------------------------------------------ *
  * Convert from string to network address. (AF_INET)                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int         )net_aton     (const char     *cp, 
+CHAOS_API(int)         net_aton     (const char     *cp,
                                      net_addr_t     *inp);
 
 /* ------------------------------------------------------------------------ *
@@ -187,13 +188,13 @@ CHAOS_API(int         )net_aton     (const char     *cp,
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char *)net_ntop     (int             af,
                                      const void     *cp,
-                                     char           *buf, 
+                                     char           *buf,
                                      size_t          len);
 
 /* ------------------------------------------------------------------------ *
  * Convert from string to network address. (AF_INET and AF_INET6)             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int         )net_pton     (int             af,
+CHAOS_API(int)         net_pton     (int             af,
                                      const char     *cp,
                                      void           *buf);
 
@@ -201,7 +202,7 @@ CHAOS_API(int         )net_pton     (int             af,
  * ------------------------------------------------------------------------ */
 #if 1 //def __GNUC__
 
-CHAOS_API(char       *)net_ntoa    (net_addr_t in);
+CHAOS_API(char *)      net_ntoa    (net_addr_t in);
 /*{
   static char buf[16];
   return net_ntoa_r(in, buf);
@@ -212,12 +213,12 @@ CHAOS_API(char       *)net_ntoa    (net_addr_t in);
 /* ------------------------------------------------------------------------ *
  * Initialize protocol heap.                                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void             )net_init       (void);
-  
+CHAOS_API(void)             net_init       (void);
+
 /* ------------------------------------------------------------------------ *
  * Destroy protocol heap.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void             )net_shutdown   (void);
+CHAOS_API(void)             net_shutdown   (void);
 
 /* ------------------------------------------------------------------------ *
  * Find a protocol.                                                           *
@@ -237,7 +238,7 @@ CHAOS_API(struct protocol *)net_register   (int             type,
 /* ------------------------------------------------------------------------ *
  * Unregister a protocol.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void            *)net_unregister (int               type,
+CHAOS_API(void *)           net_unregister (int               type,
                                             const char       *name);
 
 /* ------------------------------------------------------------------------ *
@@ -253,26 +254,26 @@ CHAOS_API(struct protocol *)net_push       (struct protocol **pptrptr);
  * Create a streaming socket with desired protocol family and type            *
  * (SOCK_DGRAM or SOCK_STREAM)                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int              )net_socket     (net_address_t   at,
+CHAOS_API(int)              net_socket     (net_address_t   at,
                                             net_socket_t    st);
 
 /* ------------------------------------------------------------------------ *
  * Bind a socket to a specified address/port                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int              )net_bind       (int             fd,
+CHAOS_API(int)              net_bind       (int             fd,
                                             net_addr_t      addr,
                                             uint16_t        port);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int              )net_vconnect   (int             fd,
+CHAOS_API(int)              net_vconnect   (int             fd,
                                             net_addr_t      addr,
                                             uint16_t        port,
                                             void           *cb_rd,
                                             void           *cb_wr,
                                             va_list         args);
 
-CHAOS_API(int              )net_connect    (int             fd,
+CHAOS_API(int)              net_connect    (int             fd,
                                             net_addr_t      addr,
                                             uint16_t        port,
                                             void           *cb_rd,
@@ -282,12 +283,12 @@ CHAOS_API(int              )net_connect    (int             fd,
 /* ------------------------------------------------------------------------ *
  * Listen for incoming connections and register read callback.                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int              )net_vlisten    (int             fd,
+CHAOS_API(int)              net_vlisten    (int             fd,
                                             int             backlog,
                                             void           *callback,
                                             va_list         args);
 
-CHAOS_API(int              )net_listen     (int             fd,
+CHAOS_API(int)              net_listen     (int             fd,
                                             int             backlog,
                                             void           *callback,
                                             ...);
@@ -295,14 +296,14 @@ CHAOS_API(int              )net_listen     (int             fd,
 /* ------------------------------------------------------------------------ *
  * Accept a pending connection.                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int              )net_accept     (int             fd,
+CHAOS_API(int)              net_accept     (int             fd,
                                             net_addr_t     *addrptr,
                                             net_port_t     *portptr);
 
 /* ------------------------------------------------------------------------ *
  * Get local socket address.                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int              )net_getsockname(int             fd,
+CHAOS_API(int)              net_getsockname(int             fd,
                                             net_addr_t     *addrptr,
                                             net_port_t     *portptr);
 
