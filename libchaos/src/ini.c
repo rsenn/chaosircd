@@ -808,7 +808,7 @@ int ini_write_int(struct ini_section *section, const char *key, int i)
 {
   char buf[16];
   
-  snprintf(buf, 16, "%i", i);
+  str_snprintf(buf, 16, "%i", i);
   
   return ini_write_str(section, key, buf);
 }
@@ -826,7 +826,7 @@ int ini_write_double(struct ini_section *section, const char *key, double d)
 {  
   char buf[64];
   
-  snprintf(buf, 64, "%f", d);
+  str_snprintf(buf, 64, "%f", d);
   
   return ini_write_str(section, key, buf);  
 }

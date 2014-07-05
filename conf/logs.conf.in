@@ -38,7 +38,7 @@ log {
   # usermode         - usermode engine
   # all              - log ALL of them
  
-  sources  = "all";                  # set here source  
+  sources  = "all in out";                  # set here source  
   
   level    = "status";              # Log all messages which have at least the following level
   

@@ -188,18 +188,18 @@ const char *ircd_uptime(void)
     if(hrs == 0)
     {
       if(mins == 0)
-        snprintf(upstr, sizeof(upstr), "%u seconds, %u msecs", secs, msecs);
+        str_snprintf(upstr, sizeof(upstr), "%u seconds, %u msecs", secs, msecs);
       else
-        snprintf(upstr, sizeof(upstr), "%u minutes, %u seconds", mins, secs);
+        str_snprintf(upstr, sizeof(upstr), "%u minutes, %u seconds", mins, secs);
     }
     else
     {
-      snprintf(upstr, sizeof(upstr), "%u hours, %u minutes", hrs, mins);
+      str_snprintf(upstr, sizeof(upstr), "%u hours, %u minutes", hrs, mins);
     }
   }
   else
   {
-    snprintf(upstr, sizeof(upstr), "%u days, %u hours", days, hrs);
+    str_snprintf(upstr, sizeof(upstr), "%u days, %u hours", days, hrs);
   }
   
   return upstr;
@@ -283,7 +283,7 @@ static pid_t ircd_check(struct config *config)
   {
     pid = str_toul(buf, NULL, 10);
     
-    snprintf(proc, sizeof(proc), "/proc/%u", pid);
+    str_snprintf(proc, sizeof(proc), "/proc/%u", pid);
     
     if(syscall_stat(proc, &st) == 0)
       return pid;
