@@ -1,5 +1,5 @@
-include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigSharedLib.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSharedLib.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 add_definitions(-DBUILD_SERVAUTH=1)
 

@@ -2,8 +2,8 @@ set(LEXER_SOURCE src/ircd.l)
 set(PARSER_SOURCE src/ircd.y)
 
 
-include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigSharedLib.cmake")
-include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSharedLib.cmake")
+include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 
 add_definitions(-DBUILD_IRCD=1)

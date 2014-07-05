@@ -17,8 +17,8 @@ add_subdirectory(libchaos)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libchaos/cmake")
 
-include("${CMAKE_SOURCE_DIR}/libchaos/cmake/PlatformChecks.cmake")
-include("${CMAKE_SOURCE_DIR}/libchaos/cmake/ConfigBuildType.cmake")
+include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/PlatformChecks.cmake")
+include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/ConfigBuildType.cmake")
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
@@ -37,12 +37,12 @@ include(CheckIncludeFile)
 check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 
 
-include("${CMAKE_SOURCE_DIR}/libchaos/cmake/SubstituteProjectIncludes.cmake")
+include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
-include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
+include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 set(CONFFILES
     conf/children.conf

@@ -19,9 +19,9 @@ endif()
 set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/cmake")
 
 
-include("${LIBCHAOS_SOURCE_DIR}/cmake/PlatformChecks.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigBuildType.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/cmake/ConfigMathLib.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 
 include(FindBISON)
 include(FindFLEX)
@@ -40,7 +40,7 @@ endif(NOT BUILD_SHARED_LIBS)
  
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
-include("${LIBCHAOS_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
 substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
