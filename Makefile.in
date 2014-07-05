@@ -21,7 +21,8 @@ dep: makefiles dep-recursive
 # Subdirectories
 ROOT = 1
 RECURSIVE = 1
-SUBDIRS = m4 libchaos include src modules tools conf doc contrib test
+@PIE_TRUE@SUBDIRS = m4 libchaos include src modules tools conf doc contrib test
+@PIE_FALSE@SUBDIRS = m4 libchaos include modules src tools conf doc contrib test
 
 RECURSIVE_TARGETS = all-recursive \
                     install-recursive \

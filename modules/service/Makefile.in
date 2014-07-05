@@ -31,7 +31,7 @@ plugin_EXEC = $(SHOBJECTS)
 $(CATEGORY).a: $(OBJECTS)
 	@$(ECHO_AR)
 	@$(RM) -f $@
-	@$(AR) cru $@ $^
+	@$(AR) $@ $^
 	@$(ECHO_RANLIB)
 	@$(RANLIB) $@
 

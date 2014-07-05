@@ -13,19 +13,31 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   A_ENABLE='auto'
   PIE_ENABLE='auto'
 
+  AC_MSG_CHECKING([wheter to build static libraries])
+
   # check for --*-static argument 
   AC_ARG_ENABLE([static],[  --enable-static    build static library (default)
-    --disable-static   do not build static library],[case $withval in
-    no|yes)  A_ENABLE=$withval ;;
+    --disable-static   do not build static library],[case $enableval in
+    no|yes)  A_ENABLE=$enableval ;;
     *) A_ENABLE="yes" ;;
-   esac])
+   esac
+   
+  AC_MSG_RESULT([$enableval])
+   
+   ])
 
+  AC_MSG_CHECKING([wheter to build shared libraries])
   # check for --*-shared argument 
   AC_ARG_ENABLE([shared],[  --enable-shared    build shared library (default)
-    --disable-shared   do not build shared library],[case $withval in
-    no|yes)  PIE_ENABLE=$withval ;;
+    --disable-shared   do not build shared library],[
+    
+    case $enableval in
+    no|yes)  PIE_ENABLE=$enableval ;;
     *) PIE_ENABLE="yes" ;;
-   esac])
+   esac
+  AC_MSG_RESULT([$enableval])
+   
+   ])
 
   WIN32='false'
   LINUX='false'
@@ -125,10 +137,10 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       ;;
   esac
 
-  AC_MSG_CHECKING([wheter to build a static library])
-  AC_MSG_RESULT([$A_ENABLE])
-  AC_MSG_CHECKING([wheter to build a shared library])
-  AC_MSG_RESULT([$PIE_ENABLE])
+dnl  AC_MSG_CHECKING([wheter to build a static library])
+dnl  AC_MSG_RESULT([$A_ENABLE])
+dnl  AC_MSG_CHECKING([wheter to build a shared library])
+dnl  AC_MSG_RESULT([$PIE_ENABLE])
 
   case "$PIE_ENABLE,$A_ENABLE" in
     no,no)
@@ -175,6 +187,8 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     PIE_LIB="#"
     NO_PIE_LIB=""
   fi
+  AC_SUBST([PIE_LIB])
+  AC_SUBST([NO_PIE_LIB])
 
   AC_SUBST([A_EXEEXT])
 
