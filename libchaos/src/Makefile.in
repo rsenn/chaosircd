@@ -103,6 +103,8 @@ INCLUDES += -I$(thisdir) \
 
 CFLAGS   += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
 
+@STATIC_TRUE@$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
+
 # include global make targets
 # ---------------------------------------------------------------------------
 include $(top_builddir)/build.mk
