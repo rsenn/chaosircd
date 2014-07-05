@@ -32,7 +32,11 @@ oldincludedir   = @oldincludedir@
 infodir         = @infodir@
 mandir          = @mandir@
 plugindir       = @plugindir@
+relplugindir    = @relplugindir@
 inidir          = @inidir@
+relinidir       = @relinidir@
+logdir          = @logdir@
+rellogdir       = @rellogdir@
 
 # autoconf related stuff
 # ---------------------------------------------------------------------------

@@ -42,6 +42,8 @@ AC_CONFIG_SRCDIR([src/ircd.c])
 
 test "$prefix" = "NONE" && prefix=${ac_default_prefix}
 test "$exec_prefix" = "NONE" && exec_prefix=${prefix}
+ 
+eval "tmp_prefix=\"${prefix}\""
 
 eval sysconfdir=${sysconfdir}
 case $sysconfdir in
@@ -63,32 +65,40 @@ AC_SUBST([pidfile])
 #eval prefix=${prefix}
 #eval libdir=${libdir}
 
-case $prefix in
+AC_MSG_CHECKING([for prefix])
+AC_MSG_RESULT([$tmp_prefix])
+
+case $tmp_prefix in
   *ircd*)
-    plugindir=${libdir}/modules
+    eval "plugindir=${libdir}/modules"
     ;;
   *)
-    plugindir=${libdir}/chaosircd
+    eval "plugindir=${libdir}/chaosircd"
     ;;
 esac
-relplugindir=${plugindir##*/lib/}
+relplugindir=${plugindir#$tmp_prefix/}
+test "$relplugindir" = "$plugindir" && relplugindir=lib/${plugindir##*/lib/}
 AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/chaosircd]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
+AC_SUBST([relplugindir])
 
-case $prefix in
+case $tmp_prefix in
   *ircd*)
-    logdir=${prefix}/logs
+    eval "logdir=${prefix}/logs"
     ;;
   *)
-    logdir=${localstatedir}/log
+    eval "logdir=${localstatedir}/log"
     ;;
 esac
+rellogdir=${logdir#$tmp_prefix/}
+test "$rellogdir" = "$logdir" && rellogdir=var/${logdir##*/var/}
 AC_ARG_WITH([logdir], [  --with-logdir=PATH   location of the logs [[LOCALSTATEDIR/log]]],
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval logdir=$withval; fi])
 AC_SUBST([logdir])
+AC_SUBST([rellogdir])
 
-case $prefix in
+case $tmp_prefix in
   *ircd*)
     eval "inidir=${localstatedir}/lib"
     ;;
@@ -96,9 +106,17 @@ case $prefix in
     eval "inidir=${localstatedir}/lib/chaosircd"
     ;;
 esac
+relinidir=${inidir#$tmp_prefix/}
+if test "$relinidir" = "$inidir"; then
+   relinidir=var${inidir##*var}
+fi 
 AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval inidir=$withval; fi])
+
+AC_MSG_CHECKING([For .ini directory])
 AC_SUBST([inidir])
+AC_SUBST([relinidir])
+AC_MSG_RESULT([$inidir $relinidir])
 
 # set extensions and flags
 # ---------------------------------------------------------------------------

@@ -40,7 +40,13 @@ MODULES              = chanmode \
                        user \
                        usermode
                        
-DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\"
+DEFS                 = -DPREFIX=\"$(prefix)\"
+DEFS += -DSYSCONFDIR=\"$(relsysconfdir)\"
+DEFS += -DPLUGINDIR=\"$(relplugindir)\" 
+DEFS += -DINIDIR=\"$(relinidir)\" 
+DEFS += -DLOGDIR=\"$(rellogdir)\" 
+DEFS += -DPID=\"$(PID)\"
+
 INCLUDES             = -I$(top_srcdir)/include \
                        -I$(srcdir) \
                        -I../include \
