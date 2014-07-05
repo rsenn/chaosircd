@@ -23,15 +23,18 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 # ---------------------------------------------------------------------------
 .c.@OBJEXT@:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -c -o $@ $<
+@DEPS_TRUE@	@QUIET@$(COMPILE) -MD -c -o $@ $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -c -o $@ $<
 
 .c.i:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -E -o $@ $<
+@DEPS_TRUE@	@QUIET@$(COMPILE) -MD -E -o $@ $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -E -o $@ $<
 
 @PIC@.c.@PIC_OBJEXT@:
 @PIC@	@$(ECHO_PIC_CC)
-@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
+@DEPS_TRUE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
+@DEPS_FALSE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
 
 #.c.@PIE_LIBEXT@:
 #	@$(ECHO_CCLD)
@@ -39,7 +42,8 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 %.@PIE_LIBEXT@: %.c %.def
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
+@DEPS_TRUE@	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
+@DEPS_FALSE@	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -o $@ $< $(LIBS)
 
 %.def: %.c
 	@$(ECHO_MKDEF)
@@ -47,7 +51,8 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 .c.s:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -S $<
+@DEPS_TRUE@	@QUIET@$(COMPILE) -MD -S $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -S $<
 
 .asm.o:
 	@$(ECHO_NASM)

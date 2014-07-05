@@ -22,7 +22,7 @@ dep: makefiles dep-recursive
 ROOT = 1
 RECURSIVE = 1
 @PIE_TRUE@SUBDIRS = libchaos include src modules tools conf doc contrib test
-@PIE_FALSE@SUBDIRS = libchaos include modules src tools conf doc contrib test
+@STATIC_TRUE@@PIE_FALSE@SUBDIRS = libchaos include modules src tools conf doc contrib test
 
 RECURSIVE_TARGETS = all-recursive \
                     install-recursive \
