@@ -5,30 +5,50 @@
 #
 # Copyleft GPL (c) 2005 by Roman Senn <smoli@paranoya.ch>
 
+# check for OpenSSL
+# ------------------------------------------------------------------
 AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # both are enabled by default 
-  A_ENABLE='auto'
-  PIE_ENABLE='auto'
+  A_ENABLE=auto
+  PIE_ENABLE=auto
+  DLM_ENABLE=auto
 
   # check for --*-static argument 
   AC_ARG_ENABLE([static],[  --enable-static    build static library (default)
-    --disable-static   do not build static library],[case $withval in
-    no|yes)  A_ENABLE=$withval ;;
-    *) A_ENABLE="yes" ;;
-   esac])
+    --disable-static   do not build static library],[A_ENABLE=auto; case $enableval in
+    no|yes)  A_ENABLE=$enableval ;;
+    *) A_ENABLE="auto" ;;
+   esac
+   
+  AC_MSG_RESULT([$A_ENABLE])
+   
+   ])
 
   # check for --*-shared argument 
   AC_ARG_ENABLE([shared],[  --enable-shared    build shared library (default)
-    --disable-shared   do not build shared library],[case $withval in
-    no|yes)  PIE_ENABLE=$withval ;;
-    *) PIE_ENABLE="yes" ;;
-   esac])
+    --disable-shared   do not build shared library],[PIE_ENABLE=auto 
+    case $enableval in
+      no|yes)  PIE_ENABLE=$enableval ;; *) PIE_ENABLE="auto" ;;
+    esac
+    ])
+
+  # check for --*-loadable* argument 
+  AC_ARG_ENABLE([loadable-modules],
+[  --enable-loadable-modules    build runtime-loadable modules (default)
+  --disable-loadable-modules    
+],[DLM_ENABLE=auto 
+    case $enableval in
+      no|yes)  DLM_ENABLE=$enableval ;; *) DLM_ENABLE="auto" ;;
+    esac
+    ])
 
   WIN32='false'
   LINUX='false'
   FREEBSD='false'
   DARWIN='false'
+
+  PIE_LIBEXT='so'
 
   case $host in
     *-mingw32 | *-cygwin) WIN32='true' ;;
@@ -37,6 +57,14 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     *-freebsd*) FREEBSD='true' ;;
   esac
         
+  #if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+  #  PIE_ENABLE=no
+  #fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
+    PIE_ENABLE=yes
+  fi
+
   # resolve automatic shit
   case $host in
     *-mingw32 | *-cygwin)
@@ -63,33 +91,34 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   case $host in
 
     *linux*|*freebsd*)
-      if test "$PIE_ENABLE" = "yes"; then
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='pio'
         PIC_DEPEXT='pd'
-        PIE_EXEEXT='so'
+
+      if test "$PIE_ENABLE" = "yes"; then
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
-        PIE_LDFLAGS="-shared -Wl,-soname -Wl,${PACKAGE_NAME}.${PIE_EXEEXT}.${VERSION_MAJOR}"
+        PIE_LDFLAGS="-shared -Wl,-soname -Wl,${PACKAGE_NAME}.${PIE_LIBEXT}.${VERSION_MAJOR}"
         PIE_VERSION_SUFFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
-        PIE_LINKS='$(PIE_NAME).$(PIE_EXEEXT).$(VERSION_MAJOR).$(VERSION_MINOR) $(PIE_NAME).$(PIE_EXEEXT).$(VERSION_MAJOR) $(PIE_NAME).$(PIE_EXEEXT)'
+        PIE_LINKS='$(PIE_NAME).$(PIE_LIBEXT).$(VERSION_MAJOR).$(VERSION_MINOR) $(PIE_NAME).$(PIE_LIBEXT).$(VERSION_MAJOR) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LIBDIR='$(libdir)'
       fi
       ;;
 
     *darwin*)
-      if test "$PIE_ENABLE" = "yes"; then
         PIC_CFLAGS='-fPIC'
         PIC_OBJEXT='dyobj'
         PIC_DEPEXT='dydep'
-        PIE_EXEEXT='dylib'
+
+      if test "$PIE_ENABLE" = "yes"; then
+        PIE_LIBEXT='dylib'
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
-        PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$PACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_EXEEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
+        PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$PACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_LIBEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
         PIE_VERSION_PREFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
-        PIE_LINKS='$(PIE_NAME).$(VERSION_MAJOR).$(VERSION_MINOR).$(PIE_EXEEXT) $(PIE_NAME).$(VERSION_MAJOR).$(PIE_EXEEXT) $(PIE_NAME).$(PIE_EXEEXT)'
+        PIE_LINKS='$(PIE_NAME).$(VERSION_MAJOR).$(VERSION_MINOR).$(PIE_LIBEXT) $(PIE_NAME).$(VERSION_MAJOR).$(PIE_LIBEXT) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LOADER='dlfcn_darwin'
         PIE_LIBDIR='$(libdir)'
       fi
@@ -104,7 +133,7 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
         PIE_NAME='$(LIBNAME:lib%=%)'
         PIE_LINK='$(CC)'
         PIE_LDFLAGS='-shared'
-        PIE_EXEEXT='dll'
+        PIE_LIBEXT='dll'
         PIE_LIBDIR='$(bindir)'
       fi
       
@@ -127,6 +156,8 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   AC_MSG_RESULT([$A_ENABLE])
   AC_MSG_CHECKING([wheter to build a shared library])
   AC_MSG_RESULT([$PIE_ENABLE])
+  AC_MSG_CHECKING([wheter to build loadable modules])
+  AC_MSG_RESULT([$DLM_ENABLE])
 
   case "$PIE_ENABLE,$A_ENABLE" in
     no,no)
@@ -173,6 +204,12 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     PIE_LIB="#"
     NO_PIE_LIB=""
   fi
+  AM_CONDITIONAL([PIE],[test "$PIE_ENABLE" = yes])
+  AM_CONDITIONAL([A],[test "$A_ENABLE" = yes])
+  AM_CONDITIONAL([DLM],[test "$DLM_ENABLE" = yes])
+
+  AC_SUBST([PIE_LIB])
+  AC_SUBST([NO_PIE_LIB])
 
   AC_SUBST([A_EXEEXT])
 
@@ -184,7 +221,7 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   AC_SUBST([PIE_LINK])
   AC_SUBST([PIE_LINKS])
   AC_SUBST([PIE_LDFLAGS])
-  AC_SUBST([PIE_EXEEXT])
+  AC_SUBST([PIE_LIBEXT])
   AC_SUBST([PIE_VERSION_PREFIX])
   AC_SUBST([PIE_VERSION_SUFFIX])
   AC_SUBST([PIE_PREPEND])
@@ -205,5 +242,6 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
 
   AC_SUBST([LIBS])
   AC_SUBST([DLFCN_LIBS])
+
 ])
 

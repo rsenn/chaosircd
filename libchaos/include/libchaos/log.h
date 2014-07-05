@@ -228,7 +228,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 #endif
 /*#if 1*/
 
-# if 0 //def DEBUG
+#if 0 //def DEBUG
 /*
  * when DEBUG is defined the normal log
  * messages get file/line instead of
@@ -246,7 +246,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 
 CHAOS_API(void log_debug)(const char *file, int line,
                       int src, int level, const char *format, ...);
-# else
+#else
 
 /*
  * when DEBUG is NOT defined, then
@@ -254,7 +254,8 @@ CHAOS_API(void log_debug)(const char *file, int line,
  * get compiled.
  */
 
-#  define debug(...) ;
+#  define debug(src, ...) \
+            log_output((src), L_debug, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #  define dump(src, ...) \

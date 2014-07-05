@@ -27,6 +27,7 @@
 #include "chaosircd/chanuser.h"
 #include "chaosircd/chanmode.h"
 #include "chaosircd/crowdguard.h"
+#include "chaosircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -123,25 +124,58 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 {
   if(!str_icmp(argv[2], "SET"))
   {
-    char channame[IRCD_CHANNELLEN+1];
+  //  char channame[IRCD_CHANNELLEN+1];
 
     if(client_is_user(cptr))
     {
-      struct channel *chptr;
+      int first_location = (cptr->user->name[0] == '~');
+      int changed_location = strcmp(cptr->user->name, argv[3]);
+      int do_log = 0;
+      struct chanuser *cuptr;
+      struct channel *chptr = NULL;
+      struct node *nptr;
 
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
 
       cptr->lastmsg = timer_systime;
 
-      channame[0] = '#';
+      /*channame[0] = '#';
       strlcpy(&channame[1], cptr->name, sizeof(channame)-1);
+*/
+      dlink_foreach_data(&cptr->user->channels, nptr, cuptr)
+      {
+        chptr = cuptr->channel;
+
+        // if this server is responsible for that channel and the channel is persistent, then log
+        if(chptr->server == server_me && (chptr->modes & CHFLG(P)))
+        {
+          do_log = 1;
+          break;
+        }
+      }  
+   
+      if(!(cptr->user->modes & (1ll << ((int)'g' - 0x40)))) 
+      {
+        char umodestr[] = "+g"; 
+        char *umodelist[] = { umodestr, NULL };
+
+        if(usermode_make(cptr->user, umodelist, cptr, USERMODE_OPTION_PERMISSION))                                                                                                                           
+        {                                                                                                                                                                       
+          /* let the user know his changes */                                                                                                                                   
+          usermode_change_send(lcptr, cptr, USERMODE_SEND_LOCAL);                                                                                                               
+                                                                                                                                                                                
+          /* and the whole network */                                                                                                                                           
+          usermode_change_send(lcptr, cptr, USERMODE_SEND_REMOTE);                                                                                                              
+        }                                                                   
+      } 
 
       // Log the geolocation if there's a channel for this user (user has been set to sharp)
-      if((chptr = channel_find_name(channame)))
+    //  if((chptr = channel_find_name(channame)))
+      if(do_log && changed_location)
       {
         // CrowdGuard functionality requires a persistent (+P) channel
-        if(chptr->modes & CHFLG(P))
-          log(m_geolocation_log, L_verbose, "Set geolocation for %s to %s", cptr->name, cptr->user->name);
+    //    if(chptr->modes & CHFLG(P))
+          log(m_geolocation_log, L_verbose, "%s geolocation for %s to %s", (first_location ? "Set" : "Changed"), cptr->name, cptr->user->name);
       }
     }
 
@@ -250,7 +284,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
      if(dlen)
        client_send(cptr, "%s", buffer);
 
-     client_send(cptr, ":%S 601 %s :end of /GEOLOCATION query", server_me, argv[3]);
+     client_send(cptr, ":%S 601 %s %u :end of /GEOLOCATION query", server_me, argv[3], count);
 
      if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
        lclient_send(lcptr, ":%S NOTICE %N :--- end of /geolocation (%d replies)", server_me, cptr, count);

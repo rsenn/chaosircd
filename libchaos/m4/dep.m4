@@ -11,8 +11,8 @@ AC_DEFUN([AC_CHECK_DEP],
 [AC_MSG_CHECKING([whether to enable dependencies])
 
 AC_ARG_ENABLE([dep],
-[  --enable-dep             dependency tracking
-  --disable-dep            no dependency tracking (default)],
+[  --enable-dependency-tracking             dependency tracking
+  --disable-dependency-tracking            no dependency tracking (default)],
 [case $enableval in
   yes)
     DEP="yes"
@@ -26,9 +26,11 @@ AC_ARG_ENABLE([dep],
   [DEP="no"
   AC_MSG_RESULT([no])])
 if test "$DEP" = "yes"; then
-  NODEP=""
+  DEP_DISABLED="#"
 else
-  NODEP="# "
+  DEP_ENABLED="# "
 fi
-AC_SUBST(NODEP)
+AM_CONDITIONAL([DEPS],[test "$DEP" = yes])
+AC_SUBST(DEP_ENABLED,[$DEP_ENABLED])
+AC_SUBST(DEP_DISABLED, [$DEP_DISABLED])
 AC_SUBST(DEP)])

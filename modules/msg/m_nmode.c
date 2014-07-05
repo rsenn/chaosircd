@@ -89,7 +89,7 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
   struct channel *chptr;
   struct list     modelist;
   time_t          ts;
-  char           *infos[CHANMODE_PER_LINE + 1];
+  char           *infos[CHANMODE_PER_LINE + 1] = { NULL };
   char           *timestamps[CHANMODE_PER_LINE + 1];
   char           *args[CHANMODE_PER_LINE + 1];
   size_t          len;

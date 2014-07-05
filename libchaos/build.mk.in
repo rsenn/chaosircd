@@ -10,36 +10,40 @@ CLEANFILES += $(OBJECTS) $(LIBRARY) $(A_LIBRARY) $(PIE_LIBRARY) $(PIE_LINKS) $(A
 
 # command lines
 # ---------------------------------------------------------------------------
-COMPILE         = $(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
+COMPILE         = $(CC) $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS)
 LINK            = $(CC) $(LDFLAGS)
 COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 # file suffixes we may encounter
 # ---------------------------------------------------------------------------
 .SUFFIXES:
-.SUFFIXES: .c .h .o .s .in .d .@PIE_EXEEXT@ .@PIC_OBJEXT@ .@PIC_DEPEXT@
+.SUFFIXES: .c .h .o .s .in .d .@PIE_LIBEXT@ .@PIC_OBJEXT@ .@PIC_DEPEXT@
 
 # compilation rules by file extension
 # ---------------------------------------------------------------------------
 .c.@OBJEXT@:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -c -o $@ $<
+@DEPS_TRUE@	@QUIET@$(COMPILE) -MD -c -o $@ $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -c -o $@ $<
 
 .c.i:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -E -o $@ $<
+@DEPS_TRUE@	@QUIET@$(COMPILE) -MD -E -o $@ $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -E -o $@ $<
 
 @PIC@.c.@PIC_OBJEXT@:
 @PIC@	@$(ECHO_PIC_CC)
-@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
+@DEPS_TRUE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
+@DEPS_FALSE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -c -o $@ $<
 
-#.c.@PIE_EXEEXT@:
+#.c.@PIE_LIBEXT@:
 #	@$(ECHO_CCLD)
 #	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(PIE_LDFLAGS) -MD -o $@ $< $(LIBS)
 
-%.@PIE_EXEEXT@: %.c %.def
+%.@PIE_LIBEXT@: %.c %.def
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(PIE_LDFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
+@DEPS_TRUE@	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
+@DEPS_FALSE@	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -o $@ $< $(LIBS)
 
 %.def: %.c
 	@$(ECHO_MKDEF)
@@ -47,7 +51,8 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 .c.s:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -S $<
+@DEPS_TRUE@	@QUIET@$(COMPILE) -MD -S $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -S $<
 
 .asm.o:
 	@$(ECHO_NASM)
@@ -251,28 +256,28 @@ $(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
 
 # rule for libraries
 # ---------------------------------------------------------------------------
-$(A_LIBRARY): $(OBJECTS)
+$(A_LIBRARY): #$(OBJECTS)
 	@$(ECHO_AR)
-	@QUIET@$(AR) $(A_LIBRARY) $(OBJECTS)
+	@QUIET@$(AR) $(A_LIBRARY) $^
 	@$(ECHO_RANLIB)
 	@QUIET@$(RANLIB) $(A_LIBRARY)
 
 $(PIE_LIBRARY): $(PIC_OBJECTS)
 	@$(ECHO_PIE_LD)
 	@QUIET@$(PIE_LINK) $(PIE_LDFLAGS) -o $(PIE_LIBRARY) $(PIC_OBJECTS) $(LDADD) $(LIBS)
-	prev='$@' ; for link in $(PIE_LINKS) ; \
-   do \
-     $(ECHO_LN)$$link ; \
-     $(RM) -f $$link ; \
-     $(LN) -s $$prev $$link ; \
-     prev=$$link ; \
-   done
+#	prev='$@' ; for link in $(PIE_LINKS) ; \
+#   do \
+#     $(ECHO_LN)$$link ; \
+#     $(RM) -f $$link ; \
+#     $(LN) -s $$prev $$link ; \
+#     prev=$$link ; \
+#   done
 
 # rule for programs
 # ---------------------------------------------------------------------------
-$(PROGRAM): $(OBJECTS) $(LDADD)
-	@$(ECHO_LD)
-	@QUIET@$(LINK) -o $(PROGRAM) $(OBJECTS) $(LDADD) $(LIB) $(LIBS)
+#$(PROGRAM): $(OBJECTS) $(LDADD)
+#	@$(ECHO_LD)
+#	@QUIET@$(LINK) -o $(PROGRAM) $^ $(LIB) $(LIBS)
 
 #$(PROGRAMS): $(LDADD)
 #	@$(ECHO_LD)
@@ -300,7 +305,7 @@ install-data: install-includeDATA \
               install-sysconfDATA \
               install-sysconf-preserveDATA \
               install-sharedstateDATA \
-              install-sharedstate-preserveDATA \
+              install-ini-preserveDATA \
               install-sharedDATA \
               install-manDATA
 
@@ -385,20 +390,20 @@ install-slibEXEC: $(slib_EXEC)
 # install plugins into plugindir
 # ---------------------------------------------------------------------------
 install-pluginEXEC: $(plugin_EXEC)
-	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX) && test "$(plugin_EXEC)"; then \
-		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) >/dev/null ; \
-	fi
-	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX); then \
-		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) 2>/dev/null ; \
-	fi
-	@list='$(plugin_EXEC)'; for p in $$list; do \
-		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f="`echo $$p | sed -e 's|^.*/||'`"; \
-		$(ECHO_INSTALL)$(plugindir)$(plugin_PREFIX)/$$f; \
-		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(plugindir)$(plugin_PREFIX)/$$f >/dev/null; \
-	done
+#	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX) && test "$(plugin_EXEC)"; then \
+#		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
+#		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) >/dev/null ; \
+#	fi
+#	@-if test ! -d $(DESTDIR)$(plugindir)$(plugin_PREFIX); then \
+#		$(ECHO_MKDIR)$(DESTDIR)$(plugindir)$(plugin_PREFIX) ; \
+#		$(INSTALL_DIR) $(DESTDIR)$(plugindir)$(plugin_PREFIX) 2>/dev/null ; \
+#	fi
+#	@list='$(plugin_EXEC)'; for p in $$list; do \
+#		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+#		f="`echo $$p | sed -e 's|^.*/||'`"; \
+#		$(ECHO_INSTALL)$(plugindir)$(plugin_PREFIX)/$$f; \
+#		$(INSTALL_EXEC) $$d$$p $(DESTDIR)$(plugindir)$(plugin_PREFIX)/$$f >/dev/null; \
+#	done
         
 # install libraries into libdir
 # ---------------------------------------------------------------------------
@@ -535,20 +540,20 @@ install-sharedstateDATA: $(sharedstate_DATA)
 		$(INSTALL_DATA) $$d$$p $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX)/$$f $(REDIR); \
 	done
 
-# install data into sharedstatedir, but not overwrite them
+# install data into inidir, but not overwrite them
 # ---------------------------------------------------------------------------
-install-sharedstate-preserveDATA: $(sharedstate_preserve_DATA)
-	@-if test ! -d $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX) && \
-		test "$(sharedstate_preserve_DATA)"; then \
-		$(ECHO_MKDIR)$(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX) ; \
-		$(INSTALL_DIR) $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX) ; \
+install-ini-preserveDATA: $(ini_preserve_DATA)
+	@-if test ! -d $(DESTDIR)$(inidir)$(ini_PREFIX) && \
+		test "$(ini_preserve_DATA)"; then \
+		$(ECHO_MKDIR)$(DESTDIR)$(inidir)$(ini_PREFIX) ; \
+		$(INSTALL_DIR) $(DESTDIR)$(inidir)$(ini_PREFIX) ; \
 	fi
-	@list='$(sharedstate_preserve_DATA)'; for p in $$list; do \
+	@list='$(ini_preserve_DATA)'; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f="`echo $$p | sed -e 's|^.*/||'`"; \
-		$(ECHO_INSTALL)$(sharedstatedir)$(sharedstate_PREFIX)/$$f; \
-		if test ! -f  $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX)/$$f ; then \
-			$(INSTALL_DATA) $$d$$p $(DESTDIR)$(sharedstatedir)$(sharedstate_PREFIX)/$$f $(REDIR); \
+		$(ECHO_INSTALL)$(inidir)$(ini_PREFIX)/$$f; \
+		if test ! -f  $(DESTDIR)$(inidir)$(ini_PREFIX)/$$f ; then \
+			$(INSTALL_DATA) $$d$$p $(DESTDIR)$(inidir)$(ini_PREFIX)/$$f $(REDIR); \
 		fi ; \
 	done
 #endif 

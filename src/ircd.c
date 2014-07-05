@@ -24,49 +24,50 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/connect.h>
-#include <libchaos/syscall.h>
-#include <libchaos/filter.h>
-#include <libchaos/listen.h>
-#include <libchaos/module.h>
-#include <libchaos/child.h>
-#include <libchaos/dlink.h>
-#include <libchaos/graph.h>
-#include <libchaos/htmlp.h>
-#include <libchaos/httpc.h>
-#include <libchaos/image.h>
-#include <libchaos/mfile.h>
-#include <libchaos/queue.h>
-#include <libchaos/sauth.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/gif.h>
-#include <libchaos/ini.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/ssl.h>
-#include <libchaos/io.h>
+#include "libchaos/config.h"
+#include "libchaos/connect.h"
+#include "libchaos/syscall.h"
+#include "libchaos/filter.h"
+#include "libchaos/listen.h"
+#include "libchaos/module.h"
+#include "libchaos/child.h"
+#include "libchaos/dlink.h"
+#include "libchaos/graph.h"
+#include "libchaos/htmlp.h"
+#include "libchaos/httpc.h"
+#include "libchaos/image.h"
+#include "libchaos/mfile.h"
+#include "libchaos/queue.h"
+#include "libchaos/sauth.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/gif.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/config.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/usermode.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/service.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/user.h>
-#include <chaosircd/msg.h>
+#include "chaosircd/config.h"
+#include "chaosircd/ircd.h"
+#include "chaosircd/chanmode.h"
+#include "chaosircd/usermode.h"
+#include "chaosircd/chanuser.h"
+#include "chaosircd/channel.h"
+#include "chaosircd/lclient.h"
+#include "chaosircd/numeric.h"
+#include "chaosircd/service.h"
+#include "chaosircd/client.h"
+#include "chaosircd/server.h"
+#include "chaosircd/conf.h"
+#include "chaosircd/oper.h"
+#include "chaosircd/user.h"
+#include "chaosircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
@@ -188,18 +189,18 @@ const char *ircd_uptime(void)
     if(hrs == 0)
     {
       if(mins == 0)
-        snprintf(upstr, sizeof(upstr), "%u seconds, %u msecs", secs, msecs);
+        str_snprintf(upstr, sizeof(upstr), "%u seconds, %u msecs", secs, msecs);
       else
-        snprintf(upstr, sizeof(upstr), "%u minutes, %u seconds", mins, secs);
+        str_snprintf(upstr, sizeof(upstr), "%u minutes, %u seconds", mins, secs);
     }
     else
     {
-      snprintf(upstr, sizeof(upstr), "%u hours, %u minutes", hrs, mins);
+      str_snprintf(upstr, sizeof(upstr), "%u hours, %u minutes", hrs, mins);
     }
   }
   else
   {
-    snprintf(upstr, sizeof(upstr), "%u days, %u hours", days, hrs);
+    str_snprintf(upstr, sizeof(upstr), "%u days, %u hours", days, hrs);
   }
 
   return upstr;
@@ -282,9 +283,9 @@ static pid_t ircd_check(struct config *config)
   if(io_read(fd, buf, sizeof(buf)) > 0)
   {
     pid = str_toul(buf, NULL, 10);
-
-    snprintf(proc, sizeof(proc), "/proc/%u", pid);
-
+    
+    str_snprintf(proc, sizeof(proc), "/proc/%u", pid);
+    
     if(syscall_stat(proc, &st) == 0)
       return pid;
   }
@@ -439,10 +440,12 @@ void ircd_loop(void)
     timeout = timer_timeout();
 
     /* Do I/O multiplexing and event handling */
-#if (defined USE_SELECT)
-    ret = io_select(&remain, timeout);
-#elif (defined USE_POLL)
+#if (defined USE_POLL)
     ret = io_poll(&remain, timeout);
+#elif (defined USE_SELECT)
+    ret = io_select(&remain, timeout);
+#else 
+#warning No I/O
 #endif /* USE_SELECT | USE_POLL */
 
     /* Remaining time is 0msecs, we need to run a timer */

@@ -8,7 +8,9 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
+#include "libchaos/log.h"
 #include "libchaos/hook.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
@@ -31,6 +33,9 @@ static int cm_persistent_msg_hook(struct client   *cptr, struct channel *acptr,
 
 static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
                                    struct channel *chptr);
+
+static int cm_persistent_participation_log;
+static int cm_persistent_event_log;
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -65,11 +70,25 @@ int cm_persistent_load(void)
   hook_register(channel_message, HOOK_DEFAULT, cm_persistent_msg_hook);
   hook_register(channel_join, HOOK_4TH, cm_persistent_join_hook);
 
+  cm_persistent_participation_log = log_source_find("participation");
+  if(cm_persistent_participation_log == -1)
+    cm_persistent_participation_log = log_source_register("participation");
+
+  cm_persistent_event_log = log_source_find("event");
+  if(cm_persistent_event_log == -1)
+    cm_persistent_event_log = log_source_register("event");
+
   return 0;
 }
 
 void cm_persistent_unload(void)
 {
+  log_source_unregister(cm_persistent_event_log);
+  cm_persistent_event_log = -1;
+
+  log_source_unregister(cm_persistent_participation_log);
+  cm_persistent_participation_log = -1;
+
   /* unregister the channel mode */
   chanmode_unregister(&cm_persistent_mode);
 
@@ -97,6 +116,25 @@ static int cm_persistent_msg_hook(struct client   *cptr, struct channel *chptr,
 static int cm_persistent_join_hook(struct lclient *lcptr, struct client *cptr,
                                    struct channel *chptr)
 {
+  int owner, created;
+
+  if(chptr->server != server_me)
+    return 0;
+
+  owner = (0 == str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])));
+  created = (chptr->chanusers.size <= 1);
+  
+  if(owner)
+  {
+    if(created)
+      log(cm_persistent_event_log, L_status, "%s created event %s", cptr->name, chptr->name);
+    else
+      log(cm_persistent_event_log, L_status, "%s rejoined event %s", cptr->name, chptr->name);
+  }
+  else if(channel_is_persistent(chptr))
+    log(cm_persistent_participation_log, L_status, "%s accepted to help on %s", cptr->name, chptr->name);
+  
+
 	if(chptr->server == server_me && (chptr->modes & CHFLG(P)))
   {
 		struct logentry *e;

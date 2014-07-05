@@ -1,6 +1,9 @@
 /* Use select() for i/o multiplexing */
 #undef USE_SELECT
 
+/* Use poll() for i/o multiplexing */
+#undef USE_POLL
+
 /* Support for SSL encrypted connections */
 #undef HAVE_SSL
 
@@ -12,3 +15,6 @@
 
 /* Define this if you have Linux-type socket filters */
 #undef LINUX_SOCKET_FILTER
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H

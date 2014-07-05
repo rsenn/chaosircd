@@ -17,16 +17,16 @@ AC_ARG_WITH(pgsql,
     [ with_pgsql="$withval" ],
     [ with_pgsql=no ])
 
-if test "$with_pgsql" != "no"; then
-  if test "$with_pgsql" = "yes"; then
+if test "$with_pgsql" != no; then
+  if test "$with_pgsql" = yes; then
     pgsql_directory="$default_directory "
-    pgsql_fail="yes"
+    pgsql_fail=yes
   elif test -d $withval; then
     pgsql_directory="$withval $default_directory"
-    pgsql_fail="yes"
+    pgsql_fail=yes
   elif test "$with_pgsql" = ""; then
     pgsql_directory="$default_directory"
-    pgsql_fail="no"
+    pgsql_fail=no
   fi
 
   AC_MSG_CHECKING(for PostgreSQL headers)
@@ -63,7 +63,7 @@ if test "$with_pgsql" != "no"; then
   done
 
     if test -z "$PGSQL_LIB_DIR"; then
-      if test "$postgresql_fail" != "no"; then
+      if test "$postgresql_fail" != no; then
         AC_MSG_ERROR("PostgreSQL library libpq",
         "$PGSQL_DIR/lib $PGSQL_DIR/lib/pgsql")
       else
@@ -86,22 +86,22 @@ AC_SUBST(PSQL_CFLAGS)])
 AC_DEFUN([AC_CHECK_MYSQL],
 [default_directory="/usr /usr/local /usr/mysql /opt/mysql"
 
-with_mysql="yes"
+with_mysql=yes
 AC_ARG_WITH(mysql,
     [  --with-mysql=DIR        support for MySQL],
     [ with_mysql="$withval" ],
     [ with_mysql=no ])
 
-if test "$with_mysql" != "no"; then
-  if test "$with_mysql" = "yes"; then
+if test "$with_mysql" != no; then
+  if test "$with_mysql" = yes; then
     mysql_directory="$default_directory";
-    mysql_fail="yes"
+    mysql_fail=yes
   elif test -d $withval; then
     mysql_directory="$withval"
-    mysql_fail="no"
+    mysql_fail=no
   elif test "$with_mysql" = ""; then
     mysql_directory="$default_directory";
-    mysql_fail="no"
+    mysql_fail=no
   fi
 
   AC_MSG_CHECKING(for MySQL headers)
@@ -118,7 +118,7 @@ if test "$with_mysql" != "no"; then
 
   if test ! -d "$MYSQL_INC_DIR"; then
     AC_MSG_RESULT(not found)
-    with_mysql="no"
+    with_mysql=no
 #    FAIL_MESSAGE("MySQL Headers", "$MYSQL_DIR $MYSQL_INC_DIR")
   else
     AC_MSG_RESULT($MYSQL_INC_DIR)
@@ -137,9 +137,9 @@ if test "$with_mysql" != "no"; then
   done
 
   if test -z "$MYSQL_LIB_DIR"; then
-    if test "$mysql_fail" != "no"; then
+    if test "$mysql_fail" != no; then
       AC_MSG_RESULT(not found)
-      with_mysql="no"
+      with_mysql=no
 #      FAIL_MESSAGE("mysqlclient library",
 #                   "$MYSQL_LIB_DIR")
     else
@@ -268,7 +268,7 @@ AC_DEFUN([AC_CHECK_FT2],
 dnl
 dnl Get the cflags and libraries from the freetype-config script
 dnl
-HAVE_FT2="no"
+HAVE_FT2=no
 AC_ARG_WITH(ft2,[  --with-ft2[[=prefix]]      Support for FreeType 2 fonts],
             ft2_prefix="$withval", ft2_prefix="")
 
@@ -285,7 +285,7 @@ if test x$ft2_prefix != x ; then
      fi
      AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
      no_ft2=""
-     if test "$FREETYPE_CONFIG" = "no" ; then
+     if test "$FREETYPE_CONFIG" = no ; then
        AC_MSG_ERROR([
        *** Unable to find FreeType2 library (http://www.freetype.org/)
        ])
@@ -295,12 +295,130 @@ if test x$ft2_prefix != x ; then
 
       TTFSUPPORT="ft2"
       AC_DEFINE_UNQUOTED(HAVE_FT2, "1", [Define this if you have freetype 2])
-      HAVE_FT2="yes"
+      HAVE_FT2=yes
      fi
 fi
 
 AC_SUBST(FT2_CFLAGS)
 AC_SUBST(FT2_LIBS)])
+# check for OpenSSL
+# ------------------------------------------------------------------
+AC_DEFUN([AC_CHECK_SSL],
+[
+AC_MSG_CHECKING(whether to compile with SSL support)
+ac_cv_ssl=auto
+ac_cv_ssl_link=shared
+eval "ac_cv_ssl_prefix=\"${prefix}\""
+AC_ARG_WITH(ssl,
+[  --with-ssl[[=yes|no|PATH]]   OpenSSL support [[auto]]],
+[
+  case "$withval" in
+    y*) ac_cv_ssl=yes ;;
+    n*) ac_cv_ssl=no ;;
+    shared) ac_cv_ssl=yes ac_cv_ssl_link=shared ;;
+    static) ac_cv_ssl=yes ac_cv_ssl_link=static ;;
+    /*) ac_cv_ssl=yes ac_cv_ssl_prefix=$withval ;;
+    *) ac_cv_ssl=auto ;;
+  esac
+])
+
+if test "$ac_cv_ssl" != no; then
+AC_MSG_CHECKING(for OpenSSL location)
+
+    AC_ARG_WITH(ssl-prefix,
+    [  --with-ssl-prefix=PATH   OpenSSL installation], 
+    [
+      case "$withval" in
+	/*) ac_cv_ssl=yes ac_cv_ssl_prefix=$withval ;;
+	*) ac_cv_ssl=yes ;;
+      esac
+    ])
+    AC_MSG_RESULT($ac_cv_ssl_prefix)
+
+fi
+
+SSL_LIBS=""
+SSL_CFLAGS=""
+eval "SSL_PREFIX=\"$ac_cv_ssl_prefix\""
+
+OPENSSL=""
+if test "$ac_cv_ssl" = yes -o "$ac_cv_ssl" = auto; then
+  saved_libs="$LIBS"
+  AC_CHECK_LIB(crypto, ERR_load_crypto_strings)
+
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = no -a "$ac_cv_ssl" = yes; then
+    AC_MSG_ERROR(could not find libcrypto, install openssl >= 0.9.7)
+    exit 1
+  fi
+
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes; then
+    SSL_LIBS="-lcrypto"
+  fi
+
+  LIBS="$SSL_LIBS $saved_libs"
+  AC_CHECK_LIB(ssl, SSL_load_error_strings)
+
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = no -a "$ac_cv_ssl" = yes;  then
+    AC_MSG_ERROR(could not find libssl, install openssl >= 0.9.7)
+    exit 1
+  fi
+
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = yes; then
+    SSL_LIBS="-lssl $SSL_LIBS"
+  fi
+
+  LIBS="$saved_libs"
+  AC_CHECK_HEADERS(openssl/opensslv.h)
+
+  if test "$ac_cv_header_openssl_opensslv_h" = no -a "$ac_cv_ssl" = yes; then
+    AC_MSG_ERROR(could not find openssl/opensslv.h, install openssl >= 0.9.7)
+    exit 1
+  fi
+
+  AC_MSG_CHECKING(for the OpenSSL UI)
+
+  OPENSSL=`which openssl 2>/dev/null`
+
+  if test "x$OPENSSL" = "x"; then
+    if test -f /usr/bin/openssl; then
+      OPENSSL=/usr/bin/openssl
+      AC_MSG_RESULT($OPENSSL)
+    else
+      AC_MSG_RESULT(not found)
+    fi
+  else
+    AC_MSG_RESULT($OPENSSL)
+  fi
+
+  if test "x$OPENSSL" = "x" -a "$ac_cv_ssl" = yes
+  then
+    AC_MSG_ERROR(could not find OpenSSL command line tool, install openssl >= 0.9.7)
+    exit 1
+  fi
+
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes -a "$ac_cv_lib_ssl_SSL_load_error_strings" = yes -a "$ac_cv_header_openssl_opensslv_h" = yes; then
+    HAVE_SSL=yes
+
+    AC_DEFINE_UNQUOTED(HAVE_SSL, 1, [Define this if you have OpenSSL])
+  else
+    HAVE_SSL=no
+    SSL_LIBS=""
+    SSL_CFLAGS=""
+    OPENSSL=""
+  fi
+fi
+
+if test "$ac_cv_ssl_link" = static; then
+  SSL_LIBS="${SSL_PREFIX}/lib/libssl.a ${SSL_PREFIX}/lib/libcrypto.a"
+fi
+
+AM_CONDITIONAL([SSL_STATIC],[test "$ac_cv_ssl_link" = static])
+AM_CONDITIONAL([SSL],[test "$ac_cv_ssl" != no])
+AC_SUBST(SSL_PREFIX)
+AC_SUBST(SSL_LIBS)
+AC_SUBST(SSL_CFLAGS)
+])                        
+
 # check for libowfat
 # ------------------------------------------------------------------
 AC_DEFUN([AC_LOWFAT],
@@ -311,7 +429,7 @@ AC_DEFUN([AC_LOWFAT],
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_TERMIOS],
 [AC_SYS_POSIX_TERMIOS
-if test "$ac_cv_sys_posix_termios" = "yes"; then
+if test "$ac_cv_sys_posix_termios" = yes; then
   AC_DEFINE_UNQUOTED([HAVE_TERMIOS], 1, 
   [Define this if you have the POSIX termios library])
 fi
@@ -702,7 +820,7 @@ int main() {
   off_t o=0;
   off_t r=sendfile(1,fd,&o,23);
   if (r!=-1)
-    printf("sent %llu bytes.\n",r);
+    printf("sent %I64u bytes.\n",r);
 }
 #endif
 ], [AC_HAVE_SENDFILE

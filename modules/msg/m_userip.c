@@ -121,8 +121,11 @@ static void m_userip(struct lclient *lcptr, struct client *cptr,
       result[len++] = '+';
 
     len += strlcpy(&result[len], acptr->user->name, IRCD_LINELEN - 1 - len);
-    result[len++] = '@';
-    len += strlcpy(&result[len], acptr->hostip, IRCD_LINELEN - 1 - len);
+    if(len + 1 + strlen(acptr->hostip) < IRCD_LINELEN - 2)
+    {
+      result[len++] = '@';
+      len += strlcpy(&result[len], acptr->hostip, IRCD_LINELEN - 1 - len);
+    }
 
     first = 0;
   }

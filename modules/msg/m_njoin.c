@@ -92,7 +92,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
   struct node     *nptr;
   unsigned long    ts;
   struct list      chanusers;
-  int              dropts = 0;
+//  int              dropts = 0;
   int              dropremote = 0;
 
   if(!client_is_server(cptr))
@@ -123,7 +123,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
     /* Check the TS */
     if(chptr->ts > ts)
     {
-      dropts = 1;
+//      dropts = 1;
       chptr->ts = ts;
 
       log(channel_log, L_warning, "Dropping TS for channel %s.",

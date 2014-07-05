@@ -20,7 +20,8 @@ include $(top_builddir)/config.mk
 # ---------------------------------------------------------------------------
 LIBNAME     = $(PACKAGE)
 A_LIBRARY   = $(LIBNAME).$(A_EXEEXT)
-PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_EXEEXT)$(PIE_VERSION_SUFFIX)
+#PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_LIBEXT)$(PIE_VERSION_SUFFIX)
+@SHARED_TRUE@PIE_LIBRARY = libchaos.$(PIE_LIBEXT)
 MODULES     = cfg \
               child \
               connect \
@@ -68,39 +69,43 @@ CONFIG_H_TOP = include/libchaos/config.h
 #PIE_DEF = libchaos.def
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,--out-implib,lib$(PIE_NAME).a
 
-@WIN32_TRUE@@SHARED_TRUE@bin_EXEC = chaos.dll
+@WIN32_TRUE@@SHARED_TRUE@bin_EXEC = libchaos.dll
 
 LIBS     += $(DLFCN_LIBS)
-
 LIBS     += $(SSL_LIBS)
+LIBS     += $(MYSQL_LIBS)
 INCLUDES += $(SSL_CFLAGS)
+INCLUDES += $(MYSQL_CFLAGS)
 
 # targets for this directory
 # ---------------------------------------------------------------------------
-all: Makefile a-library pie-library
+all: Makefile $(A_LIBRARY) $(PIE_LIBRARY)
 
 install: install-exec install-data
 
 # dependencies
 # ---------------------------------------------------------------------------
--include $(DEPS)
+@DEPS_TRUE@-include $(DEPS)
 
 # install config
 # ---------------------------------------------------------------------------
-@A_LIB@lib_DATA += $(A_LIBRARY)
+@STATIC_TRUE@lib_DATA += $(A_LIBRARY)
 @WIN32_TRUE@@SHARED_TRUE@bin_EXEC += $(PIE_LIBRARY)
 @WIN32_FALSE@@SHARED_TRUE@lib_EXEC += $(PIE_LIBRARY)
 
 # build config
 # ---------------------------------------------------------------------------
-CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_EXEEXT)\" -DBUILD_LIBCHAOS
+CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_LIBEXT)\" -DBUILD_LIBCHAOS
 FILES    += $(SYS_SOURCES)
 INCLUDES += -I$(thisdir) \
             -I$(top_srcdir)/include \
             -I. \
             -I$(top_builddir)/include 
 
-CFLAGS   += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
+CFLAGS += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
+
+$(A_LIBRARY): $(OBJECTS)
+$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 
 # include global make targets
 # ---------------------------------------------------------------------------

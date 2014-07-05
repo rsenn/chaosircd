@@ -794,7 +794,7 @@ static void mo_gline(struct lclient *lcptr, struct client *cptr,
   {
     server_send(NULL, NULL,
                 CAP_GLN, CAP_NONE,
-                ":%C GLINE %s %s %s %llu :%s",
+                ":%C GLINE %s %s %s %I64u :%s",
                 cptr, mgeptr->user, mgeptr->host,
                 mgeptr->info, mgeptr->ts, mgeptr->reason);
   }
@@ -802,7 +802,7 @@ static void mo_gline(struct lclient *lcptr, struct client *cptr,
   {
     server_send(NULL, NULL,
                 CAP_GLN, CAP_NONE,
-                ":%C GLINE %s %s %s %llu",
+                ":%C GLINE %s %s %s %I64u",
                 cptr, mgeptr->user, mgeptr->host, mgeptr->info, mgeptr->ts);
   }
 }
@@ -864,7 +864,7 @@ static void ms_gline(struct lclient *lcptr, struct client *cptr,
   m_gline_match(mgeptr);
 
   /* Relay it further */
-  server_send(lcptr, NULL, CAP_GLN, CAP_NONE, ":%C GLINE %s %s %s %llu",
+  server_send(lcptr, NULL, CAP_GLN, CAP_NONE, ":%C GLINE %s %s %s %I64u",
               cptr, mgeptr->user, mgeptr->host, mgeptr->info, mgeptr->ts);
 }
 
@@ -1001,10 +1001,10 @@ static void m_gline_burst(struct lclient *lcptr)
   {
     /* Burst a g-line */
     if(mgeptr->reason[0])
-      lclient_send(lcptr, "GLINE %s %s %s %llu :%s",
+      lclient_send(lcptr, "GLINE %s %s %s %I64u :%s",
                    mgeptr->user, mgeptr->host, mgeptr->info, mgeptr->ts, mgeptr->reason);
     else
-      lclient_send(lcptr, "GLINE %s %s %s %llu",
+      lclient_send(lcptr, "GLINE %s %s %s %I64u",
                    mgeptr->user, mgeptr->host, mgeptr->info, mgeptr->ts);
   }
 }

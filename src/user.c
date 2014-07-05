@@ -231,7 +231,7 @@ struct user *user_new(const char *name, const char *uid)
   }
 
   /* Inform about the new user */
-  debug(user_log, "New user block: %s (%s)", name, uptr->uid);
+  //debug(user_log, "New user block: %s (%s)", name, uptr->uid);
 
   dlink_add_tail(&user_list, &uptr->node, uptr);
 
@@ -478,7 +478,7 @@ void user_dump(struct user *uptr)
           uptr->oper ? uptr->oper->refcount : 0);
     dump(user_log, "   channels: %u links", uptr->channels.size);
     dump(user_log, "    invites: %u links", uptr->invites.size);
-    dump(user_log, "      modes: %llu", uptr->modes);
+    dump(user_log, "      modes: %I64u", uptr->modes);
     dump(user_log, "       name: %s", uptr->name);
     dump(user_log, "        uid: %s", uptr->uid);
     dump(user_log, "       away: %s", uptr->away);

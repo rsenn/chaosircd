@@ -16,22 +16,23 @@ SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)
 OBJEXT               = so
 DEPS                 = $(MODULES:%=%.d)
-SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
-@PIE_LIB@lib_EXEC = $(SHOBJECTS)
-@PIE_LIB@all: shobjects
-@PIE_LIB@install: install-pluginEXEC
+@DLM_TRUE@lib_EXEC = $(SHOBJECTS)
+@DLM_TRUE@all: shobjects
+@DLM_TRUE@install: install-pluginEXEC
 
-@NO_PIE_LIB@all: $(CATEGORY).a
-@NO_PIE_LIB@install:
+@DLM_FALSE@all: $(CATEGORY).a
+@DLM_FALSE@install:
 
+plugin_PREFIX = /service
 plugin_EXEC = $(SHOBJECTS)
 
 $(CATEGORY).a: $(OBJECTS)
 	@$(ECHO_AR)
 	@$(RM) -f $@
-	@$(AR) cru $@ $^
+	@$(AR) $@ $^
 	@$(ECHO_RANLIB)
 	@$(RANLIB) $@
 
@@ -49,6 +50,6 @@ DISTFILES            = Makefile.in $(SOURCES)
 DEVFILES             = CVS $(DISTFILES)
 
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
-@WIN32_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
 
 include $(top_builddir)/build.mk

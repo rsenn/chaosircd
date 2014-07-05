@@ -376,7 +376,24 @@ modules_load:		T_LOAD QSTRING ';'
           
           if(module == NULL)
           {
-            module = module_add(yylval.string);
+#define MAKE_TUPLE(ch1,ch2) ((((unsigned int)(unsigned char)(ch1))<<8)|(unsigned char)(ch2))
+	    unsigned int c = MAKE_TUPLE(yylval.string[0],yylval.string[1]);
+	    char pathbuf[256];
+
+            strlcpy(pathbuf, PLUGINDIR"/", sizeof(pathbuf));
+	    switch(c) {
+	      case MAKE_TUPLE('u','m'):  strlcat(pathbuf,"usermode/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('c','m'):  strlcat(pathbuf,"chanmode/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('l','c'):  strlcat(pathbuf,"lclient/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('s','t'):  strlcat(pathbuf,"stats/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('s','v'):  strlcat(pathbuf,"service/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('m','_'):  strlcat(pathbuf,"msg/", sizeof(pathbuf)); break;
+	      default:  break;
+	    }
+
+            strlcat(pathbuf, yylval.string, sizeof(pathbuf));
+            strlcat(pathbuf, "." DLLEXT, sizeof(pathbuf));
+            module = module_add(pathbuf);
           }
           else
           {

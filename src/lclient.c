@@ -468,8 +468,8 @@ void lclient_accept(int fd, struct listen *listen)
     }
 
     /* Inform about the new lclient */
-    log(lclient_log, L_verbose, "New local client %s:%u on listener %s",
-        lcptr->host, lcptr->port_remote, listen->name);
+    log(lclient_log, L_verbose, "New local client %s:%u on listener %s (class %s)",
+        lcptr->host, lcptr->port_remote, listen->name, clptr->name);
 
     /* Get references */
     lcptr->listen = listen_pop(listen);
@@ -477,8 +477,8 @@ void lclient_accept(int fd, struct listen *listen)
 
     /* Setup ping timeout callback */
     lcptr->ptimer = timer_start(lclient_exit, clptr->ping_freq, lcptr,
-                                "timeout: %llumsecs", clptr->ping_freq);
-
+                                "timeout: %I64umsecs", clptr->ping_freq);
+    
     timer_note(lcptr->ptimer, "ping timer for %s:%u",
                net_ntoa(lcptr->addr_remote), lcptr->port_remote);
 
@@ -817,7 +817,7 @@ void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
   {
     /* send error message & return */
     if(lclient_is_unknown(lcptr))
-      lclient_exit(lcptr, "protocol mismatch");
+      lclient_exit(lcptr, "protocol mismatch: %s", argv[1]);
     else if(lclient_is_server(lcptr))
       lclient_exit(lcptr, "unknown command: %s", argv[1]);
     else
@@ -1487,11 +1487,11 @@ void lclient_dump(struct lclient *lcptr)
           lcptr->recvb, lcptr->recvk, lcptr->recvm);
     dump(lclient_log, "       send: %ub %uk %um",
           lcptr->sendb, lcptr->sendk, lcptr->sendm);
-    dump(lclient_log, "       caps: %llu", lcptr->caps);
+    dump(lclient_log, "       caps: %I64u", lcptr->caps);
     dump(lclient_log, "         ts: %lu", lcptr->ts);
     dump(lclient_log, "     serial: %u", lcptr->serial);
-    dump(lclient_log, "        lag: %llu", lcptr->lag);
-    dump(lclient_log, "       ping: %llu", lcptr->ping);
+    dump(lclient_log, "        lag: %I64u", lcptr->lag);
+    dump(lclient_log, "       ping: %I64u", lcptr->ping);
     dump(lclient_log, "       name: %s", lcptr->name);
     dump(lclient_log, "       host: %s", lcptr->host);
     dump(lclient_log, "     hostip: %s", lcptr->hostip);

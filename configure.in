@@ -42,12 +42,24 @@ AC_CONFIG_SRCDIR([src/ircd.c])
 
 test "$prefix" = "NONE" && prefix=${ac_default_prefix}
 test "$exec_prefix" = "NONE" && exec_prefix=${prefix}
+ 
+eval "tmp_prefix=\"${prefix}\""
 
 eval sysconfdir=${sysconfdir}
 case $sysconfdir in
   *ircd*) sysconfdir=${sysconfdir} ;;
   *) sysconfdir=${sysconfdir}/chaosircd ;;
 esac
+
+relsysconfdir=${sysconfdir#$tmp_prefix/}
+test "$relsysconfdir" = "$sysconfdir" && relsysconfdir=etc${sysconfdir##*/etc}
+AC_SUBST([relsysconfdir])
+
+
+eval "rellibexecdir=\"${libexecdir}\""
+rellibexecdir=${rellibexecdir#$tmp_prefix/}
+test "$rellibexecdir" = "$libexecdir" && rellibexecdir=libexec${libexecdir##*libexec}
+AC_SUBST([rellibexecdir])
 
 eval libexecdir=${libexecdir}
 eval localstatedir=${localstatedir}
@@ -63,41 +75,62 @@ AC_SUBST([pidfile])
 #eval prefix=${prefix}
 #eval libdir=${libdir}
 
-case $prefix in
+AC_MSG_CHECKING([for prefix])
+AC_MSG_RESULT([$tmp_prefix])
+
+case $tmp_prefix in
   *ircd*)
-    plugindir=${libdir}
+    eval "plugindir=${libdir}/modules"
     ;;
   *)
-    plugindir=${libdir}/chaosircd
+    eval "plugindir=${libdir}/chaosircd"
     ;;
 esac
+relplugindir=${plugindir#$tmp_prefix/}
+test "$relplugindir" = "$plugindir" && relplugindir=lib/${plugindir##*/lib/}
 AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/chaosircd]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
-
-case $prefix in
-  *ircd*)
-    logdir=${prefix}/logs
-    ;;
-  *)
-    logdir=${localstatedir}/log
-    ;;
+AC_SUBST([relplugindir])
+case $tmp_prefix in
+  *ircd*) eval "inidir=${localstatedir}/lib"  ;;
+  *) eval "inidir=${localstatedir}/lib/chaosircd"  ;;
 esac
+relinidir=${inidir#$tmp_prefix/}
+if test "$relinidir" = "$inidir"; then
+   relinidir=${localstatedir##*/}${inidir##*${localstatedir##*/}}
+fi 
+AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
+[if test "$withval" != "yes" && test "$withval" != "no"; then eval inidir=$withval; fi])
+
+AC_MSG_CHECKING([For .ini directory])
+AC_SUBST([inidir])
+AC_SUBST([relinidir])
+AC_MSG_RESULT([$inidir $relinidir])
+
+case $tmp_prefix in
+  *ircd*) eval "logdir=${localstatedir}/log" ;; 
+  *) eval "logdir=${localstatedir}/log/chaosircd" ;;
+esac
+rellogdir=${logdir#$tmp_prefix/}
+test "$rellogdir" = "$logdir" && rellogdir=${localstatedir##*/}${logdir##*${localstatedir##*/}}
 AC_ARG_WITH([logdir], [  --with-logdir=PATH   location of the logs [[LOCALSTATEDIR/log]]],
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval logdir=$withval; fi])
 AC_SUBST([logdir])
+AC_SUBST([rellogdir])
 
-case $prefix in
-  *ircd*)
-    eval "inidir=${localstatedir}/lib"
-    ;;
-  *)
-    eval "inidir=${localstatedir}/lib/chaosircd"
-    ;;
-esac
-AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
-[if test "$withval" != "yes" && test "$withval" != "no"; then eval inidir=$withval; fi])
-AC_SUBST([inidir])
+eval "rundir=${localstatedir}/run"
+relrundir=${rundir#$tmp_prefix/}
+test "$relrundir" = "$rundir" && relrundir=${localstatedir##*/}${rundir##*${localstatedir##*/}}
+AC_ARG_WITH([rundir], [  --with-rundir=PATH   location of the runs [[LOCALSTATEDIR/run]]],
+[if test "$withval" != "yes" && test "$withval" != "no"; then eval rundir=$withval; fi])
+AC_SUBST([rundir])
+AC_SUBST([relrundir])
+
+pidfile="$rundir/chaosircd.pid"
+relpidfile="$relrundir/chaosircd.pid"
+AC_SUBST([pidfile])
+AC_SUBST([relpidfile])
 
 # set extensions and flags
 # ---------------------------------------------------------------------------
@@ -129,10 +162,12 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CONFIG_DYLIB
 
-AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
-AC_FUNC_MMAP
+dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
+AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.h])
 
-dnl AC_CHECK_SSL
+dnl AC_FUNC_MMAP
+
+AC_CHECK_SSL
 dnl AC_CHECK_FT2
 dnl AC_CHECK_PSQL
 dnl AC_CHECK_MYSQL
@@ -177,6 +212,14 @@ dnl esac
 
 dnl AC_SUBST([DLFCN_LDADD])
 
+if test "$HAVE_SSL" = yes; then
+  SSL_FALSE='#' 
+else
+ SSL_TRUE='#'
+fi
+AC_SUBST([SSL_TRUE])
+AC_SUBST([SSL_FALSE])
+
 # set debugging stuff after compiler test (-Werror could fuck it up)
 # ---------------------------------------------------------------------------
 AC_CHECK_DEP
@@ -184,12 +227,13 @@ AC_CHECK_DEBUG
 AC_CHECK_MAINTAINER
 
 # ---------------------------------------------------------------------------
-case $libdir in
-  /lib | /usr/lib) ;;
+
+eval "case $libdir in
+  /lib | /usr/lib | /usr/local/lib) ;;
   *)
-    LDFLAGS="${LDFLAGS:+$LDFLAGS }-Xlinker -rpath=\$(libdir)"
+    LDFLAGS=\"\${LDFLAGS:+\$LDFLAGS }-Wl,-rpath=\\\${libdir}\"
     ;;
-esac
+esac"
 
 case $host in
   *-linux*)

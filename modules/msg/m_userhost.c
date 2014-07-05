@@ -130,8 +130,10 @@ static void m_userhost(struct lclient *lcptr, struct client *cptr,
       result[len++] = '+';
 
     len += strlcpy(&result[len], acptr->user->name, IRCD_LINELEN - 1 - len);
-    result[len++] = '@';
-    len += strlcpy(&result[len], acptr->hostreal, IRCD_LINELEN - 1 - len);
+    if(len + 1 + strlen(acptr->hostreal) < IRCD_LINELEN - 2) {
+      result[len++] = '@';
+      len += strlcpy(&result[len], acptr->hostreal, IRCD_LINELEN - 1 - len);
+    }
 
     first = 0;
   }

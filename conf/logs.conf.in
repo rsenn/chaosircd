@@ -1,7 +1,7 @@
- A log drain - redirecting logging to a file
+# A log drain - redirecting logging to a file
 
 log {
-  path     = "@logdir@/ircd.log";
+  path     = "@rellogdir@/ircd.log";
   
   # From which sources should the log drain receive messages?
   # 
@@ -38,7 +38,7 @@ log {
   # usermode         - usermode engine
   # all              - log ALL of them
  
-  sources  = "all";                  # set here source  
+  sources  = "all in out";                  # set here source  
   
   level    = "status";              # Log all messages which have at least the following level
   
@@ -48,15 +48,15 @@ log {
 };
 
 log {
-  path     = "@logdir@/chaosircd.log";
+  path     = "@rellogdir@/chaosircd.log";
   sources  = "all";
   level    = "verbose";
   prefix   = yes;
-  truncate = yes;
+  truncate = no;
 };
 
 log {
-  path     = "@logdir@/debug.log";
+  path     = "@rellogdir@/debug.log";
   sources  = "all";
   level    = "debug";
   prefix   = yes;
@@ -64,7 +64,7 @@ log {
 };
 
 log {
-  path     = "@logdir@/traffic.log";
+  path     = "@rellogdir@/traffic.log";
   sources  = "in out";
   level    = "debug";
   prefix   = yes;
@@ -72,9 +72,9 @@ log {
 };
 
 log {
-  path     = "@logdir@/crowdguard.log";
-  sources  = "login geohash event participation";
+  path     = "@rellogdir@/crowdguard.log";
+  sources  = "login geolocation event participation";
   level    = "verbose";
   prefix   = yes;
-  truncate = yes;
+  truncate = no;
 };

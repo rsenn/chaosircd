@@ -152,9 +152,9 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
 
       burst_db = (uint32_t)(((burst_rate - (float)burst_kb) * 100) + 0.5);
       burst_kb = (uint32_t)(burst_rate + 0.5);
-
-      log(server_log, L_status,
-          "Burst from %N done in %llu msecs (%u.%02ukb/s)",
+      
+      log(server_log, L_status, 
+          "Burst from %N done in %I64u msecs (%u.%02ukb/s)",
           cptr, burst_time, burst_kb, burst_db);
 
       log(server_log, L_status,
@@ -167,8 +167,8 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
     }
     else
     {
-      log(server_log, L_status,
-          "Burst from %N via %s done in %llu msecs",
+      log(server_log, L_status, 
+          "Burst from %N via %s done in %I64u msecs",
           cptr, lcptr->name, burst_time);
 
       log(server_log, L_status,

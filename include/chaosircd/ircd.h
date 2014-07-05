@@ -57,7 +57,7 @@
 #define IRCD_NICKLEN    32
 #define IRCD_PASSWDLEN  32
 #define IRCD_CLASSLEN   32
-#define IRCD_INFOLEN    128
+#define IRCD_INFOLEN    512
 #define IRCD_CHANNELLEN 128
 #define IRCD_TOPICLEN   384
 #define IRCD_KICKLEN    256
@@ -66,8 +66,8 @@
                         IRCD_USERLEN + 1 + \
                         IRCD_HOSTLEN
 
-#define IRCD_LINELEN    1024
-#define IRCD_BUFSIZE    1024
+#define IRCD_LINELEN    2048
+#define IRCD_BUFSIZE    2048
 
 #define IRCD_PATHLEN    64
 

@@ -94,7 +94,7 @@ static void m_kick(struct lclient *lcptr, struct client *cptr,
   struct channel  *chptr;
   struct chanuser *cuptr;
   char            *targetv[IRCD_MAXTARGETS + 1];
-  uint32_t         n;
+//  uint32_t         n;
 
   if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
@@ -107,7 +107,7 @@ static void m_kick(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-  n = str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
+  /*n =*/ str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
 
   if(argv[4] == NULL)
     argv[4] = cptr->name;

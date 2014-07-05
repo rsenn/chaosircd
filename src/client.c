@@ -1106,7 +1106,7 @@ void client_introduce(struct lclient *lcptr, struct client *cptr,
                 acptr->user->uid,
                 acptr->info);
 
-    log(server_log, L_debug, "%s: mode: %s", __func__, acptr->user->mode);
+    //log(server_log, L_debug, "%s: mode: %s", __func__, acptr->user->mode);
 
     server_send(lcptr, NULL, CAP_NONE, CAP_UID,
                 "NICK %N %d %lu %s %U %s %N :%s",
