@@ -1,6 +1,6 @@
 host=$(gcc -dumpmachine)
 
-make -i distclean >/dev/null 2>/dev/null
+#make -i distclean >/dev/null 2>/dev/null
 
 ./configure \
 	--disable-dependency-tracking \
