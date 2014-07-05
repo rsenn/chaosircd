@@ -137,7 +137,7 @@ esac
 
 case $prefix in
   *chaos*)
-    plugindir=${libdir}
+    plugindir=${libdir}/plugins
     ;;
   *)
     plugindir=${libdir}/libchaos
