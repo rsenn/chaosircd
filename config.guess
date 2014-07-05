@@ -2,7 +2,7 @@
 # Attempt to guess a canonical system name.
 #   Copyright 1992-2013 Free Software Foundation, Inc.
 
-timestamp='2013-11-29'
+timestamp='2013-06-10'
 
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ dummy=$tmp/dummy ;
 tmpfiles="$dummy.c $dummy.o $dummy.rel $dummy" ;
 case $CC_FOR_BUILD,$HOST_CC,$CC in
  ,,)    echo "int x;" > $dummy.c ;
-	for c in cc gcc c89 c99 ; do
+	for c in gcc c89 c99 cc ; do
 	  if ($c -c -o $dummy.o $dummy.c) >/dev/null 2>&1 ; then
 	     CC_FOR_BUILD="$c"; break ;
 	  fi ;
@@ -809,7 +809,13 @@ EOF
 	echo ${UNAME_MACHINE}-unknown-bsdi${UNAME_RELEASE}
 	exit ;;
     *:FreeBSD:*:*)
-	echo ${UNAME_MACHINE}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'`
+	UNAME_PROCESSOR=`/usr/bin/uname -p`
+	case ${UNAME_PROCESSOR} in
+	    amd64)
+		echo x86_64-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
+	    *)
+		echo ${UNAME_PROCESSOR}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
+	esac
 	exit ;;
     i*:CYGWIN*:* | i*:MINGW*:* | i*:mingw*:*)
         TMPDIR='C:\\WINDOWS\\Temp'
@@ -959,94 +965,7 @@ EOF
         #endif
 EOF
         eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
-        TMPDIR='C:\\WINDOWS\\Temp'
-        eval $set_cc_for_build
-        sed 's/^        //' << EOF >$dummy.c
-        MACHINE=unknown
-        #ifdef WIN32
-        MACHINE=win32
-        #endif
-        #ifdef _WIN32
-        MACHINE=win32
-        #endif
-        #ifdef __MINGW32__
-        MACHINE=mingw32
-        #endif
-        #ifdef __CYGWIN__
-        MACHINE=cygwin
-        #endif
-        #ifdef __CYGWIN32__
-        MACHINE=cygwin
-        #endif
-EOF
-        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
-        TMPDIR='C:\\WINDOWS\\Temp'
-        eval $set_cc_for_build
-        sed 's/^        //' << EOF >$dummy.c
-        MACHINE=unknown
-        #ifdef WIN32
-        MACHINE=win32
-        #endif
-        #ifdef _WIN32
-        MACHINE=win32
-        #endif
-        #ifdef __MINGW32__
-        MACHINE=mingw32
-        #endif
-        #ifdef __CYGWIN__
-        MACHINE=cygwin
-        #endif
-        #ifdef __CYGWIN32__
-        MACHINE=cygwin
-        #endif
-EOF
-        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
-        TMPDIR='C:\\WINDOWS\\Temp'
-        eval $set_cc_for_build
-        sed 's/^        //' << EOF >$dummy.c
-        MACHINE=unknown
-        #ifdef WIN32
-        MACHINE=win32
-        #endif
-        #ifdef _WIN32
-        MACHINE=win32
-        #endif
-        #ifdef __MINGW32__
-        MACHINE=mingw32
-        #endif
-        #ifdef __CYGWIN__
-        MACHINE=cygwin
-        #endif
-        #ifdef __CYGWIN32__
-        MACHINE=cygwin
-        #endif
-EOF
-        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
-        TMPDIR='C:\\WINDOWS\\Temp'
-        eval $set_cc_for_build
-        sed 's/^        //' << EOF >$dummy.c
-        MACHINE=unknown
-        #ifdef WIN32
-        MACHINE=win32
-        #endif
-        #ifdef _WIN32
-        MACHINE=win32
-        #endif
-        #ifdef __MINGW32__
-        MACHINE=mingw32
-        #endif
-        #ifdef __CYGWIN__
-        MACHINE=cygwin
-        #endif
-        #ifdef __CYGWIN32__
-        MACHINE=cygwin
-        #endif
-EOF
-        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
 	echo ${UNAME_MACHINE}-pc-$MACHINE
-	exit ;;
-    i*:CYGWIN*:*)
-	echo ${UNAME_MACHINE}-pc-cygwin
 	exit ;;
     *:MINGW64*:*)
 	echo ${UNAME_MACHINE}-pc-mingw64
@@ -1092,13 +1011,10 @@ EOF
 	echo ${UNAME_MACHINE}-pc-uwin
 	exit ;;
     amd64:CYGWIN*:*:* | x86_64:CYGWIN*:*:*)
-	echo x86_64-unknown-cygwin
-	exit ;;
-    amd64:MSYS*:*:* | x86_64:MSYS*:*:*)
-	echo x86_64-unknown-msys
+	echo x86_64-unknown-$MACHINE
 	exit ;;
     p*:CYGWIN*:*)
-	echo powerpcle-unknown-cygwin
+	echo powerpcle-unknown-$MACHINE
 	exit ;;
     prep*:SunOS:5.*:*)
 	echo powerpcle-unknown-solaris2`echo ${UNAME_RELEASE}|sed -e 's/[^.]*//'`
@@ -1491,26 +1407,16 @@ EOF
 	if test "$UNAME_PROCESSOR" = unknown ; then
 	    UNAME_PROCESSOR=powerpc
 	fi
-	if test `echo "$UNAME_RELEASE" | sed -e 's/\..*//'` -le 10 ; then
-	    if [ "$CC_FOR_BUILD" != 'no_compiler_found' ]; then
-		if (echo '#ifdef __LP64__'; echo IS_64BIT_ARCH; echo '#endif') | \
-		    (CCOPTS= $CC_FOR_BUILD -E - 2>/dev/null) | \
-		    grep IS_64BIT_ARCH >/dev/null
-		then
-		    case $UNAME_PROCESSOR in
-			i386) UNAME_PROCESSOR=x86_64 ;;
-			powerpc) UNAME_PROCESSOR=powerpc64 ;;
-		    esac
-		fi
+	if [ "$CC_FOR_BUILD" != 'no_compiler_found' ]; then
+	    if (echo '#ifdef __LP64__'; echo IS_64BIT_ARCH; echo '#endif') | \
+		(CCOPTS= $CC_FOR_BUILD -E - 2>/dev/null) | \
+		grep IS_64BIT_ARCH >/dev/null
+	    then
+		case $UNAME_PROCESSOR in
+		    i386) UNAME_PROCESSOR=x86_64 ;;
+		    powerpc) UNAME_PROCESSOR=powerpc64 ;;
+		esac
 	    fi
-	elif test "$UNAME_PROCESSOR" = i386 ; then
-	    # Avoid executing cc on OS X 10.9, as it ships with a stub
-	    # that puts up a graphical alert prompting to install
-	    # developer tools.  Any system running Mac OS X 10.7 or
-	    # later (Darwin 11 and later) is required to have a 64-bit
-	    # processor. This is not true of the ARM version of Darwin
-	    # that Apple uses in portable devices.
-	    UNAME_PROCESSOR=x86_64
 	fi
 	echo ${UNAME_PROCESSOR}-apple-darwin${UNAME_RELEASE}
 	exit ;;
