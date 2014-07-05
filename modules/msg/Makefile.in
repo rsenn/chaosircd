@@ -82,19 +82,19 @@ DSO                  = @DSO@
 
 plugin_EXEC = $(SHOBJECTS)
 
-@PIE_LIB@lib_EXEC = $(SHOBJECTS)
-@PIE_LIB@all: shobjects
-@PIE_LIB@install: install-pluginEXEC
+@PIE_TRUE@lib_EXEC = $(SHOBJECTS)
+@PIE_TRUE@all: shobjects
+@PIE_TRUE@install: install-pluginEXEC
 
-@NO_PIE_LIB@all: $(CATEGORY).a
-@NO_PIE_LIB@install:
+@PIE_FALSE@all: $(CATEGORY).a
+@PIE_FALSE@install:
 
-$(CATEGORY).a: $(OBJECTS)
-	@$(ECHO_AR)
-	@$(RM) -f $@
-	@$(AR) cru $@ $^
-	@$(ECHO_RANLIB)
-	@$(RANLIB) $@
+@PIE_FALSE@$(CATEGORY).a: $(OBJECTS)
+@PIE_FALSE@	$(ECHO_AR)
+@PIE_FALSE@	$(RM) -f $@
+@PIE_FALSE@	$(AR) $@ $^
+@PIE_FALSE@	$(ECHO_RANLIB)
+@PIE_FALSE@	$(RANLIB) $@
 
 shobjects: $(SHOBJECTS)
 
