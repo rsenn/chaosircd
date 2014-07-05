@@ -34,7 +34,7 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 @PIC@.c.@PIC_OBJEXT@:
 @PIC@	@$(ECHO_PIC_CC)
 @DEPS_TRUE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
-@DEPS_FALSE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
+@DEPS_FALSE@@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -c -o $@ $<
 
 #.c.@PIE_LIBEXT@:
 #	@$(ECHO_CCLD)
