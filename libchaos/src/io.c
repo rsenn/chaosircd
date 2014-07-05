@@ -25,7 +25,6 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/config.h"
 #include "libchaos/defs.h"
 #include "libchaos/syscall.h"
 #include "libchaos/timer.h"
@@ -358,7 +357,7 @@ int io_queued_read(int fd)
       if(io_list[fd].error == EAGAIN)
       {
         io_list[fd].status.err = 0;
-        return 0;
+        return -1;
       }
 
       return -1;
@@ -581,13 +580,10 @@ void io_handle_fd(int fd)
     {
       io_list[fd].ret = io_queued_read(fd);
 
-      if(io_list[fd].ret < 0 && errno == EAGAIN) {
-
-	io_list[fd].status.err = 0;
-
-      } else if(io_list[fd].ret <= 0) {
+      if(io_list[fd].status.err || io_list[fd].status.closed)
+      {
         io_list[fd].status.closed = 1;
-        io_list[fd].status.err = (io_list[fd].ret < 0);
+     //   io_list[fd].status.err = (io_list[fd].ret < 0);
         io_list[fd].status.onread = 1;
 
 //        io_queued_write(fd);
