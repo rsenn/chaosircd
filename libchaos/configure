@@ -668,6 +668,10 @@ PIC_CFLAGS
 A_EXEEXT
 NO_PIE_LIB
 PIE_LIB
+A_FALSE
+A_TRUE
+PIE_FALSE
+PIE_TRUE
 slibdir
 PIE_LIBDIR
 STATIC_FALSE
@@ -4091,12 +4095,31 @@ fi
 
   # set up shared library
   if test "$PIE_ENABLE" = "yes"; then
+    CPPFLAGS="$CPPFLAGS -DSTATIC_LIBCHAOS=1"
     PIE_LIB=""
     NO_PIE_LIB="#"
   else
     PIE_LIB="#"
     NO_PIE_LIB=""
   fi
+   if test "$PIE_ENABLE" = yes; then
+  PIE_TRUE=
+  PIE_FALSE='#'
+else
+  PIE_TRUE='#'
+  PIE_FALSE=
+fi
+
+   if test "$A_ENABLE" = yes; then
+  A_TRUE=
+  A_FALSE='#'
+else
+  A_TRUE='#'
+  A_FALSE=
+fi
+
+
+
 
 
 
@@ -5997,6 +6020,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${STATIC_TRUE}" && test -z "${STATIC_FALSE}"; then
   as_fn_error $? "conditional \"STATIC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${PIE_TRUE}" && test -z "${PIE_FALSE}"; then
+  as_fn_error $? "conditional \"PIE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${A_TRUE}" && test -z "${A_FALSE}"; then
+  as_fn_error $? "conditional \"A\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

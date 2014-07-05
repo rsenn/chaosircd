@@ -181,12 +181,16 @@ dnl  AC_MSG_RESULT([$PIE_ENABLE])
 
   # set up shared library 
   if test "$PIE_ENABLE" = "yes"; then
+    CPPFLAGS="$CPPFLAGS -DSTATIC_LIBCHAOS=1"
     PIE_LIB=""
     NO_PIE_LIB="#"
   else
     PIE_LIB="#"
     NO_PIE_LIB=""
   fi
+  AM_CONDITIONAL([PIE],[test "$PIE_ENABLE" = yes])
+  AM_CONDITIONAL([A],[test "$A_ENABLE" = yes])
+
   AC_SUBST([PIE_LIB])
   AC_SUBST([NO_PIE_LIB])
 
@@ -221,5 +225,6 @@ dnl  AC_MSG_RESULT([$PIE_ENABLE])
 
   AC_SUBST([LIBS])
   AC_SUBST([DLFCN_LIBS])
+
 ])
 
