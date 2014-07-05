@@ -187,7 +187,6 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # set up shared library 
   if test "$PIE_ENABLE" = "yes"; then
-    CPPFLAGS="$CPPFLAGS -DSTATIC_LIBCHAOS=1"
     PIE_LIB=""
     NO_PIE_LIB="#"
   else
