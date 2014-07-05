@@ -16,8 +16,8 @@ if(NOT LIBCHAOS_BINARY_DIR)
   set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
-set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
-
+#set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
+#set(CMAKE_CURRENT_LIST_DIR "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
@@ -25,7 +25,7 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 
 include(FindOpenSSL)
 include(FindFreetype)
-include(FindPostgreSQL)
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
 
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
