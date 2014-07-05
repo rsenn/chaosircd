@@ -56,7 +56,8 @@ install: install-exec
 @SHARED_FALSE@LDADD     += $(top_builddir)/src/libchaos.a
 @WIN32_TRUE@@SHARED_TRUE@LIBS     += $(top_builddir)/src/libchaos.dll
 @SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
-@SSL_TRUE@LIBS     += $(SSL_LIBS)
+@SSL_TRUE@@SSL_STATIC_FALSE@LIBS     += $(SSL_LIBS)
+@SSL_TRUE@@SSL_STATIC_TRUE@LDADD     += $(SSL_LIBS)
 LIBS     += $(DLFCN_LIBS)
 CPPFLAGS += -DHAVE_CONFIG_H
 @STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS

@@ -413,7 +413,7 @@ if test "$ac_cv_ssl_link" = static; then
 fi
 
 AM_CONDITIONAL([SSL_STATIC],[test "$ac_cv_ssl_link" = static])
-AM_CONDITIONAL([SSL],[test "$ac_cv_ssl" = true])
+AM_CONDITIONAL([SSL],[test "$ac_cv_ssl" != no])
 AC_SUBST(SSL_PREFIX)
 AC_SUBST(SSL_LIBS)
 AC_SUBST(SSL_CFLAGS)

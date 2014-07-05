@@ -5061,7 +5061,7 @@ else
   SSL_STATIC_FALSE=
 fi
 
- if test "$ac_cv_ssl" = true; then
+ if test "$ac_cv_ssl" != no; then
   SSL_TRUE=
   SSL_FALSE='#'
 else
@@ -5793,15 +5793,6 @@ _ACEOF
 fi
 
 
- if test "$HAVE_SSL" = yes; then
-  SSL_TRUE=
-  SSL_FALSE='#'
-else
-  SSL_TRUE='#'
-  SSL_FALSE=
-fi
-
-
 
 
 # set debugging stuff after compiler test (-Werror could fuck it up)
@@ -6182,10 +6173,6 @@ if test -z "${SSL_TRUE}" && test -z "${SSL_FALSE}"; then
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
-if test -z "${SSL_TRUE}" && test -z "${SSL_FALSE}"; then
-  as_fn_error $? "conditional \"SSL\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${DEPS_TRUE}" && test -z "${DEPS_FALSE}"; then
   as_fn_error $? "conditional \"DEPS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
