@@ -50,6 +50,14 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     *-freebsd*) FREEBSD='true' ;;
   esac
         
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+    PIE_ENABLE=no
+  fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
+    PIE_ENABLE=yes
+  fi
+
   # resolve automatic shit
   case $host in
     *-mingw32 | *-cygwin)
@@ -69,14 +77,6 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       
       ;;
   esac
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-    PIE_ENABLE=no
-  fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
-    PIE_ENABLE=yes
-  fi
 
   # do some checks for PIC/PIE
 

@@ -532,8 +532,8 @@ if test "$no_recursion" != yes; then
 
       AC_MSG_NOTICE([running $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir])
       # The eval makes quoting arguments work.
-      eval $ac_sub_configure $ac_sub_configure_args \
-     --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir ||
+      (set -x; eval $ac_sub_configure $ac_sub_configure_args \
+     --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir) ||
   AC_MSG_ERROR([$ac_sub_configure failed for $ac_dir])
     fi
     cd $ac_popdir

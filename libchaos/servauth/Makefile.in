@@ -52,8 +52,8 @@ install: install-exec
 
 # build config
 # ---------------------------------------------------------------------------
-LIBS     += -L$(top_builddir)/src -lchaos
-@STATIC_TRUE@LDADD     += $(top_builddir)/src/libchaos.a
+@SHARED_TRUE@LIBS     += -L$(top_builddir)/src -lchaos
+@SHARED_FALSE@LDADD     += $(top_builddir)/src/libchaos.a
 @WIN32_TRUE@@SHARED_TRUE@LIBS     += $(top_builddir)/src/libchaos.dll
 @SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
 @SSL_TRUE@LIBS     += $(SSL_LIBS)
@@ -70,9 +70,9 @@ INCLUDES += -I$(srcdir) \
 
 #$(PROGRAM): CFLAGS += -I$(srcdir)/../include
 $(PROGRAM): $(OBJECTS)
-$(PROGRAM): $(LDADD)
+$(PROGRAM): 
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LIBS)
+	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LDADD) $(LIBS)
 
 # include global make targets
 # ---------------------------------------------------------------------------

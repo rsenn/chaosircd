@@ -134,12 +134,12 @@ $(PARSERSRC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
 	$(YACC) -d -o $(srcdir)/y.tab.c $(PARSER)
 
-@STATIC_TRUE@$(PROGRAM): main.o $(LDADD)
-@STATIC_TRUE@	@$(ECHO_LD)
-@STATIC_TRUE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
-@SHARED_TRUE@$(PROGRAM): $(OBJECTS) $(LDADD)
-@SHARED_TRUE@	@$(ECHO_LD)
-@SHARED_TRUE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+@SHARED_FALSE@$(PROGRAM): main.o $(LDADD)
+@SHARED_FALSE@	@$(ECHO_LD)
+@SHARED_FALSE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+$(PROGRAM): $(OBJECTS) $(LDADD)
+	@$(ECHO_LD)
+	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
         
 $(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 $(A_LIBRARY): $(MODULES:%=%.o) $(LEXEROBJ) $(PARSEROBJ)

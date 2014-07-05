@@ -104,6 +104,7 @@ INCLUDES += -I$(thisdir) \
 
 CFLAGS += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
 
+$(A_LIBRARY): $(OBJECTS)
 $(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 
 # include global make targets
