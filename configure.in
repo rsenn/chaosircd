@@ -65,7 +65,7 @@ AC_SUBST([pidfile])
 
 case $prefix in
   *ircd*)
-    plugindir=${libdir}
+    plugindir=${libdir}/modules
     ;;
   *)
     plugindir=${libdir}/chaosircd
