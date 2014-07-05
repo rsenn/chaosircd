@@ -256,9 +256,9 @@ $(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
 
 # rule for libraries
 # ---------------------------------------------------------------------------
-$(A_LIBRARY): $(OBJECTS)
+$(A_LIBRARY): #$(OBJECTS)
 	@$(ECHO_AR)
-	@QUIET@$(AR) $(A_LIBRARY) $(OBJECTS)
+	@QUIET@$(AR) $(A_LIBRARY) $^
 	@$(ECHO_RANLIB)
 	@QUIET@$(RANLIB) $(A_LIBRARY)
 
