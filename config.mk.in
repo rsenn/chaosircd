@@ -100,7 +100,7 @@ DOXYGEN         = @DOXYGEN@
 
 # arguments for the programs
 # ---------------------------------------------------------------------------
-DEFS            = @DEFS@
+DEFS            = #@DEFS@
 LIBS            = @LIBS@
 CFLAGS          = @CFLAGS@
 LDFLAGS         = @LDFLAGS@
