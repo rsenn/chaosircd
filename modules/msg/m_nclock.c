@@ -124,7 +124,7 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
   {
     log(server_log, L_status, "Time synchronisation request from %s.", lcptr->name);
     
-    lclient_send(lcptr, "NCLOCK %llu %lli", clk, clk - timer_mtime - timer_offset);
+    lclient_send(lcptr, "NCLOCK %I64u %lli", clk, clk - timer_mtime - timer_offset);
     
     log(server_log, L_status, "Replying time delta %lli.", clk - timer_mtime - timer_offset);
   }
@@ -132,7 +132,7 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
   {
     lcptr->lag = timer_mtime + timer_offset - clk;
     
-    lclient_send(lcptr, "NCLOCK %llu %lli :%llu",
+    lclient_send(lcptr, "NCLOCK %I64u %lli :%I64u",
                  timer_mtime + timer_offset, lcptr->lag >> 1, timer_mtime + timer_offset + (lcptr->lag >> 1));
   }
   else if(argc == 5)
@@ -156,13 +156,13 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
     
     if(delta > 500LL || delta < -500LL)
     {
-      lclient_send(lcptr, "NCLOCK %llu %lli", clk, delta);
+      lclient_send(lcptr, "NCLOCK %I64u %lli", clk, delta);
     }
     else
     {
       if(lcptr->listen)
       {
-        lclient_send(lcptr, "NCLOCK :%llu", timer_mtime + timer_offset);
+        lclient_send(lcptr, "NCLOCK :%I64u", timer_mtime + timer_offset);
       }
       else
       {
@@ -183,7 +183,7 @@ static int ms_nclock_hook(struct lclient *lcptr, struct class  *clptr)
     {
       lcptr->class = clptr;
       
-      lclient_send(lcptr, "NCLOCK :%llu", timer_mtime + timer_offset);
+      lclient_send(lcptr, "NCLOCK :%I64u", timer_mtime + timer_offset);
     }
     
     return 1;

@@ -357,7 +357,7 @@ static void m_spoof_hook_burst(struct lclient *lcptr,
                                struct client  *acptr)
 {
   if(acptr->hhash != acptr->rhash)
-    lclient_send(lcptr, "SPOOF %C %llu :%s",
+    lclient_send(lcptr, "SPOOF %C %I64u :%s",
                  acptr, 0ULL, acptr->host);
 }
 
@@ -376,10 +376,10 @@ static void m_spoof_hook_local(struct client *cptr, struct user *uptr)
     cptr->hhash = mseptr->hash;
 
     server_send(NULL, NULL, CAP_UID, CAP_NONE,
-                ":%S SPOOF %s %llu :%s",
+                ":%S SPOOF %s %I64u :%s",
                 server_me, uptr->uid, mseptr->ts, cptr->host);
     server_send(NULL, NULL, CAP_NONE, CAP_UID,
-                ":%S SPOOF %s %llu :%s",
+                ":%S SPOOF %s %I64u :%s",
                 server_me, cptr->name, mseptr->ts, cptr->host);
     
     client_send(cptr, ":%S NOTICE %C :(m_spoof) spoofed your hostname to '%s'.", 
@@ -402,10 +402,10 @@ static void m_spoof_hook_remote(struct client *cptr, struct user *uptr)
     cptr->hhash = mseptr->hash;
     
     server_send(NULL, NULL, CAP_UID, CAP_NONE,
-                ":%S SPOOF %s %llu :%s",
+                ":%S SPOOF %s %I64u :%s",
                 server_me, uptr->uid, mseptr->ts, cptr->host);
     server_send(NULL, NULL, CAP_NONE, CAP_UID,
-                ":%S SPOOF %s %llu :%s",
+                ":%S SPOOF %s %I64u :%s",
                 server_me, cptr->name, mseptr->ts, cptr->host);
     
     m_spoof_delete(mseptr);
@@ -575,10 +575,10 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
               server_me, cptr, cptr->host);
   
   server_send(NULL, NULL, CAP_UID, CAP_NONE,
-              ":%S SPOOF %s %llu :%s",
+              ":%S SPOOF %s %I64u :%s",
               server_me, cptr->user->uid, mseptr->ts, host);
   server_send(NULL, NULL, CAP_NONE, CAP_UID,
-              ":%S SPOOF %s %llu :%s",
+              ":%S SPOOF %s %I64u :%s",
               server_me, cptr->name, mseptr->ts, host);
 }
 
@@ -616,10 +616,10 @@ static void ms_spoof(struct lclient *lcptr, struct client *cptr,
   ts = str_toull(argv[3], NULL, 10);
 
   server_send(lcptr, NULL, CAP_UID, CAP_NONE,
-              ":%C SPOOF %s %llu :%s",
+              ":%C SPOOF %s %I64u :%s",
               cptr, acptr->user->uid, ts, acptr->host);
   server_send(lcptr, NULL, CAP_NONE, CAP_UID,
-              ":%C SPOOF %s %llu :%s",
+              ":%C SPOOF %s %I64u :%s",
               cptr, acptr->name, ts, acptr->host);
   
   if(client_is_local(acptr))

@@ -907,7 +907,7 @@ struct timer *timer_start(void *callback, uint64_t interval, ...)
   timer->refcount = 1;
   
   /* Be verbose */
-  debug(timer_log, "New timer #%u: interval = %llu",
+  debug(timer_log, "New timer #%u: interval = %I64u",
         timer->id, timer->interval);
   
   return timer;
@@ -922,7 +922,7 @@ struct timer *timer_start(void *callback, uint64_t interval, ...)
 void timer_remove(struct timer *timer)
 {
   /* Be verbose */
-/*  debug(timer_log, "Cancelled timer #%u: interval = %llu",
+/*  debug(timer_log, "Cancelled timer #%u: interval = %I64u",
         timer->id, timer->interval);*/
   
   /* Remove from timer list */
@@ -959,7 +959,7 @@ struct timer *timer_find(void *callback, ...)
     {
       /* Be verbose */
       debug(timer_log, "Found timer: id = #%u, callback = %p, "
-                       "interval = %llu, deadline = %llu, "
+                       "interval = %I64u, deadline = %I64u, "
                        "args = [ %p, %p, %p, %p ]",
             timer->id, timer->callback, timer->interval, timer->deadline,
             timer->args[0], timer->args[1], timer->args[2], timer->args[3]);
@@ -1206,8 +1206,8 @@ void timer_dump(struct timer *tptr)
     dump(timer_log, "   callback: %p", tptr->callback);
     dump(timer_log, "       args: %p, %p, %p, %p",
          tptr->args[0], tptr->args[1], tptr->args[2], tptr->args[3]);
-    dump(timer_log, "   interval: %llu", tptr->interval);
-    dump(timer_log, "   deadline: %llu (%lli remaining)", tptr->deadline, tptr->deadline - timer_mtime);
+    dump(timer_log, "   interval: %I64u", tptr->interval);
+    dump(timer_log, "   deadline: %I64u (%lli remaining)", tptr->deadline, tptr->deadline - timer_mtime);
     
     dump(timer_log, "[=========== end of timer dump ===========]");
   }

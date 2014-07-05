@@ -702,7 +702,7 @@ int main() {
   off_t o=0;
   off_t r=sendfile(1,fd,&o,23);
   if (r!=-1)
-    printf("sent %llu bytes.\n",r);
+    printf("sent %I64u bytes.\n",r);
 }
 #endif
 ], [AC_HAVE_SENDFILE

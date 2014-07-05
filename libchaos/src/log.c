@@ -776,7 +776,7 @@ void log_source_dump(int id)
     dump(log_log, "[============== log source dump ===============]");
   
     dump(log_log, "         id: #%u", id);
-    dump(log_log, "       flag: %llu", log_sources[id].flag);
+    dump(log_log, "       flag: %I64u", log_sources[id].flag);
     dump(log_log, "       hash: %p", log_sources[id].hash);
     dump(log_log, "       name: %s", log_sources[id].name);
     

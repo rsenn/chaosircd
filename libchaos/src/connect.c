@@ -289,7 +289,7 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
     timer_note(cnptr->timer, "connect timer for %s", cnptr->name);
       
     /* Inform about the retry */
-    log(connect_log, CONNECT_LOGLEVEL, "Initiating connect to %s in %llu msecs.",
+    log(connect_log, CONNECT_LOGLEVEL, "Initiating connect to %s in %I64u msecs.",
         cnptr->name, cnptr->interval);
   }
   
@@ -592,7 +592,7 @@ int connect_retry(struct connect *cnptr)
     
     /* Inform about the retry */
     if(delta)
-      log(connect_log, CONNECT_LOGLEVEL, "Retrying connect to %s in %llu msecs.", 
+      log(connect_log, CONNECT_LOGLEVEL, "Retrying connect to %s in %I64u msecs.", 
           cnptr->name, delta);
     
     return 0;
@@ -905,9 +905,9 @@ void connect_dump(struct connect *cnptr)
           net_ntoa(cnptr->addr_remote), cnptr->port_remote);
     dump(connect_log, "      local: %s:%u", 
           net_ntoa(cnptr->addr_local), cnptr->port_local);
-    dump(connect_log, "      start: %llu", cnptr->start);
-    dump(connect_log, "    timeout: %llu", cnptr->timeout);
-    dump(connect_log, "   interval: %llu", cnptr->interval);
+    dump(connect_log, "      start: %I64u", cnptr->start);
+    dump(connect_log, "    timeout: %I64u", cnptr->timeout);
+    dump(connect_log, "   interval: %I64u", cnptr->interval);
     dump(connect_log, "   autoconn: %s", cnptr->autoconn ? "on" : "off");
     dump(connect_log, "        ssl: %s", cnptr->ssl ? "yes" : "no");
     dump(connect_log, "       args: %p", cnptr->args);

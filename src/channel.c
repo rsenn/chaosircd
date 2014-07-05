@@ -645,7 +645,7 @@ void channel_dump(struct channel *chptr)
     dump(channel_log, "       rchanusers: %u nodes", chptr->rchanusers.size);
     dump(channel_log, "          invites: %u nodes", chptr->rchanusers.size);
 /*    dump(channel_log, "         modelists: %u nodes", chptr->modelists.size);*/
-    dump(channel_log, "            modes: %llu", chptr->rchanusers.size);
+    dump(channel_log, "            modes: %I64u", chptr->rchanusers.size);
     dump(channel_log, "           serial: %u", chptr->rchanusers.size);
     dump(channel_log, "            topic: %s", chptr->topic);
     dump(channel_log, "       topic_info: %s", chptr->topic_info);

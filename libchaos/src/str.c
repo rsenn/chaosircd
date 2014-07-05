@@ -282,9 +282,10 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
         c = *f++;
       }
 
-      if(c == 'l')
+      if(c == 'I')
       {
-        longlev++;
+	if(*f++ == '6') longlev++;
+	if(isdigit(*f++)) longlev++;
         c = *f++;
       }
 

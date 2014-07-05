@@ -816,7 +816,7 @@ int server_ping(struct lclient *lcptr)
   }
   
   lcptr->ping = 0LLU;
-  lclient_send(lcptr, "PING :%llu", timer_mtime);
+  lclient_send(lcptr, "PING :%I64u", timer_mtime);
   
   return 0;
 }
@@ -1159,7 +1159,7 @@ void server_dump(struct server *sptr)
           sptr->connect ? sptr->connect->refcount : 0);
     dump(server_log, "      users: %u links", sptr->deps[CLIENT_USER].size);
     dump(server_log, "    servers: %u links", sptr->deps[CLIENT_SERVER].size);
-    dump(server_log, "     bstart: %llu msecs", sptr->bstart);
+    dump(server_log, "     bstart: %I64u msecs", sptr->bstart);
     dump(server_log, "       name: %s", sptr->name);
     
     dump(server_log, "[=========== end of server dump ===========]");
