@@ -4132,6 +4132,7 @@ fi
 
 
 
+  PIE_EXEEXT=$PIE_EXEEXT
 
 
 
