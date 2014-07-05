@@ -29,6 +29,7 @@ DSO                  = @DSO@
 @PIE_LIB@all: shobjects
 @PIE_LIB@install: install-pluginEXEC
 
+plugin_PREFIX = /usermode
 plugin_EXEC = $(SHOBJECTS)
 
 @NO_PIE_LIB@all: $(CATEGORY).a

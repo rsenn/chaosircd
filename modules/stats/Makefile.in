@@ -26,6 +26,7 @@ DSO                  = @DSO@
 @NO_PIE_LIB@all: $(CATEGORY).a
 @NO_PIE_LIB@install:
 
+plugin_PREFIX = /stats
 plugin_EXEC = $(SHOBJECTS)
 
 $(CATEGORY).a: $(OBJECTS)

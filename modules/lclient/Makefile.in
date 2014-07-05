@@ -23,6 +23,7 @@ DEPS                 = $(MODULES:%=%.d)
 SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
+plugin_PREFIX = /lclient
 plugin_EXEC = $(SHOBJECTS)
 
 @PIE_LIB@lib_EXEC = $(SHOBJECTS)

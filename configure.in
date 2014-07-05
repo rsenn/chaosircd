@@ -127,8 +127,8 @@ AC_ARG_WITH([rundir], [  --with-rundir=PATH   location of the runs [[LOCALSTATED
 AC_SUBST([rundir])
 AC_SUBST([relrundir])
 
-pidfile="$rundir/\$(PACKAGE_NAME).pid"
-relpidfile="$relrundir/\$(PACKAGE_NAME).pid"
+pidfile="$rundir/chaosircd.pid"
+relpidfile="$relrundir/chaosircd.pid"
 AC_SUBST([pidfile])
 AC_SUBST([relpidfile])
 

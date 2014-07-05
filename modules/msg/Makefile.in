@@ -81,6 +81,7 @@ SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
 plugin_EXEC = $(SHOBJECTS)
+plugin_PREFIX = /msg
 
 @PIE_TRUE@lib_EXEC = $(SHOBJECTS)
 @PIE_TRUE@all: shobjects

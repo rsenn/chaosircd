@@ -46,6 +46,7 @@ DEFS += -DPLUGINDIR=\"$(relplugindir)\"
 DEFS += -DINIDIR=\"$(relinidir)\" 
 DEFS += -DLOGDIR=\"$(rellogdir)\" 
 DEFS += -DRUNDIR=\"$(relrundir)\"
+DEFS += -DDLLEXT=\"$(PIE_LIBEXT)\"
 DEFS += -DPID=\"$(relrundir)/$(PACKAGE_NAME).pid\"
 
 INCLUDES             = -I$(top_srcdir)/include \
