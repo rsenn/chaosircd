@@ -82,7 +82,7 @@ shellcode.h: shellcode.o dumpcode
 ifneq ($(NASM),)
 dep: Makefile $(DEPS)
 
--include $(DEPS)
+@DEPS_TRUE@-include $(DEPS)
 endif
 
 include $(top_builddir)/build.mk

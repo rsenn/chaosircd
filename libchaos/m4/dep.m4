@@ -30,6 +30,7 @@ if test "$DEP" = "yes"; then
 else
   DEP_ENABLED="# "
 fi
+AM_CONDITIONAL([DEPS],[test "$DEP" = yes])
 AC_SUBST(DEP_ENABLED,[$DEP_ENABLED])
 AC_SUBST(DEP_DISABLED, [$DEP_DISABLED])
 AC_SUBST(DEP)])

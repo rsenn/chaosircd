@@ -47,7 +47,9 @@ DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
 DEVFILES             = CVS $(DISTFILES)
-                       
+
+DEFS += -DBUILD_MODULE
+
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
 @PIE_LIB@LIBS += -L$(top_builddir)/libchaos/src -lchaos
 
