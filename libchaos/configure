@@ -5615,6 +5615,8 @@ fi
 #fi
 
 DEFS='-DBUILD_CHAOS'
+test "$PIE_ENABLE" = yes && DEFS="$DEFS -DSTATIC_LIBCHAOS"
+
 
 
 

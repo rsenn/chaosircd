@@ -141,6 +141,8 @@ AC_SUBST([plugindir])
 
 dnl LDFLAGS="${LDFLAGS:+$LDFLAGS }-rdynamic"
 DEFS='-DBUILD_CHAOS'
+test "$PIE_ENABLE" != yes && DEFS="$DEFS -DSTATIC_LIBCHAOS"
+
 
 AC_SUBST([LDFLAGS])
 AC_SUBST([DEFS])
