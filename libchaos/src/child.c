@@ -739,8 +739,8 @@ void child_dump(struct child *cdptr)
          cdptr->channels[3][CHILD_PARENT][0], cdptr->channels[3][CHILD_PARENT][1]);
     dump(child_log, "  autostart: %s", cdptr->autostart ? "on" : "off");
     dump(child_log, "   exitcode: %i", cdptr->exitcode);
-    dump(child_log, "   interval: %I64u", cdptr->interval);
-    dump(child_log, "      start: %I64u", cdptr->start);
+    dump(child_log, "   interval: %llu", cdptr->interval);
+    dump(child_log, "      start: %llu", cdptr->start);
     dump(child_log, "       name: %s", cdptr->name);
     dump(child_log, "       path: %s", cdptr->path);
     dump(child_log, "       argv: %s", cdptr->argv);

@@ -284,7 +284,7 @@ char *numeric_replies[] = {
 /* 242 RPL_STATSUPTIME,*/       ":server up %s",
 /* 243 RPL_STATSOLINE, */       "%c %s@%s * %s %s %s %s",
 /* 244 RPL_STATSHLINE, */       "%c %s * %s %d %s",
-/* 245 RPL_STATSSLINE, */       "%c %s %I64u :%s",
+/* 245 RPL_STATSSLINE, */       "%c %s %llu :%s",
 /* 246 */       NULL,
 /* 247 RPL_STATSXLINE, */       "X %s %s * * 0 0",
 /* 248 RPL_STATSULINE, */       "U %s %s",

@@ -251,7 +251,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       register int  left    = 0;
       register int  padding = 0;
       register char pad     = ' ';
-      
+ again:
       c = *f++;
       
       /* a '-' and padding means left align */
@@ -279,7 +279,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 'l')
       {
         longlev++;
-        c = *f++;
+        goto again;
       }
 
       if(c == 'I')
