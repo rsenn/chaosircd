@@ -38,4 +38,4 @@ fu_cv_sys_mounted_getmnt=yes \
   --disable-silent-rules \
 	--disable-dependency-tracking \
 	--enable-shared \
-	"$@"
+	"$@" 2>&1
