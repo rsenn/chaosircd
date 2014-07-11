@@ -46,7 +46,7 @@ INCLUDES += -I$(top_srcdir)/include -I$(top_builddir)/include
 # ---------------------------------------------------------------------------
 %: %.c $(LDADD)
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) -o $@ $^ $(LIB)
+	@SILENT_RULES@$(COMPLINK) -o $@ $^ $(LIB)
 
 # include global make targets
 # ---------------------------------------------------------------------------

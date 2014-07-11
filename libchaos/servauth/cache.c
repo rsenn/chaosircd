@@ -36,7 +36,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-
 #ifdef __CYGWIN__
 #include <cygwin/in.h>
 #else

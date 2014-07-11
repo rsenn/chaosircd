@@ -55,7 +55,7 @@ if test "\$[1]" = "--srcdir"; then
   shift
 fi
 
-if test "\$[1]" = "--quiet"; then
+if test "\$[1]" = "--silent-rules"; then
   exec 1>/dev/null
   shift
 fi

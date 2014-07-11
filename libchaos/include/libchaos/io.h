@@ -41,6 +41,10 @@ struct io;
 #include <winsock2.h>
 #endif /* HAVE_WINSOCK2_H */
 
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif /* defined HAVE_SYS_SELECT_H */
+
 #ifdef HAVE_SSL
 #include "libchaos/ssl.h"
 #endif /* HAVE_SSL */
