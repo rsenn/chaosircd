@@ -91,12 +91,8 @@ static void m_ison(struct lclient *lcptr, struct client *cptr,
   size_t         n;
   size_t         i;
   int            first = 1;
-<<<<<<< HEAD
   
-=======
-
->>>>>>> github/mingw
-  len = str_snprintf(result, sizeof(result), ":%s 303 %s :",
+	len = str_snprintf(result, sizeof(result), ":%s 303 %s :",
                  client_me->name, cptr->name);
 
   n = str_tokenize(argv[2], av, 63);

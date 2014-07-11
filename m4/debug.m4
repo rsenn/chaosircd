@@ -13,8 +13,8 @@ AC_DEFUN([AC_CHECK_DEBUG],
 AC_MSG_CHECKING([whether to enable debugging mode])
 
 AC_ARG_ENABLE([debug],
-[  --enable-debug           debugging mode
-  --disable-debug          production mode (default)],
+[  --enable-debug                 debugging mode
+  --disable-debug                production mode (default)],
 [case "$enableval" in
   yes)
     ac_cv_debug="yes"

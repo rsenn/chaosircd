@@ -721,7 +721,7 @@ Try `$[0] --help' for more information.]);;
     $ac_shift
     CONFIG_HEADERS="$CONFIG_HEADERS $ac_optarg"
     ac_need_defaults=false;;
-  -q | -quiet | --quiet | --quie | --qui | --qu | --q \
+  -q | -silent-rules | --quiet | --quie | --qui | --qu | --q \
   | -silent | --silent | --silen | --sile | --sil | --si | --s)
     ac_cs_silent=: ;;
 

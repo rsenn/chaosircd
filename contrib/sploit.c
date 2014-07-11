@@ -222,15 +222,9 @@ void sploit_run(void)
   ssl_add("connect", SSL_CONTEXT_CLIENT,
           "/etc/chaosircd/ircd.crt", "/etc/chaosircd/ircd.key",
           "RSA+HIGH:RSA+MEDIUM:@STRENGTH");
-<<<<<<< HEAD
   
   sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto, 
                                30000ull, 0, 1, 0, "connect");
-=======
-
-  sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto,
-                               30000LLU, 0, 1, 0, "connect");
->>>>>>> github/mingw
 
   connect_start(sploit_connect);
 }

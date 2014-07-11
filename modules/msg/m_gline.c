@@ -318,13 +318,8 @@ static struct m_gline_entry *m_gline_new(const char *user, const char *host,
     filter_rule_insert(m_gline_filter,
                        FILTER_SRCNET, FILTER_DENY,
                        mgeptr->addr,
-<<<<<<< HEAD
                        mgeptr->mask, 0ull);
     
-=======
-                       mgeptr->mask, 0LLU);
-
->>>>>>> github/mingw
     filter_rule_compile(m_gline_filter);
 
     filter_reattach_all(m_gline_filter);
@@ -360,15 +355,9 @@ static struct m_gline_entry *m_gline_add(const char *user, const char *host,
   {
     struct ini_section *isptr;
     char                mask[IRCD_PREFIXLEN];
-<<<<<<< HEAD
     
     str_snprintf(mask, sizeof(mask), "%s@%s", user, host);
     
-=======
-
-    str_snprintf(mask, sizeof(mask), "%s@%s", user, host);
-
->>>>>>> github/mingw
     /* Maybe that g-line already exists, then just modify the section */
     if((isptr = ini_section_find(m_gline_ini, mask)) == NULL)
       isptr = ini_section_new(m_gline_ini, mask);

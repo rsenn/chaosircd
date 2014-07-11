@@ -623,11 +623,11 @@ ac_header_list=
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 PREFIX
-NO_MAINTAINER
-MAINTAINER
+NO_MAINTAINER_MODE
+MAINTAINER_MODE
 DEBUG
-DEP
-NODEP
+DEPENDENCY_TRACKING
+NO_DEPENDENCY_TRACKING
 DLFCN_LDADD
 plugindir
 ENDIAN
@@ -749,7 +749,7 @@ SILENT
 REDIR2
 REDIR
 MAKEFLAGS
-QUIET
+SILENT_RULES
 ECHO
 target_alias
 host_alias
@@ -792,7 +792,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-enable_quiet
+enable_silent_rules
 enable_color
 with_dietlibc
 enable_static
@@ -1429,8 +1429,8 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --disable-quiet         echo commands while compiling (automake style)
-  --enable-quiet          do not echo commands while compiling, print
+  --disable-silent-rules  echo commands while compiling (automake style)
+  --enable-silent-rules   do not echo commands while compiling, print
                           variable-like name of program used (linux style)
   --disable-color         black and white compiling
   --enable-color[=THEME]  colored compiling (default)
@@ -1441,12 +1441,12 @@ Optional Features:
     --disable-static   do not build static library
   --enable-shared    build shared library (default)
     --disable-shared   do not build shared library
-  --enable-dep             dependency tracking
-  --disable-dep            no dependency tracking (default)
+  --enable-dependency-tracking  dependency tracking
+  --disable-dependency-tracking no dependency tracking (default)
   --enable-debug           debugging mode
   --disable-debug          production mode (default)
-  --enable-maintainer      maintainer mode
-  --disable-maintainer     no maintainer mode (default)
+  --enable-maintainer-mode maintainer mode
+  --disable-maintainer-modeno maintainer mode (default)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2265,36 +2265,36 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable colored compiling" >&5
 $as_echo_n "checking whether to enable colored compiling... " >&6; }
 
-ac_cv_quiet="yes"
-# Check whether --enable-quiet was given.
-if test "${enable_quiet+set}" = set; then :
-  enableval=$enable_quiet; case "$enableval" in
+ac_cv_silent_rules="yes"
+# Check whether --enable-silent-rules was given.
+if test "${enable_silent_rules+set}" = set; then :
+  enableval=$enable_silent_rules; case "$enableval" in
   no)
-    ac_cv_quiet="no"
+    ac_cv_silent_rules="no"
     ;;
   *)
-    ac_cv_quiet="yes"
+    ac_cv_silent_rules="yes"
     ;;
 esac
 fi
 
-if test "$ac_cv_quiet" = "yes"; then
+if test "$ac_cv_silent_rules" = "yes"; then
 #  MAKEFLAGS=""
   MAKEFLAGS="-s"
-  QUIET="--quiet"
+  SILENT_RULES="--quiet"
   ECHO="echo"
   REDIR=">/dev/null"
   REDIR2="2>/dev/null"
-  QUIET="@"
+  SILENT_RULES="@"
   SILENT=""
   NOSILENT="#"
 else
   MAKEFLAGS=""
-  QUIET=""
+  SILENT_RULES=""
   ECHO="true"
   REDIR=""
   REDIR2=""
-  QUIET=""
+  SILENT_RULES=""
   SILENT="#"
   NOSILENT=""
 fi
@@ -2325,25 +2325,25 @@ fi
 
 if test "$COLOR" = "yes"
 then
-  DARK_GRAY="###ESCAPE###1;30m"       # dark gray
-  LIGHT_BLUE="###ESCAPE###1;34m"      # light blue
-  LIGHT_GREEN="###ESCAPE###1;32m"     # light green
-  LIGHT_CYAN="###ESCAPE###1;36m"      # light cyan
-  LIGHT_RED="###ESCAPE###1;31m"       # light red
-  LIGHT_PURPLE="###ESCAPE###1;35m"    # light purple
-  YELLOW="###ESCAPE###1;33m"          # yellow
-  WHITE="###ESCAPE###1;37m"           # white
+  DARK_GRAY="[1;30m"       # dark gray
+  LIGHT_BLUE="[1;34m"      # light blue
+  LIGHT_GREEN="[1;32m"     # light green
+  LIGHT_CYAN="[1;36m"      # light cyan
+  LIGHT_RED="[1;31m"       # light red
+  LIGHT_PURPLE="[1;35m"    # light purple
+  YELLOW="[1;33m"          # yellow
+  WHITE="[1;37m"           # white
 
-  BLACK="###ESCAPE###0;30m"           # black
-  BLUE="###ESCAPE###0;34m"            # blue
-  GREEN="###ESCAPE###0;32m"           # green
-  CYAN="###ESCAPE###0;36m"            # cyan
-  RED="###ESCAPE###0;31m"             # red
-  PURPLE="###ESCAPE###0;35m"          # purple
-  BROWN="###ESCAPE###0;33m"           # brown
-  GRAY="###ESCAPE###0;37m"            # gray
+  BLACK="[0;30m"           # black
+  BLUE="[0;34m"            # blue
+  GREEN="[0;32m"           # green
+  CYAN="[0;36m"            # cyan
+  RED="[0;31m"             # red
+  PURPLE="[0;35m"          # purple
+  BROWN="[0;33m"           # brown
+  GRAY="[0;37m"            # gray
 
-  NC="###ESCAPE###0m"
+  NC="[0m"
 
 
   case "$THEME" in
@@ -4525,7 +4525,7 @@ fi
 done
 
 
-for ac_header in fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h
+for ac_header in fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -5647,23 +5647,23 @@ $as_echo_n "checking whether to enable dependencies... " >&6; }
 if test "${enable_dep+set}" = set; then :
   enableval=$enable_dep; case $enableval in
   yes)
-    DEP="yes"
+    DEPENDENCY_TRACKING="yes"
     $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
     ;;
   *)
-    DEP="no"
+    DEPENDENCY_TRACKING="no"
     $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
     ;;
   esac
 else
-  DEP="no"
+  DEPENDENCY_TRACKING="no"
   $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
 fi
 
-if test "$DEP" = "yes"; then
-  NODEP=""
+if test "$DEPENDENCY_TRACKING" = "yes"; then
+  NO_DEPENDENCY_TRACKING=""
 else
-  NODEP="# "
+  NO_DEPENDENCY_TRACKING="# "
 fi
 
 
@@ -5706,7 +5706,7 @@ else
 fi
 
 
-ac_cv_maintainer="no"
+ac_cv_maintainer_mode="no"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer mode" >&5
 $as_echo_n "checking whether to enable maintainer mode... " >&6; }
@@ -5715,22 +5715,22 @@ $as_echo_n "checking whether to enable maintainer mode... " >&6; }
 if test "${enable_maintainer+set}" = set; then :
   enableval=$enable_maintainer; case "$enableval" in
   yes)
-    ac_cv_maintainer="yes"
+    ac_cv_maintainer_mode="yes"
     ;;
   no)
-    ac_cv_maintainer="no"
+    ac_cv_maintainer_mode="no"
     ;;
 esac
 fi
 
 
-if test "$ac_cv_maintainer" = "yes"; then
-  MAINTAINER=""
-  NO_MAINTAINER="#"
+if test "$ac_cv_maintainer_mode" = "yes"; then
+  MAINTAINER_MODE=""
+  NO_MAINTAINER_MODE="#"
   $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
 else
-  MAINTAINER="#"
-  NO_MAINTAINER=""
+  MAINTAINER_MODE="#"
+  NO_MAINTAINER_MODE=""
   $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
 fi
 

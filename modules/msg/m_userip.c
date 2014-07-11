@@ -90,12 +90,8 @@ static void m_userip(struct lclient *lcptr, struct client *cptr,
   size_t         n;
   size_t         i;
   int            first = 1;
-<<<<<<< HEAD
   
-=======
-
->>>>>>> github/mingw
-  len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
+	len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
                  client_me->name, cptr->name);
 
   n = str_tokenize(argv[2], av, 63);

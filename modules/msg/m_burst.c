@@ -119,15 +119,9 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
     uint64_t burst_time = (uint64_t)(timer_mtime - cptr->server->bstart);
     uint32_t burst_sendq = (uint32_t)str_toul(argv[2], NULL, 10);
 
-<<<<<<< HEAD
     if(burst_time == 0ull)
       burst_time = 1ull;
     
-=======
-    if(burst_time == 0LLU)
-      burst_time = 1LLU;
-
->>>>>>> github/mingw
     burst_servers = (uint32_t)str_toul(argv[3], NULL, 10);
     burst_clients = (uint32_t)str_toul(argv[4], NULL, 10);
     burst_channels = (uint32_t)str_toul(argv[5], NULL, 10);
