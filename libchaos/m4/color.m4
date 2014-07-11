@@ -253,7 +253,7 @@ esac])
 if test "$ac_cv_silent_rules" = "yes"; then
 #  MAKEFLAGS=""
   MAKEFLAGS="-s"
-  QUIET="--silent-rules"
+  #QUIET="--silent-rules"
   ECHO="echo"
   REDIR=">/dev/null"
   REDIR2="2>/dev/null"

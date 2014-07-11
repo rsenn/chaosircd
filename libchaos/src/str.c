@@ -285,7 +285,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 'I')
       {
 	if(*f++ == '6') longlev++;
-	if(isdigit(*f++)) longlev++;
+	if(str_isdigit(*f++)) longlev++;
         c = *f++;
       }
 
@@ -1152,8 +1152,10 @@ hash_t str_hash(const char *s)
   hash_t temp;
   hash_t i;
 
+#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
+#endif
   
   if(s == NULL)
     return ret;
@@ -1180,9 +1182,11 @@ hash_t str_ihash(const char *s)
   hash_t temp;
   hash_t i;
 
+#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
-  
+#endif
+
   if(s == NULL)
     return ret;
 

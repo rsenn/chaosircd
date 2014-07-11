@@ -18,3 +18,7 @@
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
+
+/* The size of `uintptr_t', as computed by sizeof. */                                                                                
+#undef SIZEOF_UINTPTR_T                                                                                                              
+

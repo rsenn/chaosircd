@@ -70,12 +70,12 @@ OBJEXT               = o
 HEADERS              = y.tab.h
 DEPS                 = $(MODULES:%=%.d)
 @SHARED_TRUE@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
-@DLM_FALSE@LDADD                = $(top_builddir)/modules/lclient/lclient.a \
-@DLM_FALSE@                       $(top_builddir)/modules/msg/msg.a \
-@DLM_FALSE@                       $(top_builddir)/modules/usermode/usermode.a \
-@DLM_FALSE@                       $(top_builddir)/modules/chanmode/chanmode.a \
-@DLM_FALSE@                       $(top_builddir)/modules/stats/stats.a \
-@DLM_FALSE@                       $(top_builddir)/modules/service/service.a
+@DLM_TRUE@LDADD                = $(top_builddir)/modules/lclient/lclient.a \
+@DLM_TRUE@                       $(top_builddir)/modules/msg/msg.a \
+@DLM_TRUE@                       $(top_builddir)/modules/usermode/usermode.a \
+@DLM_TRUE@                       $(top_builddir)/modules/chanmode/chanmode.a \
+@DLM_TRUE@                       $(top_builddir)/modules/stats/stats.a \
+@DLM_TRUE@                       $(top_builddir)/modules/service/service.a
 
 #@STATIC_TRUE@LDADD +=  $(A_LIBRARY)
 #@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a

@@ -46,8 +46,9 @@
 #include <signal.h>
 #include <time.h>
 #include <sys/time.h>
-
  */
+
+#define HASH_BIT_SIZE (SIZEOF_UINTPTR_T*8)
 
 typedef uintptr_t hash_t;
 
