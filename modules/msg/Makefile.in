@@ -83,7 +83,7 @@ DSO                  = @DSO@
 plugin_EXEC = $(SHOBJECTS)
 plugin_PREFIX = /msg
 
-@DLM_TRUE@lib_EXEC = $(SHOBJECTS)
+@DLM_TRUE@plugin_EXEC = $(SHOBJECTS)
 @DLM_TRUE@all: shobjects
 @DLM_TRUE@install: install-pluginEXEC
 
