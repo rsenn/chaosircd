@@ -290,5 +290,6 @@ AC_CONFIG_STATUS
 AC_SUMMARIZE([prefix bindir datadir includedir],
              [COLOR DEP DEBUG |
               CC CFLAGS LDFLAGS LIBS |
-              host build],
+              host build |
+							DLM_ENABLE PIE_ENABLE A_ENABLE],
              "%20s: %s")

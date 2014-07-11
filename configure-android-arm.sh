@@ -20,7 +20,7 @@ SSL_DIR=$NCURSES_DIR
 NCURSES_LIB_DIR=$NCURSES_DIR/lib
 NCURSES_INC_DIR=$NCURSES_DIR/include
 
-export CFLAGS="--sysroot "$SYSROOT" -I$NCURSES_INC_DIR -Os -fomit-frame-pointer"
+export CFLAGS="--sysroot "$SYSROOT" -I$NCURSES_INC_DIR -ggdb -O0"
 export LDFLAGS="--sysroot "$SYSROOT" -L$NCURSES_LIB_DIR"
 
 #export LDFLAGS="-L$ANDROID_ARM_TOOLCHAIN/sysroot/usr/lib -L$ANDROID_NDK_ROOT/platforms/android-16/arch-arm/usr/lib"
@@ -37,5 +37,5 @@ fu_cv_sys_mounted_getmnt=yes \
   --disable-color \
   --disable-silent-rules \
 	--disable-dependency-tracking \
-	--enable-shared \
+	--enable-debug \
 	"$@" 2>&1

@@ -56,14 +56,6 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
     *-linux*) LINUX='true' ;;
     *-freebsd*) FREEBSD='true' ;;
   esac
-        
-  #if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-  #  PIE_ENABLE=no
-  #fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
-    PIE_ENABLE=yes
-  fi
 
   # resolve automatic shit
   case $host in
@@ -80,10 +72,34 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       
     *)
       test "$PIE_ENABLE" = auto && PIE_ENABLE='yes'
-      test "$A_ENABLE" = auto && A_ENABLE='yes'
+			test "$PIE_ENABLE" = yes && A_ENABLE='no'
+			test "$A_ENABLE" = auto && A_ENABLE='yes'
       
       ;;
   esac
+
+  if test "$DLM_ENABLE" = auto -a "$PIE_ENABLE" = auto; then
+		if test "$A_ENABLE" != yes; then
+    	PIE_ENABLE=yes
+			DLM_ENABLE=yes
+		fi
+  fi
+
+  if test "$DLM_ENABLE" = yes -a "$PIE_ENABLE" != yes; then
+    PIE_ENABLE=yes
+  fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
+    PIE_ENABLE=no
+  fi
+
+  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
+    PIE_ENABLE=yes
+  fi
+
+  if test "$PIE_ENABLE" != no -a "$DLM_ENABLE" != no; then
+    DLM_ENABLE=yes
+  fi
 
   # do some checks for PIC/PIE
 
