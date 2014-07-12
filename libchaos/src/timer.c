@@ -599,7 +599,7 @@ static uint64_t timer_read_counter(void)
 
   QueryPerformanceCounter(&counter);
 
-  log(timer_log, L_status, "Timer performance counter: %I64d", (((uint64_t)counter.HighPart << 32) + counter.LowPart) / timer_freq);
+  log(timer_log, L_status, "Timer performance counter: %lld", (((uint64_t)counter.HighPart << 32) + counter.LowPart) / timer_freq);
 
   return (((uint64_t)counter.HighPart << 32) + counter.LowPart) /
     timer_freq;
@@ -620,7 +620,7 @@ static void timer_calc_offset(void)
 
   ft = (uint64_t)tb.time * 1000 + tb.millitm;
 
-  log(timer_log, L_status, "Timer ftime: %I64d", ft);
+  log(timer_log, L_status, "Timer ftime: %lld", ft);
 
   timer_offset = ft - timer_read_counter();
 }
@@ -653,10 +653,10 @@ void timer_init(void)
   LARGE_INTEGER freq;
   QueryPerformanceFrequency(&freq);
   timer_freq = (((uint64_t)freq.HighPart << 32) + freq.LowPart) / 1000LL;
-  log(timer_log, L_status, "Performance frequency: %I64d", timer_freq);
+  log(timer_log, L_status, "Performance frequency: %lld", timer_freq);
 
   timer_calc_offset();
-  log(timer_log, L_status, "Timer offset: %I64d", timer_offset);
+  log(timer_log, L_status, "Timer offset: %lld", timer_offset);
 #endif /* WIN32 */
 
   /* Update system time */
@@ -822,7 +822,7 @@ void timer_shift(int64_t delta)
       ((timer_shift_cb *)node->data)(delta);
   }
 
-  log(timer_log, L_verbose, "Shifting timers by %I64d milliseconds...",
+  log(timer_log, L_verbose, "Shifting timers by %lld milliseconds...",
       delta);
 }
 
@@ -856,7 +856,7 @@ void timer_drift(int64_t waited)
     if(drift < -TIMER_MAX_DRIFT || drift > TIMER_MAX_DRIFT)
     {
       log(timer_log, L_warning,
-          "Timer drifted %I64dmsecs, recalcing deadlines...", drift);
+          "Timer drifted %lldmsecs, recalcing deadlines...", drift);
 
       timer_shift(drift);
     }
@@ -907,7 +907,7 @@ struct timer *timer_start(void *callback, uint64_t interval, ...)
   timer->refcount = 1;
 
   /* Be verbose */
-  debug(timer_log, "New timer #%u: interval = %I64u",
+  debug(timer_log, "New timer #%u: interval = %lld",
         timer->id, timer->interval);
 
   return timer;
@@ -922,7 +922,7 @@ struct timer *timer_start(void *callback, uint64_t interval, ...)
 void timer_remove(struct timer *timer)
 {
   /* Be verbose */
-/*  debug(timer_log, "Cancelled timer #%u: interval = %I64u",
+/*  debug(timer_log, "Cancelled timer #%u: interval = %llu",
         timer->id, timer->interval);*/
 
   /* Remove from timer list */
@@ -959,7 +959,7 @@ struct timer *timer_find(void *callback, ...)
     {
       /* Be verbose */
       debug(timer_log, "Found timer: id = #%u, callback = %p, "
-                       "interval = %I64u, deadline = %I64u, "
+                       "interval = %llu, deadline = %llu, "
                        "args = [ %p, %p, %p, %p ]",
             timer->id, timer->callback, timer->interval, timer->deadline,
             timer->args[0], timer->args[1], timer->args[2], timer->args[3]);
@@ -1106,7 +1106,7 @@ int timer_run(void)
       if(delta >= TIMER_WARN_DELTA && delta <= -TIMER_WARN_DELTA)
       {
         debug(timer_log,
-              "Timer delta for timer #%u exceeded by %I64dmsecs",
+              "Timer delta for timer #%u exceeded by %lldmsecs",
               timer->id, delta);
       }
 
@@ -1206,8 +1206,8 @@ void timer_dump(struct timer *tptr)
     dump(timer_log, "   callback: %p", tptr->callback);
     dump(timer_log, "       args: %p, %p, %p, %p",
          tptr->args[0], tptr->args[1], tptr->args[2], tptr->args[3]);
-    dump(timer_log, "   interval: %I64u", tptr->interval);
-    dump(timer_log, "   deadline: %I64u (%I64d remaining)", tptr->deadline, tptr->deadline - timer_mtime);
+    dump(timer_log, "   interval: %llu", tptr->interval);
+    dump(timer_log, "   deadline: %llu (%lld remaining)", tptr->deadline, tptr->deadline - timer_mtime);
     
     dump(timer_log, "[=========== end of timer dump ===========]");
   }

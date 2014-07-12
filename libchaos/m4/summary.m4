@@ -42,6 +42,7 @@ AC_ADD_VAR([PIE_LDFLAGS],  [PIE linker flags])dnl
 AC_ADD_VAR([LIBS],     [Libraries])dnl
 AC_ADD_VAR([A_ENABLE],     [Build static library])dnl
 AC_ADD_VAR([PIE_ENABLE],   [Build shared library])dnl
+AC_ADD_VAR([DLM_ENABLE],   [Build loadable modules])dnl
 AC_ADD_VAR([SSL_CFLAGS],   [SSL includes])dnl
 AC_ADD_VAR([SSL_LIBS],     [SSL libs])dnl
 AC_ADD_VAR([FT2_CFLAGS],   [Freetype 2 includes])dnl

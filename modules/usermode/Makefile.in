@@ -25,7 +25,7 @@ DEPS                 = $(MODULES:%=%.d)
 SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
-@DLM_TRUE@lib_EXEC = $(SHOBJECTS)
+@DLM_TRUE@plugin_EXEC = $(SHOBJECTS)
 @DLM_TRUE@all: shobjects
 @DLM_TRUE@install: install-pluginEXEC
 

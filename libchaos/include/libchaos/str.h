@@ -48,8 +48,6 @@ typedef void (str_format_cb)(char   **pptr, size_t  *bptr,
                              size_t   n,    int      padding,
                              int      left, void    *arg);
 
-#define HASH_BIT_SIZE (sizeof(hash_t)*8)
-
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char)     str_hexchars[16];
@@ -516,8 +514,10 @@ CHAOS_INLINE hash_t str_hash(const char *s)
   hash_t temp;
   hash_t i;
 
+#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
+#endif 
   
   if(s == NULL)
     return ret;
@@ -548,9 +548,11 @@ CHAOS_INLINE hash_t str_ihash(const char *s)
   hash_t temp;
   hash_t i;
 
+#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
-  
+#endif 
+
   if(s == NULL)
     return ret;
 

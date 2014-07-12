@@ -17,7 +17,13 @@ int main()
  uint64_t t = time(NULL)  * 1000llu;
   str_snprintf(buffer, sizeof(buffer), "%i %T", 1337, &t);
 
-  log(LOG_ALL, L_status, "str_nprintf() result: %s", buffer);
+	log(LOG_ALL, L_status, "str_nprintf() result: %s", buffer);
+
+	int r = str_cmp("test", "test");
+	log(LOG_ALL, L_status, "str_cmp(test,test) result: %i", r);
+
+	int r2 = str_cmp("test", "blah");
+	log(LOG_ALL, L_status, "str_cmp(test,blah) result: %i", r2);
 
 
   timer_shutdown();

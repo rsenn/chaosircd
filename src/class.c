@@ -276,7 +276,7 @@ void class_dump(struct class *clptr)
     dump(class_log, "         refcount: %u", clptr->refcount);
     dump(class_log, "             hash: %p", clptr->hash);
     dump(class_log, "             name: %s", clptr->name);
-    dump(class_log, "        ping_freq: %I64u", clptr->ping_freq);
+    dump(class_log, "        ping_freq: %llu", clptr->ping_freq);
     dump(class_log, "      max_clients: %u", clptr->max_clients);
     dump(class_log, "   clients_per_ip: %u", clptr->clients_per_ip);
     dump(class_log, "            recvq: %u", clptr->recvq);

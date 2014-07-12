@@ -817,7 +817,7 @@ int ini_write_ulong_long(struct ini_section *section, const char *key, uint64_t 
 {
   char buf[64];
   
-  str_snprintf(buf, 64, "%I64u", u);
+  str_snprintf(buf, 64, "%llu", u);
   
   return ini_write_str(section, key, buf);  
 }
