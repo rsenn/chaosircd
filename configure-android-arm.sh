@@ -3,7 +3,10 @@
 IFS=$'\n \t\r\v'
 
 if [ ! -e configure -o ! -e src/config.h.in ]; then
-	aclocal -I libchaos/m4
+     case "$PWD" in
+       */libchaos) aclocal -I m4 ;;
+       *) aclocal -I libchaos/m4 ;;
+     esac
 	autoheader
 	autoconf
 #	autoreconf --force --verbose
@@ -45,9 +48,9 @@ fu_cv_sys_mounted_getmnt=yes \
 	--build=`gcc -dumpmachine` \
 	--host=`$CC -dumpmachine` \
 	--prefix=/system \
-  --disable-color \
-  --disable-silent-rules \
-	--disable-dependency-tracking \
+	--with-mysql=no \
+	--disable-color \
+	--disable-silent-rules \
 	--enable-debug \
-	--without-mysql \
+	--disable-dependency-tracking \
 	"$@" 2>&1
