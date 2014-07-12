@@ -264,7 +264,6 @@ contrib/debian/Makefile
 doc/Makefile
 include/Makefile
 include/chaosircd/Makefile
-m4/Makefile
 modules/Makefile
 modules/chanmode/Makefile
 modules/lclient/Makefile
