@@ -3,7 +3,7 @@
 IFS=$'\n \t\r\v'
 
 if [ ! -e configure -o ! -e src/config.h.in ]; then
-	aclocal -I . 
+	aclocal -I libchaos/m4
 	autoheader
 	autoconf
 #	autoreconf --force --verbose
