@@ -48,7 +48,7 @@ static char *m_geolocation_help[] = {
 };
 
 static struct msg m_geolocation_msg = {
-  "GEOLOCATION", 1, 0, MFLG_CLIENT|MFLG_SERVER,
+  "GEOLOCATION", 1, 0, MFLG_CLIENT,
   { NULL, m_geolocation, ms_geolocation, m_geolocation },
   m_geolocation_help
 };
