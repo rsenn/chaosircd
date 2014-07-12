@@ -5,23 +5,30 @@ if [ ! -e configure -o ! -e src/config.h.in ]; then
 #	autoreconf --force --verbose
 fi
 
-ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
+ANDROID_ARM_TOOLCHAIN=F:/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64
 
-CC=arm-linux-androideabi-gcc
+type cygpath &&
+  ANDROID_ARM_TOOLCHAIN=`cygpath "$ANDROID_ARM_TOOLCHAIN"`
+
+
+export CC=arm-linux-androideabi-gcc
 #WFLAGS="-Wall -Wno-uninitialized -Wno-unused -Wno-unused-parameter -Wno-sign-compare"
 
 PATH="$ANDROID_ARM_TOOLCHAIN/bin:$PATH"
 
 SYSROOT=$ANDROID_NDK_ROOT/platforms/android-16/arch-arm
 
-NCURSES_DIR=/opt/arm-linux-androideabi-4.8/sysroot/usr
-SSL_DIR=$NCURSES_DIR
 
-NCURSES_LIB_DIR=$NCURSES_DIR/lib
-NCURSES_INC_DIR=$NCURSES_DIR/include
 
-export CFLAGS="--sysroot "$SYSROOT" -I$NCURSES_INC_DIR -ggdb -O0"
-export LDFLAGS="--sysroot "$SYSROOT" -L$NCURSES_LIB_DIR"
+SSL_DIR=v:/home/roman/Sources/openssl-1.0.2-beta1-android-arm7/system
+type cygpath &&
+  SSL_DIR=`cygpath -m "$SSL_DIR"`
+
+SSL_LIB_DIR=$SSL_DIR/lib
+SSL_INC_DIR=$SSL_DIR/include
+
+export CFLAGS="--sysroot "$SYSROOT" -I$SSL_INC_DIR -ggdb -O0"
+export LDFLAGS="--sysroot "$SYSROOT" -L$SSL_LIB_DIR"
 
 #export LDFLAGS="-L$ANDROID_ARM_TOOLCHAIN/sysroot/usr/lib -L$ANDROID_NDK_ROOT/platforms/android-16/arch-arm/usr/lib"
 #CPPFLAGS="-I$ANDROID_ARM_TOOLCHAIN/sysroot/usr/include -I$ANDROID_NDK_ROOT/platforms/android-16/arch-arm/usr/include $WFLAGS"
