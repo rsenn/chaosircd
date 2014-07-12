@@ -14,15 +14,15 @@ ANDROID_ARM_TOOLCHAIN=F:/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/pr
 type cygpath &&
   ANDROID_ARM_TOOLCHAIN=`cygpath "$ANDROID_ARM_TOOLCHAIN"`
 
-
-export CC=arm-linux-androideabi-gcc
+export CC="arm-linux-androideabi-gcc"
 #WFLAGS="-Wall -Wno-uninitialized -Wno-unused -Wno-unused-parameter -Wno-sign-compare"
 
 PATH="$ANDROID_ARM_TOOLCHAIN/bin:$PATH"
 
 SYSROOT=$ANDROID_NDK_ROOT/platforms/android-16/arch-arm
 
-
+type cygpath &&
+  SYSROOT=`cygpath -m "$SYSROOT"`
 
 SSL_DIR=v:/home/roman/Sources/openssl-1.0.2-beta1-android-arm7/system
 type cygpath &&
