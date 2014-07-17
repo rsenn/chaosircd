@@ -62,20 +62,20 @@
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int            timer_log;
-struct sheap   timer_heap;
-struct timer  *timer_timer;
-struct list    timer_list;
-int            timer_dirty;
-uint32_t       timer_id;
-uint32_t       timer_systime = 0;        /* real unixtime */
-uint32_t       timer_loctime = 0;        /* system time after timezone conversion */
-uint64_t       timer_otime   = 0ull;     /* old unixtime in miliseconds */
-uint64_t       timer_mtime   = 0ull;     /* unixtime in miliseconds */
-int64_t        timer_offset  = 0ll;
-struct timeval timer_utime   = { 0, 0 }; /* unixtime in microseconds */
-struct tm      timer_dtime;              /* daytime */
-struct list    timer_shifts;
+CHAOS_DATA_DECL(int)            timer_log;
+CHAOS_DATA_DECL(struct sheap)   timer_heap;
+CHAOS_DATA_DECL(struct timer*)  timer_timer;
+CHAOS_DATA_DECL(struct list)    timer_list;
+CHAOS_DATA_DECL(int)           timer_dirty;
+CHAOS_DATA_DECL(uint32_t)       timer_id;
+CHAOS_DATA_DECL(uint32_t)       timer_systime = 0;        /* real unixtime */
+CHAOS_DATA_DECL(uint32_t)       timer_loctime = 0;        /* system time after timezone conversion */
+CHAOS_DATA_DECL(uint64_t)       timer_otime   = 0ull;     /* old unixtime in miliseconds */
+CHAOS_DATA_DECL(uint64_t)       timer_mtime   = 0ull;     /* unixtime in miliseconds */
+CHAOS_DATA_DECL(int64_t)        timer_offset  = 0ll;
+CHAOS_DATA_DECL(struct timeval) timer_utime   = { 0, 0 }; /* unixtime in microseconds */
+CHAOS_DATA_DECL(struct tm)      timer_dtime;              /* daytime */
+CHAOS_DATA_DECL(struct list)    timer_shifts;
 
 /* ------------------------------------------------------------------------ */
 int timer_get_log() { return timer_log; }

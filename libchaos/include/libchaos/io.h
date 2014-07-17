@@ -24,6 +24,7 @@
 #define LIB_IO_H
 
 #include <stdarg.h>
+#include <sys/stat.h>
 
 /* ------------------------------------------------------------------------ *
  * Forward declarations                                                     *

@@ -149,7 +149,7 @@ void mem_fatal(void)
 /* ------------------------------------------------------------------------ *
  * Allocates a block                                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(void *mem_block_alloc(size_t size))
+static void *mem_block_alloc(size_t size)
 {
   void *ptr;
 
@@ -188,7 +188,7 @@ CHAOS_INLINE_FN(void *mem_block_alloc(size_t size))
 /* ------------------------------------------------------------------------ *
  * Frees a previously allocated block                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(void mem_block_free(void *ptr, size_t size))
+static void mem_block_free(void *ptr, size_t size)
 {
 #ifdef HAVE_MMAP
 # ifdef SAFETY_MARGIN

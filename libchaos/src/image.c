@@ -63,7 +63,7 @@ int                image_dirty;
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(int image_bit_size(int n)
+static int image_bit_size(int n)
 {
   int i;
 
@@ -74,7 +74,7 @@ CHAOS_INLINE_FN(int image_bit_size(int n)
   }
 
   return i;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Initialize image heap and add garbage collect timer.                     *

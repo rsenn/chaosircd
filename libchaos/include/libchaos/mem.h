@@ -152,13 +152,13 @@ struct dheap {
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)          mem_log;       /* Log source */
-CHAOS_API(struct dheap) mem_dheap;     /* Dynamic heap for malloc() and consorts */
-CHAOS_API(struct list)  mem_slist;
-CHAOS_API(struct list)  mem_dlist;
-CHAOS_API(uint32_t)     mem_id;
+CHAOS_DATA(int)          mem_log;       /* Log source */
+CHAOS_DATA(struct dheap) mem_dheap;     /* Dynamic heap for malloc() and consorts */
+CHAOS_DATA(struct list)  mem_slist;
+CHAOS_DATA(struct list)  mem_dlist;
+CHAOS_DATA(uint32_t)     mem_id;
 #ifndef MAP_ANON
-CHAOS_API(int)          mem_zero;      /* /dev/zero if we havent MAP_ANON */
+CHAOS_DATA(int)          mem_zero;      /* /dev/zero if we havent MAP_ANON */
 #endif /* MAP_ANON */
 
 /* ------------------------------------------------------------------------ */

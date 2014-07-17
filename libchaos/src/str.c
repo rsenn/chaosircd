@@ -82,7 +82,7 @@ void str_unregister(char c)
 /* ------------------------------------------------------------------------ *
  * Convert long long (signed 64bit) to string                               *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(size_t str_lltoa(char *s, int64_t ll))
+size_t str_lltoa(char *s, int64_t ll)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -112,7 +112,7 @@ CHAOS_INLINE_FN(size_t str_lltoa(char *s, int64_t ll))
 /* ------------------------------------------------------------------------ *
  * Convert unsigned long long (unsigned 64bit) to string                    *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(size_t str_llutoa(char *s, uint64_t llu))
+size_t str_llutoa(char *s, uint64_t llu)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -136,7 +136,7 @@ CHAOS_INLINE_FN(size_t str_llutoa(char *s, uint64_t llu))
 /* ------------------------------------------------------------------------ *
  * Convert long (signed 32bit) to string                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(size_t str_ltoa(char *s, long l))
+size_t str_ltoa(char *s, long l)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -166,7 +166,7 @@ CHAOS_INLINE_FN(size_t str_ltoa(char *s, long l))
 /* ------------------------------------------------------------------------ *
  * Convert unsigned long (unsigned 32bit) to string                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(size_t str_lutoa(char *s, unsigned long l))
+size_t str_lutoa(char *s, unsigned long l)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -190,7 +190,7 @@ CHAOS_INLINE_FN(size_t str_lutoa(char *s, unsigned long l))
 /* ------------------------------------------------------------------------ *
  * Converts a pointer to a hex string. returns length of the string         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(unsigned int str_ptoa(char *buf, void *i))
+unsigned int str_ptoa(char *buf, void *i)
 {
   register char *p = buf;
   register int n = 0; /* buffer index */
@@ -696,8 +696,8 @@ size_t str_copy(char *d, const char *s)
  * Copy string from <s> to <d>. Write max <n> bytes to <d> and always       *
  * null-terminate it. Returns new string length of <d>.                     *
  * ------------------------------------------------------------------------ */
-#if !defined(HAVE_STRLCPY) && defined(NO_C99)
-size_t strlcpy(char *d, const char *s, size_t n)
+#if !defined(HAVE_STRLCPY) //&& defined(NO_C99)
+CHAOS_INLINE_IMPL(size_t strlcpy(char *d, const char *s, size_t n)
 {
   size_t i = 0;
 
@@ -718,15 +718,15 @@ size_t strlcpy(char *d, const char *s, size_t n)
   d[i] = '\0';
 
   return i;
-}
+})
 #endif
 
 /* ------------------------------------------------------------------------ *
  * Append string <src> to <dst>. Don't let <dst> be bigger than <siz> bytes *
  * and always null-terminate. Returns new string length of <dst>            *
  * ------------------------------------------------------------------------ */
-#if !defined(HAVE_STRLCAT) && defined(NO_C99)
-size_t strlcat(char *d, const char *s, size_t n)
+#if !defined(HAVE_STRLCAT) //&& defined(NO_C99)
+CHAOS_INLINE_IMPL(size_t strlcat(char *d, const char *s, size_t n)
 {
   size_t i = 0;
 
@@ -760,14 +760,13 @@ size_t strlcat(char *d, const char *s, size_t n)
   }
 
   return i;
-}
+})
 #endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
-int str_cmp(const char *s1, const char *s2)
+CHAOS_INLINE_IMPL(int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
 
@@ -781,14 +780,12 @@ int str_cmp(const char *s1, const char *s2)
 
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
-}
-#endif
+})
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
-int str_icmp(const char *s1, const char *s2)
+CHAOS_INLINE_IMPL(int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
 
@@ -802,14 +799,12 @@ int str_icmp(const char *s1, const char *s2)
 
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
-}
-#endif
+})
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
-int str_ncmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_IMPL(int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
 
@@ -826,13 +821,12 @@ int str_ncmp(const char *s1, const char *s2, size_t n)
 
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
-}
-#endif
+})
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-int str_nicmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_IMPL(int str_nicmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
 
@@ -849,13 +843,12 @@ int str_nicmp(const char *s1, const char *s2, size_t n)
 
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
-int str_snprintf(char *str, size_t n, const char *format, ...)
+CHAOS_INLINE_IMPL(int str_snprintf(char *str, size_t n, const char *format, ...)
 {
   int ret;
 
@@ -868,8 +861,7 @@ int str_snprintf(char *str, size_t n, const char *format, ...)
   va_end(args);
 
   return ret;
-}
-#endif
+})
 
 int str_sprintf(char *str, const char *format, ...)
 {

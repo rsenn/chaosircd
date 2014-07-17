@@ -138,6 +138,41 @@ static unsigned int i2a(char *dest, unsigned int x)
   return s - bak + 1;
 }*/
 
+
+/* ------------------------------------------------------------------------ *
+ * Convert a short from host to network byteorder                              *
+ * ------------------------------------------------------------------------ */
+CHAOS_INLINE_IMPL(net_port_t net_htons(uint16_t n)
+{
+  union {
+    uint8_t c[2];
+    uint16_t i;
+  } u;
+
+  u.c[0] = (n >> 8) & 0xff;
+  u.c[1] =  n       & 0xff;
+
+  return u.i;
+})
+
+/* ------------------------------------------------------------------------ *
+ * Convert a long from host to network byteorder                              *
+ * ------------------------------------------------------------------------ */
+CHAOS_INLINE_IMPL(net_addr_t net_htonl(uint32_t n)
+{
+  union {
+    uint8_t c[4];
+    uint32_t i;
+  } u;
+
+  u.c[0] = (n >> 24) & 0xff;
+  u.c[1] = (n >> 16) & 0xff;
+  u.c[2] = (n >>  8) & 0xff;
+  u.c[3] =  n        & 0xff;
+
+  return u.i;
+})
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 char *net_ntoa_r(net_addr_t in, char *buf)

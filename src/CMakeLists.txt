@@ -27,10 +27,11 @@ ${BISON_IRCD_PARSER_OUTPUTS}
    "${CMAKE_SOURCE_DIR}/include/chaosircd/numeric.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/oper.h"
    "${CMAKE_SOURCE_DIR}/include/chaosircd/server.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/service.h"
    "${CMAKE_SOURCE_DIR}/include/chaosircd/user.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/usermode.h") 
-
+link_directories("${CMAKE_BINARY_DIR}/../libchaos/src")
 if(WIN32)
 
 add_library(ircd SHARED ${SOURCES})
+ set_target_properties(ircd PROPERTIES PREFIX "")
 target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
 add_executable(chaosircd main.c "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/config.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h")

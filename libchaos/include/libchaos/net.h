@@ -119,7 +119,7 @@ CHAOS_API(int) net_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Convert a short from host to network byteorder                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(net_port_t net_htons(uint16_t n)
+CHAOS_INLINE_FN(net_port_t net_htons(uint16_t n))
 {
   union {
     uint8_t c[2];
@@ -130,12 +130,12 @@ CHAOS_INLINE_FN(net_port_t net_htons(uint16_t n)
   u.c[1] =  n       & 0xff;
 
   return u.i;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Convert a short from network to host byteorder                             *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(uint16_t net_ntohs(net_port_t n)
+CHAOS_INLINE_FN(uint16_t net_ntohs(net_port_t n))
 {
   union {
     uint16_t i;
@@ -146,12 +146,12 @@ CHAOS_INLINE_FN(uint16_t net_ntohs(net_port_t n)
 
 
   return ((uint16_t)(u.c[0] << 8)) | ((uint16_t)u.c[1]);
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Convert a long from host to network byteorder                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(net_addr_t net_htonl(uint32_t n)
+CHAOS_INLINE_FN(net_addr_t net_htonl(uint32_t n))
 {
   union {
     uint8_t c[4];
@@ -164,12 +164,12 @@ CHAOS_INLINE_FN(net_addr_t net_htonl(uint32_t n)
   u.c[3] =  n        & 0xff;
 
   return u.i;
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Convert a long from network to host byteorder                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(uint32_t net_ntohl(net_addr_t n)
+CHAOS_INLINE_FN(uint32_t net_ntohl(net_addr_t n))
 {
   union {
     uint32_t i;
@@ -182,7 +182,7 @@ CHAOS_INLINE_FN(uint32_t net_ntohl(net_addr_t n)
          (u.c[1] << 16) |
          (u.c[2] <<  8) |
           u.c[3];
-});
+}
 
 /* ------------------------------------------------------------------------ *
  * Convert from network address to string (re-entrant). (AF_INET)             *
