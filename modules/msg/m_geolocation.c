@@ -275,7 +275,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
          }
          dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), " %N!%U", user->client, user->client);
 
-         if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
+         if(lclient_is_oper(lcptr)) // && cptr->user->name[0] == '~')
            lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
 
          count++;
@@ -286,7 +286,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
 
      client_send(cptr, ":%S 601 %s %u :end of /GEOLOCATION query", server_me, argv[3], count);
 
-     if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
+     if(lclient_is_oper(lcptr)) // && cptr->user->name[0] == '~')
        lclient_send(lcptr, ":%S NOTICE %N :--- end of /geolocation (%d replies)", server_me, cptr, count);
   }
 }

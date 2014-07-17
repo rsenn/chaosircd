@@ -75,7 +75,7 @@ ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
 # $ag_aclocal --acdir=m4
 #  cat $ag_srcdir/m4/*.m4 > $ag_srcdir/aclocal.m4
  rm -f aclocal.m4
- $ag_aclocal -I m4
+ $ag_aclocal -I $(ls -d m4 libchaos/m4 2>/dev/null)
  if test "$ag_headers"; then
    set -x
    $ag_autoheader
