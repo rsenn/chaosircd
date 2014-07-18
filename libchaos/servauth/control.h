@@ -23,6 +23,7 @@
 #define SERVAUTH_CONTROL_H
 
 #include <libchaos/queue.h>
+#include <sys/select.h>
 
 typedef struct control {
   int        recvfd;
