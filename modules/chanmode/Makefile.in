@@ -66,7 +66,9 @@ DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
 DEVFILES             = CVS $(DISTFILES)
-                       
+
+@DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
+
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
 @SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 

@@ -62,15 +62,17 @@ PARSERINC            = $(srcdir)/y.tab.h
 PARSEROBJ            = y.tab.o
 SOURCES              = $(MODULES:%=%.c) $(LEXERSRC) $(PARSERSRC)
 @WIN32_FALSE@OBJECTS              = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
-@WIN32_TRUE@OBJECTS              = main.o
-@WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
+@DLM_TRUE@@WIN32_TRUE@OBJECTS              = main.o
+@DLM_TRUE@@WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
+@DLM_FALSE@@WIN32_TRUE@OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @WIN32_TRUE@LIBNAME              = ircd
 PIE_DEF              = ircd.def
 OBJEXT               = o
 HEADERS              = y.tab.h
 DEPS                 = $(MODULES:%=%.d)
 @SHARED_TRUE@LDADD                = $(top_builddir)/lib/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
-@DLM_FALSE@LDADD                = $(top_builddir)/modules/lclient/lclient.a \
+
+@DLM_FALSE@LDADD += $(top_builddir)/modules/lclient/lclient.a \
 @DLM_FALSE@                       $(top_builddir)/modules/msg/msg.a \
 @DLM_FALSE@                       $(top_builddir)/modules/usermode/usermode.a \
 @DLM_FALSE@                       $(top_builddir)/modules/chanmode/chanmode.a \
@@ -88,8 +90,11 @@ DEPS                 = $(MODULES:%=%.d)
 @SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
 @DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.dll
 
+@DLM_FALSE@LIBPRE += -Wl,--whole-archive
+@DLM_FALSE@LIBPOST += -Wl,--no-whole-archive
+
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
-                       $(OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
+                       $(OBJECTS) $(PIC_OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 
@@ -99,7 +104,7 @@ DEVFILES             = CVS $(FILES)
 
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 main.o: CPPFLAGS += -DBUILD_MAIN=1
-#@STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
+@STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 
 @SSL_STATIC_FALSE@LIBS += $(SSL_LIBS) -ldl
 @SSL_STATIC_TRUE@LDADD += $(SSL_LIBS)
@@ -140,7 +145,7 @@ $(PARSERSRC): $(srcdir)/ircd.y
 @SHARED_FALSE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
 $(PROGRAM): $(OBJECTS) $(LDADD)
 	@$(ECHO_LD)
-	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(LINK) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBPRE) $(LDADD) $(LIBS) $(LIBPOST)
         
 $(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 $(A_LIBRARY): $(MODULES:%=%.o) $(LEXEROBJ) $(PARSEROBJ)

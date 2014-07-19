@@ -105,7 +105,16 @@ dnl   fi
 #    fi
 #  fi
 
+  if test "$DLM_ENABLE" = auto; then
+    if test "$A_ENABLE" = yes -o "$PIE_ENABLE" = no; then
+      DLM_ENABLE=no
+    elif test "$A_ENABLE" = no -o "$PIE_ENABLE" = yes; then
+      DLM_ENABLE=yes
+    fi
+  fi
+
   # do some checks for PIC/PIE
+        PIC_OBJEXT='o'
 
   # PIC compiling and PIE linking is host dependant
   case $host in
@@ -145,21 +154,21 @@ dnl   fi
       ;;
 
     *mingw32*|*cygwin*)
+        PIC_OBJEXT='pio'
+        PIC_DEPEXT='d'
+        PIE_LIBEXT='dll'
       if test "$PIE_ENABLE" = "yes" -o "$DLM_ENABLE" = yes; then    
         PIC_CFLAGS=''
-        PIC_OBJEXT='o'
-        PIC_DEPEXT='d'
         PIC='#'
         PIE_NAME='$(LIBNAME:lib%=%)'
         PIE_LINK='$(CC)'
         PIE_LDFLAGS='-shared'
-        PIE_LIBEXT='dll'
         PIE_LIBDIR='$(bindir)'
-        case $host in
-          *cygwin*) PIE_PREPEND=cyg ;;
-          *) PIE_PREPEND=lib ;;
-          esac
       fi
+       case $host in
+         *cygwin*) PIE_PREPEND=cyg ;;
+         *) PIE_PREPEND=lib ;;
+        esac
       
       case "$PIE_ENABLE,$A_ENABLE" in
         yes,yes)
