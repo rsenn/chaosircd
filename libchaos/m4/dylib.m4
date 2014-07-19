@@ -1,12 +1,12 @@
-# $Id: dylib.m4,v 1.2 2006/09/27 12:19:12 roman Exp $
-# ===========================================================================
-#
-# Configures dynamic linking
-#
-# Copyleft GPL (c) 2005 by Roman Senn <smoli@paranoya.ch>
+dnl  $Id: dylib.m4,v 1.2 2006/09/27 12:19:12 roman Exp $
+dnl  ===========================================================================
+dnl 
+dnl  Configures dynamic linking
+dnl 
+dnl  Copyleft GPL (c) 2005 by Roman Senn <smoli@paranoya.ch>
 
-# check for OpenSSL
-# ------------------------------------------------------------------
+dnl  check for OpenSSL
+dnl  ------------------------------------------------------------------
 AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # both are enabled by default 
@@ -71,35 +71,40 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
       ;;
       
     *)
-      test "$PIE_ENABLE" = auto && PIE_ENABLE='yes'
-			test "$PIE_ENABLE" = yes && A_ENABLE='no'
-			test "$A_ENABLE" = auto && A_ENABLE='yes'
-      
+      if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = auto; then
+        A_ENABLE=yes
+        PIE_ENABLE=no
+        DLM_ENABLE=yes
+      fi
       ;;
   esac
 
-  if test "$DLM_ENABLE" = auto -a "$PIE_ENABLE" = auto; then
-		if test "$A_ENABLE" != yes; then
-    	PIE_ENABLE=yes
-			DLM_ENABLE=yes
-		fi
-  fi
+dnl   if test "$DLM_ENABLE" = auto -a "$PIE_ENABLE" = auto; then
+dnl 		if test "$A_ENABLE" != yes; then
+dnl     	PIE_ENABLE=yes
+dnl 			DLM_ENABLE=yes
+dnl 		fi
+dnl   fi
+dnl 
+dnl   if test "$DLM_ENABLE" = yes -a "$PIE_ENABLE" != yes; then
+dnl     PIE_ENABLE=yes
+dnl   fi
 
-  if test "$DLM_ENABLE" = yes -a "$PIE_ENABLE" != yes; then
-    PIE_ENABLE=yes
-  fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-    PIE_ENABLE=no
-  fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
-    PIE_ENABLE=yes
-  fi
-
-  if test "$PIE_ENABLE" != no -a "$DLM_ENABLE" != no; then
-    DLM_ENABLE=yes
-  fi
+#  if test "$PIE_ENABLE" = auto; then
+#    if test "$A_ENABLE" = yes; then
+#        PIE_ENABLE=no
+#    elif test "$A_ENABLE" = no; then
+#        PIE_ENABLE_=yes
+#    fi
+#  fi
+#
+#  if test "$A_ENABLE" = auto; then
+#    if test "$PIE_ENABLE" = yes; then
+#        A_ENABLE=no
+#    elif test "$PIE_ENABLE" = no; then
+#        A_ENABLE_=yes
+#    fi
+#  fi
 
   # do some checks for PIC/PIE
 

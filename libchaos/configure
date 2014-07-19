@@ -4097,35 +4097,30 @@ fi
       ;;
 
     *)
-      test "$PIE_ENABLE" = auto && PIE_ENABLE='yes'
-			test "$PIE_ENABLE" = yes && A_ENABLE='no'
-			test "$A_ENABLE" = auto && A_ENABLE='yes'
-
+      if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = auto; then
+        A_ENABLE=yes
+        PIE_ENABLE=no
+        DLM_ENABLE=yes
+      fi
       ;;
   esac
 
-  if test "$DLM_ENABLE" = auto -a "$PIE_ENABLE" = auto; then
-		if test "$A_ENABLE" != yes; then
-    	PIE_ENABLE=yes
-			DLM_ENABLE=yes
-		fi
-  fi
 
-  if test "$DLM_ENABLE" = yes -a "$PIE_ENABLE" != yes; then
-    PIE_ENABLE=yes
-  fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = yes; then
-    PIE_ENABLE=no
-  fi
-
-  if test "$PIE_ENABLE" = auto -a "$A_ENABLE" = no; then
-    PIE_ENABLE=yes
-  fi
-
-  if test "$PIE_ENABLE" != no -a "$DLM_ENABLE" != no; then
-    DLM_ENABLE=yes
-  fi
+#  if test "$PIE_ENABLE" = auto; then
+#    if test "$A_ENABLE" = yes; then
+#        PIE_ENABLE=no
+#    elif test "$A_ENABLE" = no; then
+#        PIE_ENABLE_=yes
+#    fi
+#  fi
+#
+#  if test "$A_ENABLE" = auto; then
+#    if test "$PIE_ENABLE" = yes; then
+#        A_ENABLE=no
+#    elif test "$PIE_ENABLE" = no; then
+#        A_ENABLE_=yes
+#    fi
+#  fi
 
   # do some checks for PIC/PIE
 
