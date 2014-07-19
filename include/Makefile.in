@@ -20,7 +20,7 @@ dep: makefiles dep-recursive
 # Subdirectories
 ROOT = 1
 RECURSIVE = 1
-SUBDIRS = chaosircd
+SUBDIRS = ircd
 
 RECURSIVE_TARGETS = all-recursive \
                     clean-recursive \
