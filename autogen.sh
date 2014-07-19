@@ -128,6 +128,11 @@ s/-cygwin\$/-\$MACHINE/" $ag_srcdir/$guess
 
 }
 
+test -e config.guess || {
+test -e /usr/share/libtool/config/config.guess && cp -vf /usr/share/libtool/config/config.guess . 
+test -e /usr/share/libtool/config/config.sub && cp -vf /usr/share/libtool/config/config.sub . 
+}
+
 for dir in $DIRS
 do
   pushd $dir
