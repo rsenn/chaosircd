@@ -11,11 +11,11 @@ top_builddir = @top_builddir@
 thisdir      =
 
 # Redirect to recursive targets
-all: makefiles all-recursive
+all: makefiles config.h all-recursive
 clean: makefiles clean-recursive
 distclean: makefiles distclean-recursive
 maintainer-clean: makefiles maintainer-clean-recursive
-install: makefiles install-recursive
+install: makefiles config.h install-recursive
 dep: makefiles dep-recursive
 
 # Subdirectories
@@ -62,7 +62,7 @@ DISTFILES = $(FILES) configure
 DEVFILES = CVS $(FILES)
 
 # Local targets
-all-local: Makefile config.mk $(srcdir)/configure
+all-local: Makefile config.mk $(srcdir)/configure 
 install-local:
 dep-local:
 
