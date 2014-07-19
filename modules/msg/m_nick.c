@@ -28,13 +28,13 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/client.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
+#include <ircd/ircd.h>
+#include <ircd/lclient.h>
+#include <ircd/numeric.h>
+#include <ircd/client.h>
+#include <ircd/chars.h>
+#include <ircd/ircd.h>
+#include <ircd/msg.h>
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

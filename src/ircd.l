@@ -36,8 +36,8 @@
 #include <libchaos/syscall.h>
 #include <libchaos/log.h>
   
-#include <chaosircd/ircd.h>
-#include <chaosircd/conf.h>
+#include <ircd/ircd.h>
+#include <ircd/conf.h>
   
 #undef isatty
 #undef YY_INPUT

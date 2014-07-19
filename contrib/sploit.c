@@ -12,7 +12,7 @@
 #include <libchaos/dlink.h>
 #include <libchaos/connect.h>
 
-#include <chaosircd/config.h>
+#include <ircd/config.h>
 
 //#define RETADDR 0x4003f6d0
 //#define RETADDR 0x08099145
@@ -220,7 +220,7 @@ void sploit_run(void)
   sploit_proto = net_register(NET_CLIENT, "sploit", sploit_handler);
 
   ssl_add("connect", SSL_CONTEXT_CLIENT,
-          "/etc/chaosircd/ircd.crt", "/etc/chaosircd/ircd.key",
+          "/etc/ircd/ircd.crt", "/etc/ircd/ircd.key",
           "RSA+HIGH:RSA+MEDIUM:@STRENGTH");
 
   sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto,

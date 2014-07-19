@@ -36,13 +36,13 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/usermode.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/numeric.h>
+#include <ircd/ircd.h>
+#include <ircd/user.h>
+#include <ircd/oper.h>
+#include <ircd/usermode.h>
+#include <ircd/channel.h>
+#include <ircd/chanuser.h>
+#include <ircd/numeric.h>
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *

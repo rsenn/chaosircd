@@ -28,12 +28,12 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanmode.h>
+#include <ircd/msg.h>
+#include <ircd/chars.h>
+#include <ircd/client.h>
+#include <ircd/server.h>
+#include <ircd/channel.h>
+#include <ircd/chanmode.h>
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

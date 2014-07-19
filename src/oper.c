@@ -36,13 +36,13 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/numeric.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/user.h>
-#include <chaosircd/msg.h>
+#include <ircd/numeric.h>
+#include <ircd/lclient.h>
+#include <ircd/client.h>
+#include <ircd/ircd.h>
+#include <ircd/oper.h>
+#include <ircd/user.h>
+#include <ircd/msg.h>
 
 /* -------------------------------------------------------------------------- *
  * Heap for the opers.                                                        *

@@ -8,10 +8,10 @@
 #ifndef SRC_CROWDGUARD_H
 #define SRC_CROWDGUARD_H
 
-#include "chaosircd/user.h"
-#include "chaosircd/client.h"
-#include "chaosircd/channel.h"
-#include "chaosircd/chanuser.h"
+#include "ircd/user.h"
+#include "ircd/client.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 
 #define channel_owner_flags ((cuptr->flags & CHFLG(o)) | \
                              (cuptr->flags & CHFLG(h)) | \

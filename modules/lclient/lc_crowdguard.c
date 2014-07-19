@@ -13,10 +13,10 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "chaosircd/ircd.h"
-#include "chaosircd/lclient.h"
-#include "chaosircd/client.h"
-#include "chaosircd/msg.h"
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

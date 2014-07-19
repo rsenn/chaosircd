@@ -40,9 +40,9 @@
 #include <libchaos/connect.h>
 #include <libchaos/ssl.h>
 
-#include <chaosircd/ircd.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/oper.h>
+#include <ircd/ircd.h>
+#include <ircd/conf.h>
+#include <ircd/oper.h>
 
   
 #define YY_FATAL_ERROR(x) log(conf_log, L_warning, x)

@@ -28,9 +28,9 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
+#include <ircd/msg.h>
+#include <ircd/client.h>
+#include <ircd/server.h>
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

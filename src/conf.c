@@ -40,12 +40,12 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/config.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/client.h>
-#include <chaosircd/class.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/oper.h>
+#include <ircd/config.h>
+#include <ircd/ircd.h>
+#include <ircd/client.h>
+#include <ircd/class.h>
+#include <ircd/conf.h>
+#include <ircd/oper.h>
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *

@@ -28,12 +28,12 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/server.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
+#include <ircd/ircd.h>
+#include <ircd/user.h>
+#include <ircd/server.h>
+#include <ircd/client.h>
+#include <ircd/lclient.h>
+#include <ircd/numeric.h>
 
 /* -------------------------------------------------------------------------- *
  * Numeric format string table                                                *

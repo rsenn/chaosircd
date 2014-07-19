@@ -27,10 +27,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/usermode.h>
+#include <ircd/ircd.h>
+#include <ircd/user.h>
+#include <ircd/oper.h>
+#include <ircd/usermode.h>
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

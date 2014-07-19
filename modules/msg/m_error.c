@@ -29,11 +29,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/server.h>
+#include <ircd/ircd.h>
+#include <ircd/msg.h>
+#include <ircd/client.h>
+#include <ircd/lclient.h>
+#include <ircd/server.h>
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

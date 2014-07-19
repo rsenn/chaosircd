@@ -53,21 +53,21 @@
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "chaosircd/config.h"
-#include "chaosircd/ircd.h"
-#include "chaosircd/chanmode.h"
-#include "chaosircd/usermode.h"
-#include "chaosircd/chanuser.h"
-#include "chaosircd/channel.h"
-#include "chaosircd/lclient.h"
-#include "chaosircd/numeric.h"
-#include "chaosircd/service.h"
-#include "chaosircd/client.h"
-#include "chaosircd/server.h"
-#include "chaosircd/conf.h"
-#include "chaosircd/oper.h"
-#include "chaosircd/user.h"
-#include "chaosircd/msg.h"
+#include "ircd/config.h"
+#include "ircd/ircd.h"
+#include "ircd/chanmode.h"
+#include "ircd/usermode.h"
+#include "ircd/chanuser.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/service.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/conf.h"
+#include "ircd/oper.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *

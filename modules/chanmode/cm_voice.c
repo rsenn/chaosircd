@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/chanuser.h>
+#include <ircd/ircd.h>
+#include <ircd/numeric.h>
+#include <ircd/channel.h>
+#include <ircd/chanmode.h>
+#include <ircd/chanuser.h>
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
