@@ -49,6 +49,8 @@ DEFS += -DRUNDIR=\"$(relrundir)\"
 DEFS += -DDLLEXT=\"$(PIE_LIBEXT)\"
 DEFS += -DPID=\"$(relrundir)/$(PACKAGE_NAME).pid\"
 
+@DLM_FALSE@DEFS += -DSTATIC_IRCD
+
 INCLUDES             = -I$(top_srcdir)/include \
                        -I$(srcdir) \
                        -I../include \
@@ -90,8 +92,8 @@ DEPS                 = $(MODULES:%=%.d)
 @SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
 @DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.dll
 
-@DLM_FALSE@LIBPRE += -Wl,--whole-archive
-@DLM_FALSE@LIBPOST += -Wl,--no-whole-archive
+@DLM_FALSE@LDPRE += -Wl,--whole-archive
+@DLM_FALSE@LDPOST += -Wl,--no-whole-archive
 
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
                        $(OBJECTS) $(PIC_OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
@@ -103,13 +105,16 @@ DISTFILES            = $(FILES) y.tab.c y.tab.h lex.yy.c main.c
 DEVFILES             = CVS $(FILES)
 
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
-main.o: CPPFLAGS += -DBUILD_MAIN=1
+@WIN32_TRUE@@DLM_TRUE@main.o: CPPFLAGS += -DBUILD_MAIN=1
 @STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 
-@SSL_STATIC_FALSE@LIBS += $(SSL_LIBS) -ldl
+@SSL_STATIC_FALSE@LIBS += $(SSL_LIBS)
 @SSL_STATIC_TRUE@LDADD += $(SSL_LIBS)
 
+@SSL_STATIC_TRUE@LIBS +=  -ldl
+
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
+@WIN32_TRUE@LIBS += -lws2_32 -ldnsapi
 
 @WIN32_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@DLM_FALSE@OBJECTS += main.o
@@ -146,7 +151,7 @@ $(PARSERSRC): $(srcdir)/ircd.y
 @SHARED_FALSE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
 $(PROGRAM): $(OBJECTS) $(LDADD)
 	@$(ECHO_LD)
-	$(LINK) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBPRE) $(LDADD) $(LIBS) $(LIBPOST)
+	$(LINK) $(LDFLAGS) -o $@ $(OBJECTS) $(LDPRE) $(LDADD) $(LDPOST) $(LIBS)
         
 $(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 $(A_LIBRARY): $(MODULES:%=%.o) $(LEXEROBJ) $(PARSEROBJ)

@@ -38,13 +38,11 @@ struct io;
 #include "libchaos/syscall.h"
 #include "libchaos/queue.h"
 
-#ifdef HAVE_SYS_SELECT_H
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <sys/select.h>
 #endif
-
-#ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
-#endif /* HAVE_WINSOCK2_H */
 
 #ifdef HAVE_SSL
 #include "libchaos/ssl.h"

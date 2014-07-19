@@ -112,7 +112,7 @@ fi
 
 
 ac_cv_LIBS="$LIBS"
-LIBS="$LIBS -lws2_32"
+LIBS="$LIBS -lws2_32 -ldnsapi"
 
 AC_MSG_CHECKING([for winsock2])
 AC_TRY_COMPILE([#include <winsock2.h>], 
