@@ -1903,6 +1903,189 @@ eval ac_res=\$$3
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_func
+
+# ac_fn_c_compute_int LINENO EXPR VAR INCLUDES
+# --------------------------------------------
+# Tries to find the compile-time value of EXPR in a program that includes
+# INCLUDES, setting VAR accordingly. Returns whether the value could be
+# computed
+ac_fn_c_compute_int ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if test "$cross_compiling" = yes; then
+    # Depending upon the size, compute the lo and hi bounds.
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+static int test_array [1 - 2 * !(($2) >= 0)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_lo=0 ac_mid=0
+  while :; do
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+static int test_array [1 - 2 * !(($2) <= $ac_mid)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_hi=$ac_mid; break
+else
+  as_fn_arith $ac_mid + 1 && ac_lo=$as_val
+			if test $ac_lo -le $ac_mid; then
+			  ac_lo= ac_hi=
+			  break
+			fi
+			as_fn_arith 2 '*' $ac_mid + 1 && ac_mid=$as_val
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  done
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+static int test_array [1 - 2 * !(($2) < 0)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_hi=-1 ac_mid=-1
+  while :; do
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+static int test_array [1 - 2 * !(($2) >= $ac_mid)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_lo=$ac_mid; break
+else
+  as_fn_arith '(' $ac_mid ')' - 1 && ac_hi=$as_val
+			if test $ac_mid -le $ac_hi; then
+			  ac_lo= ac_hi=
+			  break
+			fi
+			as_fn_arith 2 '*' $ac_mid && ac_mid=$as_val
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  done
+else
+  ac_lo= ac_hi=
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+# Binary search between lo and hi bounds.
+while test "x$ac_lo" != "x$ac_hi"; do
+  as_fn_arith '(' $ac_hi - $ac_lo ')' / 2 + $ac_lo && ac_mid=$as_val
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+static int test_array [1 - 2 * !(($2) <= $ac_mid)];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_hi=$ac_mid
+else
+  as_fn_arith '(' $ac_mid ')' + 1 && ac_lo=$as_val
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+done
+case $ac_lo in #((
+?*) eval "$3=\$ac_lo"; ac_retval=0 ;;
+'') ac_retval=1 ;;
+esac
+  else
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+static long int longval () { return $2; }
+static unsigned long int ulongval () { return $2; }
+#include <stdio.h>
+#include <stdlib.h>
+int
+main ()
+{
+
+  FILE *f = fopen ("conftest.val", "w");
+  if (! f)
+    return 1;
+  if (($2) < 0)
+    {
+      long int i = longval ();
+      if (i != ($2))
+	return 1;
+      fprintf (f, "%ld", i);
+    }
+  else
+    {
+      unsigned long int i = ulongval ();
+      if (i != ($2))
+	return 1;
+      fprintf (f, "%lu", i);
+    }
+  /* Do not output a trailing newline, as this causes \r\n confusion
+     on some platforms.  */
+  return ferror (f) || fclose (f) != 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  echo >>conftest.val; read $3 <conftest.val; ac_retval=0
+else
+  ac_retval=1
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+rm -f conftest.val
+
+  fi
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_compute_int
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -2325,25 +2508,25 @@ fi
 
 if test "$COLOR" = "yes"
 then
-  DARK_GRAY="[1;30m"       # dark gray
-  LIGHT_BLUE="[1;34m"      # light blue
-  LIGHT_GREEN="[1;32m"     # light green
-  LIGHT_CYAN="[1;36m"      # light cyan
-  LIGHT_RED="[1;31m"       # light red
-  LIGHT_PURPLE="[1;35m"    # light purple
-  YELLOW="[1;33m"          # yellow
-  WHITE="[1;37m"           # white
+  DARK_GRAY="###ESCAPE###1;30m"       # dark gray
+  LIGHT_BLUE="###ESCAPE###1;34m"      # light blue
+  LIGHT_GREEN="###ESCAPE###1;32m"     # light green
+  LIGHT_CYAN="###ESCAPE###1;36m"      # light cyan
+  LIGHT_RED="###ESCAPE###1;31m"       # light red
+  LIGHT_PURPLE="###ESCAPE###1;35m"    # light purple
+  YELLOW="###ESCAPE###1;33m"          # yellow
+  WHITE="###ESCAPE###1;37m"           # white
 
-  BLACK="[0;30m"           # black
-  BLUE="[0;34m"            # blue
-  GREEN="[0;32m"           # green
-  CYAN="[0;36m"            # cyan
-  RED="[0;31m"             # red
-  PURPLE="[0;35m"          # purple
-  BROWN="[0;33m"           # brown
-  GRAY="[0;37m"            # gray
+  BLACK="###ESCAPE###0;30m"           # black
+  BLUE="###ESCAPE###0;34m"            # blue
+  GREEN="###ESCAPE###0;32m"           # green
+  CYAN="###ESCAPE###0;36m"            # cyan
+  RED="###ESCAPE###0;31m"             # red
+  PURPLE="###ESCAPE###0;35m"          # purple
+  BROWN="###ESCAPE###0;33m"           # brown
+  GRAY="###ESCAPE###0;37m"            # gray
 
-  NC="[0m"
+  NC="###ESCAPE###0m"
 
 
   case "$THEME" in
@@ -4525,7 +4708,7 @@ fi
 done
 
 
-for ac_header in fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h
+for ac_header in cygwin/in.h dlfcn.h elf.h fcntl.h inttypes.h io.h limits.h linux/filter.h linux/types.h net/bpf.h net/ethernet.h netinet/in.h signal.h sys/ioctl.h sys/mman.h sys/poll.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/types.h sys/wait.h unistd.h winsock.h ws.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -5242,6 +5425,106 @@ fi
 
 
 
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of long" >&5
+$as_echo_n "checking size of long... " >&6; }
+if ${ac_cv_sizeof_long+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (long))" "ac_cv_sizeof_long"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_long" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error 77 "cannot compute sizeof (long)
+See \`config.log' for more details" "$LINENO" 5; }
+   else
+     ac_cv_sizeof_long=0
+   fi
+fi
+
+fi
+$as_echo "$as_me:$LINENO: result: $ac_cv_sizeof_long" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_sizeof_long${NC} >&6
+
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_LONG $ac_cv_sizeof_long
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of long long" >&5
+$as_echo_n "checking size of long long... " >&6; }
+if ${ac_cv_sizeof_long_long+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (long long))" "ac_cv_sizeof_long_long"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_long_long" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error 77 "cannot compute sizeof (long long)
+See \`config.log' for more details" "$LINENO" 5; }
+   else
+     ac_cv_sizeof_long_long=0
+   fi
+fi
+
+fi
+$as_echo "$as_me:$LINENO: result: $ac_cv_sizeof_long_long" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_sizeof_long_long${NC} >&6
+
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_LONG_LONG $ac_cv_sizeof_long_long
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of uintptr_t" >&5
+$as_echo_n "checking size of uintptr_t... " >&6; }
+if ${ac_cv_sizeof_uintptr_t+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (uintptr_t))" "ac_cv_sizeof_uintptr_t"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_uintptr_t" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error 77 "cannot compute sizeof (uintptr_t)
+See \`config.log' for more details" "$LINENO" 5; }
+   else
+     ac_cv_sizeof_uintptr_t=0
+   fi
+fi
+
+fi
+$as_echo "$as_me:$LINENO: result: $ac_cv_sizeof_uintptr_t" >&5 ; echo ${COLOR_DEFAULT}$ac_cv_sizeof_uintptr_t${NC} >&6
+
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_UINTPTR_T $ac_cv_sizeof_uintptr_t
+_ACEOF
+
+
+
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether byte ordering is bigendian" >&5
 $as_echo_n "checking whether byte ordering is bigendian... " >&6; }
 if ${ac_cv_c_bigendian+:} false; then :
@@ -5499,14 +5782,44 @@ fi
 # FIXME: must be declared as pascal call and must have 2 arguments (8 bytes)
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for poll" >&5
+$as_echo_n "checking for poll... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+poll()
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  $as_echo "$as_me:$LINENO: result: yes" >&5 ; echo ${COLOR_YES}yes${NC} >&6
+else
+  $as_echo "$as_me:$LINENO: result: no" >&5 ; echo ${COLOR_NO}no${NC} >&6
+  HAVE_POLL=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+if test "$HAVE_POLL" = yes ; then
+
+cat >>confdefs.h <<_ACEOF
+#define USE_POLL 1
+_ACEOF
+
+else
 
 cat >>confdefs.h <<_ACEOF
 #define USE_SELECT 1
 _ACEOF
 
+fi
+
 
 ac_cv_LIBS="$LIBS"
-LIBS="$LIBS -ldnsapi -lws2_32"
+LIBS="$LIBS -lws2_32"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for winsock2" >&5
 $as_echo_n "checking for winsock2... " >&6; }
@@ -5586,6 +5899,7 @@ fi
 #fi
 
 DEFS='-DBUILD_CHAOS'
+
 
 
 

@@ -1,8 +1,8 @@
 /* Use select() for i/o multiplexing */
 #undef USE_SELECT
 
-/* Define this if you have <sys/select.h> */
-#undef HAVE_SYS_SELECT_H
+/* Use poll() for i/o multiplexing */
+#undef USE_POLL
 
 /* Support for SSL encrypted connections */
 #undef HAVE_SSL
@@ -15,3 +15,19 @@
 
 /* Define this if you have Linux-type socket filters */
 #undef LINUX_SOCKET_FILTER
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H
+
+/* The size of `uintptr_t', as computed by sizeof. */                                                                                
+#undef SIZEOF_UINTPTR_T                                                                                                              
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
