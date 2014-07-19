@@ -68,9 +68,9 @@ MODULES              = m_away \
 
 #                       m_vuln 
 
-INCLUDES             = -I$(top_srcdir)/libchaos/include \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../libchaos/include \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)
@@ -113,8 +113,8 @@ DEVFILES             = CVS $(DISTFILES)
 DEFS += -DBUILD_MODULE
 
 @WIN32_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/src -lircd
-@DLM_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@DLM_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 #@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/src/ircd.dll
-#@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/libchaos/src/libchaos.dll
+#@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/lib/src/libchaos.dll
 
 include $(top_builddir)/build.mk

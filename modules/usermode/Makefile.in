@@ -13,9 +13,9 @@ MODULES              = um_client \
                        um_wallops \
                        um_crowdguard
 
-INCLUDES             = -I$(top_srcdir)/libchaos/include \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../libchaos/include \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)
@@ -58,6 +58,6 @@ DEVFILES             = CVS $(DISTFILES)
 DEFS += -DBUILD_MODULE
 
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
-@SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 
 include $(top_builddir)/build.mk

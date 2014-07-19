@@ -15,7 +15,7 @@
 # If not, write to the Free Software Foundation,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-DIRS="libchaos ."
+DIRS="lib ."
 
 # Gentoo/Mandrake stuff:
 export WANT_AUTOCONF_2_5=1
@@ -75,7 +75,7 @@ ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
 # $ag_aclocal --acdir=m4
 #  cat $ag_srcdir/m4/*.m4 > $ag_srcdir/aclocal.m4
  rm -f aclocal.m4
- $ag_aclocal -I $(ls -d m4 libchaos/m4 2>/dev/null)
+ $ag_aclocal -I $(ls -d m4 lib/m4 2>/dev/null)
  if test "$ag_headers"; then
    set -x
    $ag_autoheader

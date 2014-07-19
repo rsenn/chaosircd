@@ -53,7 +53,7 @@ INCLUDES             = -I$(top_srcdir)/include \
                        -I$(srcdir) \
                        -I../include \
                        -I. \
-                       -I../libchaos/include
+                       -I../lib/include
                        
 LEXERSRC             = $(srcdir)/lex.yy.c
 LEXEROBJ             = lex.yy.o
@@ -69,7 +69,7 @@ PIE_DEF              = ircd.def
 OBJEXT               = o
 HEADERS              = y.tab.h
 DEPS                 = $(MODULES:%=%.d)
-@SHARED_TRUE@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
+@SHARED_TRUE@LDADD                = $(top_builddir)/lib/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
 @DLM_FALSE@LDADD                = $(top_builddir)/modules/lclient/lclient.a \
 @DLM_FALSE@                       $(top_builddir)/modules/msg/msg.a \
 @DLM_FALSE@                       $(top_builddir)/modules/usermode/usermode.a \
@@ -78,15 +78,15 @@ DEPS                 = $(MODULES:%=%.d)
 @DLM_FALSE@                       $(top_builddir)/modules/service/service.a
 
 #@STATIC_TRUE@LDADD +=  $(A_LIBRARY)
-#@STATIC_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
+#@STATIC_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.a
 
 #@STATIC_TRUE@ifeq ($(LINKFLAGS), -static)
-#@STATIC_TRUE@LDADD                = $(top_builddir)/libchaos/src/.libs/libchaos.a
+#@STATIC_TRUE@LDADD                = $(top_builddir)/lib/src/.libs/libchaos.a
 #@STATIC_TRUE@endif
 
-#@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
-@SHARED_FALSE@LDADD += $(top_builddir)/libchaos/src/libchaos.a
-#@SHARED_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/libchaos/src/libchaos.dll
+#@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/lib/src -lchaos
+@SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
+#@SHARED_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.dll
 
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
                        $(OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
