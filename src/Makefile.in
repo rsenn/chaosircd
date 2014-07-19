@@ -112,6 +112,7 @@ main.o: CPPFLAGS += -DBUILD_MAIN=1
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
 
 @WIN32_FALSE@OBJECTS += main.o
+@WIN32_TRUE@@DLM_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@SHARED_TRUE@cgircd$(EXEEXT): ircd.dll
 @WIN32_TRUE@@SHARED_FALSE@cgircd$(EXEEXT): libircd.a
 @WIN32_TRUE@@SHARED_TRUE@cgircd: ircd.dll
