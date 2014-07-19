@@ -19,9 +19,9 @@ include $(top_builddir)/config.mk
 # configuration for this directory
 # ---------------------------------------------------------------------------
 LIBNAME     = $(PACKAGE)
-A_LIBRARY   = $(LIBNAME).$(A_EXEEXT)
+@A_TRUE@A_LIBRARY   = $(LIBNAME).$(A_EXEEXT)
 #PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_LIBEXT)$(PIE_VERSION_SUFFIX)
-@SHARED_TRUE@PIE_LIBRARY = libchaos.$(PIE_LIBEXT)
+@PIE_TRUE@PIE_LIBRARY = @PIE_PREPEND@chaos.@PIE_LIBEXT@
 MODULES     = cfg \
               child \
               connect \
@@ -104,8 +104,8 @@ INCLUDES += -I$(thisdir) \
 
 CFLAGS += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
 
-$(A_LIBRARY): $(OBJECTS)
-$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
+$(DLM_FALSE)$(PIE_FALSE)$(A_LIBRARY): $(OBJECTS)
+$(DLM_FALSE)$(PIE_FALSE)$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 
 # include global make targets
 # ---------------------------------------------------------------------------
