@@ -47,6 +47,8 @@
 #include <chaosircd/conf.h>
 #include <chaosircd/oper.h>
 
+#include "../config.h"
+
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
@@ -230,7 +232,7 @@ found:
  * -------------------------------------------------------------------------- */
 static void usage(char **argv)
 {
-  puts(PROJECT_NAME"-"PROJECT_VERSION
+  puts(PACKAGE_NAME"-"PACKAGE_VERSION
        " - pi-networks irc server\n");
   puts("Usage: %s [options]\n", *argv);
   puts("  -h, --help           show this help");

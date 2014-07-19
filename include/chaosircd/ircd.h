@@ -96,21 +96,27 @@
 #  define IRCD_DATA(type) extern  __declspec(dllimport) type
 #  define IRCD_API(type)                                type
 # endif
+# ifndef IRCD_DATA_DECL
+#  define IRCD_DATA_DECL(type) __declspec(dllexport) type
+# endif
+# ifndef IRCD_DATA
+#  define IRCD_DATA(type) extern __declspec(dllimport) type
+# endif
 #endif
 
 #ifndef IRCD_MODULE
 # define IRCD_MODULE(type) extern type
 #endif
 
-#ifndef IRCD_DATA
-# define IRCD_DATA(type) extern __declspec(dllimport) type
-#endif
-#ifndef IRCD_DATA_DECL
-# define IRCD_DATA_DECL(type) __declspec(dllexport) type
-#endif
 
 #ifndef IRCD_API
 # define IRCD_API(type) type
+#endif
+#ifndef IRCD_DATA
+# define IRCD_DATA(type) type
+#endif
+#ifndef IRCD_DATA_DECL
+# define IRCD_DATA_DECL(type) type
 #endif
 
 IRCD_DATA(int)      ircd_log;

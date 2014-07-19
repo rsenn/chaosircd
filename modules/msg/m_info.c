@@ -41,6 +41,8 @@
 #include <chaosircd/channel.h>
 #include <chaosircd/chanuser.h>
 
+#include "../../config.h"
+
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
@@ -68,7 +70,7 @@ static struct msg m_info_msg = {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static const char *m_info_text[] = {
-  PROJECT_NAME " v" PROJECT_VERSION " - " PROJECT_RELEASE,
+  PACKAGE_NAME " v" PACKAGE_VERSION " - " PACKAGE_RELEASE,
   "",
   "Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>",
   "                         Manuel Kohler <maenu.kohler@bluewin.ch>",

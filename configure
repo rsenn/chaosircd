@@ -2498,14 +2498,14 @@ fi
 CONFIGURE_ARGS="$ac_configure_args"
 
 
-PROJECT_RELEASE="peace & love hippie edition"
+PACKAGE_RELEASE="peace & love hippie edition"
 
 cat >>confdefs.h <<_ACEOF
-#define PROJECT_RELEASE "$PROJECT_RELEASE"
+#define PACKAGE_RELEASE "$PACKAGE_RELEASE"
 _ACEOF
 
 
-VERSION=${PROJECT_VERSION%%[a-z]*}
+VERSION=${PACKAGE_VERSION%%[a-z]*}
 
 VERSION_MAJOR=${VERSION%%.[0-9]*}
 VERSION_MINOR=${VERSION#*[0-9].}
