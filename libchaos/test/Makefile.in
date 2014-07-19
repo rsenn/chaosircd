@@ -23,9 +23,9 @@ TESTS = cfgtest \
         graphtest \
         imagetest \
         ttftest \
-				strtest
+	strtest
 
-SOURCES = $(TESTS:%=%.c)
+SOURCES = $(TESTS:%=$(srcdir)/%.c)
 OBJECTS = $(TESTS:%=%.o)
 PROGRAMS = $(TESTS)
 
