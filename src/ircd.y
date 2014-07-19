@@ -197,12 +197,12 @@ global_entry:		T_GLOBAL
           if(conf_current.global.name[0])
             strcpy(conf_new.global.name, conf_current.global.name);
           else
-            strcpy(conf_new.global.name, "chaosircd.com");
+            strcpy(conf_new.global.name, "cgircd.com");
           
           if(conf_current.global.info[0])
             strcpy(conf_new.global.info, conf_current.global.info);
           else
-            strcpy(conf_new.global.info, "chaosircd");
+            strcpy(conf_new.global.info, "cgircd");
           conf_current.global.nodetach = 1;
 	}
 			'{' global_items '}' ';';

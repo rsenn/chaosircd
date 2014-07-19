@@ -1,12 +1,12 @@
 # $Id: configure.in,v 1.16 2006/09/28 09:47:03 roman Exp $
 # ===========================================================================
 #
-# GNU autoconf template for chaosircd
+# GNU autoconf template for cgircd
 #
 # initialize autoconf (require version 2.5x)
 # ---------------------------------------------------------------------------
 AC_PREREQ(2.59)
-AC_INIT([chaosircd],[2.2.1])
+AC_INIT([cgircd],[2.2.1])
 AC_CONFIG_SUBDIRS([libchaos])
 
 # check for compiling modes
@@ -48,7 +48,7 @@ eval "tmp_prefix=\"${prefix}\""
 eval sysconfdir=${sysconfdir}
 case $sysconfdir in
   *ircd*) sysconfdir=${sysconfdir} ;;
-  *) sysconfdir=${sysconfdir}/chaosircd ;;
+  *) sysconfdir=${sysconfdir}/cgircd ;;
 esac
 
 relsysconfdir=${sysconfdir#$tmp_prefix/}
@@ -64,8 +64,8 @@ AC_SUBST([rellibexecdir])
 eval libexecdir=${libexecdir}
 eval localstatedir=${localstatedir}
 
-eval pidfile=${localstatedir}/run/chaosircd.pid
-AC_ARG_WITH([pidfile], [  --with-pidfile=PATH     location of the pid-file [[LOCALSTATEDIR/run/chaosircd.pid]]], 
+eval pidfile=${localstatedir}/run/cgircd.pid
+AC_ARG_WITH([pidfile], [  --with-pidfile=PATH     location of the pid-file [[LOCALSTATEDIR/run/cgircd.pid]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval pidfile=$withval; fi])
 AC_SUBST([pidfile])
 
@@ -83,18 +83,18 @@ case $tmp_prefix in
     eval "plugindir=${libdir}/modules"
     ;;
   *)
-    eval "plugindir=${libdir}/chaosircd"
+    eval "plugindir=${libdir}/cgircd"
     ;;
 esac
 relplugindir=${plugindir#$tmp_prefix/}
 test "$relplugindir" = "$plugindir" && relplugindir=lib/${plugindir##*/lib/}
-AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/chaosircd]]], 
+AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/cgircd]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
 AC_SUBST([relplugindir])
 case $tmp_prefix in
   *ircd*) eval "inidir=${localstatedir}/lib"  ;;
-  *) eval "inidir=${localstatedir}/lib/chaosircd"  ;;
+  *) eval "inidir=${localstatedir}/lib/cgircd"  ;;
 esac
 relinidir=${inidir#$tmp_prefix/}
 if test "$relinidir" = "$inidir"; then
@@ -110,7 +110,7 @@ AC_MSG_RESULT([$inidir $relinidir])
 
 case $tmp_prefix in
   *ircd*) eval "logdir=${localstatedir}/log" ;; 
-  *) eval "logdir=${localstatedir}/log/chaosircd" ;;
+  *) eval "logdir=${localstatedir}/log/cgircd" ;;
 esac
 rellogdir=${logdir#$tmp_prefix/}
 test "$rellogdir" = "$logdir" && rellogdir=${localstatedir##*/}${logdir##*${localstatedir##*/}}
@@ -127,8 +127,8 @@ AC_ARG_WITH([rundir], [  --with-rundir=PATH   location of the runs [[LOCALSTATED
 AC_SUBST([rundir])
 AC_SUBST([relrundir])
 
-pidfile="$rundir/chaosircd.pid"
-relpidfile="$relrundir/chaosircd.pid"
+pidfile="$rundir/cgircd.pid"
+relpidfile="$relrundir/cgircd.pid"
 AC_SUBST([pidfile])
 AC_SUBST([relpidfile])
 

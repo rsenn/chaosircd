@@ -10,7 +10,7 @@ top_builddir         = @top_builddir@
 thisdir              = include/ircd/
 PACKAGE              = @PACKAGE_NAME@
 
-include_PREFIX = /chaosircd
+include_PREFIX = /cgircd
 include_DATA = $(HEADERS)
 
 all: Makefile config.h

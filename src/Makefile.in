@@ -6,7 +6,7 @@ thisdir              = src/
 plugindir            = @plugindir@
 
 EXEEXT               = @EXEEXT@
-PROGRAM              = chaosircd$(EXEEXT)
+PROGRAM              = cgircd$(EXEEXT)
 LIBNAME              = ircd
 #@WIN32_FALSE@PIE_LIBRARY          =
 A_LIBRARY          = libircd.a
@@ -14,7 +14,7 @@ A_LIBRARY          = libircd.a
 
 
 
-bin_EXEC = chaosircd$(EXEEXT)
+bin_EXEC = cgircd$(EXEEXT)
 @SHARED_TRUE@@WIN32_TRUE@bin_EXEC += $(PIE_LIBRARY)
 @STATIC_TRUE@@WIN32_TRUE@lib_DATA += $(A_LIBRARY)
 
@@ -107,10 +107,10 @@ main.o: CPPFLAGS += -DBUILD_MAIN=1
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
 
 @WIN32_FALSE@OBJECTS += main.o
-@WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): ircd.dll
-@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
-@WIN32_TRUE@@SHARED_TRUE@chaosircd: ircd.dll
-@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
+@WIN32_TRUE@@SHARED_TRUE@cgircd$(EXEEXT): ircd.dll
+@WIN32_TRUE@@SHARED_FALSE@cgircd$(EXEEXT): libircd.a
+@WIN32_TRUE@@SHARED_TRUE@cgircd: ircd.dll
+@WIN32_TRUE@@SHARED_FALSE@cgircd: libircd.a
 @WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 

@@ -1,5 +1,5 @@
 
-set(PROJECT_NAME chaosircd)
+set(PROJECT_NAME cgircd)
 set(PROJECT_VERSION 2.2.1)
 set(PROJECT_RELEASE "peace, love & hippie edition")
 set(PROJECT_TARNAME ${PROJECT_NAME}-${PROJECT_VERSION})
@@ -91,7 +91,7 @@ set(CHAOSIRCD_HEADERS
     include/ircd/usermode.h)
 
 install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
-install(FILES ${CONFFILES} DESTINATION etc/chaosircd)
+install(FILES ${CONFFILES} DESTINATION etc/cgircd)
 install(FILES ${TOOLS} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
 
 set(TOOLS 

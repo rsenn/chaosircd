@@ -1,9 +1,9 @@
-Configure and compile chaosircd from source:
+Configure and compile cgircd from source:
 
-  ./configure --prefix=/usr/chaosircd
+  ./configure --prefix=/usr/cgircd
   make
 
-Install chaosircd (probably you must be root):
+Install cgircd (probably you must be root):
 	
   make install
 

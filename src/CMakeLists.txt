@@ -12,7 +12,7 @@ bison_target(IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c VERBOS
 flex_target(IRCD_SCANNER ircd.l  ${CMAKE_CURRENT_SOURCE_DIR}/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
-add_executable(chaosircd 
+add_executable(cgircd 
    ${BISON_IRCD_PARSER_OUTPUTS}
    ${FLEX_IRCD_SCANNER_OUTPUTS}
    chanmode.c channel.c chanuser.c chars.c
@@ -32,7 +32,7 @@ add_executable(chaosircd
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
    
-target_link_libraries(chaosircd libchaos ${SOCKET_LIBRARIES})
+target_link_libraries(cgircd libchaos ${SOCKET_LIBRARIES})
 
-install(TARGETS chaosircd 
+install(TARGETS cgircd 
         RUNTIME DESTINATION bin)

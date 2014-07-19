@@ -48,7 +48,7 @@ log {
 };
 
 log {
-  path     = "@rellogdir@/chaosircd.log";
+  path     = "@rellogdir@/cgircd.log";
   sources  = "all";
   level    = "verbose";
   prefix   = yes;

@@ -1,13 +1,13 @@
 #!/bin/sh
 #
-# chaosircd init.d script for debian
+# cgircd init.d script for debian
 #
 # by kon <kon@539.ch>
 #
 # the vars below are almost certainly to be changed :)
 
 # name of the daemon 
-NAME=chaosircd
+NAME=cgircd
 # location of the daemon
 DAEMON=/usr/$NAME/$NAME
 # user the daemon runs as

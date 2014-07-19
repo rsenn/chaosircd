@@ -35,7 +35,7 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
 
     install(TARGETS "${MODULE_NAME}"
-            RUNTIME DESTINATION libexec/chaosircd
-            LIBRARY DESTINATION lib/chaosircd
-            ARCHIVE DESTINATION lib/chaosircd)
+            RUNTIME DESTINATION libexec/cgircd
+            LIBRARY DESTINATION lib/cgircd
+            ARCHIVE DESTINATION lib/cgircd)
 endforeach()
