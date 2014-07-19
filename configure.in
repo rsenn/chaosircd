@@ -37,7 +37,7 @@ AC_DEFINE_UNQUOTED(PLATFORM, "$PLATFORM", [Platform this server runs on])
 
 # set directories
 # ---------------------------------------------------------------------------
-AC_CONFIG_HEADERS([config.h include/chaosircd/config.h])
+AC_CONFIG_HEADERS([config.h include/ircd/config.h])
 AC_CONFIG_SRCDIR([src/ircd.c])
 
 test "$prefix" = "NONE" && prefix=${ac_default_prefix}
@@ -263,7 +263,7 @@ contrib/Makefile
 contrib/debian/Makefile
 doc/Makefile
 include/Makefile
-include/chaosircd/Makefile
+include/ircd/Makefile
 modules/Makefile
 modules/chanmode/Makefile
 modules/lclient/Makefile

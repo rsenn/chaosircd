@@ -72,25 +72,25 @@ foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
 endforeach(SUBSTFILE)
 
 set(CHAOSIRCD_HEADERS
-    include/chaosircd/chanmode.h
-    include/chaosircd/channel.h
-    include/chaosircd/chanuser.h
-    include/chaosircd/chars.h
-    include/chaosircd/class.h
-    include/chaosircd/client.h
-    include/chaosircd/conf.h
-    include/chaosircd/config.h
-    include/chaosircd/ircd.h
-    include/chaosircd/lclient.h
-    include/chaosircd/msg.h
-    include/chaosircd/numeric.h
-    include/chaosircd/oper.h
-    include/chaosircd/server.h
-    include/chaosircd/service.h
-    include/chaosircd/user.h
-    include/chaosircd/usermode.h)
+    include/ircd/chanmode.h
+    include/ircd/channel.h
+    include/ircd/chanuser.h
+    include/ircd/chars.h
+    include/ircd/class.h
+    include/ircd/client.h
+    include/ircd/conf.h
+    include/ircd/config.h
+    include/ircd/ircd.h
+    include/ircd/lclient.h
+    include/ircd/msg.h
+    include/ircd/numeric.h
+    include/ircd/oper.h
+    include/ircd/server.h
+    include/ircd/service.h
+    include/ircd/user.h
+    include/ircd/usermode.h)
 
-install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/chaosircd)
+install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
 install(FILES ${CONFFILES} DESTINATION etc/chaosircd)
 install(FILES ${TOOLS} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
 

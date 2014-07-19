@@ -20,15 +20,15 @@ add_executable(chaosircd
    lclient.c main.c msg.c numeric.c oper.c
    server.c service.c user.c usermode.c
    ${MSINTTYPES_HEADERS}
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/chanmode.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/channel.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/chanuser.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/chars.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/class.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/client.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/conf.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/config.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/ircd.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/lclient.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/msg.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/numeric.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/oper.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/server.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/service.h"
-   "${CMAKE_SOURCE_DIR}/include/chaosircd/user.h" "${CMAKE_SOURCE_DIR}/include/chaosircd/usermode.h") 
+   "${CMAKE_SOURCE_DIR}/include/ircd/chanmode.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/channel.h" "${CMAKE_SOURCE_DIR}/include/ircd/chanuser.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/chars.h" "${CMAKE_SOURCE_DIR}/include/ircd/class.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/client.h" "${CMAKE_SOURCE_DIR}/include/ircd/conf.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/lclient.h" "${CMAKE_SOURCE_DIR}/include/ircd/msg.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/numeric.h" "${CMAKE_SOURCE_DIR}/include/ircd/oper.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/server.h" "${CMAKE_SOURCE_DIR}/include/ircd/service.h"
+   "${CMAKE_SOURCE_DIR}/include/ircd/user.h" "${CMAKE_SOURCE_DIR}/include/ircd/usermode.h") 
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
    
