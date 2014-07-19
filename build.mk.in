@@ -23,35 +23,35 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 # ---------------------------------------------------------------------------
 .c.@OBJEXT@:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -c -o $@ $<
+	@SILENT_RULES@$(COMPILE) -MD -c -o $@ $<
 
 .c.i:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -E -o $@ $<
+	@SILENT_RULES@$(COMPILE) -MD -E -o $@ $<
 
 @PIC@.c.@PIC_OBJEXT@:
 @PIC@	@$(ECHO_PIC_CC)
-@PIC@	@QUIET@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
+@PIC@	@SILENT_RULES@$(COMPILE) $(PIC_CFLAGS) -MD -MF $(<:%.c=%.@PIC_DEPEXT@) -c -o $@ $<
 
 #.c.@PIE_EXEEXT@:
 #	@$(ECHO_CCLD)
-#	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(PIE_LDFLAGS) -MD -o $@ $< $(LIBS)
+#	@SILENT_RULES@$(COMPLINK) $(PIC_CFLAGS) $(PIE_LDFLAGS) -MD -o $@ $< $(LIBS)
 
 %.@PIE_EXEEXT@: %.c %.def
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
+	@SILENT_RULES@$(COMPLINK) $(PIC_CFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
 
 %.def: %.c
 	@$(ECHO_MKDEF)
-	@QUIET@{ echo "EXPORTS"; echo "  $(subst .def,_load,$@)"; echo "  $(subst .def,_unload,$@)"; } >$@
+	@SILENT_RULES@{ echo "EXPORTS"; echo "  $(subst .def,_load,$@)"; echo "  $(subst .def,_unload,$@)"; } >$@
 
 .c.s:
 	@$(ECHO_CC)
-	@QUIET@$(COMPILE) -MD -S $<
+	@SILENT_RULES@$(COMPILE) -MD -S $<
 
 .asm.o:
 	@$(ECHO_NASM)
-	@QUIET@$(NASM) $(NASMFLAGS) $(srcpfx)$<
+	@SILENT_RULES@$(NASM) $(NASMFLAGS) $(srcpfx)$<
 
 # targets for makefiles in subdirs
 # ---------------------------------------------------------------------------
@@ -60,12 +60,12 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 #  keeping themselves up to date)
 #
 makefiles: $(SUBMAKE:%=%/Makefile)
-$(SUBMAKE:%=%/Makefile):
-	@if test ! -f "$@" ; then \
-	  $(ECHO_CONFIG) ; \
-  	(cd $(top_builddir) && ./config.status $(thisdir)$@) > /dev/null ; \
-  fi
-  
+@NO_DEPENDENCY_TRACKING@$(SUBMAKE:%=%/Makefile):
+@NO_DEPENDENCY_TRACKING@	@if test ! -f "$@" ; then \
+@NO_DEPENDENCY_TRACKING@	  $(ECHO_CONFIG) ; \
+@NO_DEPENDENCY_TRACKING@  	(cd $(top_builddir) && $(SHELL) config.status $(thisdir)$@) > /dev/null ; \
+@NO_DEPENDENCY_TRACKING@  fi
+@NO_DEPENDENCY_TRACKING@  
 # common recursive targets
 # ---------------------------------------------------------------------------
 $(RECURSIVE_TARGETS):
@@ -189,77 +189,77 @@ $(ARCHIVE): $(OBJECTS)
 # ---------------------------------------------------------------------------
 Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(top_builddir)/config.mk $(top_builddir)/build.mk
 	@$(ECHO_CONFIG)
-#	echo '@QUIET@cd $(top_builddir) && ./config.status $(thisdir)Makefile $(REDIR)'
-	@QUIET@cd $(top_builddir) && ./config.status $(thisdir)Makefile $(REDIR)
+#	echo '@SILENT_RULES@cd $(top_builddir) && ./config.status $(thisdir)Makefile $(REDIR)'
+	@SILENT_RULES@cd $(top_builddir) && ./config.status $(thisdir)Makefile $(REDIR)
 
 Doxyfile: $(top_builddir)/config.status $(srcdir)/Doxyfile.in $(top_builddir)/config.mk $(top_builddir)/build.mk
 	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./config.status $(thisdir)Doxyfile $(REDIR)
+	@SILENT_RULES@cd $(top_builddir) && ./config.status $(thisdir)Doxyfile $(REDIR)
 
 # rule for build.mk
 # ---------------------------------------------------------------------------
 $(top_builddir)/build.mk: $(top_builddir)/config.status $(top_srcdir)/build.mk.in
 	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./config.status build.mk $(REDIR)
+	@SILENT_RULES@cd $(top_builddir) && ./config.status build.mk $(REDIR)
                                 
 # rule for config.mk
 # ---------------------------------------------------------------------------
 $(top_builddir)/config.mk: $(top_builddir)/config.status $(top_srcdir)/config.mk.in
 	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./config.status config.mk $(REDIR)
+	@SILENT_RULES@cd $(top_builddir) && ./config.status config.mk $(REDIR)
 
 # rule for config.status
 # ---------------------------------------------------------------------------
 $(top_builddir)/config.status: $(top_srcdir)/configure
 	@$(ECHO_CONFIG)
-	@QUIET@cd $(top_builddir) && ./configure $(ac_configure_args)
+	@SILENT_RULES@cd $(top_builddir) && ./configure $(ac_configure_args)
 
 # rule for config.h
 # ---------------------------------------------------------------------------
 $(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
 	@$(ECHO_CONFIG)
-	@QUIET@test -z $(CONFIG_H_TOP) || { cd $(top_builddir) && \
+	@SILENT_RULES@test -z $(CONFIG_H_TOP) || { cd $(top_builddir) && \
 	rm -f $(CONFIG_H_TOP) && \
 	./config.status $(CONFIG_H_TOP) $(REDIR); }
 
 # targets for maintainer generated files
 # ---------------------------------------------------------------------------
-@MAINTAINER@$(top_srcdir)/configure: $(top_srcdir)/configure.in $(top_srcdir)/aclocal.m4
-@MAINTAINER@	@$(ECHO_AUTOCONF)
-@MAINTAINER@	@QUIET@rm -f $(top_srcdir)/configure
-@MAINTAINER@	@QUIET@cd $(top_srcdir) && (autoconf && \
-@MAINTAINER@	mv configure configure.tmp && \
-@MAINTAINER@	sed 's,###ESCAPE###,[,' < configure.tmp > configure && \
-@MAINTAINER@	chmod 755 configure)
+@MAINTAINER_MODE@$(top_srcdir)/configure: $(top_srcdir)/configure.in $(top_srcdir)/aclocal.m4
+@MAINTAINER_MODE@	@$(ECHO_AUTOCONF)
+@MAINTAINER_MODE@	@SILENT_RULES@rm -f $(top_srcdir)/configure
+@MAINTAINER_MODE@	@SILENT_RULES@cd $(top_srcdir) && (autoconf && \
+@MAINTAINER_MODE@	mv configure configure.tmp && \
+@MAINTAINER_MODE@	sed 's,###ESCAPE###,[,' < configure.tmp > configure && \
+@MAINTAINER_MODE@	chmod 755 configure)
 
-@MAINTAINER@$(top_srcdir)/aclocal.m4: $(top_srcdir)/m4/*.m4 $(top_srcdir)/configure.in
-@MAINTAINER@	@$(ECHO_ACLOCAL)
-@MAINTAINER@	@QUIET@rm -f $(top_srcdir)/aclocal.m4
-@MAINTAINER@	@QUIET@cd $(top_srcdir) && aclocal -I m4
+@MAINTAINER_MODE@$(top_srcdir)/aclocal.m4: $(top_srcdir)/m4/*.m4 $(top_srcdir)/configure.in
+@MAINTAINER_MODE@	@$(ECHO_ACLOCAL)
+@MAINTAINER_MODE@	@SILENT_RULES@rm -f $(top_srcdir)/aclocal.m4
+@MAINTAINER_MODE@	@SILENT_RULES@cd $(top_srcdir) && aclocal -I m4
 
 #$(top_srcdir)/aclocal.m4 
-@MAINTAINER@$(CONFIG_H_IN): $(top_srcdir)/configure.in
-@MAINTAINER@	@$(ECHO_AUTOHEADER)
-@MAINTAINER@	@QUIET@cd $(top_srcdir) && autoheader
+@MAINTAINER_MODE@$(CONFIG_H_IN): $(top_srcdir)/configure.in
+@MAINTAINER_MODE@	@$(ECHO_AUTOHEADER)
+@MAINTAINER_MODE@	@SILENT_RULES@cd $(top_srcdir) && autoheader
 
 # makes a subdir party of a library
 # ---------------------------------------------------------------------------
 .libdep: $(OBJECTS)
 	@$(ECHO_AR)
-	@QUIET@$(AR) $(LIB) $(OBJECTS)
+	@SILENT_RULES@$(AR) $(LIB) $(OBJECTS)
 	@touch $@
 
 # rule for libraries
 # ---------------------------------------------------------------------------
 $(A_LIBRARY): $(OBJECTS)
 	@$(ECHO_AR)
-	@QUIET@$(AR) $(A_LIBRARY) $(OBJECTS)
+	@SILENT_RULES@$(AR) $(A_LIBRARY) $(OBJECTS)
 	@$(ECHO_RANLIB)
-	@QUIET@$(RANLIB) $(A_LIBRARY)
+	@SILENT_RULES@$(RANLIB) $(A_LIBRARY)
 
 $(PIE_LIBRARY): $(PIC_OBJECTS)
 	@$(ECHO_PIE_LD)
-	@QUIET@$(PIE_LINK) $(PIE_LDFLAGS) -o $(PIE_LIBRARY) $(PIC_OBJECTS) $(LDADD) $(LIBS)
+	@SILENT_RULES@$(PIE_LINK) $(PIE_LDFLAGS) -o $(PIE_LIBRARY) $(PIC_OBJECTS) $(LDADD) $(LIBS)
 	prev='$@' ; for link in $(PIE_LINKS) ; \
    do \
      $(ECHO_LN)$$link ; \
@@ -272,12 +272,12 @@ $(PIE_LIBRARY): $(PIC_OBJECTS)
 # ---------------------------------------------------------------------------
 #$(PROGRAM): $(OBJECTS) $(LDADD)
 #	@$(ECHO_LD)
-#	@QUIET@$(LINK) -o $(PROGRAM) $^ $(LIB) $(LIBS)
+#	@SILENT_RULES@$(LINK) -o $(PROGRAM) $^ $(LIB) $(LIBS)
 
 #$(PROGRAMS): $(LDADD)
 #	@$(ECHO_LD)
 #	@make $@.o
-#	@QUIET@$(LINK) -o $@ $@.o $(LDADD) $(LIB) $(LIBS)
+#	@SILENT_RULES@$(LINK) -o $@ $@.o $(LDADD) $(LIB) $(LIBS)
 # library rules
 # ---------------------------------------------------------------------------
 @A_LIB@a-library: $(A_LIBRARY)
@@ -681,10 +681,10 @@ devdistdir: makefiles
 	! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \
 	|| chmod -R a+r $(devdistdir)
 
-cvsdir = $(PACKAGE_NAME)
-distdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
-distpkg = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
-devdistdir = $(PACKAGE_NAME)
+cvsdir = $(PROJECT_NAME)
+distdir = $(PROJECT_NAME)-$(PROJECT_VERSION)
+distpkg = $(PROJECT_NAME)-$(PROJECT_VERSION)
+devdistdir = $(PROJECT_NAME)
 devdistpkg = $(devdistdir)-`date +%Y%m%d | sed s/-// | sed s/-//`
 
 remove_distdir = \

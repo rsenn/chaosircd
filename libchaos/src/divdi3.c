@@ -67,25 +67,25 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
     if(d0 > n1)
     {
       /* 0q = nn / 0D */
-      
+
       udiv_qrnnd(q0, n0, n1, n0, d0);
       q1 = 0;
-      
+
       /* Remainder in n0.  */
     }
     else
     {
       /* qq = NN / 0d */
-      
+
       if(d0 == 0)
         d0 = 1 / d0;	/* Divide intentionally by zero.  */
-      
+
       udiv_qrnnd(q1, n1, 0, n1, d0);
       udiv_qrnnd(q0, n0, n1, n0, d0);
-      
+
       /* Remainder in n0.  */
     }
-    
+
     if(rp != 0)
     {
       rr.s.low = n0;
@@ -93,7 +93,7 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
       *rp = rr.ll;
     }
   }
-  
+
 #else /* UDIV_NEEDS_NORMALIZATION */
 
   if(d1 == 0)
@@ -101,31 +101,31 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
     if(d0 > n1)
     {
       /* 0q = nn / 0D */
-      
+
       count_leading_zeros (bm, d0);
-      
+
       if(bm != 0)
       {
         /* Normalize, i.e. make the most significant bit of the
          denominator set.  */
-        
+
         d0 = d0 << bm;
         n1 = (n1 << bm) | (n0 >> (W_TYPE_SIZE - bm));
         n0 = n0 << bm;
       }
-      
+
       udiv_qrnnd(q0, n0, n1, n0, d0);
       q1 = 0;
-      
+
       /* Remainder in n0 >> bm.  */
     }
     else
     {
       /* qq = NN / 0d */
-      
+
       if(d0 == 0)
         d0 = 1 / d0;	/* Divide intentionally by zero.  */
-      
+
       count_leading_zeros(bm, d0);
 
       if(bm == 0)
@@ -133,9 +133,9 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
         /* From (n1 >= d0) /\ (the most significant bit of d0 is set),
          * conclude (the most significant bit of n1 is set) /\ (the
          * leading quotient digit q1 = 1).
-         * 
+         *
          * This special case is necessary, not an optimization.
-	 *	 (Shifts counts of W_TYPE_SIZE are undefined.) 
+	 *	 (Shifts counts of W_TYPE_SIZE are undefined.)
          */
         n1 -= d0;
         q1 = 1;
@@ -144,22 +144,22 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
       {
         /* Normalize.  */
         b = W_TYPE_SIZE - bm;
-        
+
         d0 = d0 << bm;
         n2 = n1 >> b;
         n1 = (n1 << bm) | (n0 >> b);
         n0 = n0 << bm;
-        
+
         udiv_qrnnd(q1, n1, n2, n1, d0);
       }
-      
+
       /* n1 != d0...  */
-      
+
       udiv_qrnnd(q0, n0, n1, n0, d0);
-      
+
       /* Remainder in n0 >> bm.  */
     }
-    
+
     if(rp != 0)
     {
       rr.s.low = n0 >> bm;
@@ -193,11 +193,11 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
         /* From (n1 >= d1) /\ (the most significant bit of d1 is set),
          * conclude (the most significant bit of n1 is set) /\ (the
          * quotient digit q0 = 0 or 1).
-         * 
-         * This special case is necessary, not an optimization.  
+         *
+         * This special case is necessary, not an optimization.
          */
         /* The condition on the next line takes advantage of that
-         * n1 >= d1 (true due to program flow).  
+         * n1 >= d1 (true due to program flow).
          */
         if(n1 > d1 || n0 >= d0)
         {
@@ -206,9 +206,9 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
         }
         else
           q0 = 0;
-        
+
         q1 = 0;
-        
+
         if(rp != 0)
         {
           rr.s.low = n0;
@@ -221,7 +221,7 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
         uint32_t m1, m0;
         /* Normalize.  */
         b = W_TYPE_SIZE - bm;
-        
+
         d1 = (d1 << bm) | (d0 >> b);
         d0 = d0 << bm;
         n2 = n1 >> b;
@@ -236,7 +236,7 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
           q0--;
           sub_ddmmss(m1, m0, m1, m0, d1, d0);
         }
-        
+
         q1 = 0;
 
         /* Remainder in (n1n0 - m1m0) >> bm.  */
@@ -250,7 +250,7 @@ __udivmoddi4 (uint64_t n, uint64_t d, uint64_t *rp)
       }
     }
   }
-  
+
   ww.s.low = q0;
   ww.s.high = q1;
   return ww.ll;
@@ -266,18 +266,18 @@ int64_t __divdi3(int64_t u, int64_t v)
     c = ~c;
     u = -u;
   }
-  
+
   if(v < 0)
   {
     c = ~c;
     v = -v;
   }
-  
+
   w = __udivmoddi4(u, v, NULL);
-  
+
   if(c)
     w = -w;
-  
+
   return w;
 }
 
@@ -291,15 +291,15 @@ int64_t __moddi3(int64_t u, int64_t v)
     c = ~c;
     u = -u;
   }
-  
+
   if(v < 0)
     v = -v;
-  
+
   __udivmoddi4(u, v, &w);
-  
+
   if(c)
     w = -w;
-  
+
   return w;
 }
 
@@ -313,7 +313,7 @@ uint64_t __umoddi3(uint64_t u, uint64_t v)
   uint64_t w;
 
   __udivmoddi4(u, v, &w);
-  
+
   return w;
 }
 

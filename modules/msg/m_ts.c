@@ -39,9 +39,11 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_ts(struct lclient *lcptr, struct client *cptr, 
+static void m_ts(struct lclient *lcptr, struct client *cptr,
+                 int             argc,  char         **argv);
+static void mo_ts(struct lclient *lcptr, struct client *cptr,
                   int             argc,  char         **argv);
-static void ms_ts(struct lclient *lcptr, struct client *cptr, 
+static void ms_ts(struct lclient *lcptr, struct client *cptr,
                   int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -49,15 +51,15 @@ static void ms_ts(struct lclient *lcptr, struct client *cptr,
  * -------------------------------------------------------------------------- */
 static char *mo_ts_help[] =
 {
-  "TS <channel> [value]",
+  "TS [channel] [value]",
   "",
   "Operator command setting the TS of a channel.",
   NULL
 };
 
 static struct msg mo_ts_msg = {
-  "TS", 1, 2, MFLG_OPER,
-  { NULL, NULL, ms_ts, mo_ts },
+  "TS", 0, 2, MFLG_CLIENT,
+  { NULL, m_ts, ms_ts, mo_ts },
   mo_ts_help
 };
 
@@ -68,38 +70,55 @@ int m_ts_load(void)
 {
   if(msg_register(&mo_ts_msg) == NULL)
     return -1;
-  
+
   server_default_caps |= CAP_TS;
-  
+
   return 0;
 }
 
 void m_ts_unload(void)
 {
   server_default_caps &= ~CAP_TS;
-  
+
   msg_unregister(&mo_ts_msg);
 }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
- * argv[1] - 'ts'                                                             *
- * argv[2] - name                                                             *
+ * argv[1] - 'TS'                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_ts(struct lclient *lcptr, struct client *cptr, 
+static void m_ts(struct lclient *lcptr, struct client *cptr,
+                 int             argc,  char         **argv)
+{
+  client_send(cptr, ":%S 599 %N TS %u", server_me, cptr, timer_systime);
+}
+
+/* -------------------------------------------------------------------------- *
+ * argv[0] - prefix                                                           *
+ * argv[1] - 'ts'                                                             *
+ * argv[2] - [name]                                                           *
+ * argv[3] - [value]                                                          *
+ * -------------------------------------------------------------------------- */
+static void mo_ts(struct lclient *lcptr, struct client *cptr,
                   int             argc,  char         **argv)
 {
   struct channel *chptr;
   uint32_t        ts;
-  
+
+  if(!argv[2])
+  {
+    m_ts(lcptr, cptr, argc, argv);
+    return;
+  }
+
   if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
-  
+
   if(argv[3])
     ts = str_toul(argv[3], NULL, 10);
   else
     ts = timer_systime;
-  
+
   log(channel_log, L_status, "%s (%s@%s) changed channel TS for %s from %u to %u.",
       cptr->name, cptr->user->name, cptr->host, chptr->name, chptr->ts, ts);
 
@@ -109,20 +128,20 @@ static void mo_ts(struct lclient *lcptr, struct client *cptr,
               ":%C TS %s :%u", cptr, chptr->name, chptr->ts);
 }
 
-static void ms_ts(struct lclient *lcptr, struct client *cptr, 
+static void ms_ts(struct lclient *lcptr, struct client *cptr,
                   int             argc,  char         **argv)
 {
   struct channel *chptr;
   uint32_t        ts;
-  
+
   if(argv[3] == NULL)
     return;
-  
+
   if((chptr = channel_find_name(argv[2])) == NULL)
     return;
-  
+
   ts = str_toul(argv[3], NULL, 10);
-  
+
   if(client_is_server(cptr))
     log(channel_log, L_status, "%s changed channel TS for %s from %u to %u.",
         cptr->name, chptr->name, chptr->ts, ts);

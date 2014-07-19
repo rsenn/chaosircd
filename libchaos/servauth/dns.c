@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: dns.c,v 1.3 2006/09/28 09:44:11 roman Exp $
  */
 
@@ -100,7 +100,7 @@ static const uint8_t dns_hexchars[] = "0123456789abcdef";
 /* -------------------------------------------------------------------------
    Error messages
    ------------------------------------------------------------------------- */
-static const char *dns_errstrs[] = 
+static const char *dns_errstrs[] =
 {
   "Success",
   "No domain name servers available",
@@ -115,9 +115,9 @@ static const char *dns_errstrs[] =
 };
 
 /* -------------------------------------------------------------------------
-   Used for global respective per-instance and per-server statistics 
+   Used for global respective per-instance and per-server statistics
    ------------------------------------------------------------------------- */
-struct dns_stat 
+struct dns_stat
 {
   uint32_t errors;           /* socket errors */
   uint32_t queries;          /* queries sent */
@@ -128,7 +128,7 @@ struct dns_stat
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-struct dns_server 
+struct dns_server
 {
   int             at;
   net_addr_t      addr;       /* Will contain IPv4 address when af = NET_ADDRESS_IPV4
@@ -145,7 +145,7 @@ struct dns_server
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-struct dns_options 
+struct dns_options
 {
   int         ipv6_support;
   int         ipv6_sock;
@@ -163,7 +163,7 @@ struct dns_options
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-struct dns_instance 
+struct dns_instance
 {
   struct dns_server    servers[MAX_SERVERS];
   uint32_t             server_count;
@@ -178,7 +178,7 @@ struct dns_instance
 };
 
 /* -------------------------------------------------------------------------
-   Non-reentrant (default) instance 
+   Non-reentrant (default) instance
    ------------------------------------------------------------------------- */
 struct dns_instance dns;
 #define inst (&dns)
@@ -201,9 +201,9 @@ static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
 {
 /* -------------------------------------------------------------------------
    Convert IPv4 address to domain style
-  
+
    192.168.100.1 -> 1.100.168.192.in-addr.arpa
-     
+
    Returns number of bytes written to *dst.
    ------------------------------------------------------------------------- */
 
@@ -246,14 +246,14 @@ static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
 
     return p - dst + 14;
   }
-  
+
 /* -------------------------------------------------------------------------
    Convert IPv6 address to domain style
-     
+
                         4321:0:1:2:3:4:567:89ab
                                   ->
    b.a.9.8.7.6.5.0.4.0.0.0.3.0.0.0.2.0.0.0.1.0.0.0.0.0.0.0.1.2.3.4.ip6.int.
-     
+
    Returns number of bytes written to *dst.
    ------------------------------------------------------------------------- */
 
@@ -304,12 +304,12 @@ static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
    on systems where network byte order == host byte order.
    ------------------------------------------------------------------------- */
 
-static inline void dns_uint16_unpack(const uint8_t *in, uint16_t *out)
+void dns_uint16_unpack(const uint8_t *in, uint16_t *out)
 {
   *out = ((uint16_t)(in[0] << 8)) | in[1];
 }
 
-static inline void dns_uint16_pack(uint8_t *out, uint16_t in)
+void dns_uint16_pack(uint8_t *out, uint16_t in)
 {
   out[0] = in >> 8;
   out[1] = in & 255;
@@ -450,8 +450,7 @@ proto:
 /* -------------------------------------------------------------------------
    Gets the length of a domain in DNS style format
    ------------------------------------------------------------------------- */
-
-static __inline__ size_t dns_dn_len(const uint8_t *domain)
+ size_t dns_dn_len(const uint8_t *domain)
 {
   const uint8_t *p;
   uint8_t c;
@@ -652,25 +651,25 @@ static size_t dns_dot_to_dn(uint8_t *out, const char *d, size_t n)
 
 /* -------------------------------------------------------------------------
    Add a nameserver to the DB
-   
+
    Name must be a valid IPv4 or (when compiled with IPv6) IPv6 address.
-   
+
    When dns_server->af is set to NET_ADDRESS_IPV4, then at least
    dns_server->addr will be valid.
    When dns_server->af is set to NET_ADDRESS_IPV6, then at least
    dns_server->addr6 will be valid.
-   
+
    Unused dns_server structs are always marked with
    INADDR_ANY respective in6addr_any.
-   
+
    Special cases (when compiled with HAVE_IPV6):
-    - If its an IPv4 to IPv6 mapped address, both members 
+    - If its an IPv4 to IPv6 mapped address, both members
       (addr & addr6) of the dns_server struct will be valid.
     - If its localhost both members (addr & addr6)
       of the dns_server struct will be valid.
     - If ipv6_sock in options struct is zero then IPv6
       addresses other than IPv4 mapped ones will be invalid.
- 
+
    Returns NULL on error or a pointer to a valid dns_server struct.
    If the nameserver already exists a pointer to it will be returned.
    ------------------------------------------------------------------------- */
@@ -722,7 +721,7 @@ static struct dns_server *dns_add_ns(const char *name)
     return NULL;
 
   log(servauth_log, L_verbose, "nameserver: %s", name);
-  
+
   /* Find a free dns_server struct */
   for(i = 0; i < MAX_SERVERS; i++)
   {
@@ -804,7 +803,7 @@ void dns_clear_ns(struct dns_server *ns)
 
 /* -------------------------------------------------------------------------
    Get next DNS server.
- 
+
    When at == NET_ADDRESS_IPV4 then the next server with a valid IPv4 address
    will be returned.
    When at == NET_ADDRESS_IPV6 then the next server with a valid IPv6 address
@@ -836,16 +835,16 @@ static struct dns_server *dns_get_ns(int at)
 static int dns_timeout(void *arg)
 {
   struct dns_resolver *res = arg;
-  
+
   if(res->callback)
     res->callback(arg);
-  
+
   if(res->timer)
   {
     timer_remove(res->timer);
     res->timer = NULL;
   }
-  
+
   return 0;
 }
 
@@ -853,7 +852,7 @@ static int dns_timeout(void *arg)
    Tries to get nameservers from supplied file.
    Each nameserver has to be on its own line.
    Supports IPv4 and IPv6 (if compiled with IPv6) addresses.
-   
+
    Returns number of nameservers added.
    ------------------------------------------------------------------------- */
 #ifndef WIN32
@@ -867,32 +866,32 @@ static void dns_read_line(int fd, void *arg)
   for(EVER)
   {
     ret = io_gets(fd, buf, DNS_LINEBUF_SIZE);
-    
+
     if(ret <= 0)
       break;
-    
+
     while(str_isspace(buf[i]))
       i++;
-    
+
     if(!str_ncmp("nameserver", &buf[i], 10))
     {
       i += 10;
-      
+
       while(str_isspace(buf[i]))
         i++;
-      
+
       if(!str_isdigit(buf[i]))
         return;
 
       p = str_chr(&buf[i], '\n');
-      
+
       if(p)
         *p = '\0';
-      
+
       dns_add_ns(&buf[i]);
     }
   }
-  
+
   io_close(fd);
 }
 
@@ -916,43 +915,42 @@ static int dns_read_conf(const char *filename)
 /* -------------------------------------------------------------------------
    Check for next re-read of config file, env vars and stuff.
    If deadline has been exceeded there then do it!
-   
+
    Returns positive value if DB was updated (number of servers in DB)
    otherwise 0.
    ------------------------------------------------------------------------- */
+int
+dns_updatedb(void){
+  int ret = 0;
 
-int dns_updatedb()
-{
   inst->server_count = 0;
-
 #ifdef WIN32
-  net_addr_t servers[256];
-  DWORD ret = sizeof(servers);
+/*	   long srvlist[256];
+  int ret = sizeof(srvlist);
 
-  memset(servers, 0, sizeof(servers));
-  int err;
-  err = DnsQueryConfig(DnsConfigDnsServerList, FALSE, NULL, NULL, 
-                 servers, &ret);
-  
-  if(err)
+  memset(srvlist, 0, sizeof(srvlist));
+  int error;
+  error = DnsQueryConfig(DnsConfigDnsServerList, FALSE, NULL, NULL,
+                 srvlist, &ret);
+
+  if(error)
   {
-    log(servauth_log, L_status, "DnsQueryConfig error: %i", err);
+    log(servauth_log, L_status, "DnsQueryConfig erroror: %i", error);
   }
   else
   {
-    ret /= sizeof(net_addr_t);
+    ret /= sizeof(IP4_ADDRESS);
     int i;
-    
+
     for(i = 0; i < ret; i++)
     {
-      /* Skip network addresses (those with last octet set to 0) */
-      if(servers[i] && (net_ntohl(servers[i]) & 0xff) != 0)
-        dns_add_ns(net_ntoa(servers[i]));
+      // Skip network addresses (those with last octet set to 0) 
+      if(srvlist[i] && (net_ntohl(srvlist[i]) & 0xff) != 0)
+        dns_add_ns(net_ntoa(srvlist[i]));
     }
-  }
-      
+  }*/
+
 #else
-  int ret = 0;
 
   /* Config file was supplied, read it */
   if(inst->options.config)
@@ -967,7 +965,7 @@ int dns_updatedb()
     if(dns_add_ns("127.0.0.1"))
 #endif /* HAVE_IPV6 */
       ret++;
-  
+
   return ret;
 }
 
@@ -977,10 +975,10 @@ int dns_updatedb()
 
 /* -------------------------------------------------------------------------
    Initialize a DNS instance.
-   
+
    Zeroes the instance.
    Removes (zeroes) all dns_servers.
-   Initializes options to their defaults.   
+   Initializes options to their defaults.
    ------------------------------------------------------------------------- */
 
 void dns_init()
@@ -1274,7 +1272,7 @@ static int dns_extract_name(struct dns_resolver *res, char *out, size_t len)
    Extracts n'th address from a response packet
    ------------------------------------------------------------------------- */
 
-static int dns_extract_addr(struct dns_resolver *res, 
+static int dns_extract_addr(struct dns_resolver *res,
                             int at, void *addr, size_t n)
 {
   uint32_t pos;
@@ -1501,12 +1499,12 @@ void dns_clear(struct dns_resolver *res)
   dns_free_reply(res);
 
   timer_push(&res->timer);
-  
+
   dns_zero(res);
 }
 
 /* -------------------------------------------------------------------------
-   Create IPv4 or IPv6 socket depending on the current server.  
+   Create IPv4 or IPv6 socket depending on the current server.
    Will do IPv4 fallback on error.
    ------------------------------------------------------------------------- */
 
@@ -1534,7 +1532,7 @@ static int dns_socket(struct dns_resolver *res, int type)
   else if(!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6)
   {
     int flags;
-    
+
     fd = net_socket(PF_INET, type);
 
     if(fd == -1)
@@ -1566,7 +1564,7 @@ static int dns_socket(struct dns_resolver *res, int type)
 }
 
 /* -------------------------------------------------------------------------
-   When we are connecting to 127.0.0.1 respective ::1 we will bind to 
+   When we are connecting to 127.0.0.1 respective ::1 we will bind to
    localhost otherwise we'll bind to INADDR_ANY respective in6_addr.
    ------------------------------------------------------------------------- */
 
@@ -1591,7 +1589,7 @@ static int dns_bind(struct dns_resolver *res)
       addr = net_addr_loopback;
     else
       addr = net_addr_any;
-    
+
     return net_bind(res->sock - 1, addr, port);
 #ifdef HAVE_IPV6
   }
@@ -1634,9 +1632,9 @@ static int dns_connect(struct dns_resolver *res)
     void *cb;
 
 //    local.sin_family = NET_ADDRESS_IPV4;
-    
+
     cb = (res->stype == NET_SOCKET_STREAM ? &dns_event_cn : NULL);
-    
+
     return net_connect(res->sock - 1, res->ns->addr, 53, cb, cb, res);
   }
 #ifdef HAVE_IPV6
@@ -1685,12 +1683,12 @@ static int dns_send(struct dns_resolver *res)
 
 /* -------------------------------------------------------------------------
    When socket gets writeable, send out pending stuff and change status
-   to DNS_ST_SENT 
+   to DNS_ST_SENT
    ------------------------------------------------------------------------- */
 static void dns_event_cn(int fd, void *ptr)
 {
-  struct dns_resolver *res = ptr;  
-  
+  struct dns_resolver *res = ptr;
+
 /*  if(!io_list[fd].status.connected)
   {
     if(res->callback)
@@ -1701,10 +1699,10 @@ static void dns_event_cn(int fd, void *ptr)
     if(dns_send(res) == -1)
     {
       dns_start(res, res->stype);
-      
+
       return;
     }
-    
+
     res->status = DNS_ST_SENT;
   }
 }
@@ -1715,7 +1713,7 @@ static void dns_event_cn(int fd, void *ptr)
 static void dns_event_rd(int fd, void *ptr)
 {
   struct dns_resolver *res = ptr;
-  
+
   if(res->stype == NET_SOCKET_DGRAM)
   {
     uint8_t buf[513];
@@ -1726,21 +1724,21 @@ static void dns_event_rd(int fd, void *ptr)
     if(ret <= 0)
     {
       dns_error(DNS_ERECV);
-      
+
       return;
     }
 
     if(ret > sizeof(buf) - 1 || dns_irrelevant(res, buf, ret))
     {
       dns_error(DNS_ESERVFAIL);
-      
+
       return;
     }
 
     if(dns_want_tcp(buf, ret))
     {
       dns_start(res, NET_SOCKET_STREAM);
-      
+
       return;
     }
 
@@ -1757,7 +1755,7 @@ static void dns_event_rd(int fd, void *ptr)
     if(res->reply == NULL)
     {
       dns_error(DNS_EMEMORY);
-      
+
       return;
     }
 
@@ -1769,7 +1767,7 @@ static void dns_event_rd(int fd, void *ptr)
 
     if(res->callback)
       res->callback(res);
-    
+
     return;
 
     /*dns_start(res, res->stype);*/
@@ -1789,13 +1787,13 @@ static int dns_start(struct dns_resolver *res, int type)
 
   res->query[2] = rand() & 0xff;
   res->query[3] = rand() & 0xff;
-  
+
 #ifdef HAVE_IPV6
   at = inst->options.ipv6_sock ? NET_ADDRESS_IPV6 : NET_ADDRESS_IPV4;
 #else
   at = NET_ADDRESS_IPV4;
 #endif /* HAVE_IPV6 */
-  
+
   res->ns = dns_get_ns(at);
 
   if(res->ns == NULL)
@@ -1829,10 +1827,10 @@ again:
   {
     if(res->status != DNS_ST_SENT)
       dns_send(res);
-    
+
     io_register(res->sock - 1, IO_CB_READ, dns_event_rd, res);
   }
-  
+
   return DNS_ESUCCESS;
 }
 
@@ -2055,7 +2053,7 @@ struct dns_resolver *dns_forall_next()
    Start a DNS_T_PTR lookup.
    Valid address families (af) are NET_ADDRESS_IPV4 and NET_ADDRESS_IPV6.
    (Corresponding to struct in_addr respective in6_addr for ip)
- 
+
    Returns:  1 when lookup is done (caching not yet implemented).
              0 when lookup is in progress.
             -1 on error
@@ -2081,13 +2079,13 @@ int dns_ptr_lookup(struct dns_resolver *res, int at, void *ip, uint64_t t)
    Start a DNS_T_A[AAA] lookup.
    Valid address families (af) are NET_ADDRESS_IPV4 and NET_ADDRESS_IPV6.
    (Corresponding to struct in_addr respective in6_addr for ip)
- 
+
    Returns:  1 when lookup is done (caching not yet implemented).
              0 when lookup is in progress.
             -1 on error
    ------------------------------------------------------------------------- */
 
-int dns_name_lookup(struct dns_resolver *res, int at, 
+int dns_name_lookup(struct dns_resolver *res, int at,
                     const char *name, uint64_t t)
 {
   uint8_t domain[256];

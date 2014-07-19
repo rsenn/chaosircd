@@ -63,7 +63,7 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CONFIG_DYLIB
 
-AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h])
+AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h])
 AC_FUNC_MMAP
 
 AC_CHECK_SSL
@@ -91,10 +91,12 @@ AC_CHECK_HEADER([winsock2.h])
 dnl AC_CHECK_LIB([ws2_32], [WSAStartup])
 dnl AC_CHECK_LIB([wsock32], [WSAStartup])
 
+dnl AC_CHECK_LIB([dnsapi], [DnsQueryConfig@24])
+
 AC_DEFINE_UNQUOTED([USE_SELECT], [1], [Use select() for i/o multiplexing])
 
 ac_cv_LIBS="$LIBS"
-LIBS="$LIBS -lws2_32"
+LIBS="$LIBS -ldnsapi -lws2_32"
 
 AC_MSG_CHECKING([for winsock2])
 AC_TRY_COMPILE([#include <winsock2.h>], 

@@ -55,69 +55,69 @@ struct chanuser {
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-extern int              chanuser_log;
+IRCD_DATA(int)           chanuser_log;
 extern struct sheap     chanuser_heap;
 
 /* -------------------------------------------------------------------------- *
  * Initialize the chanuser module                                             *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_init        (void);
+IRCD_API(void)          chanuser_init        (void);
 
 /* -------------------------------------------------------------------------- *
  * Shut down the chanuser module                                              *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_shutdown    (void);
+IRCD_API(void)          chanuser_shutdown    (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct chanuser *chanuser_new         (struct channel        *chptr, 
+IRCD_API(struct chanuser*) chanuser_new      (struct channel        *chptr,
                                               struct client         *sptr);
 
 /* -------------------------------------------------------------------------- *
  * Create a chanuser block, link it to the channel and the user and           *
  * set the flags                                                              *
  * -------------------------------------------------------------------------- */
-extern struct chanuser *chanuser_add         (struct channel        *chptr, 
+IRCD_API(struct chanuser*) chanuser_add      (struct channel        *chptr,
                                               struct client         *sptr);
 
 /* -------------------------------------------------------------------------- *
  * Find a chanuser block                                                      *
  * -------------------------------------------------------------------------- */
-extern struct chanuser *chanuser_find        (struct channel        *chptr, 
+IRCD_API(struct chanuser*) chanuser_find     (struct channel        *chptr,
                                               struct client         *sptr);
 
 /* -------------------------------------------------------------------------- *
  * Find a chanuser block and warn                                             *
  * -------------------------------------------------------------------------- */
-struct chanuser        *chanuser_find_warn   (struct client         *cptr,
+IRCD_API(struct chanuser*) chanuser_find_warn(struct client         *cptr,
                                               struct channel        *chptr,
                                               struct client         *acptr);
 
 /* -------------------------------------------------------------------------- *
  * Delete a chanuser block                                                    *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_delete      (struct chanuser       *cuptr);
+IRCD_API(void)          chanuser_delete      (struct chanuser       *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * Show all chanusers to a client                                             *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_show        (struct client         *cptr,
-                                              struct channel        *chptr, 
+IRCD_API(void)          chanuser_show        (struct client         *cptr,
+                                              struct channel        *chptr,
                                               struct chanuser       *cuptr,
                                               int                    eon);
 
 /* -------------------------------------------------------------------------- *
  * Parse chanusers                                                            *
  * -------------------------------------------------------------------------- */
-extern uint32_t         chanuser_parse       (struct lclient        *lcptr,  
+IRCD_API(uint32_t)      chanuser_parse       (struct lclient        *lcptr,
                                               struct list           *lptr,
-                                              struct channel        *chptr, 
+                                              struct channel        *chptr,
                                               char                  *args,
-                                              int                    prefix);  
+                                              int                    prefix);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct node     *chanuser_assemble    (char                  *buf,
+IRCD_API(struct node*)  chanuser_assemble    (char                  *buf,
                                               struct node           *nptr,
                                               size_t                 n,
                                               int                    of,
@@ -125,80 +125,80 @@ extern struct node     *chanuser_assemble    (char                  *buf,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_introduce   (struct lclient        *lcptr,
+IRCD_API(void)          chanuser_introduce   (struct lclient        *lcptr,
                                               struct client         *cptr,
                                               struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern size_t           chanuser_burst       (struct lclient        *lcptr,
+IRCD_API(size_t)        chanuser_burst       (struct lclient        *lcptr,
                                               struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_discharge   (struct lclient        *lcptr,
+IRCD_API(void)          chanuser_discharge   (struct lclient        *lcptr,
                                               struct chanuser       *cuptr,
                                               const char            *reason);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_mode_set    (struct chanuser       *cuptr,
+IRCD_API(void)          chanuser_mode_set    (struct chanuser       *cuptr,
                                               uint64_t               flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int              chanuser_mode_bounce (struct lclient        *lcptr,
+IRCD_API(int)           chanuser_mode_bounce (struct lclient        *lcptr,
                                               struct client         *cptr,
                                               struct channel        *chptr,
                                               struct chanuser       *cuptr,
                                               struct list           *lptr,
-                                              struct chanmodechange *cmcptr);  
+                                              struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_send_joins  (struct lclient        *lcptr, 
+IRCD_API(void)          chanuser_send_joins  (struct lclient        *lcptr,
                                               struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_send_modes  (struct lclient        *lcptr,
+IRCD_API(void)          chanuser_send_modes  (struct lclient        *lcptr,
                                               struct client         *cptr,
-                                              struct node           *nptr);  
+                                              struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * Walk through all channels a client is in and message all members           *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_vsend       (struct lclient        *one,
+IRCD_API(void)          chanuser_vsend       (struct lclient        *one,
                                               struct client         *sptr,
-                                              const char            *format, 
+                                              const char            *format,
                                               va_list                args);
 
-extern void             chanuser_send        (struct lclient        *one,
+IRCD_API(void)          chanuser_send        (struct lclient        *one,
                                               struct client         *sptr,
-                                              const char            *format, 
+                                              const char            *format,
                                               ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_drop        (struct client         *cptr, 
-                                              struct channel        *chptr);  
+IRCD_API(void)          chanuser_drop        (struct client         *cptr,
+                                              struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_whois       (struct client         *cptr, 
+IRCD_API(void)          chanuser_whois       (struct client         *cptr,
                                               struct user           *auptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_kick        (struct lclient        *lcptr,
+IRCD_API(void)          chanuser_kick        (struct lclient        *lcptr,
                                               struct client         *cptr,
-                                              struct channel        *chptr, 
+                                              struct channel        *chptr,
                                               struct chanuser       *cuptr,
                                               char                 **targetv,
                                               const char            *reason);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             chanuser_support     (void);
-  
+IRCD_API(void)          chanuser_support     (void);
+
 #endif /* SRC_CHANUSER_H */

@@ -14,15 +14,15 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
   PIE_ENABLE='auto'
 
   # check for --*-static argument 
-  AC_ARG_ENABLE([static],[  --enable-static    build static library (default)
-    --disable-static   do not build static library],[case $withval in
+  AC_ARG_ENABLE([static],[  --enable-static                build static library (default)
+  --disable-static               do not build static library],[case $withval in
     no|yes)  A_ENABLE=$withval ;;
     *) A_ENABLE="yes" ;;
    esac])
 
   # check for --*-shared argument 
-  AC_ARG_ENABLE([shared],[  --enable-shared    build shared library (default)
-    --disable-shared   do not build shared library],[case $withval in
+  AC_ARG_ENABLE([shared],[  --enable-shared                build shared library (default)
+  --disable-shared               do not build shared library],[case $withval in
     no|yes)  PIE_ENABLE=$withval ;;
     *) PIE_ENABLE="yes" ;;
    esac])

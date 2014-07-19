@@ -93,9 +93,6 @@
 /* Define to the full name of this package. */
 #undef PACKAGE_NAME
 
-/* Define to the release name of this package. */
-#undef PACKAGE_RELEASE
-
 /* Define to the full name and version of this package. */
 #undef PACKAGE_STRING
 
@@ -110,6 +107,9 @@
 
 /* Platform this server runs on */
 #undef PLATFORM
+
+/* Define to the release name of this package. */
+#undef PROJECT_RELEASE
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

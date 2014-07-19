@@ -69,19 +69,19 @@ static int conf_getopt(int argc, char **argv, const char *optstring,
 {
   static int lastidx = 0, lastofs = 0;
   char *tmp;
-  
-  /* Return immediately if we already read all 
-     arguments or when theres no switch left. */  
+
+  /* Return immediately if we already read all
+     arguments or when theres no switch left. */
   if(conf_optind > argc || !argv[conf_optind] ||
-     argv[conf_optind][0] != '-' || 
+     argv[conf_optind][0] != '-' ||
      argv[conf_optind][1] == '\0')
     return -1;
-  
+
 again:
-  
+
   if(argv[conf_optind] == NULL)
     return -1;
-  
+
   /* Skip this argument if its '--' */
   if(argv[conf_optind][1] == '-' && argv[conf_optind][2] == 0)
   {
@@ -137,7 +137,7 @@ again:
         }
 
         /* Skip to next arg */
-        conf_optind++;        
+        conf_optind++;
 
         /* Set flag if pointer present */
         if(o->flag)
@@ -148,26 +148,26 @@ again:
         return 0;
       }
     }
-    
+
     if(*optstring == ':')
       return ':';
-    
+
     log(conf_log, L_fatal, "invalid option`%s'.", arg);
-    
+
     conf_optind++;
-    
+
     return '?';
   }
-  
+
   /* Update last index */
   if(lastidx != conf_optind)
   {
-    lastidx = conf_optind; 
+    lastidx = conf_optind;
     lastofs = 0;
   }
-  
+
   conf_optopt = argv[conf_optind][lastofs + 1];
-  
+
   if((tmp = str_chr(optstring, conf_optopt)))
   {
     /* Apparently, we looked for \0, i.e. end of argument */
@@ -200,10 +200,10 @@ again:
           return ':';
 
         log(conf_log, L_fatal, "missing argument for -%c.", conf_optopt);
-        
+
         return ':';
       }
-      
+
       conf_optind++;
     }
     else
@@ -211,13 +211,13 @@ again:
       lastofs++;
       return conf_optopt;
     }
-    
+
 found:
     conf_optind++;
     return conf_optopt;
   }
   /* not found */
-  else 
+  else
   {
     log(conf_log, L_fatal, "unknown option -%c.", conf_optopt);
     conf_optind++;
@@ -230,7 +230,7 @@ found:
  * -------------------------------------------------------------------------- */
 static void usage(char **argv)
 {
-  puts(PACKAGE_NAME"-"PACKAGE_VERSION
+  puts(PROJECT_NAME"-"PROJECT_VERSION
        " - pi-networks irc server\n");
   puts("Usage: %s [options]\n", *argv);
   puts("  -h, --help           show this help");
@@ -253,15 +253,15 @@ static struct option longoptions[] = {
 void conf_init(int argc, char **argv, char **envp)
 {
   int c;
-  
+
   conf_log = log_source_register("conf");
-  
+
   memset(&conf_current, 0, sizeof(struct config));
   memset(&conf_new, 0, sizeof(struct config));
-  
+
   strcpy(conf_current.global.configfile, SYSCONFDIR"/ircd.conf");
   conf_new.global.nodetach = 0;
-  
+
   while((c = conf_getopt(argc, argv, "hdf:", longoptions)) > 0)
   {
     switch(c)
@@ -280,7 +280,7 @@ void conf_init(int argc, char **argv, char **envp)
         break;
     }
   }
-  
+
   conf_read();
 }
 
@@ -292,7 +292,7 @@ void conf_shutdown(void)
 /*  conf_free(&conf_current);
   conf_free(&conf_new);*/
   io_close(conf_fd);
-  
+
   log_source_unregister(conf_log);
 }
 /* -------------------------------------------------------------------------- *
@@ -300,7 +300,7 @@ void conf_shutdown(void)
 void conf_free(struct config *config)
 {
 /*  struct node *node;
-  
+
   dlink_foreach(&config->logs, node)
     log_drain_push(node->data);
 
@@ -315,7 +315,7 @@ void conf_free(struct config *config)
  * This is called when a config file is read successfully.                    *
  * -------------------------------------------------------------------------- */
 void conf_done(void)
-{  
+{
   memcpy(&conf_current.logs, &conf_new.logs, sizeof(struct config) - sizeof(struct conf_global));
 
   conf_current.global.nodetach = conf_new.global.nodetach;
@@ -324,14 +324,14 @@ void conf_done(void)
   strcpy(conf_current.global.pidfile, conf_new.global.pidfile);
 /*  if(conf_current.global.name[0])
     strlcpy(me->name, conf_current.global.name, sizeof(me->name));
-  
+
   if(conf_current.global.info[0])
     strlcpy(me->info, conf_current.global.info, sizeof(me->info));
-  
+
   for(i = 0; i < sizeof(me->name); i++)
     if(chars_isspace(me->name[i]))
       me->name[i] = '\0';*/
-  
+
   hooks_call(conf_done, HOOK_DEFAULT, &conf_current);
 }
 
@@ -345,40 +345,40 @@ void conf_read_callback(int fd, void *ptr)
     log(conf_log, L_status, "Read %u lines from %s.",
         io_list[fd].recvq.lines,
         conf_current.global.configfile);
-    
+
 /*    conf_free(&conf_new);*/
     yyparse();
-    
+
     conf_free(&conf_current);
     conf_done();
-    
-    io_close(fd);    
+
+    io_close(fd);
   }
 }
-  
+
 /* -------------------------------------------------------------------------- *
  * Read the config file(s).                                                   *
  * -------------------------------------------------------------------------- */
 void conf_read(void)
 {
   /* Open the file in non-blocking mode */
-  log(conf_log, L_status, "Reading config from %s.", 
+  log(conf_log, L_status, "Reading config from %s.",
       conf_current.global.configfile);
-  
+
   conf_fd = io_open(conf_current.global.configfile, IO_OPEN_READ);
-  
+
   strlcpy(conffile, conf_current.global.configfile, sizeof(conffile));
-  
+
   if(conf_fd == -1)
   {
-    log(conf_log, L_fatal, "Could not open config file: %s.", 
+    log(conf_log, L_fatal, "Could not open config file: %s.",
         conf_current.global.configfile);
     return;
   }
-  
+
   /* Enable the read queue */
   io_queue_control(conf_fd, ON, OFF, OFF);
- 
+
   /* Set up a handler that will be called when file is read */
   io_register(conf_fd, IO_CB_READ, conf_read_callback, NULL);
 }
@@ -397,7 +397,7 @@ void conf_yy_error(char *msg)
 void conf_rehash_hook(struct config *config)
 {
   log(conf_log, L_status, "Rehash done.");
-  
+
   hook_unregister(conf_done, HOOK_DEFAULT, conf_rehash_hook);
 }
 
@@ -414,7 +414,7 @@ void conf_rehash(void)
   struct ssl_context *scptr;
 
   conf_read();
-  
+
   dlink_foreach(&listen_list, lptr)
   {
     if(--lptr->refcount == 0)
@@ -423,7 +423,7 @@ void conf_rehash(void)
       listen_delete(lptr);
     }
   }
-  
+
   dlink_foreach(&connect_list, cnptr)
   {
     if(--cnptr->refcount == 0)
@@ -432,7 +432,7 @@ void conf_rehash(void)
       connect_delete(cnptr);
     }
   }
-  
+
   dlink_foreach(&module_list, mptr)
   {
     if(--mptr->refcount == 0)
@@ -441,7 +441,7 @@ void conf_rehash(void)
       module_delete(mptr);
     }
   }
-  
+
   dlink_foreach(&mfile_list, mfptr)
   {
     if(--mfptr->refcount == 0)
@@ -450,7 +450,7 @@ void conf_rehash(void)
       mfile_delete(mfptr);
     }
   }
-  
+
   dlink_foreach(&class_list, clptr)
   {
     if(--clptr->refcount == 0)
@@ -459,7 +459,7 @@ void conf_rehash(void)
       class_delete(clptr);
     }
   }
-  
+
   dlink_foreach(&ssl_list, scptr)
   {
     if(--scptr->refcount == 0)
@@ -468,7 +468,7 @@ void conf_rehash(void)
       ssl_delete(scptr);
     }
   }
-  
+
   dlink_foreach(&oper_list, optr)
   {
     if(--optr->refcount == 0)
@@ -478,6 +478,6 @@ void conf_rehash(void)
     }
   }
 
-  hook_register(conf_done, HOOK_DEFAULT, conf_rehash_hook);  
+  hook_register(conf_done, HOOK_DEFAULT, conf_rehash_hook);
 }
 

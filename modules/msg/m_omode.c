@@ -47,7 +47,7 @@
 static void mo_omode         (struct lclient *lcptr, struct client *cptr,
                               int             argc,  char         **argv);
 static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
-                              struct channel *chptr, int            argc, 
+                              struct channel *chptr, int            argc,
                               char          **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -61,10 +61,10 @@ static char *m_omode_help[] = {
   "following command:",
   "/quote help chanmodes",
   NULL
-};    
+};
 
 static struct msg m_omode_msg = {
-  "OMODE", 1, 3, MFLG_OPER, 
+  "OMODE", 1, 3, MFLG_OPER,
   { NULL, NULL, NULL, mo_omode },
   m_omode_help
 };
@@ -76,7 +76,7 @@ int m_omode_load(void)
 {
   if(msg_register(&m_omode_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -88,11 +88,11 @@ void m_omode_unload(void)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
-                              struct channel *chptr, int            argc,  
+                              struct channel *chptr, int            argc,
                               char          **argv)
 {
   struct list           list;
-  
+
   if(argc < 4)
   {
     chanmode_show(cptr, chptr);
@@ -101,10 +101,10 @@ static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
 
   chanmode_parse(lcptr, cptr, chptr, NULL, &list, argv[3], argv[4],
                  client_is_user(cptr) ? IRCD_MODESPERLINE : CHANMODE_PER_LINE);
-  
+
   chanmode_apply(lcptr, cptr, chptr, NULL, &list);
-  
-  chanmode_send_local(cptr, chptr, list.head, 
+
+  chanmode_send_local(cptr, chptr, list.head,
                       client_is_user(cptr) ? IRCD_MODESPERLINE : CHANMODE_PER_LINE);
   chanmode_send_remote(lcptr, cptr, chptr, list.head);
 }
@@ -122,16 +122,16 @@ static void mo_omode(struct lclient *lcptr, struct client *cptr,
   if(channel_is_valid(argv[2]))
   {
     struct channel *chptr;
-    
+
     chptr = channel_find_name(argv[2]);
-  
+
     if(chptr == NULL)
     {
       client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL),
                   client_me->name, cptr->name, argv[2]);
       return;
     }
-    
+
     mo_omode_channel(lcptr, cptr, chptr, argc, argv);
   }
 }

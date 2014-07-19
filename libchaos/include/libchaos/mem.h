@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: mem.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -104,7 +104,7 @@ struct sblock {
   struct list    free_ones;   /* list of unused elements */
   struct list    used_ones;   /* list of used elements */
 };
- 
+
 /* ------------------------------------------------------------------------ *
  * Block allowing allocation of dynamic length chunks.                        *
  * ------------------------------------------------------------------------ */
@@ -152,13 +152,13 @@ struct dheap {
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)          mem_log;       /* Log source */
-CHAOS_API(struct dheap) mem_dheap;     /* Dynamic heap for malloc() and consorts */
-CHAOS_API(struct list)  mem_slist;
-CHAOS_API(struct list)  mem_dlist;
-CHAOS_API(uint32_t)     mem_id;
+CHAOS_DATA(int)          mem_log;       /* Log source */
+CHAOS_DATA(struct dheap) mem_dheap;     /* Dynamic heap for malloc() and consorts */
+CHAOS_DATA(struct list)  mem_slist;
+CHAOS_DATA(struct list)  mem_dlist;
+CHAOS_DATA(uint32_t)     mem_id;
 #ifndef MAP_ANON
-CHAOS_API(int)          mem_zero;      /* /dev/zero if we havent MAP_ANON */
+CHAOS_DATA(int)          mem_zero;      /* /dev/zero if we havent MAP_ANON */
 #endif /* MAP_ANON */
 
 /* ------------------------------------------------------------------------ */
@@ -210,8 +210,8 @@ CHAOS_API(void *)mem_static_alloc        (struct sheap *shptr);
  * Free an element on a static heap                                           *
  *                                                                            *
  * <msptr>          Pointer to a static heap structure                        *
- * 
- * 
+ *
+ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)  mem_static_free         (struct sheap *shptr,
                                           void         *scptr);
@@ -232,7 +232,7 @@ CHAOS_API(void)  mem_static_destroy      (struct sheap *shptr);
 #ifdef DEBUG
 CHAOS_API(int)   mem_static_valid        (struct sheap *shptr,
                                           void         *scptr);
-#endif /* DEBUG */ 
+#endif /* DEBUG */
 
 /* ------------------------------------------------------------------------ *
  * Create a new dynamic heap                                                  *
@@ -240,7 +240,7 @@ CHAOS_API(int)   mem_static_valid        (struct sheap *shptr,
  * <dhptr>   Pointer to a dynamic heap structure                              *
  * <size>    How big the a chunk can be at the maximum                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_dynamic_create      (struct dheap *dhptr, 
+CHAOS_API(void)  mem_dynamic_create      (struct dheap *dhptr,
                                           size_t        size);
 
 /* ------------------------------------------------------------------------ *
@@ -261,7 +261,7 @@ CHAOS_API(void *)mem_dynamic_alloc       (struct dheap *dhptr,
 CHAOS_API(void *)mem_dynamic_realloc     (struct dheap *dhptr,
                                           void         *ptr,
                                           size_t        size);
-  
+
 /* ------------------------------------------------------------------------ *
  * Free a chunk. haha                                                         *
  * ------------------------------------------------------------------------ */
@@ -342,7 +342,7 @@ CHAOS_API(inline) void *memset(void *s, int c, size_t n)
                 ((int32_t)(c & 0xff) << 16) |
                 ((int32_t)(c & 0xff) << 24);
     n >>= 2;
- 
+
     for(i = 0; i < n; i++)
       ((int32_t *)s)[i] = q;
   }
@@ -352,7 +352,7 @@ CHAOS_API(inline) void *memset(void *s, int c, size_t n)
     int16_t q = ((int16_t)(c & 0xff) <<  0) |
                 ((int16_t)(c & 0xff) <<  8);
     n >>= 1;
- 
+
     for(i = 0; i < n; i++)
       ((int16_t *)s)[i] = q;
   }
@@ -390,9 +390,9 @@ CHAOS_API(inline) void *memcpy(void *d, const void *s, size_t n)
   }
   /* n is a multiple of 2, so do 16bit copying */
   else if(!(n & 0x01) && (n >= 2))
-  { 
+  {
     n >>= 1;
-                
+
     for(i = 0; i < n; i++)
       ((int16_t *)d)[i] = ((int16_t *)s)[i];
   }
@@ -402,7 +402,7 @@ CHAOS_API(inline) void *memcpy(void *d, const void *s, size_t n)
     for(i = 0; i < n; i++)
       ((int8_t *)d)[i] = ((int8_t *)s)[i];
   }
-  
+
   return d;
 }
 
@@ -410,16 +410,16 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
 {
   size_t i;
   ssize_t dist;
-  
+
   dist = (size_t)d - (size_t)s;
-  
+
   if(dist <= 0)
   {
     /* n is a multiple of 8, so do 64bit copying */
     if(!(n & 0x07) && (n >= 8) && (dist >= 8 || dist == 0))
     {
       n >>= 3;
-      
+
       for(i = 0; i < n; i++)
         ((int64_t *)d)[i] = ((int64_t *)s)[i];
     }
@@ -427,7 +427,7 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
     else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
     {
       n >>= 2;
-      
+
       for(i = 0; i < n; i++)
         ((int32_t *)d)[i] = ((int32_t *)s)[i];
     }
@@ -435,7 +435,7 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
     else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
     {
       n >>= 1;
-      
+
       for(i = 0; i < n; i++)
         ((int16_t *)d)[i] = ((int16_t *)s)[i];
     }
@@ -465,11 +465,11 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
     else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
     {
       n >>= 2;
-      
+
       for(i = n - 1;; i--)
       {
         ((int32_t *)d)[i] = ((int32_t *)s)[i];
-        
+
         if(i == 0)
           break;
       }
@@ -478,11 +478,11 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
     else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
     {
       n >>= 1;
-      
+
       for(i = n - 1;; i--)
       {
         ((int16_t *)d)[i] = ((int16_t *)s)[i];
-        
+
         if(i == 0)
           break;
       }
@@ -493,7 +493,7 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
       for(i = n - 1;; i--)
       {
         ((int8_t *)d)[i] = ((int8_t *)s)[i];
-        
+
         if(i == 0)
           break;
       }
@@ -506,12 +506,12 @@ CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
 CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
 {
   size_t i;
-  
+
   /* n is a multiple of 8, so do 64bit comparing */
   if(!(n & 0x07) && (n >= 8))
   {
     n >>= 3;
-    
+
     for(i = 0; i < n; i++)
       if(((int64_t *)d)[i] != ((int64_t *)s)[i])
         return 1;
@@ -520,7 +520,7 @@ CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
   else if(!(n & 0x03) && (n >= 4))
   {
     n >>= 2;
-    
+
     for(i = 0; i < n; i++)
       if(((int32_t *)d)[i] != ((int32_t *)s)[i])
         return 1;
@@ -529,7 +529,7 @@ CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
   else if(!(n & 0x01) && (n >= 2))
   {
     n >>= 1;
-    
+
     for(i = 0; i < n; i++)
       if(((int16_t *)d)[i] != ((int16_t *)s)[i])
         return 1;
@@ -541,7 +541,7 @@ CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
       if(((int8_t *)d)[i] != ((int8_t *)s)[i])
         return 1;
   }
-  
+
   return 0;
 }
 
@@ -562,7 +562,7 @@ CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
                               } \
                             } while(0)*/
 /*
-  * calloc is kludgy and we can't alloc memory 
+  * calloc is kludgy and we can't alloc memory
   * of 64bit sizes anyway (n * size), use heaps
   * for fixed size stuff anyway!!!
   */

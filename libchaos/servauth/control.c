@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: control.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -50,7 +50,7 @@ static int control_exec(control_t *cptr, int ac, char **av)
 
   if(ac < 1)
     return -1;
-  
+
   cmdptr = command_get(cmds, av[0]);
 
   if(cmdptr != NULL)
@@ -71,7 +71,7 @@ static int control_parse(control_t *cptr, char *line)
 
   if(ac == 0)
     return 0;
-  
+
   return control_exec(cptr, ac, av);
 }
 
@@ -81,10 +81,10 @@ static int control_parse(control_t *cptr, char *line)
 static void control_readable(int fd, void *ptr)
 {
   char buf[1024];
-  
+
   if(io_list[fd].status.closed || io_list[fd].status.err)
     servauth_shutdown();
-  
+
   if(io_list[fd].recvq.lines)
   {
     while(io_gets(fd, buf, 1024) > 0)
@@ -106,11 +106,11 @@ static void control_readable(int fd, void *ptr)
 void control_init(control_t *cptr, int recvfd, int sendfd)
 {
   memset(cptr, 0, sizeof(control_t));
-  
+
   cptr->recvfd = recvfd;
   cptr->sendfd = sendfd;
-  
-  if(sendfd != recvfd) 
+
+  if(sendfd != recvfd)
   {
     io_queue_control(recvfd, ON, OFF, ON);
     io_queue_control(sendfd, OFF, ON, ON);
@@ -119,7 +119,7 @@ void control_init(control_t *cptr, int recvfd, int sendfd)
   {
     io_queue_control(recvfd, ON, ON, ON);
   }
-  
+
   io_register(recvfd, IO_CB_READ, control_readable, cptr);
 }
 
@@ -135,7 +135,7 @@ int control_send(control_t *cptr, const char *format, ...)
   ret = io_vputs(cptr->sendfd, format, args);
 
   va_end(args);
-  
+
   return ret;
 }
 

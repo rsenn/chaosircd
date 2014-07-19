@@ -41,7 +41,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_kick (struct lclient *lcptr, struct client *cptr, 
+static void m_kick (struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -56,7 +56,7 @@ static char *m_kick_help[] = {
   "",
   "If no reason is specified, the name of the",
   "user originating the kick is used.",
-  NULL  
+  NULL
 };
 
 static struct msg m_kick_msg = {
@@ -72,7 +72,7 @@ int m_kick_load(void)
 {
   if(msg_register(&m_kick_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -94,24 +94,24 @@ static void m_kick(struct lclient *lcptr, struct client *cptr,
   struct channel  *chptr;
   struct chanuser *cuptr;
   char            *targetv[IRCD_MAXTARGETS + 1];
-  uint32_t         n;
+//  uint32_t         n;
 
   if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
 
   cuptr = chanuser_find(chptr, cptr);
-  
+
   if(cuptr == NULL)
-  { 
+  {
     numeric_send(cptr, ERR_NOTONCHANNEL, chptr->name);
     return;
   }
-   
-  n = str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
-  
+
+  /*n =*/ str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
+
   if(argv[4] == NULL)
     argv[4] = cptr->name;
-  
-  chanuser_kick(lcptr, cptr, chptr, cuptr, targetv, 
+
+  chanuser_kick(lcptr, cptr, chptr, cuptr, targetv,
                 argv[4] ? argv[4] : cptr->name);
 }

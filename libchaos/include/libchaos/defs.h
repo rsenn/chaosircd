@@ -28,15 +28,15 @@
 #ifndef NULL
 #define NULL (void *)0
 #endif /* NULL */
-
+/*
 #include <stdlib.h>
 #include <stdint.h>
-
+*/
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif // HAVE_INTTYPES_H
 
-#include <sys/stat.h>
+//#include <sys/stat.h>
 
 /*
 #include <fcntl.h>
@@ -49,15 +49,32 @@
 
  */
 
-#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__)
+typedef uintptr_t hash_t;
+
+#ifndef _MSC_VER
+#define DLLIMPORT __attribute__((dllimport))
+#define DLLEXPORT __attribute__((dllexport))
+#else
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+#endif
+
+#ifdef __x86_64__
+#define HASH_BIT_SIZE 64
+#else
+#define HASH_BIT_SIZE 32
+#endif
+
+#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__MINGW64__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
-#   define CHAOS_API(type) __attribute__((dllexport)) type
-#   define CHAOS_DATA(type) extern __attribute__((dllexport)) type
+#   define CHAOS_API(type) DLLEXPORT type
+#   define CHAOS_DATA(type) extern DLLEXPORT type
 #  else
 #   define CHAOS_API(type) type
-#   define CHAOS_DATA(type) extern __attribute__((dllimport)) type
+#   define CHAOS_DATA(type) extern DLLIMPORT type
 #  endif
+# define CHAOS_DATA_DECL(type) DLLEXPORT type
 # endif
 #endif
 
@@ -67,16 +84,29 @@
 #ifndef CHAOS_DATA
 # define CHAOS_DATA(type) extern type
 #endif
-
-#ifndef CHAOS_INLINE
-#ifdef __clang__
-#define CHAOS_INLINE static inline
-#else
-#define CHAOS_INLINE extern inline
-#endif
+#ifndef CHAOS_DATA_DECL
+# define CHAOS_DATA_DECL(type) type
 #endif
 
-#ifdef __clang__
+#ifndef CHAOS_INLINE_FN
+# ifdef _MSC_VER
+#  define CHAOS_INLINE __inline
+#  define CHAOS_INLINE_IMPL(function)
+# elif defined(__clang__)
+#  define CHAOS_INLINE static inline
+# else
+#  define CHAOS_INLINE extern inline
+# endif
+# ifndef CHAOS_INLINE_IMPL
+#  define CHAOS_INLINE_IMPL(function) function
+# endif
+# define CHAOS_INLINE_FN(function) CHAOS_API() function; CHAOS_INLINE function
+#endif
+#ifndef CHAOS_INLINE_IMPL
+# define CHAOS_INLINE_IMPL(function) function
+#endif
+
+#if defined(__clang__) || defined(_MSC_VER)
 #undef NO_C99
 #else
 #define NO_C99 1

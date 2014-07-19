@@ -60,7 +60,7 @@ static char *m_whois_help[] = {
   NULL
 };
 
-static struct msg m_whois_msg = 
+static struct msg m_whois_msg =
 {
   "WHOIS", 1, 2, MFLG_CLIENT,
   { NULL, m_whois, m_whois, m_whois },
@@ -74,7 +74,7 @@ int m_whois_load(void)
 {
   if(msg_register(&m_whois_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -91,14 +91,14 @@ static void m_whois(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   struct client *acptr;
-  
+
   if(lclient_is_server(lcptr))
   {
     if(lcptr->caps & CAP_UID)
       acptr = client_find_uid(argv[2]);
     else
       acptr = client_find_nick(argv[2]);
-    
+
     if(acptr == NULL)
     {
       log(client_log, L_warning, "Dropping WHOIS for unknown user %s.",
@@ -117,7 +117,7 @@ static void m_whois(struct lclient *lcptr, struct client *cptr,
     user_whois(cptr, acptr->user);
   }
   else
-  {    
+  {
     if(acptr->source->caps & CAP_UID)
       lclient_send(acptr->source, ":%s WHOIS %s",
                    cptr->user->uid, acptr->user->uid);

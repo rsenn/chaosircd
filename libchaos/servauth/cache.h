@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: cache.h,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -41,7 +41,7 @@
 /* -------------------------------------------------------------------------- *
  * cache entry for auth replies/timeouts.                                     *
  * -------------------------------------------------------------------------- */
-struct cache_entry_auth 
+struct cache_entry_auth
 {
   int            status;
   net_addr_t     addr;
@@ -51,7 +51,7 @@ struct cache_entry_auth
 /* -------------------------------------------------------------------------- *
  * cache entry for dns replies/timeouts.                                      *
  * -------------------------------------------------------------------------- */
-struct cache_entry_dns 
+struct cache_entry_dns
 {
   int            status;
   net_addr_t     addr;
@@ -114,38 +114,38 @@ extern void           cache_auth_put         (struct cache_auth *cache,
 /* -------------------------------------------------------------------------- *
  * pick a auth query from cache.                                              *
  * -------------------------------------------------------------------------- */
-extern int            cache_auth_pick        (struct cache_auth *cache, 
+extern int            cache_auth_pick        (struct cache_auth *cache,
                                               net_addr_t         addr,
                                               uint64_t           t);
 
 /* -------------------------------------------------------------------------- *
  * generate new cache for dns requests                                        *
  * -------------------------------------------------------------------------- */
-extern int            cache_dns_new          (struct cache_dns  *cache, 
+extern int            cache_dns_new          (struct cache_dns  *cache,
                                               uint32_t           size);
 
 /* -------------------------------------------------------------------------- *
  * put a dns request into cache.                                              *
  * -------------------------------------------------------------------------- */
 extern void           cache_dns_put          (struct cache_dns  *cache,
-                                              int                status, 
+                                              int                status,
                                               net_addr_t         addr,
-                                              const char        *name, 
+                                              const char        *name,
                                               uint64_t           t);
 
 /* -------------------------------------------------------------------------- *
  * pick a reverse dns query from cache.                                       *
  * -------------------------------------------------------------------------- */
-extern int            cache_dns_pick_reverse (struct cache_dns  *cache, 
+extern int            cache_dns_pick_reverse (struct cache_dns  *cache,
                                               net_addr_t         addr,
-                                              const char       **namep, 
+                                              const char       **namep,
                                               uint64_t           t);
 
 /* -------------------------------------------------------------------------- *
  * pick a reverse dns query from cache.                                       *
  * -------------------------------------------------------------------------- */
 extern net_addr_t     cache_dns_pick_forward (struct cache_dns  *cache,
-                                              const char        *name, 
+                                              const char        *name,
                                               uint64_t           t);
 /* -------------------------------------------------------------------------- *
  * generate new cache for proxy checks                                        *
@@ -166,7 +166,7 @@ extern void           cache_proxy_put        (struct cache_proxy *cache,
 /* -------------------------------------------------------------------------- *
  * pick a proxy query from cache.                                             *
  * -------------------------------------------------------------------------- */
-extern int            cache_proxy_pick       (struct cache_proxy *cache, 
+extern int            cache_proxy_pick       (struct cache_proxy *cache,
                                               net_addr_t          addr,
                                               uint16_t            port,
                                               int                 type,

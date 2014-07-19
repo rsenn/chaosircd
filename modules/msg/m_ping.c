@@ -49,7 +49,7 @@ static char *m_ping_help[] = {
   "Sends a irc ping to the target.",
   "If the target is ommited then it is sent to your local server.",
   NULL
-};  
+};
 
 static struct msg m_ping_msg = {
   "PING", 0, 2, MFLG_CLIENT,
@@ -64,7 +64,7 @@ int m_ping_load(void)
 {
   if(msg_register(&m_ping_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -77,19 +77,19 @@ void m_ping_unload(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'ping'                                                           *
  * -------------------------------------------------------------------------- */
-static void m_ping(struct lclient *lcptr, struct client *cptr, 
+static void m_ping(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
   struct server *asptr;
   struct client *acptr;
-  
+
   /* do pings on server-server links */
   if(client_is_server(cptr) && client_is_local(cptr) && argv[2] && chars_isdigit(argv[2][0]))
   {
     lclient_send(lcptr, "PONG :%s", argv[2]);
     return;
   }
-  
+
   /* bitchx lag shit */
   if(argc == 4 && chars_isdigit(argv[2][0]))
   {
@@ -100,13 +100,13 @@ static void m_ping(struct lclient *lcptr, struct client *cptr,
       return;
     }
   }
-  
+
   /* rfc violating ping shit */
   if(argv[2] == NULL)
     argv[2] = server_me->name;
-    
+
   asptr = server_find_name(argv[2]);
-  
+
   if(asptr == NULL)
   {
     if(lcptr->caps & CAP_UID)
@@ -118,14 +118,14 @@ static void m_ping(struct lclient *lcptr, struct client *cptr,
   {
     acptr = asptr->client;
   }
-  
+
   if(acptr == NULL)
   {
     acptr = client_me;
     argv[3] = argv[2];
     argv[2] = client_me->name;
   }
-  
+
   if(acptr == client_me)
   {
     if(argv[3])

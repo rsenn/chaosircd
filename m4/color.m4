@@ -84,7 +84,7 @@ AC_DEFUN([AC_MSG_RESULT_UNQUOTED], [AC_MSG_RESULT([$1], [$2])])
 # echo stuff using a color
 # ---------------------------------------------------------------------------
 AC_DEFUN([AC_ECHO_COLOR],
-[echo -e ${COLOR_$2}$1${NC} >&AS_MESSAGE_FD])
+[echo ${COLOR_$2}$1${NC} >&AS_MESSAGE_FD])
 
 # echo result using a color
 # ---------------------------------------------------------------------------
@@ -237,45 +237,45 @@ AC_DEFUN([AC_CHECK_COLOR],
 [# set color variables
 AC_MSG_CHECKING(whether to enable colored compiling)
 
-ac_cv_quiet="yes"
-AC_ARG_ENABLE(quiet,
-[  --disable-quiet         echo commands while compiling (automake style)
-  --enable-quiet          do not echo commands while compiling, print 
+ac_cv_silent_rules="yes"
+AC_ARG_ENABLE(silent-rules,
+[  --disable-silent-rules         echo commands while compiling (automake style)
+  --enable-silent-rules          do not echo commands while compiling, print 
                           variable-like name of program used (linux style)],
 [case "$enableval" in
   no)
-    ac_cv_quiet="no"
+    ac_cv_silent_rules="no"
     ;;
   *)
-    ac_cv_quiet="yes"
+    ac_cv_silent_rules="yes"
     ;;
 esac])
-if test "$ac_cv_quiet" = "yes"; then
+if test "$ac_cv_silent_rules" = "yes"; then
 #  MAKEFLAGS=""
   MAKEFLAGS="-s"
-  QUIET="--quiet"
+  SILENT_RULES="--quiet"
   ECHO="echo"
   REDIR=">/dev/null"
   REDIR2="2>/dev/null"
-  QUIET="@"
+  SILENT_RULES="@"
   SILENT=""
   NOSILENT="#"
 else
   MAKEFLAGS=""
-  QUIET=""
+  SILENT_RULES=""
   ECHO="true"
   REDIR=""
   REDIR2=""
-  QUIET=""
+  SILENT_RULES=""
   SILENT="#"
   NOSILENT=""
 fi
 AC_SUBST(ECHO)
-AC_SUBST(QUIET)
+AC_SUBST(SILENT_RULES)
 AC_SUBST(MAKEFLAGS)
 AC_SUBST(REDIR)
 AC_SUBST(REDIR2)
-AC_SUBST(QUIET)
+AC_SUBST(SILENT_RULES)
 AC_SUBST(SILENT)
 AC_SUBST(NOSILENT)
 COLOR="no"

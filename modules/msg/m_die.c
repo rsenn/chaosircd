@@ -44,7 +44,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_die(struct lclient *lcptr, struct client *cptr, 
+static void mo_die(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -71,7 +71,7 @@ int m_die_load(void)
 {
   if(msg_register(&mo_die_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -85,7 +85,7 @@ void m_die_unload(void)
  * argv[1] - 'die'                                                            *
  * argv[2] - name                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_die(struct lclient *lcptr, struct client *cptr, 
+static void mo_die(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
 {
   if(server_relay_always(lcptr, cptr, 2, ":%C DIE %s", &argc, argv))

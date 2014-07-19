@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: queue.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -115,8 +115,8 @@ CHAOS_API(uint32_t)  queue_gets       (struct fqueue *fifoptr,
  * Read stuff from the queue tail but do NOT dequeue it.                      *
  * ------------------------------------------------------------------------ */
 CHAOS_API(uint32_t)  queue_map         (struct fqueue *fifoptr,
-                                        void          *buf, 
-                                        uint32_t       n);  
+                                        void          *buf,
+                                        uint32_t       n);
 
 /* ------------------------------------------------------------------------ *
  * Remove n bytes from queue tail.                                            *
@@ -132,19 +132,19 @@ CHAOS_API(void)      queue_free        (struct fqueue *fifoptr);
 /* ------------------------------------------------------------------------ *
  * Link a queue to the tail of another.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)      queue_link        (struct fqueue *from, 
+CHAOS_API(void)      queue_link        (struct fqueue *from,
                                         struct fqueue *to);
 
 /* ------------------------------------------------------------------------ *
  * Release a multicast list.                                                  *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)      queue_destroy     (struct fqueue *fifoptr);
-    
+
 /* ------------------------------------------------------------------------ *
  * Dump a queue.                                                              *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
 CHAOS_API(void)      queue_dump        (struct fqueue *fifoptr);
-#endif /* DEBUG */  
+#endif /* DEBUG */
 
 #endif /* LIB_QUEUE_H */

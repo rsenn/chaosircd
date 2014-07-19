@@ -36,20 +36,20 @@
 struct class;
 struct channel;
 
-struct stats 
+struct stats
 {
   struct node node;
   char        letter;
   void      (*cb)(struct client *);
 };
 
-struct capab 
+struct capab
 {
   char    *name;
   uint32_t cap;
 };
 
-struct cryptcap 
+struct cryptcap
 {
   char    *name;     /* name of capability (cipher name) */
   uint32_t cap;      /* mask value */
@@ -57,7 +57,7 @@ struct cryptcap
   int      cipherid; /* ID number of cipher type (3DES, AES, IDEA) */
 };
 
-struct burst 
+struct burst
 {
   uint32_t sendq;
   uint32_t servers;
@@ -66,7 +66,7 @@ struct burst
   uint32_t chanmodes;
 };
 
-struct server 
+struct server
 {
   struct node     node;
   struct node     rnode;
@@ -74,7 +74,7 @@ struct server
   struct node     snode;
   uint32_t        id;
   int             refcount;
-  uint32_t        hash;
+  hash_t          hash;
   int             location;
   struct client  *client;
   struct lclient *lclient;
@@ -98,8 +98,8 @@ struct server
 #define CAP_KLN         0x00000010   /* Can do KLINE message */
 #define CAP_GLN         0x00000020   /* Can do GLINE message */
 #define CAP_HOP         0x00000040   /* can do half ops (+h) */
-#define CAP_PAR         0x00000080   
-#define CAP_SPF         0x00000100   
+#define CAP_PAR         0x00000080
+#define CAP_SPF         0x00000100
 #define CAP_RW          0x00000200   /* Does remote whois */
 #define CAP_DE          0x00000400   /* supports deny */
 #define CAP_AM          0x00000800   /* supports automode */
@@ -137,7 +137,7 @@ struct server
 
 #define NOCAP  0
 #define NOCAPS 0
-#define CAP_NONE 0 
+#define CAP_NONE 0
 
 
 #define IsCapableEnc(x, cap)    ((x)->local->enc_caps &   (cap))
@@ -154,7 +154,7 @@ struct server
 #define SERVER_NOCRYPT 0
 #define SERVER_CRYPT   1
 
-#define SERVER_NOTS 0 
+#define SERVER_NOTS 0
 #define SERVER_TS   1
 
 #define server_is_local(s) (s->location == SERVER_LOCAL)
@@ -175,7 +175,7 @@ IRCD_DATA(struct stats      )server_stats[];
 IRCD_DATA(int               )server_default_caps;
 IRCD_DATA(int               )server_default_cipher;
 IRCD_DATA(struct capab      )server_caps[];
-IRCD_DATA(struct cryptcap   )server_ciphers[];  
+IRCD_DATA(struct cryptcap   )server_ciphers[];
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) server_get_log(void);
@@ -187,7 +187,7 @@ IRCD_API(void           )server_init        (void);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(void           )server_shutdown    (void);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(struct server *)server_new         (const char     *name,
@@ -223,7 +223,7 @@ IRCD_API(void           )server_release     (struct server  *sptr);
  * -------------------------------------------------------------------------- */
 IRCD_API(void           )server_set_name    (struct server  *sptr,
                                              const char     *name);
-  
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(struct server *)server_find_id     (uint32_t        id);
@@ -231,11 +231,11 @@ IRCD_API(struct server *)server_find_id     (uint32_t        id);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(struct server *)server_find_name   (const char     *name);
-    
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(struct server *)server_find_namew  (struct client  *cptr,
-                                             const char     *name);    
+                                             const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -244,7 +244,7 @@ IRCD_API(int            )server_connect     (struct client  *sptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int            )server_relay       (struct lclient *lcptr, 
+IRCD_API(int            )server_relay       (struct lclient *lcptr,
                                              struct client  *cptr,
                                              struct server  *sptr,
                                              const char     *format,
@@ -254,19 +254,19 @@ IRCD_API(int            )server_relay       (struct lclient *lcptr,
  * -------------------------------------------------------------------------- */
 IRCD_API(int            )server_relay_always(struct lclient *lcptr,
                                              struct client  *cptr,
-                                             uint32_t        sindex, 
+                                             uint32_t        sindex,
                                              const char     *format,
                                              int            *argc,
                                              char          **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int            )server_relay_maybe (struct lclient *lcptr,  
+IRCD_API(int            )server_relay_maybe (struct lclient *lcptr,
                                              struct client  *cptr,
-                                             uint32_t        sindex, 
+                                             uint32_t        sindex,
                                              const char     *format,
                                              int            *argc,
-                                             char          **argv);    
+                                             char          **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -288,15 +288,15 @@ IRCD_API(void           )server_send_server (struct lclient *lcptr);
  * After valid PASS/CAPAB/SERVER has been received                            *
  * -------------------------------------------------------------------------- */
 IRCD_API(void           )server_login       (struct lclient *lcptr);
-  
-/* -------------------------------------------------------------------------- *
- * -------------------------------------------------------------------------- */
-IRCD_API(void           )server_register    (struct lclient *lcptr, 
-                                             struct class   *clptr);    
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void           )server_introduce   (struct lclient *lcptr, 
+IRCD_API(void           )server_register    (struct lclient *lcptr,
+                                             struct class   *clptr);
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+IRCD_API(void           )server_introduce   (struct lclient *lcptr,
                                              struct server  *sptr);
 
 /* -------------------------------------------------------------------------- *
@@ -315,19 +315,19 @@ IRCD_API(int            )server_ping        (struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void           )server_vsend       (struct lclient *one,    
+IRCD_API(void           )server_vsend       (struct lclient *one,
                                              struct channel *chptr,
-                                             uint64_t        caps,   
+                                             uint64_t        caps,
                                              uint64_t        nocaps,
-                                             const char     *format, 
+                                             const char     *format,
                                              va_list         args);
 
-IRCD_API(void           )server_send        (struct lclient *one,    
+IRCD_API(void           )server_send        (struct lclient *one,
                                              struct channel *chptr,
-                                             uint64_t        caps,   
+                                             uint64_t        caps,
                                              uint64_t        nocaps,
-                                             const char     *format, 
-                                             ...);  
+                                             const char     *format,
+                                             ...);
 
 /* -------------------------------------------------------------------------- *
  * Get a reference to a server block                                          *
@@ -350,13 +350,13 @@ IRCD_API(void           )server_stats_unregister (char   letter);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void           )server_stats_show       (struct client *cptr, 
+IRCD_API(void           )server_stats_show       (struct client *cptr,
                                                   char           letter);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(void           )server_dump             (struct server  *sptr);
-  
+
 #endif /* SRC_SERVER_H */
 
-  
+

@@ -50,7 +50,7 @@ int         um_paranoid_bounce     (struct user           *uptr,
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_paranoid = 
+static struct usermode um_paranoid =
 {
   'p',
   USERMODE_LIST_OFF,
@@ -70,17 +70,17 @@ int um_paranoid_load(void)
   hook_register(user_whois, HOOK_DEFAULT, um_paranoid_whois_hook);
 
   server_default_caps |= CAP_PAR;
-  
+
   return 0;
 }
 
 void um_paranoid_unload(void)
 {
   server_default_caps &= ~CAP_PAR;
-  
+
   hook_unregister(user_whois, HOOK_DEFAULT, um_paranoid_whois_hook);
   usermode_unregister(&um_paranoid);
-  
+
 }
 
 int um_paranoid_bounce(struct user *uptr, struct usermodechange *umcptr,
@@ -88,7 +88,7 @@ int um_paranoid_bounce(struct user *uptr, struct usermodechange *umcptr,
 {
   if(flags & USERMODE_OPTION_PERMISSION)
     return -1;
-  
+
   return 0;
 }
 
@@ -99,9 +99,9 @@ static void um_paranoid_whois_hook(struct client *cptr,
                                    struct user   *uptr)
 {
   char cipher[64];
-  
+
   ssl_cipher(cptr->source->fds[0], cipher, sizeof(cipher));
-  
+
   if(uptr->modes & ((int)'p' - 0x40))
     numeric_send(cptr, RPL_WHOISSSL, uptr->client->name, cipher);
 }

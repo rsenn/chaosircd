@@ -5,8 +5,6 @@
 #
 # Copyleft GPL (c) 2005 by Roman Senn <smoli@paranoya.ch>
 
-# check for OpenSSL
-# ------------------------------------------------------------------
 AC_DEFUN([AC_CONFIG_DYLIB],[
 
   # both are enabled by default 

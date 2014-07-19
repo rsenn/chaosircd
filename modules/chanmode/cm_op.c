@@ -43,10 +43,10 @@ static int cm_op_hook(struct list     *lptr,   struct chanuser  *cuptr);
 static int cm_op_kick(struct lclient  *lcptr,  struct client    *cptr,
                       struct channel  *chptr,  struct chanuser  *cuptr,
                       struct chanuser *acuptr, const char       *reason);
-  
+
 /* -------------------------------------------------------------------------- *
  *  * -------------------------------------------------------------------------- */
-static const char *cm_op_help[] = { 
+static const char *cm_op_help[] = {
   "+o <nickname>   Chanop status. Chanops have full control of a channel.",
   "                They can set modes and the topic and kick members.",
   NULL
@@ -70,10 +70,10 @@ int cm_op_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_op_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_join, HOOK_2ND, cm_op_hook);
   hook_register(chanuser_kick, HOOK_DEFAULT, cm_op_kick);
-  
+
   return 0;
 }
 
@@ -81,7 +81,7 @@ void cm_op_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_op_mode);
-  
+
   hook_unregister(chanuser_kick, HOOK_DEFAULT, cm_op_kick);
   hook_unregister(channel_join, HOOK_2ND, cm_op_hook);
 }
@@ -93,7 +93,7 @@ static int cm_op_hook(struct list *lptr, struct chanuser *cuptr)
   cuptr->flags |= CHFLG(o);
   chanmode_prefix_make(cuptr->prefix, cuptr->flags);
   chanmode_change_add(lptr, CHANMODE_ADD, 'o', NULL, cuptr);
-  
+
   return 0;
 }
 
@@ -108,7 +108,7 @@ static int cm_op_kick(struct lclient  *lcptr,  struct client    *cptr,
     if(cuptr->flags & CHFLG(o))
       return 1;
   }
-  
+
   return 0;
 }
 

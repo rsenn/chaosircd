@@ -31,6 +31,8 @@
 
 #include "y.tab.h"
 
+#include "../config.h"
+
 #include <libchaos/dlink.h>
 #include <libchaos/str.h>
 #include <libchaos/syscall.h>

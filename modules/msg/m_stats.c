@@ -56,7 +56,7 @@ static char *m_stats_help[] = {
   "If used without parameters, the information",
   "from the local server is displayed.",
   NULL
-};    
+};
 
 static struct msg m_stats_msg = {
   "STATS", 1, 2, MFLG_CLIENT,
@@ -71,7 +71,7 @@ int m_stats_load(void)
 {
   if(msg_register(&m_stats_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -88,7 +88,7 @@ static void m_stats(struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv)
 {
   uint32_t i;
-  
+
   if(argc > 3)
   {
     if(server_relay_maybe(lcptr, cptr, 2, ":%C STATS %s :%s", &argc, argv))
@@ -96,7 +96,7 @@ static void m_stats(struct lclient *lcptr, struct client *cptr,
     if(server_relay_maybe(lcptr, cptr, 3, ":%C STATS %s :%s", &argc, argv))
       return;
   }
-  
+
   for(i = 0; argv[2][i]; i++)
     server_stats_show(cptr, argv[2][i]);
 }

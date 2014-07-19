@@ -64,7 +64,7 @@ int m_nmode_load(void)
 {
   if(msg_register(&ms_nmode_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -89,13 +89,13 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
   struct channel *chptr;
   struct list     modelist;
   time_t          ts;
-  char           *infos[CHANMODE_PER_LINE + 1];
+  char           *infos[CHANMODE_PER_LINE + 1] = { NULL };
   char           *timestamps[CHANMODE_PER_LINE + 1];
   char           *args[CHANMODE_PER_LINE + 1];
   size_t          len;
   size_t          i;
   char           *lastinfo = infos[0];
-  uint32_t        lasthash = 0;
+  hash_t          lasthash = 0;
   
   if((chptr = channel_find_name(argv[2])) == NULL)
   {
@@ -103,16 +103,16 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
         argv[2]);
     return;
   }
-  
+
   ts = str_toul(argv[3], NULL, 10);
-  
+
   if(ts > chptr->ts)
   {
     log(server_log, L_warning, "Dropping NMODE for %s with too recent TS",
         chptr->name);
-    
+
     cptr->server->in.chanmodes += str_len(argv[4]);
-    
+
     return;
   }
 
@@ -120,40 +120,40 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
   {
     log(channel_log, L_warning, "TS for channel %s changed from %lu to %lu.",
         chptr->name, chptr->ts, ts);
-    
+
     chptr->ts = ts;
   }
-  
+
   len = str_len(argv[4]);
-  
+
   if(str_tokenize_s(argv[5], infos, CHANMODE_PER_LINE, ';') != len ||
      str_tokenize_s(argv[6], timestamps, CHANMODE_PER_LINE, ';') != len ||
      str_tokenize_s(argv[7], args, CHANMODE_PER_LINE, ';') != len)
   {
-    log(chanmode_log, L_warning, 
+    log(chanmode_log, L_warning,
         "Argument count does not match on NMODE for %s.", chptr->name);
     return;
   }
-  
+
   dlink_list_zero(&modelist);
-  
+
   for(i = 0; i < len; i++)
   {
     struct chanmodechange *cmcptr;
-    
+
     if(!chars_isalpha(argv[4][i]))
       continue;
-    
+
     cmcptr = chanmode_change_add(&modelist, CHANMODE_ADD,
                                  argv[4][i], args[i], NULL);
-    
+
     if(cmcptr == NULL)
     {
       log(chanmode_log, L_warning, "Unknown flag '%c' in NMODE for %s.",
           argv[4][i], chptr->name);
       continue;
     }
-    
+
     if(infos[i][0] != '-')
     {
       strlcpy(cmcptr->info, (infos[i][0] != '*' ? infos[i] : lastinfo), sizeof(cmcptr->info));
@@ -161,7 +161,7 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
       lastinfo = cmcptr->info;
       lasthash = cmcptr->ihash;
     }
-    
+
     if(i)
       ts += str_tol(timestamps[i], NULL, 10);
     else
@@ -169,14 +169,14 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
 
     cmcptr->ts = ts;
   }
-  
+
   cptr->server->in.chanmodes += modelist.size;
-  
+
   chanmode_apply(lcptr, cptr, chptr, NULL, &modelist);
-  
+
   chanmode_send_local(cptr, chptr, modelist.head, IRCD_MODESPERLINE);
-  
+
   chanmode_introduce(lcptr, cptr, chptr, modelist.head);
-  
+
   chanmode_change_destroy(&modelist);
 }

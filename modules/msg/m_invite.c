@@ -41,7 +41,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_invite(struct lclient *lcptr, struct client *cptr,  
+static void m_invite(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -56,7 +56,7 @@ static char *m_invite_help[] = {
 };
 
 static struct msg m_invite_msg = {
-  "INVITE", 2, 3, MFLG_CLIENT | MFLG_UNREG, 
+  "INVITE", 2, 3, MFLG_CLIENT | MFLG_UNREG,
   { NULL, m_invite, m_invite, m_invite },
   m_invite_help
 };
@@ -68,7 +68,7 @@ int m_invite_load(void)
 {
   if(msg_register(&m_invite_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -88,7 +88,7 @@ static void m_invite(struct lclient *lcptr, struct client *cptr,
 {
   struct channel *chptr;
   struct client  *acptr;
-  
+
   if(client_is_local(cptr) && client_is_user(cptr))
   {
     if((acptr = client_find_nickhw(cptr, argv[2])) == NULL)
@@ -104,20 +104,20 @@ static void m_invite(struct lclient *lcptr, struct client *cptr,
         return;
       }
   }
-  
+
   if((chptr = channel_find_warn(cptr, argv[3])) == NULL)
     return;
-  
+
   if(client_is_local(cptr))
     numeric_send(cptr, RPL_INVITING, acptr->name, chptr->name);
-  
+
   if(client_is_service(acptr))
   {
     service_handle(acptr->service, lcptr, cptr, chptr, "INVITE", "%s",
                    argv[4] ? argv[4] : "");
   }
   else
-  {  
+  {
     if(client_is_remote(acptr))
     {
       if(argv[4])
@@ -137,6 +137,6 @@ static void m_invite(struct lclient *lcptr, struct client *cptr,
       else
         client_send(acptr, ":%N!%U@%H INVITE %N %s",
                     cptr, cptr, cptr, acptr, chptr->name);
-    }  
+    }
   }
 }

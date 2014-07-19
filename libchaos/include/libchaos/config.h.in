@@ -1,6 +1,9 @@
 /* Use select() for i/o multiplexing */
 #undef USE_SELECT
 
+/* Define this if you have <sys/select.h> */
+#undef HAVE_SYS_SELECT_H
+
 /* Support for SSL encrypted connections */
 #undef HAVE_SSL
 
