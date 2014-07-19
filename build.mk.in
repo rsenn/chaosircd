@@ -47,7 +47,7 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 %.def: %.c
 	@$(ECHO_MKDEF)
-	@QUIET@{ echo "EXPORTS"; echo "  $(subst .def,_load,$@)"; echo "  $(subst .def,_unload,$@)"; } >$@
+@DLM_TRUE@@WIN32_TRUE@	@QUIET@{ echo "EXPORTS"; echo "  $(subst .def,_load,$@)"; echo "  $(subst .def,_unload,$@)"; } >$@
 
 .c.s:
 	@$(ECHO_CC)
