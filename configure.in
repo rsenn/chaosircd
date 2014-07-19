@@ -274,7 +274,7 @@ modules/usermode/Makefile
 src/Makefile
 test/Makefile
 tools/Makefile
-tools/chaosircd-config
+tools/ircd-config
 tools/mkca
 tools/mkcrt
 tools/mkkeys

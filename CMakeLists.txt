@@ -57,7 +57,7 @@ set(CONFFILES
     conf/ssl.conf)
 
 set(TOOLS
-    tools/chaosircd-config
+    tools/ircd-config
     tools/mkca
     tools/mkcrt
     tools/mkkeys
@@ -95,7 +95,7 @@ install(FILES ${CONFFILES} DESTINATION etc/chaosircd)
 install(FILES ${TOOLS} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
 
 set(TOOLS 
-   tools/chaosircd-config tools/mkca tools/mkcrt tools/mkkeys
+   tools/ircd-config tools/mkca tools/mkcrt tools/mkkeys
    tools/mkreq tools/openssl.cnf tools/sign)
 
 foreach(SUBSTFILE ${TOOLS})

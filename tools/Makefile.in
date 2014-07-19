@@ -5,7 +5,7 @@ top_builddir         = @top_builddir@
 thisdir              = tools/
 
 sbin_EXEC = mkca mkcrt mkkeys mkreq sign openssl.cnf
-bin_EXEC = chaosircd-config
+bin_EXEC = ircd-config
 EXEC = $(sbin_EXEC) $(bin_EXEC)
 
 all: $(EXEC)
@@ -16,7 +16,7 @@ include $(top_builddir)/config.mk
 CLEANFILES = *~ mkca mkcrt mkkeys mkreq sign
 DISTCLEANFILES = Makefile $(CLEANFILES) $(DATA) 
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
-DISTFILES = Makefile.in mkca.in mkcrt.in mkkeys.in mkreq.in sign.in openssl.cnf.in chaosircd-config.in
+DISTFILES = Makefile.in mkca.in mkcrt.in mkkeys.in mkreq.in sign.in openssl.cnf.in ircd-config.in
 DEVFILES = CVS $(DISTFILES)
 #INSTALL = @INSTALL@
 #INSTALL_EXEC = $(INSTALL) -m 700
@@ -39,9 +39,9 @@ sign: sign.in $(top_builddir)/config.status
 openssl.cnf: openssl.cnf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
 	@(cd $(top_srcdir) && ./config.status tools/openssl.cnf) >/dev/null
-chaosircd-config: chaosircd-config.in $(top_builddir)/config.status
+ircd-config: ircd-config.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/chaosircd-config) >/dev/null
+	@(cd $(top_srcdir) && ./config.status tools/ircd-config) >/dev/null
 
 dep:
 
