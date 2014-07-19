@@ -22,7 +22,7 @@ dep: makefiles dep-recursive
 ROOT = 1
 RECURSIVE = 1
 @DLM_TRUE@SUBDIRS = lib include src modules tools conf doc contrib test
-@DLM_FALSE@ = lib include modules src tools conf doc contrib test
+@DLM_FALSE@SUBDIRS = lib include modules src tools conf doc contrib test
 
 RECURSIVE_TARGETS = all-recursive \
                     install-recursive \

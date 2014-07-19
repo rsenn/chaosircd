@@ -40,14 +40,6 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
-#ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
-#endif /* HAVE_WINSOCK2_H */
-
-#ifdef HAVE_WS2TCPIP_H
-#include <ws2tcpip.h>
-#endif /* HAVE_WS2TCPIP_H */
-
 #ifdef HAVE_CYGWIN_IN_H
 #include <cygwin/in.h>
 #endif /* HAVE_CYGWIN_IN_H */
@@ -66,6 +58,7 @@
 
 #ifdef WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #define EINPROGRESS WSAEWOULDBLOCK
 #endif /* WIN32 */
 
@@ -77,8 +70,8 @@ struct timer *net_timer;
 struct list   net_list;
 uint32_t      net_id;
 
-net_addr_t    net_addr_any = INADDR_ANY;
-net_addr_t    net_addr_loopback = INADDR_ANY;
+net_addr_t    net_addr_any = NET_ADDR_ANY;
+net_addr_t    net_addr_loopback = NET_ADDR_ANY;
 
 /* ------------------------------------------------------------------------ */
 int net_get_log() { return net_log; }

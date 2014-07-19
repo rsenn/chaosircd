@@ -268,7 +268,7 @@ AC_DEFUN([AC_CHECK_FT2],
 dnl
 dnl Get the cflags and libraries from the freetype-config script
 dnl
-HAVE_FT2=no
+HAVE_FT2="no"
 AC_ARG_WITH(ft2,[  --with-ft2[[=prefix]]      Support for FreeType 2 fonts],
             ft2_prefix="$withval", ft2_prefix="")
 
@@ -285,7 +285,7 @@ if test x$ft2_prefix != x ; then
      fi
      AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
      no_ft2=""
-     if test "$FREETYPE_CONFIG" = no ; then
+     if test "$FREETYPE_CONFIG" = "no" ; then
        AC_MSG_ERROR([
        *** Unable to find FreeType2 library (http://www.freetype.org/)
        ])
@@ -295,7 +295,7 @@ if test x$ft2_prefix != x ; then
 
       TTFSUPPORT="ft2"
       AC_DEFINE_UNQUOTED(HAVE_FT2, "1", [Define this if you have freetype 2])
-      HAVE_FT2=yes
+      HAVE_FT2="yes"
      fi
 fi
 
@@ -304,73 +304,57 @@ AC_SUBST(FT2_LIBS)])
 # check for OpenSSL
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_SSL],
-[
-AC_MSG_CHECKING(whether to compile with SSL support)
-ac_cv_ssl=auto
-ac_cv_ssl_link=shared
-eval "ac_cv_ssl_prefix=\"${prefix}\""
+[AC_MSG_CHECKING(whether to compile with SSL support)
+ac_cv_ssl="auto"
 AC_ARG_WITH(ssl,
-[  --with-ssl[[=yes|no|PATH]]   OpenSSL support [[auto]]],
+[  --with-ssl[[=yes|no|auto]]   OpenSSL support [[auto]]],
 [
-  case "$withval" in
-    y*) ac_cv_ssl=yes ;;
-    n*) ac_cv_ssl=no ;;
-    shared) ac_cv_ssl=yes ac_cv_ssl_link=shared ;;
-    static) ac_cv_ssl=yes ac_cv_ssl_link=static ;;
-    /*) ac_cv_ssl=yes ac_cv_ssl_prefix=$withval ;;
-    *) ac_cv_ssl=auto ;;
+  case "$enableval" in
+    y*) ac_cv_ssl="yes" ;;
+    n*) ac_cv_ssl="no" ;;
+    *) ac_cv_ssl="auto" ;;
   esac
 ])
-
-if test "$ac_cv_ssl" != no; then
-AC_MSG_CHECKING(for OpenSSL location)
-
-    AC_ARG_WITH(ssl-prefix,
-    [  --with-ssl-prefix=PATH   OpenSSL installation], 
-    [
-      case "$withval" in
-	/*) ac_cv_ssl=yes ac_cv_ssl_prefix=$withval ;;
-	*) ac_cv_ssl=yes ;;
-      esac
-    ])
-    AC_MSG_RESULT($ac_cv_ssl_prefix)
-
-fi
+AC_MSG_RESULT($ac_cv_ssl)
 
 SSL_LIBS=""
 SSL_CFLAGS=""
-eval "SSL_PREFIX=\"$ac_cv_ssl_prefix\""
-
 OPENSSL=""
-if test "$ac_cv_ssl" = yes -o "$ac_cv_ssl" = auto; then
+if test "$ac_cv_ssl" = "yes" || test "$ac_cv_ssl" = "auto"
+then
   saved_libs="$LIBS"
   AC_CHECK_LIB(crypto, ERR_load_crypto_strings)
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = no -a "$ac_cv_ssl" = yes; then
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" && test "$ac_cv_ssl" = "yes"
+  then
     AC_MSG_ERROR(could not find libcrypto, install openssl >= 0.9.7)
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes; then
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes"
+  then
     SSL_LIBS="-lcrypto"
   fi
 
   LIBS="$SSL_LIBS $saved_libs"
   AC_CHECK_LIB(ssl, SSL_load_error_strings)
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = no -a "$ac_cv_ssl" = yes;  then
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" && test "$ac_cv_ssl" = "yes"
+  then
     AC_MSG_ERROR(could not find libssl, install openssl >= 0.9.7)
     exit 1
   fi
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = yes; then
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes"
+  then
     SSL_LIBS="-lssl $SSL_LIBS"
   fi
 
   LIBS="$saved_libs"
   AC_CHECK_HEADERS(openssl/opensslv.h)
 
-  if test "$ac_cv_header_openssl_opensslv_h" = no -a "$ac_cv_ssl" = yes; then
+  if test "$ac_cv_header_openssl_opensslv_h" = "no" && test "$ac_cv_ssl" = "yes"
+  then
     AC_MSG_ERROR(could not find openssl/opensslv.h, install openssl >= 0.9.7)
     exit 1
   fi
@@ -379,8 +363,10 @@ if test "$ac_cv_ssl" = yes -o "$ac_cv_ssl" = auto; then
 
   OPENSSL=`which openssl 2>/dev/null`
 
-  if test "x$OPENSSL" = "x"; then
-    if test -f /usr/bin/openssl; then
+  if test "x$OPENSSL" = "x"
+  then
+    if test -f /usr/bin/openssl
+    then
       OPENSSL=/usr/bin/openssl
       AC_MSG_RESULT($OPENSSL)
     else
@@ -390,15 +376,15 @@ if test "$ac_cv_ssl" = yes -o "$ac_cv_ssl" = auto; then
     AC_MSG_RESULT($OPENSSL)
   fi
 
-  if test "x$OPENSSL" = "x" -a "$ac_cv_ssl" = yes
+  if test "x$OPENSSL" = "x" && test "$ac_cv_ssl" = "yes"
   then
     AC_MSG_ERROR(could not find OpenSSL command line tool, install openssl >= 0.9.7)
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = yes -a "$ac_cv_lib_ssl_SSL_load_error_strings" = yes -a "$ac_cv_header_openssl_opensslv_h" = yes; then
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes" && test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes" && test "$ac_cv_header_openssl_opensslv_h" = "yes"
+  then
     HAVE_SSL=yes
-
     AC_DEFINE_UNQUOTED(HAVE_SSL, 1, [Define this if you have OpenSSL])
   else
     HAVE_SSL=no
@@ -429,7 +415,7 @@ AC_DEFUN([AC_LOWFAT],
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_TERMIOS],
 [AC_SYS_POSIX_TERMIOS
-if test "$ac_cv_sys_posix_termios" = yes; then
+if test "$ac_cv_sys_posix_termios" = "yes"; then
   AC_DEFINE_UNQUOTED([HAVE_TERMIOS], 1, 
   [Define this if you have the POSIX termios library])
 fi
@@ -820,7 +806,7 @@ int main() {
   off_t o=0;
   off_t r=sendfile(1,fd,&o,23);
   if (r!=-1)
-    printf("sent %I64u bytes.\n",r);
+    printf("sent %llu bytes.\n",r);
 }
 #endif
 ], [AC_HAVE_SENDFILE

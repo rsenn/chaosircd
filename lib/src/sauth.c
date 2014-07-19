@@ -178,7 +178,7 @@ static void sauth_callback(struct sauth *sauth, int type)
     {
       log(sauth_log, L_verbose, "DNS query (#%u) %s. (%s -> %s)",
           sauth->id, what, sauth->host,
-          (sauth->addr == INADDR_ANY ?
+          (sauth->addr == NET_ADDR_ANY ?
            "NXDOMAIN" : net_ntoa(sauth->addr)));
 
       break;
