@@ -1,4 +1,4 @@
-/* cgircd - CrowdGuard IRC daemon
+/* chaosircd - pi-networks irc server
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -39,6 +39,15 @@
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
 #include "../config.h"
+
+#ifdef WIN32
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#else 
+#include <winsock.h>
+#endif /* HAVE_WINSOCK2_H */
+#include <windows.h>
+#endif
 
 #include <stdarg.h>
 
@@ -357,7 +366,7 @@ int io_queued_read(int fd)
       if(io_list[fd].error == EAGAIN)
       {
         io_list[fd].status.err = 0;
-        return -1;
+        return 0;
       }
 
       return -1;
@@ -580,10 +589,10 @@ void io_handle_fd(int fd)
     {
       io_list[fd].ret = io_queued_read(fd);
 
-      if(io_list[fd].status.err || io_list[fd].status.closed)
+      if(io_list[fd].ret <= 0)
       {
         io_list[fd].status.closed = 1;
-     //   io_list[fd].status.err = (io_list[fd].ret < 0);
+        io_list[fd].status.err = (io_list[fd].ret < 0);
         io_list[fd].status.onread = 1;
 
 //        io_queued_write(fd);
@@ -688,10 +697,12 @@ void io_init_except(int fd0, int fd1, int fd2)
 
   io_log = log_source_register("i/o");
 
+#if !(defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(__MSYS__))
   /* Close all fds */
   for(i = 0; i < IO_MAX_FDS; i++)
     if(i != fd0 && i != fd1 && i != fd2)
       syscall_close(i);
+#endif
 
   memset(io_list, 0, IO_MAX_FDS * sizeof(struct io));
 
