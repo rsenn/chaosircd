@@ -179,8 +179,8 @@ void connect_default(struct connect *cnptr)
   /* Internal stuff */
   cnptr->fd = -1;
   cnptr->active = 1;
-  cnptr->addr_remote = INADDR_LOOPBACK;
-  cnptr->addr_local = INADDR_ANY;
+  cnptr->addr_remote = NET_ADDR_LOOPBACK;
+  cnptr->addr_local = NET_ADDR_ANY;
   cnptr->port_remote = 0;
   cnptr->port_local = 0;
   cnptr->start = 0LLU;
@@ -234,7 +234,7 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
   /* Externally initialised stuff */
   if(!net_aton(address, &cnptr->addr_remote))
   {
-    cnptr->addr_remote = INADDR_ANY;
+    cnptr->addr_remote = NET_ADDR_ANY;
     cnptr->resolve = 1;
   }
   else
@@ -270,13 +270,13 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
   cnptr->status = CONNECT_IDLE;
   cnptr->id = connect_id++;
   cnptr->refcount = 1;
-  cnptr->addr_local = INADDR_ANY;
+  cnptr->addr_local = NET_ADDR_ANY;
   cnptr->port_local = 0;
 
   str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);
 
   /* Add to connect list */
-  dlink_add_tail(&connect_list, &cnptr->node, connect);
+  dlink_add_tail(&connect_list, &cnptr->node, cnptr);
 
   log(connect_log, L_debug, "Added connect block: %s", cnptr->name);
 
@@ -334,7 +334,7 @@ int connect_update(struct connect *cnptr,    const char      *address,
   {
     if(!net_aton(address, &cnptr->addr_remote))
     {
-      cnptr->addr_remote = INADDR_ANY;
+      cnptr->addr_remote = NET_ADDR_ANY;
       cnptr->resolve = 1;
     }
     else

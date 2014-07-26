@@ -51,6 +51,10 @@ DEVFILES             = CVS $(DISTFILES)
 
 DEFS += -DBUILD_MODULE
 
+@DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
+@DLM_FALSE@DEFS += -DSTATIC_IRCD
+
+
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
 @SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 

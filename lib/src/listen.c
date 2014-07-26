@@ -116,7 +116,7 @@ static void listen_accept(int fd, void *ptr)
 
     listen->status = LISTEN_ERROR;
 
-    listen->addr_remote = INADDR_ANY;
+    listen->addr_remote = NET_ADDR_ANY;
     listen->port_remote = 0;
   }
 
@@ -224,8 +224,8 @@ void listen_default(struct listen *listen)
   listen->refcount = 0;
   listen->lhash = 0;
   listen->nhash = 0;
-  listen->addr_local = INADDR_ANY;
-  listen->addr_remote = INADDR_ANY;
+  listen->addr_local = NET_ADDR_ANY;
+  listen->addr_remote = NET_ADDR_ANY;
   listen->port_local = 0;
   listen->port_remote = 0;
   listen->filter = NULL;
@@ -282,7 +282,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
   listen->port_local = port;
   listen->addr_local = addr;
   listen->port_remote = 0;
-  listen->addr_remote = INADDR_ANY;
+  listen->addr_remote = NET_ADDR_ANY;
   listen->filter = NULL;
 
   listen->ssl = 0;

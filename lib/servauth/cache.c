@@ -36,9 +36,10 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-
 #ifdef __CYGWIN__
 #include <cygwin/in.h>
+#elif  defined(WIN32)
+#include <winsock2.h>
 #else
 #include <netinet/in.h>
 #endif /* __CYGWIN__ */

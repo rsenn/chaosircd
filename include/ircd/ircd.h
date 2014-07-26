@@ -85,17 +85,17 @@
 #define IRCD_STACKSIZE       262144
 #define IRCD_LINUX_STACKTOP  0xc0000000
 
-#ifdef WIN32
-#ifdef BUILD_MODULES
-#define IRCD_MODULE(type) extern __attribute__((dllexport)) type
-#endif
-#ifdef BUILD_IRCD
-#define IRCD_DATA(type) extern __attribute__((dllexport)) type
-#define IRCD_API(type)         __attribute__((dllexport)) type
-#else
-#define IRCD_DATA(type) extern __attribute__((dllimport)) type
-#define IRCD_API(type)                                    type
-#endif
+#if defined(WIN32) && !defined(STATIC_IRCD)
+# ifdef BUILD_MODULES
+#  define IRCD_MODULE(type) extern __attribute__((dllexport)) type
+# endif
+# ifdef BUILD_IRCD
+#  define IRCD_DATA(type) extern __attribute__((dllexport)) type
+#  define IRCD_API(type)         __attribute__((dllexport)) type
+# else
+#  define IRCD_DATA(type) extern __attribute__((dllimport)) type
+#  define IRCD_API(type)                                    type
+# endif
 #endif
 
 #ifndef IRCD_MODULE

@@ -46,6 +46,10 @@ include $(top_builddir)/config.mk
 
 #INSTALL = @INSTALL@
 
+@DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
+@DLM_FALSE@DEFS += -DSTATIC_IRCD
+
+
 CLEANFILES           = *~ core core.* \
                        $(OBJECTS) $(SHOBJECTS)
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
