@@ -63,6 +63,7 @@ static const char base32[] = {
   0
 };
 
+/* -------------------------------------------------------------------------- */
 static int valid_base32(const char *s)
 {
   while(*s)
@@ -113,6 +114,22 @@ void m_geolocation_unload(void)
   msg_unregister(&m_geolocation_msg);
 }
 
+/* -------------------------------------------------------------------------- */
+static int
+have_common_channel(struct user* u1, struct user* u2) {
+	struct chanuser *cu1, *cu2;
+	struct node *n1, *n2;
+
+	dlink_foreach_data(&u1->channels, n1, cu1) {
+		struct channel* chptr = cu1->channel;
+		dlink_foreach_data(&u2->channels, n2, cu2) {
+			if(chptr == cu2->channel)
+				return 1;
+		}
+	}
+	return 0;
+}
+
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'GEOLOCATION'                                                    *
@@ -133,7 +150,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
       int do_log = 0;
       struct chanuser *cuptr;
       struct channel *chptr = NULL;
-      struct node *nptr;
+           struct node *nptr;
 
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
 
@@ -266,21 +283,27 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
 //       if(!str_ncmp(user->name, argv[3], len))
        if(check_hashes(hashcount, hasharray, user->name))
        {
-         size_t toklen = str_len(user->client->name) + 1 + str_len(user->name);
+         size_t toklen = str_len(user->client->name);
+         int show_geohash = have_common_channel(cptr->user, user);
 
+         if(show_geohash)
+        	 toklen += 1 + str_len(user->name);
+
+         // location reply only when the searching and the found user have at least 1 channel in common
          if(di+dlen+1+toklen > IRCD_LINELEN)
-         {
-           client_send(cptr, "%s", buffer);
-           dlen = 0;
-         }
-         dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), " %N!%U", user->client, user->client);
+		 {
+		   client_send(cptr, "%s", buffer);
+		   dlen = 0;
+		 }
+		 dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), (show_geohash?" %N!%U":" %N"), user->client, user->client);
 
-         if(lclient_is_oper(lcptr)) // && cptr->user->name[0] == '~')
-           lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
+		 if(lclient_is_oper(lcptr)) // && cptr->user->name[0] == '~')
+		   lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
 
          count++;
        }
      }
+
      if(dlen)
        client_send(cptr, "%s", buffer);
 
