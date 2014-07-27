@@ -52,7 +52,7 @@
 
 typedef uintptr_t hash_t;
 
-#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__)
+#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
 #   define CHAOS_API(type) __attribute__((dllexport)) type
