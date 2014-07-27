@@ -60,3 +60,6 @@
 
 /* Suffix for shared loadable modules */
 #define DLLEXT ".dll"
+
+/* The size of `uintptr_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINTPTR_T 32

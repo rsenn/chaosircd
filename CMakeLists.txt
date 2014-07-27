@@ -1,12 +1,12 @@
 
-set(PROJECT_NAME cgircd)
-set(PROJECT_VERSION 2.2.1)
-set(PROJECT_RELEASE "peace, love & hippie edition")
-set(PROJECT_TARNAME ${PROJECT_NAME}-${PROJECT_VERSION})
+set(PACKAGENAME cgircd)
+set(PACKAGEVERSION 2.2.1)
+set(PACKAGERELEASE "peace, love & hippie edition")
+set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
 set(DEFAULT_SHARED_LIB FALSE)
 
-project(${PROJECT_NAME} C)
+project(${PACKAGENAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 

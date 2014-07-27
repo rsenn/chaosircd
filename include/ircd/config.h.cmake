@@ -2,25 +2,25 @@
 #cmakedefine CREATION
 
 /* Define to the address where bug reports for this package should be sent. */
-#cmakedefine PROJECT_BUGREPORT "@PROJECT_BUGREPORT@"
+#cmakedefine PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 
 /* Define to the full name of this package. */
-#cmakedefine PROJECT_NAME "@PROJECT_NAME@"
+#cmakedefine PACKAGE_NAME "@CMAKE_PROJECT_NAME@"
 
 /* Define to the release name of this package. */
-#cmakedefine PROJECT_RELEASE "@PROJECT_RELEASE@"
+#cmakedefine PACKAGE_RELEASE "@PACKAGE_RELEASE@"
 
 /* Define to the full name and version of this package. */
-#cmakedefine PROJECT_STRING "@PROJECT_STRING@"
+#cmakedefine PACKAGE_STRING "@PACKAGE_STRING@"
 
 /* Define to the one symbol short name of this package. */
-#cmakedefine PROJECT_TARNAME "@PROJECT_TARNAME@"
+#cmakedefine PACKAGE_TARNAME "@PACKAGE_TARNAME@"
 
 /* Define to the home page for this package. */
-#cmakedefine PROJECT_URL "@PROJECT_URL@"
+#cmakedefine PACKAGE_URL "@PACKAGE_URL@"
 
 /* Define to the version of this package. */
-#cmakedefine PROJECT_VERSION "@PROJECT_VERSION@"
+#cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
 
 /* Platform this server runs on */
 #cmakedefine PLATFORM

@@ -24,28 +24,28 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/connect.h>
-#include <libchaos/syscall.h>
-#include <libchaos/listen.h>
-#include <libchaos/module.h>
-#include <libchaos/mfile.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/ssl.h>
-#include <libchaos/io.h>
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/syscall.h"
+#include "libchaos/listen.h"
+#include "libchaos/module.h"
+#include "libchaos/mfile.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/config.h>
-#include <ircd/ircd.h>
-#include <ircd/client.h>
-#include <ircd/class.h>
-#include <ircd/conf.h>
-#include <ircd/oper.h>
+#include "ircd/config.h"
+#include "ircd/ircd.h"
+#include "ircd/client.h"
+#include "ircd/class.h"
+#include "ircd/conf.h"
+#include "ircd/oper.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *

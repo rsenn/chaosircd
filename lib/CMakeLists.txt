@@ -27,6 +27,7 @@ include(FindOpenSSL)
 include(FindFreetype)
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
 
+check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
   set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
