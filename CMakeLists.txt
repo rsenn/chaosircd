@@ -13,14 +13,14 @@ cmake_minimum_required(VERSION 2.6)
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libchaos")
 set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
 
-add_subdirectory(libchaos)
+add_subdirectory(lib)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/FindBISON.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/FindFLEX.cmake")
-include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/PlatformChecks.cmake")
-include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/ConfigBuildType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/PlatformChecks.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/ConfigBuildType.cmake")
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
@@ -39,7 +39,7 @@ include(CheckIncludeFile)
 check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 
 
-include("${CMAKE_SOURCE_DIR}/libchaos/CMakeModules/SubstituteProjectIncludes.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")

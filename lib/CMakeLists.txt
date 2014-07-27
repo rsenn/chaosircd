@@ -1,11 +1,11 @@
-set(PACKAGE_NAME libchaos)
-set(PACKAGE_VERSION 2.2.1)
-set(PACKAGE_RELEASE "peace, love & hippie edition")
-set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
+#set(PACKAGE_NAME libchaos)
+#set(PACKAGE_VERSION 2.2.1)
+#set(PACKAGE_RELEASE "peace, love & hippie edition")
+#set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
 
 set(DEFAULT_SHARED_LIB FALSE)
 
-project(${PACKAGE_NAME} C)
+#project(${PACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
