@@ -42,7 +42,7 @@ check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
-substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
