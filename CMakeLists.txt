@@ -10,8 +10,8 @@ project(${PROJECT_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
-set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libchaos")
-set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
+set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
 add_subdirectory(lib)
 
