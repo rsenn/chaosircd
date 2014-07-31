@@ -307,7 +307,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
      if(dlen)
        client_send(cptr, "%s", buffer);
 
-     client_send(cptr, ":%S 601 %s %u :end of /GEOLOCATION query", server_me, argv[3], count);
+     client_send(cptr, ":%S 601 %N %s %u :end of /GEOLOCATION query", server_me, cptr, argv[3], count);
 
      if(lclient_is_oper(lcptr)) // && cptr->user->name[0] == '~')
        lclient_send(lcptr, ":%S NOTICE %N :--- end of /geolocation (%d replies)", server_me, cptr, count);
