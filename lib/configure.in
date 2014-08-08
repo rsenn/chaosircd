@@ -6,7 +6,7 @@
 # initialize autoconf (require version 2.5x)
 # ---------------------------------------------------------------------------
 AC_PREREQ(2.50)
-AC_INIT([libcgircd],[2.1.0])
+AC_INIT([libchaos],[2.1.0])
 
 # check for compiling modes
 # ---------------------------------------------------------------------------
@@ -144,10 +144,10 @@ case $prefix in
     plugindir=${libdir}/plugins
     ;;
   *)
-    plugindir=${libdir}/libcgircd
+    plugindir=${libdir}/libchaos
     ;;
 esac
-AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/libcgircd]]],
+AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/libchaos]]],
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
 
@@ -159,7 +159,7 @@ AC_SUBST([plugindir])
 
 dnl LDFLAGS="${LDFLAGS:+$LDFLAGS }-rdynamic"
 DEFS='-DBUILD_CHAOS'
-dnl  test "$A_ENABLE" = yes && DEFS="$DEFS -DSTATIC_libcgircd"
+dnl  test "$A_ENABLE" = yes && DEFS="$DEFS -DSTATIC_LIBCHAOS"
 
 
 AC_SUBST([LDFLAGS])
