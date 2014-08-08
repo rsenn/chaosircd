@@ -1,7 +1,7 @@
 host=$(gcc -dumpmachine)
 
 #make -i distclean >/dev/null 2>/dev/null
-
+(set -x
 ./configure \
 	--disable-dependency-tracking \
 	--disable-maintainer-mode \
@@ -13,8 +13,9 @@ host=$(gcc -dumpmachine)
 	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
 	"$@" 
-
-./config.status
+)
+(set -x
+./config.status)
 
 cat <<EOF | tee build-linux.sh |sed -u "s|^|build-linux.sh: |"
 #!/bin/sh
