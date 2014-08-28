@@ -30,7 +30,7 @@
 #define DB_TYPE_MYSQL 2
 
 #ifdef HAVE_SQLITE
-#include <sqlite.h>
+#include <sqlite3.h>
 #endif /* HAVE_SQLITE */
 #ifdef HAVE_MYSQL
 #include <mysql.h>

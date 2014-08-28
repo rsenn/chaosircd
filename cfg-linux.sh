@@ -1,5 +1,7 @@
 host=$(gcc -dumpmachine)
 
+: ${DEBUG=enable}
+
 #make -i distclean >/dev/null 2>/dev/null
 (set -x
 ./configure \
@@ -13,6 +15,7 @@ host=$(gcc -dumpmachine)
 	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
         --with-sqlite=/usr \
+        ${DEBUG:+--${DEBUG}-debug} \
 	"$@" 
 )
 (set -x

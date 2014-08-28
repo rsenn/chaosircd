@@ -199,7 +199,7 @@ if test "$with_mysql" != no; then
       MYSQL_DIR=$i
       MYSQL_INC_DIR=$i/include
     fi
-    test -d "$MYSQL_INC_DIR" && break
+    test -n "$MYSQL_INC_DIR" -a -d "$MYSQL_INC_DIR" && break
   done
 
   if test ! -d "$MYSQL_INC_DIR"; then
@@ -223,7 +223,7 @@ if test "$with_mysql" != no; then
     test -d "$MYSQL_LIB_DIR" && break
   done
 
-  if test -z "$MYSQL_LIB_DIR"; then
+  if test -z "$MYSQL_LIB_DIR" -o -z "$MYSQL_INC_DIR"; then
     if test "$mysql_fail" != no; then
       AC_MSG_RESULT(not found)
       with_mysql=no
@@ -232,6 +232,7 @@ if test "$with_mysql" != no; then
     else
       AC_MSG_RESULT(no)
     fi
+    MYSQL=false
   else
     AC_MSG_RESULT($MYSQL_LIB_DIR)
     MYSQL=true
