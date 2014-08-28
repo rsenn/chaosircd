@@ -22,6 +22,7 @@ TESTS = cfgtest \
         giftest \
         graphtest \
         imagetest \
+        dbtest \
         ttftest \
 	strtest
 
@@ -42,6 +43,7 @@ LIB      += $(SSL_LIBS)
 #LIB      += $(PSQL_LIBS)
 #LIB      += $(MYSQL_LIBS)
 ttftest: LIB      += $(FT2_LIBS)
+dbtest: LIB      += $(MYSQL_LIBS)
 LIB      += $(LIBS)
 CFLAGS   += $(SSL_CFLAGS) $(PSQL_CFLAGS) $(MYSQL_CFLAGS) $(FT2_CFLAGS)
 INCLUDES += -I$(top_srcdir)/include -I$(top_builddir)/include

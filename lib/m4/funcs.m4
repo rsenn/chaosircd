@@ -126,7 +126,7 @@ if test "$with_mysql" != no; then
 
   AC_MSG_CHECKING(for MySQL client library)
 
-  for i in lib lib/mysql; do
+  for i in lib64 lib lib64/mysql lib/mysql; do
     str="$MYSQL_DIR/$i/libmysqlclient.*"
     for j in `echo $str`; do
       if test -r $j; then
