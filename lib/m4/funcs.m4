@@ -112,7 +112,7 @@ if test "$with_sqlite" != no; then
     if test -r $i/include/sqlite3.h; then
       SQLITE_DIR=$i
       SQLITE_INC_DIR=$i/include/sqlite
-    elif test -r $i/include/sqlite.h; then
+    elif test -r $i/include/sqlite3.h; then
       SQLITE_DIR=$i
       SQLITE_INC_DIR=$i/include
     fi
