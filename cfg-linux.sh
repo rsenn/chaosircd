@@ -12,7 +12,7 @@ host=$(gcc -dumpmachine)
 	--disable-color \
 	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
-        --with-mysql=/usr \
+        --with-sqlite=/usr \
 	"$@" 
 )
 (set -x

@@ -42,6 +42,7 @@ if test "$with_pgsql" != no; then
       PGSQL_DIR=$i
       PGSQL_INC_DIR=$i/include/postgresql
     fi
+    test -d "$PSQL_INC_DIR" && break
   done
 
   if test ! -d "$PGSQL_INC_DIR"; then
@@ -57,9 +58,10 @@ if test "$with_pgsql" != no; then
     for j in `echo $str`; do
       if test -r $j; then
           PGSQL_LIB_DIR="$PGSQL_DIR/$i"
-          break 2
+          break 
       fi
     done
+      test -d "$PSQL_LIB_DIR" && break
   done
 
     if test -z "$PGSQL_LIB_DIR"; then
@@ -109,13 +111,14 @@ if test "$with_sqlite" != no; then
   AC_MSG_CHECKING(for SQLite headers)
 
   for i in $sqlite_directory; do
-    if test -r $i/include/sqlite3.h; then
+    if test -r $i/include/sqlite/sqlite3.h; then
       SQLITE_DIR=$i
       SQLITE_INC_DIR=$i/include/sqlite
     elif test -r $i/include/sqlite3.h; then
       SQLITE_DIR=$i
       SQLITE_INC_DIR=$i/include
     fi
+    test -d "$SQLITE_INC_DIR" && break
   done
 
   if test ! -d "$SQLITE_INC_DIR"; then
@@ -129,13 +132,14 @@ if test "$with_sqlite" != no; then
   AC_MSG_CHECKING(for SQLite client library)
 
   for i in lib64 lib lib64/sqlite lib/sqlite; do
-    str="$SQLITE_DIR/$i/libsqlite.*"
+    str="$SQLITE_DIR/$i/libsqlite3.*"
     for j in `echo $str`; do
       if test -r $j; then
         SQLITE_LIB_DIR="$SQLITE_DIR/$i"
-        break 2
       fi
+      test -d "$SQLITE_LIB_DIR" && break
     done
+    test -d "$SQLITE_LIB_DIR" && break
   done
 
   if test -z "$SQLITE_LIB_DIR"; then
@@ -150,7 +154,7 @@ if test "$with_sqlite" != no; then
   else
     AC_MSG_RESULT($SQLITE_LIB_DIR)
     SQLITE=true
-    SQLITE_LIBS="-L${SQLITE_LIB_DIR} -Wl,-rpath,${SQLITE_LIB_DIR} -lsqlite"
+    SQLITE_LIBS="-L${SQLITE_LIB_DIR} -Wl,-rpath,${SQLITE_LIB_DIR} -lsqlite3"
     SQLITE_CFLAGS="-I${SQLITE_INC_DIR}"
     AC_CHECK_LIB(z, compress)
     DBSUPPORT="$DBSUPPORT SQLite"
@@ -195,6 +199,7 @@ if test "$with_mysql" != no; then
       MYSQL_DIR=$i
       MYSQL_INC_DIR=$i/include
     fi
+    test -d "$MYSQL_INC_DIR" && break
   done
 
   if test ! -d "$MYSQL_INC_DIR"; then
@@ -212,9 +217,10 @@ if test "$with_mysql" != no; then
     for j in `echo $str`; do
       if test -r $j; then
         MYSQL_LIB_DIR="$MYSQL_DIR/$i"
-        break 2
+        break
       fi
     done
+    test -d "$MYSQL_LIB_DIR" && break
   done
 
   if test -z "$MYSQL_LIB_DIR"; then
