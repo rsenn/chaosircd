@@ -73,9 +73,13 @@ CONFIG_H_TOP = include/libchaos/config.h
 
 LIBS     += $(DLFCN_LIBS)
 LIBS     += $(SSL_LIBS)
-LIBS     += $(MYSQL_LIBS)
+@SQLITE_TRUE@INCLUDES += $(SQLITE_CFLAGS)
+@SQLITE_TRUE@LIBS     += $(SQLITE_LIBS)
+@MYSQL_TRUE@INCLUDES += $(MYSQL_CFLAGS)
+@MYSQL_TRUE@LIBS     += $(MYSQL_LIBS)
+@PSQL_TRUE@INCLUDES += $(PSQL_CFLAGS)
+@PSQL_TRUE@LIBS     += $(PSQL_LIBS)
 INCLUDES += $(SSL_CFLAGS)
-INCLUDES += $(MYSQL_CFLAGS)
 
 # targets for this directory
 # ---------------------------------------------------------------------------

@@ -71,6 +71,7 @@ if test "$with_pgsql" != no; then
       fi
     else
       AC_MSG_RESULT($PGSQL_LIB_DIR)
+      PSQL=true
       PSQL_LIBS="-L${PGSQL_LIB_DIR} -lpq"
       PSQL_CFLAGS="-I${PGSQL_INC_DIR}"
       DBSUPPORT="$DBSUPPORT PostgreSQL"
@@ -78,8 +79,88 @@ if test "$with_pgsql" != no; then
     fi
 
 fi
+AM_CONDITIONAL([PSQL],[test "$PSQL" = true])
 AC_SUBST(PSQL_LIBS)
 AC_SUBST(PSQL_CFLAGS)])
+
+# check for SQLite
+# ------------------------------------------------------------------
+AC_DEFUN([AC_CHECK_SQLITE],
+[default_directory="/usr /usr/local" 
+
+with_sqlite=yes
+AC_ARG_WITH(sqlite,
+    [  --with-sqlite=DIR        support for SQLite],
+    [ with_sqlite="$withval" ],
+    [ with_sqlite=no ])
+
+if test "$with_sqlite" != no; then
+  if test "$with_sqlite" = yes; then
+    sqlite_directory="$default_directory";
+    sqlite_fail=yes
+  elif test -d $withval; then
+    sqlite_directory="$withval"
+    sqlite_fail=no
+  elif test "$with_sqlite" = ""; then
+    sqlite_directory="$default_directory";
+    sqlite_fail=no
+  fi
+
+  AC_MSG_CHECKING(for SQLite headers)
+
+  for i in $sqlite_directory; do
+    if test -r $i/include/sqlite3.h; then
+      SQLITE_DIR=$i
+      SQLITE_INC_DIR=$i/include/sqlite
+    elif test -r $i/include/sqlite.h; then
+      SQLITE_DIR=$i
+      SQLITE_INC_DIR=$i/include
+    fi
+  done
+
+  if test ! -d "$SQLITE_INC_DIR"; then
+    AC_MSG_RESULT(not found)
+    with_sqlite=no
+#    FAIL_MESSAGE("SQLite Headers", "$SQLITE_DIR $SQLITE_INC_DIR")
+  else
+    AC_MSG_RESULT($SQLITE_INC_DIR)
+  fi
+
+  AC_MSG_CHECKING(for SQLite client library)
+
+  for i in lib64 lib lib64/sqlite lib/sqlite; do
+    str="$SQLITE_DIR/$i/libsqlite.*"
+    for j in `echo $str`; do
+      if test -r $j; then
+        SQLITE_LIB_DIR="$SQLITE_DIR/$i"
+        break 2
+      fi
+    done
+  done
+
+  if test -z "$SQLITE_LIB_DIR"; then
+    if test "$sqlite_fail" != no; then
+      AC_MSG_RESULT(not found)
+      with_sqlite=no
+#      FAIL_MESSAGE("sqlite library",
+#                   "$SQLITE_LIB_DIR")
+    else
+      AC_MSG_RESULT(no)
+    fi
+  else
+    AC_MSG_RESULT($SQLITE_LIB_DIR)
+    SQLITE=true
+    SQLITE_LIBS="-L${SQLITE_LIB_DIR} -Wl,-rpath,${SQLITE_LIB_DIR} -lsqlite"
+    SQLITE_CFLAGS="-I${SQLITE_INC_DIR}"
+    AC_CHECK_LIB(z, compress)
+    DBSUPPORT="$DBSUPPORT SQLite"
+    AC_DEFINE_UNQUOTED(HAVE_SQLITE, "1", [Define this if you have SQLite])
+  fi
+fi
+AM_CONDITIONAL([SQLITE],[test "$SQLITE" = true])
+AC_SUBST([SQLITE_LIBS])
+AC_SUBST([SQLITE_CFLAGS])
+])
 
 # check for MySQL
 # ------------------------------------------------------------------
@@ -147,6 +228,7 @@ if test "$with_mysql" != no; then
     fi
   else
     AC_MSG_RESULT($MYSQL_LIB_DIR)
+    MYSQL=true
     MYSQL_LIBS="-L${MYSQL_LIB_DIR} -Wl,-rpath,${MYSQL_LIB_DIR} -lmysqlclient"
     MYSQL_CFLAGS="-I${MYSQL_INC_DIR}"
     AC_CHECK_LIB(z, compress)
@@ -154,7 +236,7 @@ if test "$with_mysql" != no; then
     AC_DEFINE_UNQUOTED(HAVE_MYSQL, "1", [Define this if you have MySQL])
   fi
 fi
-
+AM_CONDITIONAL([MYSQL],[test "$MYSQL" = true])
 AC_SUBST([MYSQL_LIBS])
 AC_SUBST([MYSQL_CFLAGS])
 ])
