@@ -30,7 +30,7 @@
 
 #include <stddef.h>
 
-#include <libchaos/dlink.h>
+#include "dlink.h"
 
 #define CLIENT_BLOCK_SIZE    64
 #define LCLIENT_BLOCK_SIZE   32

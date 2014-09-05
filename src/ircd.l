@@ -31,10 +31,10 @@
 
 #include "y.tab.h"
 
-#include <libchaos/dlink.h>
-#include <libchaos/str.h>
-#include <libchaos/syscall.h>
-#include <libchaos/log.h>
+#include "dlink.h"
+#include "str.h"
+#include "syscall.h"
+#include "log.h"
   
 #include <ircd/ircd.h>
 #include <ircd/conf.h>

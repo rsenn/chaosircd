@@ -63,7 +63,7 @@ dnl
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libchaos/io.h>
+#include "io.h"
 
 char*
 my_strdup (char *str)

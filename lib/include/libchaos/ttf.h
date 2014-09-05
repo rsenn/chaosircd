@@ -37,9 +37,9 @@
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
 
-#include "libchaos/defs.h"
-#include "libchaos/dlink.h"
-#include "libchaos/image.h"
+#include "defs.h"
+#include "dlink.h"
+#include "image.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *

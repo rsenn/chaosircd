@@ -25,13 +25,13 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/mem.h"
-#include "libchaos/graph.h"
-#include "libchaos/log.h"
-#include "libchaos/str.h"
-#include "libchaos/image.h"
-#include "libchaos/timer.h"
+#include "defs.h"
+#include "mem.h"
+#include "graph.h"
+#include "log.h"
+#include "str.h"
+#include "image.h"
+#include "timer.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *

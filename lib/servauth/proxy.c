@@ -19,13 +19,13 @@
  * $Id: proxy.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "defs.h"
+#include "io.h"
+#include "timer.h"
+#include "log.h"
+#include "mem.h"
+#include "net.h"
+#include "str.h"
 
 #include "proxy.h"
 

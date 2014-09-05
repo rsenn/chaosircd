@@ -19,13 +19,13 @@
  * $Id: control.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/syscall.h>
-#include <libchaos/queue.h>
-#include <libchaos/log.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "defs.h"
+#include "io.h"
+#include "syscall.h"
+#include "queue.h"
+#include "log.h"
+#include "net.h"
+#include "str.h"
 
 #include "servauth.h"
 #include "control.h"

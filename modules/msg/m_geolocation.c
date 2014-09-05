@@ -8,10 +8,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/log.h"
-#include "libchaos/str.h"
-#include "libchaos/timer.h"
-#include "libchaos/dlink.h"
+#include "log.h"
+#include "str.h"
+#include "timer.h"
+#include "dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

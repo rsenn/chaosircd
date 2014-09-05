@@ -22,15 +22,15 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/dlink.h>
-#include <libchaos/io.h>
-#include <libchaos/ini.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/hook.h>
-#include <libchaos/sauth.h>
-#include <libchaos/timer.h>
+#include "dlink.h"
+#include "io.h"
+#include "ini.h"
+#include "log.h"
+#include "mem.h"
+#include "str.h"
+#include "hook.h"
+#include "sauth.h"
+#include "timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

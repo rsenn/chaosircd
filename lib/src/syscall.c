@@ -22,11 +22,11 @@
 
 #define _GNU_SOURCE
 
-#include "libchaos/defs.h"
+#include "defs.h"
 
 #if 0//(defined USE_IA32_LINUX_INLINE) //&& !(defined PIC)
 
-#include "libchaos/syscall.h"
+#include "syscall.h"
 
 static const char *errno_table[] = {
 /* esuccess         */ "success",

@@ -22,11 +22,11 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/timer.h>
-#include <libchaos/str.h>
+#include "defs.h"
+#include "io.h"
+#include "log.h"
+#include "timer.h"
+#include "str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

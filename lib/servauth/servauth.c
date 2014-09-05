@@ -19,16 +19,16 @@
  * $Id: servauth.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#include <libchaos/defs.h>
-#include <libchaos/connect.h>
-#include <libchaos/dlink.h>
-#include <libchaos/queue.h>
-#include <libchaos/timer.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/io.h>
-#include <libchaos/syscall.h>
+#include "defs.h"
+#include "connect.h"
+#include "dlink.h"
+#include "queue.h"
+#include "timer.h"
+#include "log.h"
+#include "mem.h"
+#include "str.h"
+#include "io.h"
+#include "syscall.h"
 
 #ifdef HAVE_CONFIG_H
 #include "../config.h"

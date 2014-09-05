@@ -24,17 +24,17 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/connect.h>
-#include <libchaos/listen.h>
-#include <libchaos/dlink.h>
-#include <libchaos/timer.h>
-#include <libchaos/sauth.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/io.h>
+#include "defs.h"
+#include "connect.h"
+#include "listen.h"
+#include "dlink.h"
+#include "timer.h"
+#include "sauth.h"
+#include "hook.h"
+#include "log.h"
+#include "mem.h"
+#include "str.h"
+#include "io.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

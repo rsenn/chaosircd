@@ -23,7 +23,7 @@
 #define _GNU_SOURCE
 
 #include <math.h>
-#include "libchaos/defs.h"
+#include "defs.h"
 #ifdef HAVE_FT2
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -32,11 +32,11 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/mem.h"
-#include "libchaos/ttf.h"
-#include "libchaos/log.h"
-#include "libchaos/str.h"
-#include "libchaos/image.h"
+#include "mem.h"
+#include "ttf.h"
+#include "log.h"
+#include "str.h"
+#include "image.h"
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */

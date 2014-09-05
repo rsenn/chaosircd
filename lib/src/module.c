@@ -25,22 +25,22 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/io.h"
-#include "libchaos/syscall.h"
-#include "libchaos/module.h"
-#include "libchaos/timer.h"
-#include "libchaos/dlink.h"
-#include "libchaos/log.h"
-#include "libchaos/mem.h"
-#include "libchaos/str.h"
+#include "defs.h"
+#include "io.h"
+#include "syscall.h"
+#include "module.h"
+#include "timer.h"
+#include "dlink.h"
+#include "log.h"
+#include "mem.h"
+#include "str.h"
 
 #ifndef USE_DSO
 #define USE_DSO
 #endif
 
 #ifdef DARWIN
-#include "libchaos/dlfcn_darwin.h"
+#include "dlfcn_darwin.h"
 #endif /* DARWIN */
 
 #ifndef USE_DSO

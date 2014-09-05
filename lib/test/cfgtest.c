@@ -1,8 +1,8 @@
-#include "libchaos/mem.h"
-#include "libchaos/timer.h"
-#include "libchaos/log.h"
-#include "libchaos/io.h"
-#include "libchaos/cfg.h"
+#include "mem.h"
+#include "timer.h"
+#include "log.h"
+#include "io.h"
+#include "cfg.h"
 
 int main()
 {

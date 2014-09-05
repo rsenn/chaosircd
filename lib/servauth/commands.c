@@ -21,13 +21,13 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/queue.h>
-#include <libchaos/log.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "defs.h"
+#include "io.h"
+#include "timer.h"
+#include "queue.h"
+#include "log.h"
+#include "net.h"
+#include "str.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

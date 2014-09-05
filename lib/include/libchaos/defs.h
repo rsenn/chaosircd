@@ -23,7 +23,7 @@
 #ifndef CHAOS_DEFS_H
 #define CHAOS_DEFS_H
 
-#include "libchaos/config.h"
+#include "config.h"
 
 #ifndef NULL
 #define NULL (void *)0

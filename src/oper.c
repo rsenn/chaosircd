@@ -24,14 +24,14 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "defs.h"
+#include "io.h"
+#include "timer.h"
+#include "hook.h"
+#include "log.h"
+#include "mem.h"
+#include "net.h"
+#include "str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

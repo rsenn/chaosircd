@@ -31,9 +31,9 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/dlink.h"
-#include "libchaos/timer.h"
+#include "defs.h"
+#include "dlink.h"
+#include "timer.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *

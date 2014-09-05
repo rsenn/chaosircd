@@ -22,9 +22,9 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/log.h>
-#include <libchaos/dlink.h>
-#include <libchaos/connect.h>
+#include "log.h"
+#include "dlink.h"
+#include "connect.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

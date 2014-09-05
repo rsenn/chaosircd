@@ -24,12 +24,12 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
-#include "libchaos/defs.h"
-#include "libchaos/dlink.h"
-#include "libchaos/log.h"
-#include "libchaos/mem.h"
-#include "libchaos/str.h"
-#include "libchaos/db.h"
+#include "defs.h"
+#include "dlink.h"
+#include "log.h"
+#include "mem.h"
+#include "str.h"
+#include "db.h"
 
 #define DB_TMPBUF_SIZE 128 * 1024
 

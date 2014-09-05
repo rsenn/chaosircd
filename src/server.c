@@ -21,13 +21,13 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <libchaos/connect.h>
-#include <libchaos/timer.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/log.h>
-#include <libchaos/hook.h>
-#include <libchaos/ssl.h>
+#include "connect.h"
+#include "timer.h"
+#include "net.h"
+#include "str.h"
+#include "log.h"
+#include "hook.h"
+#include "ssl.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

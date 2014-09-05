@@ -63,11 +63,11 @@ CPPFLAGS += -DHAVE_CONFIG_H
 @A_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 
 INCLUDES += -I$(srcdir) \
-            -I$(top_srcdir)/include \
+            -I$(top_srcdir)/include/libchaos \
             -I$(builddir) \
-            -I$(top_builddir)/include \
+            -I$(top_builddir)/include/libchaos \
             -I. \
-            -I../include
+            -I../include/libchaos
 
 #$(PROGRAM): CFLAGS += -I$(srcdir)/../include
 $(PROGRAM): $(OBJECTS)

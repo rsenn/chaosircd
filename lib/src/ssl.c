@@ -20,17 +20,17 @@
  * $Id: ssl.c,v 1.4 2006/09/28 08:38:31 roman Exp $
  */
 
-#include "libchaos/defs.h"
+#include "defs.h"
 
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/config.h"
-#include "libchaos/io.h"
-#include "libchaos/ssl.h"
-#include "libchaos/mem.h"
-#include "libchaos/str.h"
-#include "libchaos/syscall.h"
+#include "config.h"
+#include "io.h"
+#include "ssl.h"
+#include "mem.h"
+#include "str.h"
+#include "syscall.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
