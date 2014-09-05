@@ -25,9 +25,13 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#define DB_TYPE_PGSQL 0
-#define DB_TYPE_MYSQL 1
+#define DB_TYPE_SQLITE 0
+#define DB_TYPE_PGSQL 1
+#define DB_TYPE_MYSQL 2
 
+#ifdef HAVE_SQLITE
+#include <sqlite3.h>
+#endif /* HAVE_SQLITE */
 #ifdef HAVE_MYSQL
 #include <mysql.h>
 #endif /* HAVE_MYSQL */
@@ -67,6 +71,9 @@ struct db
 
   union
   {
+#ifdef HAVE_SQLITE
+    sqlite3               *sq;
+#endif /* HAVE_PGSQL */
 #ifdef HAVE_PGSQL
     PGconn                *pg;
 #endif /* HAVE_PGSQL */

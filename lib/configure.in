@@ -69,6 +69,7 @@ AC_FUNC_MMAP
 
 AC_CHECK_SSL
 AC_CHECK_FT2
+AC_CHECK_SQLITE
 AC_CHECK_PSQL
 AC_CHECK_MYSQL
 
@@ -198,6 +199,7 @@ AC_SUMMARIZE([prefix bindir datadir includedir],
               CC CFLAGS LDFLAGS LIBS |
               SSL_CFLAGS SSL_LIBS
               FT2_CFLAGS FT2_LIBS 
+              SQLITE_CFLAGS SQLITE_LIBS
               PSQL_CFLAGS PSQL_LIBS
               MYSQL_CFLAGS MYSQL_LIBS |
               host build],

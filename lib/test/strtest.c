@@ -4,6 +4,8 @@
 #include "libchaos/io.h"
 #include "libchaos/timer.h"
 
+#include <time.h>
+
 int main()
 {
   char buffer[2048];

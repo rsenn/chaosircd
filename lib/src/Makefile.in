@@ -73,9 +73,13 @@ CONFIG_H_TOP = include/libchaos/config.h
 
 LIBS     += $(DLFCN_LIBS)
 LIBS     += $(SSL_LIBS)
-LIBS     += $(MYSQL_LIBS)
+@SQLITE_TRUE@CFLAGS += $(SQLITE_CFLAGS)
+@SQLITE_TRUE@LIBS     += $(SQLITE_LIBS)
+@MYSQL_TRUE@CFLAGS += $(MYSQL_CFLAGS)
+@MYSQL_TRUE@LIBS     += $(MYSQL_LIBS)
+@PSQL_TRUE@CFLAGS += $(PSQL_CFLAGS)
+@PSQL_TRUE@LIBS     += $(PSQL_LIBS)
 INCLUDES += $(SSL_CFLAGS)
-INCLUDES += $(MYSQL_CFLAGS)
 
 # targets for this directory
 # ---------------------------------------------------------------------------
@@ -102,7 +106,7 @@ INCLUDES += -I$(thisdir) \
             -I. \
             -I$(top_builddir)/include 
 
-CFLAGS += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)
+CFLAGS += $(SSL_CFLAGS)
 
 $(DLM_FALSE)$(PIE_FALSE)$(A_LIBRARY): $(OBJECTS)
 $(DLM_FALSE)$(PIE_FALSE)$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
