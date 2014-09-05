@@ -817,7 +817,637 @@ EOF
 		echo ${UNAME_PROCESSOR}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
 	esac
 	exit ;;
-    i*:CYGWIN*:* | i*:MINGW*:* | i*:mingw*:*)
+			i*:CYGWIN*:* | i*:MINGW*:* | i*:mingw*:*)
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+					TMPDIR='C:\\WINDOWS\\Temp'
+					eval $set_cc_for_build
+					sed 's/^        //' << EOF >$dummy.c
+					MACHINE=unknown
+					#ifdef WIN32
+					MACHINE=win32
+					#endif
+					#ifdef _WIN32
+					MACHINE=win32
+					#endif
+					#ifdef __MINGW32__
+					MACHINE=mingw32
+					#endif
+					#ifdef __CYGWIN__
+					MACHINE=cygwin
+					#endif
+					#ifdef __CYGWIN32__
+					MACHINE=cygwin
+					#endif
+	EOF
+					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+        TMPDIR='C:\\WINDOWS\\Temp'
+        eval $set_cc_for_build
+        sed 's/^        //' << EOF >$dummy.c
+        MACHINE=unknown
+        #ifdef WIN32
+        MACHINE=win32
+        #endif
+        #ifdef _WIN32
+        MACHINE=win32
+        #endif
+        #ifdef __MINGW32__
+        MACHINE=mingw32
+        #endif
+        #ifdef __CYGWIN__
+        MACHINE=cygwin
+        #endif
+        #ifdef __CYGWIN32__
+        MACHINE=cygwin
+        #endif
+EOF
+        eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
         TMPDIR='C:\\WINDOWS\\Temp'
         eval $set_cc_for_build
         sed 's/^        //' << EOF >$dummy.c

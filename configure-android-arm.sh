@@ -4,7 +4,7 @@ IFS=$'\n \t\r\v'
 
 if [ ! -e configure -o ! -e src/config.h.in ]; then
      case "$PWD" in
-       */libchaos) aclocal -I m4 ;;
+       */libchaos) aclocal -I lib/m4 ;;
        *) aclocal -I libchaos/m4 ;;
      esac
 	autoheader
