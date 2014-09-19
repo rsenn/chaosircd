@@ -161,7 +161,7 @@ static int cmd_userdb(control_t *cptr, int ac, char **av)
 
   } else if(!strcmp(av[1], "register")) {
     int v = userdb_register(udb, av[2], &av[3], ac - 3);
-    control_send(&servauth_control, "userdb register %s %d", av[2], !v);
+    control_send(&servauth_control, "userdb register %s %d", av[2], v);
   } else if(!strcmp(av[1], "mutate")) {
     int v = userdb_mutate(udb, &av[2], ac - 2);
   }

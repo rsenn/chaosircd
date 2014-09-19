@@ -228,7 +228,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 #endif
 /*#if 1*/
 
-#if 0 //def DEBUG
+#ifdef DEBUG
 /*
  * when DEBUG is defined the normal log
  * messages get file/line instead of

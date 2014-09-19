@@ -264,10 +264,8 @@ int userdb_register     (struct userdb_client *userdb, const char* uid, const ch
   userdb_build_values(userdb, &fields, v, num_values, ',', '`', '=', '\0');
   userdb_build_values(userdb, &values, v, num_values, ',', '\'', '\0', '=');
 
-  userdb->result = db_query(userdb->handle, "INSERT INTO users (uid,%s) VALUES ('%s',%s);", fields.s, uid, values.s);
-    
-  if(db_affected_rows(userdb->handle) <= 1)
-    return -1;
+  if(db_query(userdb->handle, "INSERT INTO users (uid,%s) VALUES ('%s',%s);", fields.s, uid, values.s))
+    return 1; //db_affected_rows(userdb->handle);
 
   return 0;
 }
