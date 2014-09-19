@@ -115,10 +115,10 @@ extern struct db          *db_new               (int         type);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern int                 db_connect           (struct db  *db,
-                                                 char       *host,
-                                                 char       *user,
-                                                 char       *pass,
-                                                 char       *dbname);
+                                                 const char* host,
+                                                 const char* user,
+                                                 const char* pass,
+                                                 const char* dbname);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -133,7 +133,7 @@ extern void                db_close             (struct db  *db);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 extern size_t              db_escape_string     (struct db  *db,
-                                                 char       *to,
+                                                 const char* to,
                                                  const char *from,
                                                  size_t      len);
 

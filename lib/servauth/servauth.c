@@ -74,12 +74,15 @@ static struct dlog *servauth_drain;
  * -------------------------------------------------------------------------- */
 void servauth_init(void)
 {
-  log_init(0, 0, 0);
+//  log_init(0, 0, 0);
+  log_init(2, LOG_ALL, L_debug);
+  
   mem_init();
   timer_init();
   queue_init();
   dlink_init();
   connect_init();
+  db_init();
 
 #ifdef SIGPIPE
   syscall_signal(SIGPIPE, SIG_IGN);

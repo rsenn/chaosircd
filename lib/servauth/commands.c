@@ -39,6 +39,7 @@
 #include "auth.h"
 #include "proxy.h"
 #include "query.h"
+#include "userdb.h"
 
 /* -------------------------------------------------------------------------- *
  * command prototypes                                                         *
@@ -48,6 +49,7 @@ static int cmd_auth        (control_t *cptr, int ac, char **av);
 static int cmd_dns_forward (control_t *cptr, int ac, char **av);
 static int cmd_dns_reverse (control_t *cptr, int ac, char **av);
 static int cmd_proxy       (control_t *cptr, int ac, char **av);
+static int cmd_userdb      (control_t *cptr, int ac, char **av);
 
 /* -------------------------------------------------------------------------- *
  * main commands                                                              *
@@ -56,6 +58,7 @@ struct cmd_table cmds[] = {
   { "dns",     &cmd_dns   },
   { "auth",    &cmd_auth  },
   { "proxy",   &cmd_proxy },
+  { "userdb",  &cmd_userdb },
   { NULL,      NULL       }
 };
 
@@ -127,6 +130,41 @@ static int cmd_auth(control_t *cptr, int ac, char **av)
 
   if(query_start(q, QUERY_AUTH, timer_systime) == -1)
     return -1;
+
+  return 0;
+}
+
+/* -------------------------------------------------------------------------- *
+ * cmd_userdb() -
+ *                                                                            *
+ * av[0] = "userdb"                                                             *
+ * av[1] = "verify"|"register"|"mutate"
+ * -------------------------------------------------------------------------- */
+static int cmd_userdb(control_t *cptr, int ac, char **av)
+{
+  static struct userdb_client *udb;
+
+  if(!udb) {
+    udb = calloc(sizeof(struct userdb_client),1);
+
+    if(   userdb_connect(udb, "127.0.0.1", "root", "") )
+      log(servauth_log, L_status, "userdb connection succeeded");
+
+
+  }
+
+  if(!strcmp(av[1], "verify")) {
+    char *s;
+    int v = userdb_verify(udb, av[2], av[3] ? av[3] : "", &s);
+    control_send(&servauth_control, "userdb verify %s %d %s", av[2], !!v, s ? s : "");
+    free(s);
+
+  } else if(!strcmp(av[1], "register")) {
+    int v = userdb_register(udb, av[2], &av[3], ac - 3);
+    control_send(&servauth_control, "userdb register %s %d", av[2], !v);
+  } else if(!strcmp(av[1], "mutate")) {
+    int v = userdb_mutate(udb, &av[2], ac - 2);
+  }
 
   return 0;
 }

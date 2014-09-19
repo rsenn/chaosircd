@@ -371,6 +371,8 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
 {
   str_vsnprintf(db_tmpbuf, DB_TMPBUF_SIZE, format, args);
 
+  log(db_log, L_debug, "Query: %s", db_tmpbuf);
+
   switch(db->type)
   {
 #ifdef HAVE_PGSQL
