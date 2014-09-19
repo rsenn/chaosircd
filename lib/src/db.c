@@ -262,7 +262,7 @@ struct db *db_new(int type)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int db_connect(struct db *db, char *host, char *user, char *pass, char *dbname)
+int db_connect(struct db *db, const char *host, const char *user, const char *pass, const char *dbname)
 {
   db_current = db;
 

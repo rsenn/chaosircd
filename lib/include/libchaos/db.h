@@ -132,8 +132,8 @@ extern void                db_close             (struct db  *db);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern size_t              db_escape_string     (struct db  *db,
-                                                 const char* to,
+extern size_t              db_escape_string     (struct db *db,
+                                                 char* to,
                                                  const char *from,
                                                  size_t      len);
 

@@ -157,22 +157,30 @@ int userdb_lookup(struct userdb_client *userdb, const char* uid)
   return -1;
 }
 
-static int userdb_build_values(stralloc* sa, const char* v[], size_t n, char sep, char q , char stop, char start) {
+static int userdb_build_values(struct userdb_client* udb, stralloc* sa, const char* v[], size_t n, char sep, char q , char stop, char start) {
   size_t i;
 
-  stralloc_init(sa);
+//stralloc_init(sa);
 
   for(i = 0; i < n; ++i)
   {
     if(!v[i]) v[i] = "";
     size_t len = str_len(v[i]);
     if(sa->len) stralloc_catb(sa, &sep,1);
-    int quote =  (q != '\0') && (sep == ',' )||(!len || str_chr(v[i], sep) != NULL);
-
+    int quote =  (q != '\0') && (((sep == ',' )||(!len || str_chr(v[i], sep) != NULL)) || (q == '`'));
     if(quote)
       stralloc_catb(sa, &q, 1);
 
-    char *str = (char*)v[i];
+    char *str;
+      int sql = (q == '\'' && sep == ',' && start == '=');
+
+    if(sql) {
+      str = malloc(len * 2+1);
+      db_escape_string(udb->handle, str, v[i], len);
+      len = str_len(str);
+    }
+   else 
+     str = strdup(v[i]);
 
     if(start) {
       while(len) {
@@ -188,9 +196,8 @@ static int userdb_build_values(stralloc* sa, const char* v[], size_t n, char sep
     while(len) {
       if(*str == stop)
         break;
-      if(*str == '\'')
-        stralloc_catb(sa, "\\'", 2);
-      else
+      if(*str == q && !sql)
+        stralloc_catb(sa, "\\", 1);
         stralloc_catb(sa, str, 1);
       ++str;
       --len;
@@ -199,9 +206,9 @@ static int userdb_build_values(stralloc* sa, const char* v[], size_t n, char sep
     if(quote)
       stralloc_catb(sa, &q, 1);
   }
-  int len = sa->len;
+  n = sa->len;
   stralloc_catb(sa, "\0", 1);
-  return len;
+  return n;
 }
 
 
@@ -233,7 +240,7 @@ int   userdb_verify       (struct userdb_client *userdb,
         row[i] = "";
     }*/
 
-    userdb_build_values(&sa, row, db_num_fields(userdb->result), ' ', '\'', 0, 0);
+    userdb_build_values(userdb, &sa, row, db_num_fields(userdb->result), ' ', '\'', 0, 0);
 
 //if(&sa.len)     stralloc_catb(&sa, "'", 1);
     *retstr = sa.s;
@@ -251,13 +258,13 @@ int userdb_register     (struct userdb_client *userdb, const char* uid, const ch
                          size_t num_values)
 {
 
-  stralloc fields;
-  stralloc values;
+  stralloc fields = { 0, 0, 0 };
+  stralloc values = { 0, 0, 0 };
 
-  userdb_build_values(&fields, v, num_values, ',', '\'', '=', '\0');
-  userdb_build_values(&values, v, num_values, ',', '`', '\0', '=');
+  userdb_build_values(userdb, &fields, v, num_values, ',', '`', '=', '\0');
+  userdb_build_values(userdb, &values, v, num_values, ',', '\'', '\0', '=');
 
-  userdb->result = db_query(userdb->handle, "INSERT INTO cgircd.users (uid,%s) VALUES ('%s',%s)", fields.s, uid, values.s);
+  userdb->result = db_query(userdb->handle, "INSERT INTO users (uid,%s) VALUES ('%s',%s);", fields.s, uid, values.s);
     
   if(db_affected_rows(userdb->handle) <= 1)
     return -1;
