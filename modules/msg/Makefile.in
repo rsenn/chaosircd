@@ -62,6 +62,7 @@ MODULES              = m_away \
                        m_user \
                        m_userhost \
                        m_userip \
+                       m_userdb \
                        m_version \
                        m_who \
                        m_whois 

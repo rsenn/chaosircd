@@ -170,7 +170,7 @@ static int cmd_userdb(control_t *cptr, int ac, char **av)
     //int v = userdb_search(udb, av[2], &av[3], ac - 3);
     //control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
     int v = userdb_search(udb, &av[2], ac - 2, &s);
-    control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
+    control_send(&servauth_control, "userdb search %s %d %s", av[2], v, s ? s : "");
     if(s) free(s);
   }
 

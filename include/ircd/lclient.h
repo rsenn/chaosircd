@@ -39,6 +39,7 @@
 #define LCLIENT_PLUGDATA_COOKIE 1
 #define LCLIENT_PLUGDATA_MFLOOD 2
 #define LCLIENT_PLUGDATA_CFLOOD 3
+#define LCLIENT_PLUGDATA_USERDB 4
 
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *

@@ -47,6 +47,7 @@
 #define SUPPORT_BLOCK_SIZE   32
 #define STATS_BLOCK_SIZE     16
 #define SERVICE_BLOCK_SIZE   16
+#define USERDB_BLOCK_SIZE   16
 
 #define IRCD_IDLEN      8
 #define IRCD_CIPHERLEN  8

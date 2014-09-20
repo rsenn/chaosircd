@@ -38,6 +38,7 @@ MODULES              = chanmode \
                        server \
                        service \
                        user \
+                       userdb \
                        usermode
                        
 DEFS                 = -DPREFIX=\"$(prefix)\"

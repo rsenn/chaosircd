@@ -225,6 +225,7 @@ AC_SUBST([SSL_FALSE])
 AC_CHECK_DEP
 AC_CHECK_DEBUG
 AC_CHECK_MAINTAINER
+AC_CHECK_WERROR
 
 # ---------------------------------------------------------------------------
 
