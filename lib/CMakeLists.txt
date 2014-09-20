@@ -30,7 +30,28 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindMySQL.cmake")
 
 if(MYSQL_FOUND)
+  set(USE_MYSQL true CACHE BOOL "Use MySQL")
+endif()
+
+if(USE_MYSQL)
+  set(MYSQL_LIBS "${MYSQL_LIBRARIES}")
+  include_directories("${MYSQL_INCLUDE_DIR}")
   add_definitions(-DHAVE_MYSQL=1)
+endif()
+
+if(FREETYPE_LIBRARY)
+  set(USE_FREETYPE true CACHE BOOL "Use FreeType")
+endif()
+
+
+if(FREETYPE_FOUND)
+  set(USE_FREETYPE true CACHE BOOL "Use FreeType")
+endif()
+
+if(USE_FREETYPE)
+  set(FREETYPE_LIBS "${FREETYPE_LIBRARIES}")
+  include_directories(${FREETYPE_INCLUDE_DIRS})
+  add_definitions(-DHAVE_FREETYPE=1)
 endif()
 
 include(CheckLibraryExists)
@@ -44,7 +65,6 @@ if(HAVE_LOWFAT)
 endif()
 
 add_definitions(-DHAVE_CONFIG_H=1)
-include_directories("${MYSQL_INCLUDE_DIR}")
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
@@ -110,11 +130,11 @@ if(BUILD_SHARED)
 												SOVERSION "${LIBRARY_VERSION}"
 												PREFIX "")
 
-	target_link_libraries(chaos ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+	target_link_libraries(chaos ${MYSQL_LIBS} ${FREETYPE_LIBS} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 else()
   add_library(chaos STATIC ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
-	target_link_libraries(chaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+	target_link_libraries(chaos LINK_PUBLIC ${MYSQL_LIBS} ${FREETYPE_LIBS} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 endif()
 
 install(TARGETS chaos

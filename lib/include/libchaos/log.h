@@ -83,10 +83,10 @@ struct dlog {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA(int          )log_log;
-CHAOS_DATA(struct list  )log_list;
-CHAOS_DATA(struct slog  )log_sources[LOG_SOURCE_COUNT];
-CHAOS_DATA(log_source_t )log_source_filter;
+CHAOS_DATA(int) log_log;
+CHAOS_DATA(struct list) log_list;
+CHAOS_DATA(struct slog) log_sources[LOG_SOURCE_COUNT];
+CHAOS_DATA(log_source_t) log_source_filter;
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) log_get_log(void);
