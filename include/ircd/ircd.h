@@ -111,13 +111,13 @@
 #define IRCD_API(type) type
 #endif
 
-IRCD_API(int        ) ircd_log;
-IRCD_API(int        ) ircd_log_in;
-IRCD_API(int        ) ircd_log_out;
-IRCD_API(const char*) ircd_package;
-IRCD_API(const char*) ircd_version;
-IRCD_API(const char*) ircd_release;
-IRCD_API(struct list) ircd_support;
+extern int         ircd_log;
+extern int         ircd_log_in;
+extern int         ircd_log_out;
+extern const char *ircd_package;
+extern const char *ircd_version;
+extern const char *ircd_release;
+extern struct list ircd_support;
 
 typedef enum {
    false = 0,
@@ -156,47 +156,47 @@ IRCD_API(void) ircd_loop(void);
 /* -------------------------------------------------------------------------- *
  * Assemble uptime string                                                     *
  * -------------------------------------------------------------------------- */
-IRCD_API(const char*) ircd_uptime(void);
+extern const char     *ircd_uptime       (void);
 
 /* -------------------------------------------------------------------------- *
  * Garbage collect.                                                           *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) ircd_collect(void);
+extern void            ircd_collect      (void);
 
 /* -------------------------------------------------------------------------- *
  * Restart the daemon.                                                        *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) ircd_restart(void);
+extern int             ircd_restart      (void);
 
 /* -------------------------------------------------------------------------- *
  * Clean things up.                                                           *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) ircd_shutdown(void);
+extern void            ircd_shutdown     (void);
 
 /* -------------------------------------------------------------------------- *
  * Add a new support value                                                    *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct support*) ircd_support_new(void);
+extern struct support *ircd_support_new  (void);
 
 /* -------------------------------------------------------------------------- *
  * Find a support entry by name                                               *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct support*) ircd_support_find(const char *name);
+extern struct support *ircd_support_find (const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Unset a support value                                                      *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) ircd_support_unset(const char *name);
+extern void            ircd_support_unset(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Set a support value                                                        *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct support*) ircd_support_set(const char *name, const char *value,
-		...);
+extern struct support *ircd_support_set  (const char *name,
+                                          const char *value, ...);
 
 /* -------------------------------------------------------------------------- *
  * Show support numeric to a client                                           *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) ircd_support_show(struct client *cptr);
+extern void            ircd_support_show (struct client *cptr);
 
 #endif /* SRC_IRCD_H */

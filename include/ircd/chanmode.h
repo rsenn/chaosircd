@@ -166,48 +166,57 @@ struct chanmodeitem {
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-IRCD_DATA(int            ) chanmode_log;
+extern int             chanmode_log;
 /*struct sheap    chanmode_heap;
 struct sheap    chanmode_item_heap;*/
-IRCD_DATA(struct chanmode) chanmode_table      [0x40];
-IRCD_DATA(char           ) chanmode_flags      [CHANMODE_PER_LINE * 2 + 1];
-IRCD_DATA(char           ) chanmode_args_id    [IRCD_LINELEN];
-IRCD_DATA(char           ) chanmode_args_nick  [IRCD_LINELEN];
-IRCD_DATA(char           ) chanmode_cmd_id     [IRCD_LINELEN];
-IRCD_DATA(char           ) chanmode_cmd_nick   [IRCD_LINELEN];
-IRCD_DATA(char           ) chanmode_cmd_prefix [IRCD_LINELEN];
+extern struct chanmode chanmode_table      [0x40];
+extern char            chanmode_flags      [CHANMODE_PER_LINE * 2 + 1];
+extern char            chanmode_args_id    [IRCD_LINELEN];
+extern char            chanmode_args_nick  [IRCD_LINELEN];
+extern char            chanmode_cmd_id     [IRCD_LINELEN];
+extern char            chanmode_cmd_nick   [IRCD_LINELEN];
+extern char            chanmode_cmd_prefix [IRCD_LINELEN];
 
 /* -------------------------------------------------------------------------- *
  * Initialize the chanmode module                                             *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_init(void);
+extern void             chanmode_init           (void);
 
 /* -------------------------------------------------------------------------- *
  * Shut down the chanmode module                                              *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_shutdown(void);
+extern void             chanmode_shutdown       (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct chanmode*) chanmode_register(struct chanmode *cmptr);
+extern struct chanmode *chanmode_register       (struct chanmode       *cmptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_unregister(struct chanmode *cmptr);
+extern int              chanmode_unregister     (struct chanmode       *cmptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct chanmodechange*) chanmode_change_add(struct list *list, int what, char mode, char *arg,
-		struct chanuser *acuptr);
+extern struct chanmodechange *
+                        chanmode_change_add     (struct list           *list,
+                                                 int                    what,
+                                                 char                   mode,
+                                                 char                  *arg,
+                                                 struct chanuser       *acuptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct chanmodechange*) chanmode_change_insert(struct list *list, struct chanmodechange *before,
-		int what, char mode, char *arg);
+extern struct chanmodechange *
+                        chanmode_change_insert  (struct list           *list,
+                                                 struct chanmodechange *before,
+                                                 int                    what,
+                                                 char                   mode,
+                                                 char                  *arg);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_change_destroy(struct list *list);
+extern void             chanmode_change_destroy (struct list *list);
+
 
 /* -------------------------------------------------------------------------- *
  * Parse channel mode changes                                                 *
@@ -222,9 +231,14 @@ IRCD_API(void) chanmode_change_destroy(struct list *list);
  *                                                                            *
  * if a chanuser is present then <cptr> and <chptr> will be ignored.          *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_parse(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *list,
-		char *modes, char *args, uint32_t pc);
+extern void             chanmode_parse          (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct chanuser       *cuptr,
+                                                 struct list           *list,
+                                                 char                  *modes,
+                                                 char                  *args,
+                                                 uint32_t               pc);
 
 /* -------------------------------------------------------------------------- *
  * Apply channel mode changes                                                 *
@@ -238,122 +252,157 @@ IRCD_API(void) chanmode_parse(struct lclient *lcptr, struct client *cptr,
  *                                                                            *
  * if a chanuser is present then <cptr> and <chptr> will be ignored.          *
  * -------------------------------------------------------------------------- */
-IRCD_API(uint32_t) chanmode_apply(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr);
+extern uint32_t         chanmode_apply          (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct chanuser       *cuptr,
+                                                 struct list           *lptr);
 
 /* -------------------------------------------------------------------------- *
  *  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_send_local(struct client *cptr, struct channel *chptr,
-		struct node *nptr, size_t n);
+extern void             chanmode_send_local     (struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct node           *nptr,
+                                                 size_t                 n);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_send_remote(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct node *nptr);
+extern void             chanmode_send_remote    (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_send(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct list *lptr);
+extern void             chanmode_send           (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct list           *lptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(uint32_t) chanmode_flags_build(char *dst, int types, uint64_t flags);
+extern uint32_t         chanmode_flags_build    (char                  *dst,
+                                                 int                    types,
+                                                 uint64_t               flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(uint32_t) chanmode_args_build(char *dst, struct channel *chptr);
+extern uint32_t         chanmode_args_build     (char                  *dst,
+                                                 struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_show(struct client *cptr, struct channel *chptr);
+extern void             chanmode_show           (struct client         *cptr,
+                                                 struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_bounce_simple(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr);
+extern int              chanmode_bounce_simple  (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct chanuser       *cuptr,
+                                                 struct list           *lptr,
+                                                 struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_bounce_ban(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr);
+extern int              chanmode_bounce_ban     (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct chanuser       *cuptr,
+                                                 struct list           *lptr,
+                                                 struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_bounce_mask(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr);
+extern int              chanmode_bounce_mask    (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct chanuser       *cuptr,
+                                                 struct list           *lptr,
+                                                 struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_match_ban(struct client *cptr, struct channel *chptr,
-		struct list *mlptr);
+extern int              chanmode_match_ban      (struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct list           *mlptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_match_amode(struct client *cptr, struct channel *chptr,
-		struct list *mlptr);
+extern int              chanmode_match_amode    (struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct list           *mlptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_match_deny(struct client *cptr, struct channel *chptr,
-		struct list *mlptr);
+extern int              chanmode_match_deny     (struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct list           *mlptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) chanmode_mask_add(struct client *cptr, struct list *mlptr,
-		struct chanmodechange *cmcptr);
+extern int              chanmode_mask_add       (struct client         *cptr,
+                                                 struct list           *mlptr,
+                                                 struct chanmodechange *cmcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_mask_delete(struct list *mlptr,
-		struct chanmodeitem *cmiptr);
+extern void             chanmode_mask_delete    (struct list           *mlptr,
+                                                 struct chanmodeitem   *cmiptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_prefix_make(char *buf, uint64_t flags);
+extern void             chanmode_prefix_make    (char                  *buf,
+                                                 uint64_t               flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_changes_make(struct list *list, int what,
-		struct chanuser *cuptr);
+extern void             chanmode_changes_make   (struct list           *list,
+                                                 int                    what,
+                                                 struct chanuser       *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-IRCD_API(void) chanmode_changes_dump (struct list *lptr);
+extern void             chanmode_changes_dump   (struct list           *lptr);
 #endif /* DEBUG */
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(uint64_t) chanmode_prefix_parse(const char *pfx);
+extern uint64_t         chanmode_prefix_parse   (const char            *pfx);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_list(struct client *cptr, struct channel *chptr, char c);
+extern void             chanmode_list           (struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 char                   c);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct node*) chanmode_assemble_list(char *buf, struct node *nptr,
-		size_t len);
+extern struct node     *chanmode_assemble_list  (char                  *buf,
+                                                 struct node           *nptr,
+                                                 size_t                 len);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_introduce(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct node *nptr);
+extern void             chanmode_introduce      (struct lclient        *lcptr,
+                                                 struct client         *cptr,
+                                                 struct channel        *chptr,
+                                                 struct node           *nptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(size_t) chanmode_burst(struct lclient *lcptr, struct channel *chptr);
+extern size_t           chanmode_burst          (struct lclient        *lcptr,
+                                                 struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_drop(struct client *cptr, struct channel *chptr);
+extern void             chanmode_drop           (struct client         *cptr,
+                                                 struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) chanmode_support(void);
+extern void             chanmode_support        (void);
 
 #endif /* SRC_CHANMODE_H */

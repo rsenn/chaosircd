@@ -47,52 +47,61 @@ char         *db_tmpbuf;
 /* ------------------------------------------------------------------------ *
  * Strip whitespace                                                         *
  * ------------------------------------------------------------------------ */
-static inline char *db_trim(char *s) {
-	uint32_t i;
-	uint32_t len;
+static inline char *db_trim(char *s)
+{
+  uint32_t i;
+  uint32_t len;
 
-	len = str_len(s);
+  len = str_len(s);
 
-	for(i = len; i > 0; i--) {
-		if(!str_isspace(s[i - 1])) {
-			s[i] = '\0';
-			break;
-		}
-	}
+  for(i = len; i > 0; i--)
+  {
+    if(!str_isspace(s[i - 1]))
+    {
+      s[i] = '\0';
+      break;
+    }
+  }
 
-	return s;
+  return s;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void db_format_str(char **pptr, size_t *bptr, size_t n, int padding,
-		int left, void *arg) {
-	(void) padding;
-	size_t i, len;
-	char *escaped;
+static void
+db_format_str(char   **pptr, size_t  *bptr,
+              size_t   n,    int      padding,
+              int      left, void    *arg) {
+  (void)padding;
+  size_t i, len;
+  char *escaped;
 
-	len = str_len(arg) + 1024;
+  len = str_len(arg) + 1024;
 
-	if(arg) {
-		escaped = mem_dynamic_alloc(&db_dheap, str_len(arg) + 1024);
+  if(arg)
+  {
+    escaped = mem_dynamic_alloc(&db_dheap, str_len(arg) + 1024);
 
-		len = db_escape_string(db_current, escaped, arg, str_len(arg));
-	} else {
-		escaped = "(null)";
+    len = db_escape_string(db_current, escaped, arg, str_len(arg));
+  }
+  else
+  {
+    escaped = "(null)";
 
-		len = 6;
-	}
+    len = 6;
+  }
 
-	for(i = 0; i < len; i++) {
-		if(*bptr >= n)
-			break;
+  for(i = 0; i < len; i++)
+  {
+    if(*bptr >= n)
+      break;
 
-		*(*pptr)++ = escaped[i];
-		(*bptr)++;
-	}
+    *(*pptr)++ = escaped[i];
+    (*bptr)++;
+  }
 
-	if(arg)
-		mem_dynamic_free(&db_dheap, escaped);
+  if(arg)
+    mem_dynamic_free(&db_dheap, escaped);
 }
 
 /* ------------------------------------------------------------------------ *
@@ -100,475 +109,509 @@ static void db_format_str(char **pptr, size_t *bptr, size_t n, int padding,
 #ifdef HAVE_PGSQL
 static void db_notice_handler(void *arg, const char *message)
 {
-	log(db_log, L_verbose, "Notice from PostgreSQL: %s", message);
+  log(db_log, L_verbose, "Notice from PostgreSQL: %s", message);
 }
 #endif /* HAVE_PGSQL */
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #if (defined HAVE_PGSQL) || (defined HAVE_MYSQL)
-static struct db_result *db_new_result(struct db *db, uint32_t fields,
-		uint64_t rows) {
-	struct db_result *result;
+static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t rows)
+{
+  struct db_result *result;
 
-	result = mem_static_alloc(&db_result_heap);
+  result = mem_static_alloc(&db_result_heap);
 
-	result->db = db;
-	result->res.common = NULL;
-	result->row = 0LLU;
-	result->rows = rows;
-	result->fields = fields;
-	result->data = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
-	result->fdata = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
+  result->db = db;
+  result->res.common = NULL;
+  result->row = 0LLU;
+  result->rows = rows;
+  result->fields = fields;
+  result->data = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
+  result->fdata = mem_dynamic_alloc(&db_dheap, (fields + 1) * sizeof(char *));
 
-	return result;
+  return result;
 }
 #endif
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void db_set_error(struct db *db) {
+static void db_set_error(struct db *db)
+{
 
-	db->error = 1;
-	if(db->handle.common) {
-		const char *error = NULL;
+  db->error = 1;
+  if(db->handle.common)
+  {
+    const char *error = NULL;
 
-		switch(db->type) {
+    switch(db->type)
+    {
 #ifdef HAVE_PQSQL
-			case DB_TYPE_PGSQL:
-			{
-				error = PQerrorMessage(db->handle.pg);
-			}
-			break;
+      case DB_TYPE_PGSQL:
+      {
+        error = PQerrorMessage(db->handle.pg);
+      }
+      break;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-			case DB_TYPE_MYSQL: {
-				error = mysql_error(db->handle.my);
-			}
-				break;
+      case DB_TYPE_MYSQL:
+      {
+        error = mysql_error(db->handle.my);
+      }
+      break;
 #endif /* HAVE_MYSQL */
-			default:
-				strcpy(db->errormsg, "no database support");
-		}
+      default:
+        strcpy(db->errormsg, "no database support");
+    }
 
-		if(error)
-			strlcpy(db->errormsg, error, sizeof(db->error));
-	} else {
-		strcpy(db->errormsg, "no database connection");
-	}
+    if(error)
+      strlcpy(db->errormsg, error, sizeof(db->error));
+  }
+  else
+  {
+    strcpy(db->errormsg, "no database connection");
+  }
 }
 
 /* ------------------------------------------------------------------------ *
  * Initialize DB heap                                                       *
  * ------------------------------------------------------------------------ */
-void db_init(void) {
-	db_log = log_source_register("db");
+void db_init(void)
+{
+  db_log = log_source_register("db");
 
-	str_register('Q', db_format_str);
+  str_register('Q', db_format_str);
 
-	mem_static_create(&db_heap, sizeof(struct db), DB_BLOCK_SIZE);
-	mem_static_note(&db_heap, "db block heap");
-	mem_static_create(&db_result_heap, sizeof(struct db_result),
-			DB_BLOCK_SIZE * 4);
-	mem_static_note(&db_result_heap, "db result heap");
+  mem_static_create(&db_heap, sizeof(struct db), DB_BLOCK_SIZE);
+  mem_static_note(&db_heap, "db block heap");
+  mem_static_create(&db_result_heap, sizeof(struct db_result), DB_BLOCK_SIZE * 4);
+  mem_static_note(&db_result_heap, "db result heap");
 
-	mem_dynamic_create(&db_dheap, 256 * 1024);
+  mem_dynamic_create(&db_dheap, 256 * 1024);
 
-	db_serial = 0;
+  db_serial = 0;
 
-	dlink_list_zero(&db_list);
+  dlink_list_zero(&db_list);
 
-	db_tmpbuf = mem_dynamic_alloc(&db_dheap, DB_TMPBUF_SIZE);
+  db_tmpbuf = mem_dynamic_alloc(&db_dheap, DB_TMPBUF_SIZE);
 }
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB heap                                                          *
  * ------------------------------------------------------------------------ */
-void db_shutdown(void) {
-	struct node *next;
-	struct db *db;
+void db_shutdown(void)
+{
+  struct node *next;
+  struct db   *db;
 
-	dlink_foreach_safe(&db_list, db, next)
-		db_destroy(db);
+  dlink_foreach_safe(&db_list, db, next)
+    db_destroy(db);
 
-	mem_static_destroy(&db_result_heap);
-	mem_static_destroy(&db_heap);
-	mem_dynamic_destroy(&db_dheap);
+  mem_static_destroy(&db_result_heap);
+  mem_static_destroy(&db_heap);
+  mem_dynamic_destroy(&db_dheap);
 
-	str_unregister('Q');
+  str_unregister('Q');
 
-	log_source_unregister(db_log);
+  log_source_unregister(db_log);
 }
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB instance                                                      *
  * ------------------------------------------------------------------------ */
-void db_destroy(struct db *db) {
-	dlink_delete(&db_list, &db->node);
+void db_destroy(struct db *db)
+{
+  dlink_delete(&db_list, &db->node);
 
-	mem_static_free(&db_heap, db);
+  mem_static_free(&db_heap, db);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct db* db_new(int type) {
-	struct db *db;
+struct db* db_new(int type)
+{
+  struct db *db;
 
-	switch(type) {
+  switch(type)
+  {
 #ifdef HAVE_MYSQL
-		case DB_TYPE_MYSQL:
-			break;
+    case DB_TYPE_MYSQL:
+      break;
 #endif /* HAVE_MYSQL */
 #ifdef HAVE_PGSQL
-			case DB_TYPE_PGSQL:
-			break;
+    case DB_TYPE_PGSQL:
+      break;
 #endif /* HAVE_PGSQL */
-		default:
-			log(db_log, L_fatal, "Database type #%i not supported.", type);
-			return NULL;
-	}
+    default:
+      log(db_log, L_fatal, "Database type #%i not supported.", type);
+      return NULL;
+  }
 
-	db = mem_static_alloc(&db_heap);
 
-	db->type = type;
-	db->refcount = 0;
-	db->id = db_serial++;
-	db->error = 0;
-	db->errormsg[0] = '\0';
-	db->handle.common = NULL;
+  db = mem_static_alloc(&db_heap);
 
-	dlink_add_tail(&db_list, &db->node, db);
+  db->type = type;
+  db->refcount = 0;
+  db->id = db_serial++;
+  db->error = 0;
+  db->errormsg[0] = '\0';
+  db->handle.common = NULL;
 
-	db_current = db;
+  dlink_add_tail(&db_list, &db->node, db);
 
-	return db;
+  db_current = db;
+
+  return db;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int db_connect(struct db *db, const char *host, const char *user,
-		const char *pass, const char *dbname) {
-	db_current = db;
+int db_connect(struct db *db, const char *host, const char *user, const char *pass, const char *dbname)
+{
+  db_current = db;
 
-	switch(db->type) {
+  switch(db->type)
+  {
 #ifdef HAVE_PGSQL
-		case DB_TYPE_PGSQL:
-		{
-			db->handle.pg = PQsetdbLogin(host, NULL, NULL, NULL, dbname, user, pass);
+    case DB_TYPE_PGSQL:
+    {
+      db->handle.pg = PQsetdbLogin(host, NULL, NULL, NULL, dbname, user, pass);
 
-			if(db->handle.pg != NULL && PQstatus(db->handle.pg) == CONNECTION_OK)
-			{
-				PQsetNoticeProcessor(db->handle.pg, db_notice_handler, NULL);
-				return 0;
-			}
-		}
-		break;
+      if(db->handle.pg != NULL && PQstatus(db->handle.pg) == CONNECTION_OK)
+      {
+        PQsetNoticeProcessor(db->handle.pg, db_notice_handler, NULL);
+        return 0;
+      }
+    }
+    break;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-		case DB_TYPE_MYSQL: {
-			db->handle.my = mysql_init(NULL);
+    case DB_TYPE_MYSQL:
+    {
+      db->handle.my = mysql_init(NULL);
 
-			if(mysql_real_connect(db->handle.my, host, user, pass,
+      if(mysql_real_connect(db->handle.my, host, user, pass,
 #if MYSQL_VERSION_ID >= 32200
-					dbname,
+                            dbname,
 #endif /* MYSQL_VERSION_ID */
-					3306, NULL, 0) != NULL)
+                            3306, NULL, 0) != NULL)
 
-			{
+      {
 #if MYSQL_VERSION_ID < 32200
-				if(dbname != NULL) {
-					if(!mysql_select_db(conn, db))
-						return 0;
-				} else
+        if(dbname != NULL)
+        {
+          if(!mysql_select_db(conn, db))
+            return 0;
+        }
+        else
 #endif /* MYSQL_VERSION_ID */
-					return 0;
-			}
-		}
-			break;
+          return 0;
+      }
+    }
+    break;
 #endif /* HAVE_MYSQL */
-	}
+  }
 
-	db_set_error(db);
-	db_close(db);
+  db_set_error(db);
+  db_close(db);
 
-	return -1;
+  return -1;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void db_close(struct db *db) {
-	db_current = db;
+void db_close(struct db *db)
+{
+  db_current = db;
 
-	if(db->handle.common) {
-		switch(db->type) {
+  if(db->handle.common)
+  {
+    switch(db->type)
+    {
 #ifdef HAVE_PGSQL
-			case DB_TYPE_PGSQL:
-			{
-				PQfinish(db->handle.pg);
-			}
-			break;
+      case DB_TYPE_PGSQL:
+      {
+        PQfinish(db->handle.pg);
+      }
+      break;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-			case DB_TYPE_MYSQL: {
-				mysql_close(db->handle.my);
-			}
-				break;
+      case DB_TYPE_MYSQL:
+      {
+        mysql_close(db->handle.my);
+      }
+      break;
 #endif /* HAVE_MYSQL */
-		}
+    }
 
-		db->handle.common = NULL;
-	}
+    db->handle.common = NULL;
+  }
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 char* db_escape_string_dup(struct db *db, const char *from) {
-	char* ret = malloc(str_len(from) * 2 + 1);
-	if(ret)
-		db_escape_string(db, ret, from, str_len(from));
-	return ret;
+  char* ret = malloc(str_len(from)*2+1);
+  if(ret)
+    db_escape_string(db, ret, from, str_len(from));
+  return ret;
 }
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-size_t db_escape_string(struct db *db, char *to, const char *from, size_t len) {
-	db_current = db;
+size_t db_escape_string(struct db *db, char *to, const char *from, size_t len)
+{
+  db_current = db;
 
-	switch(db->type) {
+  switch(db->type)
+  {
 #ifdef HAVE_PGSQL
-		case DB_TYPE_PGSQL:
-		return PQescapeString(to, from, len);
+    case DB_TYPE_PGSQL:
+      return PQescapeString(to, from, len);
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-		case DB_TYPE_MYSQL:
-			return (size_t) mysql_escape_string(to, from, len);
+    case DB_TYPE_MYSQL:
+      return (size_t)mysql_escape_string(to, from, len);
 #endif /* HAVE_MYSQL */
-	}
+  }
 
-	return 0;
+  return 0;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct db_result *db_vquery(struct db *db, const char *format, va_list args) {
-	str_vsnprintf(db_tmpbuf, DB_TMPBUF_SIZE, format, args);
+struct db_result *db_vquery(struct db *db, const char *format, va_list args)
+{
+  str_vsnprintf(db_tmpbuf, DB_TMPBUF_SIZE, format, args);
 
-	switch(db->type) {
+
+  switch(db->type)
+  {
 #ifdef HAVE_PGSQL
-		case DB_TYPE_PGSQL:
-		{
-			struct db_result *result = NULL;
-			PGresult *res;
-			ExecStatusType status;
-			uint64_t rows;
-			uint32_t fields;
-			char *tuples;
+    case DB_TYPE_PGSQL:
+    {
+      struct db_result *result = NULL;
+      PGresult         *res;
+      ExecStatusType    status;
+      uint64_t          rows;
+      uint32_t          fields;
+      char             *tuples;
 
-			res = PQexec(db->handle.pg, db_tmpbuf);
+      res = PQexec(db->handle.pg, db_tmpbuf);
 
-			db_set_error(db);
+      db_set_error(db);
 
-			if(res != NULL)
-			status = PQresultStatus(res);
-			else
-			status = (ExecStatusType)PQstatus(db->handle.pg);
+      if(res != NULL)
+        status = PQresultStatus(res);
+      else
+        status = (ExecStatusType)PQstatus(db->handle.pg);
 
-			switch(status)
-			{
-				case PGRES_EMPTY_QUERY:
-				{
-					if(res != NULL)
-					PQclear(res);
+      switch(status)
+      {
+        case PGRES_EMPTY_QUERY:
+        {
+          if(res != NULL)
+            PQclear(res);
 
-					res = NULL;
-				}
-				break;
-				case PGRES_BAD_RESPONSE:
-				case PGRES_NONFATAL_ERROR:
-				case PGRES_FATAL_ERROR:
-				{
-					if(res != NULL)
-					PQclear(res);
+          res = NULL;
+        }
+        break;
+        case PGRES_BAD_RESPONSE:
+        case PGRES_NONFATAL_ERROR:
+        case PGRES_FATAL_ERROR:
+        {
+          if(res != NULL)
+            PQclear(res);
 
-					res = NULL;
+          res = NULL;
 
-					return NULL;
-				}
-				case PGRES_COMMAND_OK:
-				default:
-				{
-					if(res == NULL)
-					return NULL;
-				}
-				break;
-			}
+          return NULL;
+        }
+        case PGRES_COMMAND_OK:
+        default:
+        {
+          if(res == NULL)
+            return NULL;
+        }
+        break;
+      }
 
-			rows = PQntuples(res);
-			fields = PQnfields(res);
+      rows = PQntuples(res);
+      fields = PQnfields(res);
 
-			tuples = PQcmdTuples(res);
+      tuples = PQcmdTuples(res);
 
-			if(tuples && tuples[0])
-			db->affected_rows = str_toull(tuples, NULL, 10);
-			else
-			db->affected_rows = 0LLU;
+      if(tuples && tuples[0])
+        db->affected_rows = str_toull(tuples, NULL, 10);
+      else
+        db->affected_rows = 0LLU;
 
-			if(rows || fields)
-			{
-				result = db_new_result(db, fields, rows);
-				result->res.pg = res;
-			}
-			else
-			{
-				PQclear(res);
-			}
+      if(rows || fields)
+      {
+        result = db_new_result(db, fields, rows);
+        result->res.pg = res;
+      }
+      else
+      {
+        PQclear(res);
+      }
 
-			return result;
-		}
+      return result;
+    }
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-		case DB_TYPE_MYSQL: {
-			MYSQL_RES *res;
-			int num_rows = 0;
-			struct db_result *result = NULL;
+    case DB_TYPE_MYSQL:
+    {
+      MYSQL_RES *res;
+      int num_rows = 0; 
+      struct db_result *result = NULL;
 
-			db->error = mysql_query(db->handle.my, db_tmpbuf);
+      db->error = mysql_query(db->handle.my, db_tmpbuf);
 
-			if(db->error) {
-				log(db_log, L_debug, "Query: %s = %d", db_tmpbuf, db->error);
-				db_set_error(db);
-				return NULL;
-			}
-			db->affected_rows = mysql_affected_rows(db->handle.my);
+      if(db->error) {
+  log(db_log, L_debug, "Query: %s = %d",db_tmpbuf,db->error);
+        db_set_error(db);
+        return NULL;
+      }
+      db->affected_rows = mysql_affected_rows(db->handle.my);
 
-			res = mysql_store_result(db->handle.my);
+      res = mysql_store_result(db->handle.my);
 
-			if(res) {
-				result = db_new_result(db, mysql_num_fields(res),
-						mysql_num_rows(res));
+      if(res)
+      {
+        result = db_new_result(db, mysql_num_fields(res), mysql_num_rows(res));
 
-				result->res.my = res;
-				result->row = 0;
+        result->res.my = res;
+        result->row = 0;
 
-				num_rows = db_num_rows(result);
-			}
+        num_rows = db_num_rows(result);
+      }
 
-			log(db_log, L_debug, "Query: %s = affected_rows=%d num_rows=%d",
-					db_tmpbuf, db->affected_rows, num_rows);
-			return result;
-		}
+  log(db_log, L_debug, "Query: %s = affected_rows=%d num_rows=%d",db_tmpbuf, db->affected_rows, num_rows);
+        return result;
+    }
 #endif /* HAVE_MYSQL */
-	}
+  }
 
-	return NULL;
+  return NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct db_result *db_query(struct db *db, const char *format, ...) {
-	struct db_result *ret;
+struct db_result *db_query(struct db *db, const char *format, ...)
+{
+  struct db_result *ret;
 
-	va_list args;
+  va_list args;
 
-	va_start(args, format);
+  va_start(args, format);
 
-	ret = db_vquery(db, format, args);
+  ret = db_vquery(db, format, args);
 
-	va_end(args);
+  va_end(args);
 
-	return ret;
+  return ret;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-uint64_t db_affected_rows(struct db *db) {
-	return db->affected_rows;
+uint64_t db_affected_rows(struct db *db)
+{
+  return db->affected_rows;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void db_free_result(struct db_result *result) {
-	switch(result->db->type) {
+void db_free_result(struct db_result *result)
+{
+  switch(result->db->type)
+  {
 #ifdef HAVE_PGSQL
-		case DB_TYPE_PGSQL:
-		{
-			if(result->res.pg)
-			PQclear(result->res.pg);
-		}
-		break;
+    case DB_TYPE_PGSQL:
+    {
+      if(result->res.pg)
+        PQclear(result->res.pg);
+    }
+    break;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-		case DB_TYPE_MYSQL: {
-			if(result->res.my)
-				mysql_free_result(result->res.my);
-		}
-			break;
+    case DB_TYPE_MYSQL:
+    {
+      if(result->res.my)
+        mysql_free_result(result->res.my);
+    }
+    break;
 #endif /* HAVE_MYSQL */
-	}
+  }
 
-	result->res.common = NULL;
+  result->res.common = NULL;
 
-	mem_dynamic_free(&db_dheap, result->data);
+  mem_dynamic_free(&db_dheap, result->data);
 
-	mem_static_free(&db_result_heap, result);
+  mem_static_free(&db_result_heap, result);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-char **db_fetch_row(struct db_result *result) {
-	if(result->row >= result->rows)
-		return NULL;
+char **db_fetch_row(struct db_result *result)
+{
+  if(result->row >= result->rows)
+    return NULL;
 
-	switch(result->db->type) {
+  switch(result->db->type)
+  {
 #ifdef HAVE_PGSQL
-		case DB_TYPE_PGSQL:
-		{
-			int i;
+    case DB_TYPE_PGSQL:
+    {
+      int i;
 
-			for(i = 0; i < result->fields; i++)
-			{
-				if(PQgetisnull(result->res.pg, result->row, i))
-				result->data[i] = NULL;
-				else
-				result->data[i] = db_trim(PQgetvalue(result->res.pg, result->row, i));
-			}
+      for(i = 0; i < result->fields; i++)
+      {
+        if(PQgetisnull(result->res.pg, result->row, i))
+          result->data[i] = NULL;
+        else
+          result->data[i] = db_trim(PQgetvalue(result->res.pg, result->row, i));
+      }
 
-			result->data[i] = NULL;
-			result->row++;
+      result->data[i] = NULL;
+      result->row++;
 
-			return result->data;
-		}
-		break;
+      return result->data;
+    }
+    break;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-		case DB_TYPE_MYSQL: {
-			char **row;
-			size_t i;
+    case DB_TYPE_MYSQL:
+    {
+      char **row;
+      size_t i;
 
-			row = mysql_fetch_row(result->res.my);
+      row = mysql_fetch_row(result->res.my);
 
-			for(i = 0; i < result->fields; i++)
-				result->data[i] = row[i];
+      for(i = 0; i < result->fields; i++)
+        result->data[i] = row[i];
 
-			result->data[i] = NULL;
+      result->data[i] = NULL;
 
-			result->row++;
+      result->row++;
 
-			return result->data;
-		}
-			break;
+      return result->data;
+    }
+    break;
 #endif /* HAVE_MYSQL */
-	}
+  }
 
-	return NULL;
+  return NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-uint64_t db_num_rows(struct db_result *result) {
-	return result->rows;
+uint64_t db_num_rows(struct db_result *result)
+{
+  return result->rows;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-uint32_t db_num_fields(struct db_result *result) {
-	return result->fields;
+uint32_t db_num_fields(struct db_result *result)
+{
+  return result->fields;
 }

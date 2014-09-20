@@ -60,58 +60,60 @@ CHAOS_API(int)               cfg_dirty;
 /* ------------------------------------------------------------------------ *
  * Initialize cfg heap and add garbage collect timer.                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_init(void);
+CHAOS_API(void)              cfg_init            (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy cfg heap and cancel timer.                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_shutdown(void);
+CHAOS_API(void)              cfg_shutdown        (void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int) cfg_collect(void);
+CHAOS_API(int)               cfg_collect         (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_default(struct cfg *iptr);
+CHAOS_API(void)              cfg_default         (struct cfg  *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct cfg *) cfg_new (const char *name);
+CHAOS_API(struct cfg *)      cfg_new             (const char  *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int) cfg_load(struct cfg *cfptr, const char *path);
+CHAOS_API(int)               cfg_load            (struct cfg  *cfptr,
+                                                  const char  *path);
 
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_release(struct cfg *cfptr);
+CHAOS_API(void)              cfg_release         (struct cfg  *cfptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_delete(struct cfg *cfptr);
+CHAOS_API(void)              cfg_delete         (struct cfg  *cfptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_set_name(struct cfg *cfptr, const char *name);
+CHAOS_API(void)              cfg_set_name        (struct cfg  *cfptr,
+                                                  const char    *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(const char *) cfg_get_name (struct cfg *cfptr);
+CHAOS_API(const char *)      cfg_get_name        (struct cfg  *cfptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct cfg *) cfg_find_name (const char *name);
+CHAOS_API(struct cfg *)      cfg_find_name       (const char    *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct cfg *) cfg_find_id (uint32_t id);
+CHAOS_API(struct cfg *)      cfg_find_id         (uint32_t       id);
 
 /* ------------------------------------------------------------------------ *
  * Dump cfgers and cfg heap.                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) cfg_dump(struct cfg *cfptr);
+CHAOS_API(void)              cfg_dump            (struct cfg  *cfptr);
 
 #endif /* LIB_CFG_H */

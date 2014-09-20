@@ -22,6 +22,7 @@
 #ifndef SRC_USERMODE_H
 #define SRC_USERMODE_H
 
+
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
@@ -32,6 +33,7 @@
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
 #include "ircd/client.h"
+
 
 /* -------------------------------------------------------------------------- *
  * Defines                                                                    *
@@ -77,40 +79,43 @@
 struct usermodechange;
 struct usermode;
 
-typedef int (um_handler_t)(struct user *, struct usermodechange *,
-		uint32_t flags);
+typedef int (um_handler_t)(struct user *,
+                           struct usermodechange *,
+                           uint32_t flags);
 
 struct usermode {
-	/* these values are set by the usermode modules... */
-	char character; /* the letter */
-	int list_mode; /* says what is kept in the list.
-	 * USERMODE_LIST_ON, USERMODE_LIST_OF or
-	 * USERMODE_LIST_NOLIST. */
-	int list_type; /* what kind of users kept in the list.
-	 * USERMODE_LIST_LOCAL, USERMODE_LIST_REMOTE
-	 * OR USERMODE_LIST_GLOBAL. */
-	int arg; /* information about arguments for this usermode.
-	 * bitwise-ORed with USERMODE_ARG_ENABLE and
-	 * USERMODE_ARG_EMPTY */
-	um_handler_t *handler; /* called on a change on this flag */
+  /* these values are set by the usermode modules... */
+  char          character; /* the letter */
+  int           list_mode; /* says what is kept in the list.
+                            * USERMODE_LIST_ON, USERMODE_LIST_OF or
+                            * USERMODE_LIST_NOLIST. */
+  int           list_type; /* what kind of users kept in the list.
+                            * USERMODE_LIST_LOCAL, USERMODE_LIST_REMOTE
+                            * OR USERMODE_LIST_GLOBAL. */
+  int           arg;       /* information about arguments for this usermode.
+                            * bitwise-ORed with USERMODE_ARG_ENABLE and
+                            * USERMODE_ARG_EMPTY */
+  um_handler_t *handler;   /* called on a change on this flag */
 
-	/* ..and these by usermode.c */
-	struct list list; /* the list users are kept in when flag is on */
-	uint64_t flag; /* the bit flag */
-	struct node node;
+  /* ..and these by usermode.c */
+  struct list   list;      /* the list users are kept in when flag is on */
+  uint64_t      flag;      /* the bit flag */
+  struct node   node;
 };
 
 struct usermodechange {
-	struct node node;
-	struct usermode *mode; /* the mode */
-	int change; /* the change */
-	char *arg;
+  struct node      node;
+  struct usermode *mode;   /* the mode */
+  int              change; /* the change */
+  char            *arg;
 };
+
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-IRCD_DATA(int) usermode_log;
+int usermode_log;
+
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) usermode_get_log(void);
@@ -118,94 +123,116 @@ IRCD_API(int) usermode_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize the usermode module                                             *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_init(void);
+extern void
+usermode_init          (void);
 
 /* -------------------------------------------------------------------------- *
  * Shut down the USERMODE module                                              *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_shutdown(void);
+extern void
+usermode_shutdown      (void);
 
 /* -------------------------------------------------------------------------- *
  * Called to register a usermode                                              *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) usermode_register(struct usermode *umptr);
+extern int
+usermode_register      (struct usermode *umptr);
 
 /* -------------------------------------------------------------------------- *
  * Called to unregister a usermode                                            *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_unregister(struct usermode *umptr);
+extern void
+usermode_unregister    (struct usermode *umptr);
 
 /* -------------------------------------------------------------------------- *
  * Answer a usermode request                                                  *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_show(struct client *cptr);
+extern void
+usermode_show          (struct client  *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Add a usermode change to the usermode_heap                                 *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_change_add(struct usermode *mode, int change, char *arg);
+extern void
+usermode_change_add    (struct usermode *mode, int change, char *arg);
 
 /* -------------------------------------------------------------------------- *
  * Removes all usermode changes from the usermode_list and free the memory    *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_change_destroy(void);
+extern void
+usermode_change_destroy(void);
 
 /* -------------------------------------------------------------------------- *
  * Parses a user mode buffer                                                  *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) usermode_parse(uint64_t modes, char **args, struct client *cptr,
-		uint32_t flags);
+extern int
+usermode_parse         (uint64_t        modes,     char         **args,
+                       struct client   *cptr,      uint32_t       flags);
 
 /* -------------------------------------------------------------------------- *
  * Form a string representating the modes given                               *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_assemble(uint64_t modes, char *umbuf);
+extern void
+usermode_assemble      (uint64_t        modes,     char          *umbuf);
 
 /* -------------------------------------------------------------------------- *
  * Change the flags in modes after usermode_parse() is called                 *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) usermode_apply(struct user *uptr, uint64_t *modes, uint32_t flags);
+extern int
+usermode_apply         (struct user    *uptr,      uint64_t      *modes,
+                        uint32_t        flags);
 
-IRCD_API(void) usermode_unlinkall_user(struct user *uptr);
+extern void
+usermode_unlinkall_user(struct user    *uptr);
 
-IRCD_API(void) usermode_linkall_user(struct user *uptr);
+extern void
+usermode_linkall_user  (struct user    *uptr);
 
 /* -------------------------------------------------------------------------- *
  * To call this function is normaly all stuff to do :)                        *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) usermode_make(struct user *uptr, char **args, struct client *cptr,
-		uint32_t flags);
+extern int
+usermode_make          (struct user    *uptr,      char         **args,
+                        struct client  *cptr,      uint32_t       flags);
 
 /* -------------------------------------------------------------------------- *
  * Send a usermode change back to the user                                    *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_send_local(struct lclient *lcptr, struct client *cptr,
-		char *umcbuf, char *umcargs);
+extern void
+usermode_send_local    (struct lclient *lcptr,     struct client *cptr,
+                        char           *umcbuf,    char          *umcargs);
 
 /* -------------------------------------------------------------------------- *
  * Send a usermode change to the whole network                                *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_send_remote(struct lclient *lcptr, struct client *cptr,
-		char *umcbuf, char *umcargs);
+extern void
+usermode_send_remote   (struct lclient *lcptr,     struct client *cptr,
+                        char           *umcbuf,    char          *umcargs);
 
 /* -------------------------------------------------------------------------- *
  * Make a usermode change string after usermode_parse() is called             *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_change_send(struct lclient *lcptr, struct client *cptr,
-		int remote);
+extern void
+usermode_change_send   (struct lclient *lcptr,     struct client *cptr,
+                        int             remote);
+
 
 /* -------------------------------------------------------------------------- *
  * Find a usermode by it's character                                          *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct usermode*) usermode_find(char character);
+extern struct usermode *
+usermode_find          (char character);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_support(void);
+extern void
+usermode_support       (void);
 
 /* -------------------------------------------------------------------------- *
  * Dump usermodes                                                             *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) usermode_dump(struct usermode *umptr);
+extern void
+usermode_dump          (struct usermode *umptr);
+
 
 #endif /* SRC_CHANMODE_H */

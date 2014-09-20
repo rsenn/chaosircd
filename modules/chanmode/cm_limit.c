@@ -48,13 +48,20 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_limit_hook(struct client *cptr, struct channel *chptr,
-		const char *key, int *reply);
-static int cm_limit_bounce(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr);
-static void cm_limit_build(char *dst, struct channel *chptr, uint32_t *di,
-		uint64_t *flag);
+static void cm_limit_hook   (struct client         *cptr,
+                             struct channel        *chptr,
+                             const char            *key,
+                             int                   *reply);
+static int  cm_limit_bounce (struct lclient        *lcptr,
+                             struct client         *cptr,
+                             struct channel        *chptr,
+                             struct chanuser       *cuptr,
+                             struct list           *lptr,
+                             struct chanmodechange *cmcptr);
+static void cm_limit_build  (char                  *dst,
+                             struct channel        *chptr,
+                             uint32_t              *di,
+                             uint64_t              *flag);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -76,77 +83,87 @@ static struct chanmode cm_limit_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_limit_load(void) {
-	/* register the channel mode */
-	if(chanmode_register(&cm_limit_mode) == NULL)
-		return -1;
+int cm_limit_load(void)
+{
+  /* register the channel mode */
+  if(chanmode_register(&cm_limit_mode) == NULL)
+    return -1;
 
-	hook_register(channel_join, HOOK_1ST, cm_limit_hook);
-	hook_register(chanmode_args_build, HOOK_1ST, cm_limit_build);
+  hook_register(channel_join, HOOK_1ST, cm_limit_hook);
+  hook_register(chanmode_args_build, HOOK_1ST, cm_limit_build);
 
-	return 0;
+  return 0;
 }
 
-void cm_limit_unload(void) {
-	/* unregister the channel mode */
-	chanmode_unregister(&cm_limit_mode);
+void cm_limit_unload(void)
+{
+  /* unregister the channel mode */
+  chanmode_unregister(&cm_limit_mode);
 
-	hook_unregister(chanmode_args_build, HOOK_1ST, cm_limit_build);
-	hook_unregister(channel_join, HOOK_1ST, cm_limit_hook);
+  hook_unregister(chanmode_args_build, HOOK_1ST, cm_limit_build);
+  hook_unregister(channel_join, HOOK_1ST, cm_limit_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void cm_limit_hook(struct client *cptr, struct channel *chptr,
-		const char *key, int *reply) {
-	/* We're already denied or an invex matched */
-	if(*reply > 0 || *reply == -CM_INVEX_CHAR || *reply == -CM_INVITE_CHAR)
-		return;
+                           const char    *key,  int            *reply)
+{
+  /* We're already denied or an invex matched */
+  if(*reply > 0 || *reply == -CM_INVEX_CHAR || *reply == -CM_INVITE_CHAR)
+    return;
 
-	if((chptr->modes & CHFLG(l)) && chptr->chanusers.size + 1 > chptr->limit) {
-		*reply = ERR_CHANNELISFULL;
-	}
+  if((chptr->modes & CHFLG(l)) && chptr->chanusers.size + 1 > chptr->limit)
+  {
+    *reply = ERR_CHANNELISFULL;
+  }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int cm_limit_bounce(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr) {
-	if(cmcptr->what == CHANMODE_DEL) {
-		if(!(chptr->modes & cmcptr->mode->flag))
-			return 1;
+int cm_limit_bounce(struct lclient *lcptr, struct client         *cptr,
+                    struct channel *chptr, struct chanuser       *cuptr,
+                    struct list    *lptr,  struct chanmodechange *cmcptr)
+{
+  if(cmcptr->what == CHANMODE_DEL)
+  {
+    if(!(chptr->modes & cmcptr->mode->flag))
+      return 1;
 
-		chptr->limit = -1;
-	}
+    chptr->limit = -1;
+  }
 
-	if(cmcptr->what == CHANMODE_ADD) {
-		unsigned long limit;
+  if(cmcptr->what == CHANMODE_ADD)
+  {
+    unsigned long limit;
 
-		limit = str_toul(cmcptr->arg, NULL, 10);
+    limit = str_toul(cmcptr->arg, NULL, 10);
 
-		if(limit == ULONG_MAX || limit == 0)
-			return 1;
+    if(limit == ULONG_MAX || limit == 0)
+      return 1;
 
-		if((chptr->modes & cmcptr->mode->flag)) {
-			if(chptr->limit != limit)
-				chptr->modes &= ~cmcptr->mode->flag;
-		}
+    if((chptr->modes & cmcptr->mode->flag))
+    {
+      if(chptr->limit != limit)
+        chptr->modes &= ~cmcptr->mode->flag;
+    }
 
-		chptr->limit = limit;
-	}
+    chptr->limit = limit;
+  }
 
-	return chanmode_bounce_simple(lcptr, cptr, chptr, cuptr, lptr, cmcptr);
+  return chanmode_bounce_simple(lcptr, cptr, chptr, cuptr, lptr, cmcptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_limit_build(char *dst, struct channel *chptr, uint32_t *di,
-		uint64_t *flag) {
-	if(*flag == CHFLG(l) && chptr->modes & CHFLG(l) && chptr->limit > 0) {
-		if(*di != 0)
-			dst[(*di)++] = ' ';
+static void cm_limit_build(char     *dst, struct channel *chptr,
+                           uint32_t *di,  uint64_t       *flag)
+{
+  if(*flag == CHFLG(l) && chptr->modes & CHFLG(l) && chptr->limit > 0)
+  {
+    if(*di != 0)
+      dst[(*di)++] = ' ';
 
-		*di += str_snprintf(&dst[*di], IRCD_KEYLEN * 8 + 1, "%i", chptr->limit);
-	}
+    *di += str_snprintf(&dst[*di], IRCD_KEYLEN * 8 + 1, "%i", chptr->limit);
+  }
 }

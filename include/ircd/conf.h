@@ -87,10 +87,10 @@ struct config {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct config) conf_current;
-IRCD_API(struct config) conf_new;
-IRCD_API(int          ) conf_fd;
-IRCD_API(int          ) conf_log;
+extern struct config conf_current;
+extern struct config conf_new;
+extern int           conf_fd;
+extern int           conf_log;
 
 /* -------------------------------------------------------------------------- *
  * some declarations for flex/bison                                           *
@@ -107,7 +107,7 @@ extern char linebuf[IRCD_BUFSIZE];
 /* exporting to parser */
 extern int           yydebug;
 extern struct global globalopts;
-IRCD_API(int          ) conf_fd;
+extern int           conf_fd;
 extern void          yyerror(char *);
 extern int           yyparse(void);
 extern void          yy_fatal_error(const char *);
@@ -121,41 +121,44 @@ extern void          yy_fatal_error(const char *);
 
 //#define isatty(x) 0
 
+
 /* -------------------------------------------------------------------------- *
  * Getopt and configfile coldstart.                                           *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) conf_init(int argc, char **argv, char **envp);
+extern void               conf_init         (int            argc,
+                                             char         **argv,
+                                             char         **envp);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown config code.                                                      *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) conf_shutdown(void);
+extern void               conf_shutdown     (void);
 
 /* -------------------------------------------------------------------------- *
  * Read the config file(s).                                                   *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) conf_read(void);
+extern void               conf_read         (void);
 
 /* -------------------------------------------------------------------------- *
  * This is called when a config file is read successfully.                    *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) conf_done(void);
+extern void               conf_done         (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) conf_rehash(void);
+extern void               conf_rehash       (void);
 
 /* -------------------------------------------------------------------------- *
  * Dump a config structure.                                                   *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-IRCD_API(void) conf_dump (struct config *cfgptr);
+extern void               conf_dump         (struct config *cfgptr);
 #endif /* DEBUG */
 
 /* -------------------------------------------------------------------------- *
  * Bison parser error functions.                                              *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) conf_yy_error(char *msg);
-IRCD_API(int) conf_yy_fatal(char *msg);
+extern void conf_yy_error  (char     *msg);
+extern int  conf_yy_fatal  (char     *msg);
 
 #endif /* __CONF_H */
