@@ -33,6 +33,9 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
 
     add_library("${MODULE_NAME}" MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
+    
+    link_directories("${CMAKE_BINARY_DIR}/src" "${cgircd_BINARY_DIR}")
+    target_link_libraries("${MODULE_NAME}" ircd)
 
     install(TARGETS "${MODULE_NAME}"
             RUNTIME DESTINATION libexec/cgircd
