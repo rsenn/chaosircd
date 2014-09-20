@@ -3,7 +3,12 @@ set(PACKAGE_VERSION 2.2.1)
 set(PACKAGE_RELEASE "peace, love & hippie edition")
 set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
 
-set(DEFAULT_SHARED_LIB FALSE)
+if(WINDOWS)
+  set(DEFAULT_SHARED_LIB TRUE)
+else()
+  set(DEFAULT_SHARED_LIB FALSE)
+endif()
+
 
 project(${PACKAGE_NAME} C)
 
