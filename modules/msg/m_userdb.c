@@ -82,17 +82,17 @@ static struct sheap  m_userdb_heap;
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_userdb_help[] = {
-  "USERDB [verify|register|search|mutate] <uid> [arguments...]",
+  "USERDB [VERIFY|REGISTER|SEARCH|MUTATE] <UID> [ARGUMENTS...]",
   "",
-  "verify <uid> <password>",
-  "register <uid> <key=value pairs...>",
-  "search < uid | key-value-pairs... >",
-  "mutate <uid> <key-value-pairs...>",
+  "VERIFY <uid> <password>",
+  "REGISTER <uid> <key=value pairs...>",
+  "SEARCH < uid | key-value-pairs... >",
+  "MUTATE <uid> <key-value-pairs...>",
   NULL
 };
 
 static struct msg m_userdb_msg = {
-  "USERDB", 1, 4, MFLG_CLIENT,
+  "USERDB", 1, 0, MFLG_CLIENT,
   { NULL, m_userdb, m_userdb, m_userdb }, 
   m_userdb_help
 };
@@ -102,11 +102,11 @@ static struct msg m_userdb_msg = {
  * -------------------------------------------------------------------------- */
 int
 m_userdb_load(void) {
-  if(hook_register(lclient_handshake, HOOK_DEFAULT, m_userdb_handshake) == NULL)
-    return -1;
+//  if(hook_register(lclient_handshake, HOOK_DEFAULT, m_userdb_handshake) == NULL)
+//    return -1;
 
   hook_register(lclient_release, HOOK_DEFAULT, m_userdb_release);
-  hook_register(lclient_register, HOOK_DEFAULT, m_userdb_register);
+//  hook_register(lclient_register, HOOK_DEFAULT, m_userdb_register);
 
   mem_static_create(&m_userdb_heap, sizeof(struct m_userdb_s),
                     SAUTH_BLOCK_SIZE / 2);
@@ -131,9 +131,9 @@ m_userdb_unload(void) {
   dlink_foreach_safe_data(&m_userdb_list, node, next, arg)
     m_userdb_done(arg);
 
-  hook_unregister(lclient_register, HOOK_DEFAULT, m_userdb_register);
+ // hook_unregister(lclient_register, HOOK_DEFAULT, m_userdb_register);
   hook_unregister(lclient_release, HOOK_DEFAULT, m_userdb_release);
-  hook_unregister(lclient_handshake, HOOK_DEFAULT, m_userdb_handshake);
+ // hook_unregister(lclient_handshake, HOOK_DEFAULT, m_userdb_handshake);
 
   mem_static_destroy(&m_userdb_heap);
 }
@@ -241,13 +241,13 @@ m_userdb_lookup_auth(struct m_userdb_s *arg) {
 }
 
 /* -------------------------------------------------------------------------- *
- * AUTH lookup callback, called upon AUTH failure or completion               *
  * -------------------------------------------------------------------------- */
-/*static void
-m_userdb_proxy(struct userdb *udb, struct m_userdb_s *arg) {
-}*/
-
 static void
-m_userdb(struct lclient* lcptr, struct client* cptr,
-         int             argc,  char         **argv) {
+m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
+
+  if(!str_icmp(argv[2],"verify")) {
+  } else if(!str_icmp(argv[2],"register"))  {
+  } else if(!str_icmp(argv[2],"mutate"))  {
+  } else if(!str_icmp(argv[2],"search"))  {
+  }
 }
