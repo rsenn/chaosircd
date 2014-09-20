@@ -68,73 +68,83 @@ struct fqueue {
 /* ------------------------------------------------------------------------ *
  * Initialize the queue code.                                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_init(void);
+CHAOS_API(void)     queue_init        (void);
 
 /* ------------------------------------------------------------------------ *
  * Initialize the queue code.                                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_shutdown(void);
+CHAOS_API(void)     queue_shutdown    (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_zero(struct fqueue *fifoptr);
+CHAOS_API(void)     queue_zero        (struct fqueue *fifoptr);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect queue data                                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_collect(void);
+CHAOS_API(void)     queue_collect     (void);
 
 /* ------------------------------------------------------------------------ *
  * Write data to the queue tail.                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t) queue_write(struct fqueue *fifoptr, const void *buf,
-		uint32_t n);
+CHAOS_API(uint32_t) queue_write       (struct fqueue *fifoptr,
+                                       const void    *buf,
+                                       uint32_t       n);
 
 /* ------------------------------------------------------------------------ *
  * Write a string to queue tail.                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t) queue_puts(struct fqueue *fifoptr, const char *s);
+CHAOS_API(uint32_t) queue_puts        (struct fqueue *fifoptr,
+                                       const char    *s);
 
 /* ------------------------------------------------------------------------ *
  * Read data from the queue head.                                             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t) queue_read(struct fqueue *fifoptr, void *buf, uint32_t n);
+CHAOS_API(uint32_t) queue_read        (struct fqueue *fifoptr,
+                                       void          *buf,
+                                       uint32_t       n);
 
 /* ------------------------------------------------------------------------ *
  * Get a line from queue tail.                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t) queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n);
+CHAOS_API(uint32_t)  queue_gets       (struct fqueue *fifoptr,
+                                       void          *buf,
+                                       uint32_t       n);
 
 /* ------------------------------------------------------------------------ *
  * Read stuff from the queue tail but do NOT dequeue it.                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t) queue_map(struct fqueue *fifoptr, void *buf, uint32_t n);
+CHAOS_API(uint32_t)  queue_map         (struct fqueue *fifoptr,
+                                        void          *buf,
+                                        uint32_t       n);
 
 /* ------------------------------------------------------------------------ *
  * Remove n bytes from queue tail.                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t) queue_cut(struct fqueue *fifoptr, uint32_t n);
+CHAOS_API(uint32_t)  queue_cut         (struct fqueue *fifoptr,
+                                        uint32_t       n);
 
 /* ------------------------------------------------------------------------ *
  * Frees a queue.                                                             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_free(struct fqueue *fifoptr);
+CHAOS_API(void)      queue_free        (struct fqueue *fifoptr);
 
 /* ------------------------------------------------------------------------ *
  * Link a queue to the tail of another.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_link(struct fqueue *from, struct fqueue *to);
+CHAOS_API(void)      queue_link        (struct fqueue *from,
+                                        struct fqueue *to);
 
 /* ------------------------------------------------------------------------ *
  * Release a multicast list.                                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) queue_destroy(struct fqueue *fifoptr);
+CHAOS_API(void)      queue_destroy     (struct fqueue *fifoptr);
 
 /* ------------------------------------------------------------------------ *
  * Dump a queue.                                                              *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(void) queue_dump (struct fqueue *fifoptr);
+CHAOS_API(void)      queue_dump        (struct fqueue *fifoptr);
 #endif /* DEBUG */
 
 #endif /* LIB_QUEUE_H */

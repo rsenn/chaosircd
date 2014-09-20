@@ -38,14 +38,15 @@ struct userdb_client;
 
 typedef void (userdb_callback_t)(struct userdb_client *);
 
-struct userdb_client {
-	struct db *handle;
-	struct db_result *result;
-	uint64_t timeout;
-	void *userarg;
-	struct timer *timer;
-	char reply[256];
-	userdb_callback_t *callback;
+struct userdb_client
+{
+  struct db                *handle;
+  struct db_result         *result;
+  uint64_t           timeout;
+  void              *userarg;
+  struct timer      *timer;
+  char               reply[256];
+  userdb_callback_t   *callback;
 };
 
 #define userdb_is_idle(userdb) (!((struct userdb_client *)(userdb))->handle)
@@ -57,21 +58,32 @@ struct userdb_client {
                                (c) == '-' || (c) == '_' || \
                                (c) == '.')
 
-extern void userdb_zero(struct userdb_client *userdb);
-extern void userdb_clear(struct userdb_client *userdb);
-extern int userdb_connect(struct userdb_client *userdb, const char* host,
-		const char* user, const char* password);
-extern int userdb_verify(struct userdb_client *userdb, const char* uid,
-		const char* msisdn, char** retstr);
-extern int userdb_register(struct userdb_client *userdb, char* uid,
-		char** values, size_t num_values);
-extern int userdb_search(struct userdb_client *userdb, char** v, size_t,
-		char** s);
-extern int userdb_mutate(struct userdb_client *userdb, const char* uid,
-		char** values, size_t num_values);
-extern void userdb_set_userarg(struct userdb_client *userdb, void *arg);
-extern void *userdb_get_userarg(struct userdb_client *userdb);
-extern void userdb_set_callback(struct userdb_client *userdb,
-		userdb_callback_t *cb, uint64_t timeout);
+extern void  userdb_zero         (struct userdb_client *userdb);
+extern void  userdb_clear        (struct userdb_client *userdb);
+extern int   userdb_connect      (struct userdb_client *userdb,
+                                  const char*           host,
+                                  const char*           user,
+                                  const char*           password);
+extern int   userdb_verify       (struct userdb_client *userdb,
+                                  const char*           uid,
+                                  const char*           msisdn,
+                                  char**           retstr);
+extern int   userdb_register     (struct userdb_client *userdb,
+                                  char*           uid,
+                                  char**           values,
+                                  size_t num_values);
+extern int   userdb_search     (struct userdb_client *userdb,
+                                char**           v, size_t,
+                                char**          s);
+extern int   userdb_mutate       (struct userdb_client *userdb,
+                                  const char*       uid,
+                                  char**           values,
+                                  size_t num_values);
+extern void  userdb_set_userarg  (struct userdb_client *userdb,
+                                  void               *arg);
+extern void *userdb_get_userarg  (struct userdb_client *userdb);
+extern void  userdb_set_callback (struct userdb_client *userdb,
+                                  userdb_callback_t    *cb,
+                                  uint64_t            timeout);
 
 #endif /* SERVAUTH_USERDB_H */

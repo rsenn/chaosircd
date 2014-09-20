@@ -219,154 +219,162 @@ const uint32_t chars[] = {
   /* 0xBA */   CHAN_C|NONEOS_C,
   /* 0xBB */   CHAN_C|NONEOS_C,
   /* 0xBC */   CHAN_C|NONEOS_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
-  /* ï¿½ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ½ */      CHAN_C|NONEOS_C|UID_C,
+  /* ¾ */      CHAN_C|NONEOS_C|UID_C,
+  /* ¿ */      CHAN_C|NONEOS_C|UID_C,
+  /* À */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Á */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Â */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ã */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ä */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Å */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Æ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ç */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* È */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* É */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ê */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ë */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ì */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Í */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Î */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ï */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ğ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ñ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ò */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ó */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ô */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Õ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ö */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* × */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ø */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ù */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ú */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Û */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ü */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* İ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* Ş */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ß */      CHAN_C|NONEOS_C|UID_C,
+  /* à */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* á */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* â */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ã */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ä */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* å */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* æ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ç */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* è */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* é */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ê */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ë */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ì */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* í */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* î */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ï */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ğ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ñ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ò */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ó */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ô */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* õ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ö */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ÷ */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ø */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ù */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ú */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* û */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ü */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ı */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
+  /* ş */      CHAN_C|NONEOS_C|ALPHA_C|NICK_C|UID_C,
   /* 0xFF */   CHAN_C|NONEOS_C
 };
 
 /* -------------------------------------------------------------------------- *
  * Check for a valid hostname                                                 *
  * -------------------------------------------------------------------------- */
-int chars_valid_host(const char *s) {
-	uint32_t dot = 0;
+int chars_valid_host(const char *s)
+{
+  uint32_t dot = 0;
 
-	if(s == NULL)
-		return 0;
+  if(s == NULL)
+    return 0;
 
-	if(*s == '.')
-		return 0;
+  if(*s == '.')
+    return 0;
 
-	while(*s) {
-		if(!chars_ishostchar(*s))
-			return 0;
+  while(*s)
+  {
+    if(!chars_ishostchar(*s))
+      return 0;
 
-		if(*s == '.')
-			dot++;
+    if(*s == '.')
+      dot++;
 
-		s++;
-	}
+    s++;
+  }
 
-	return (dot > 0);
+  return (dot > 0);
 }
 
 /* -------------------------------------------------------------------------- *
  * Check for a valid username                                                 *
  * -------------------------------------------------------------------------- */
-int chars_valid_user(const char *s) {
-	if(s == NULL)
-		return 0;
+int chars_valid_user(const char *s)
+{
+  if(s == NULL)
+    return 0;
 
-	if(*s == '~')
-		s++;
+  if(*s == '~')
+    s++;
 
-	while(*s) {
-		if(!chars_isuserchar(*s))
-			return 0;
+  while(*s)
+  {
+    if(!chars_isuserchar(*s))
+      return 0;
 
-		s++;
-	}
+    s++;
+  }
 
-	return 1;
+  return 1;
 }
 
 /* -------------------------------------------------------------------------- *
  * Check for a valid nickname                                                 *
  * -------------------------------------------------------------------------- */
-int chars_valid_nick(const char *s) {
-	if(s == NULL)
-		return 0;
+int chars_valid_nick(const char *s)
+{
+  if(s == NULL)
+    return 0;
 
-	if(chars_isdigit(*s) || *s == '-')
-		return 0;
+  if(chars_isdigit(*s) || *s == '-')
+    return 0;
 
-	while(*s) {
-		if(!chars_isnickchar(*s))
-			return 0;
+  while(*s)
+  {
+    if(!chars_isnickchar(*s))
+      return 0;
 
-		s++;
-	}
+    s++;
+  }
 
-	return 1;
+  return 1;
 }
 
 /* -------------------------------------------------------------------------- *
  * Check for a valid channelname                                              *
  * -------------------------------------------------------------------------- */
-int chars_valid_chan(const char *s) {
-	if(s == NULL)
-		return 0;
+int chars_valid_chan(const char *s)
+{
+  if(s == NULL)
+    return 0;
 
-	while(*s) {
-		if(!chars_ischanchar(*s))
-			return 0;
+  while(*s)
+  {
+    if(!chars_ischanchar(*s))
+      return 0;
 
-		s++;
-	}
+    s++;
+  }
 
-	return 1;
+  return 1;
 }
 

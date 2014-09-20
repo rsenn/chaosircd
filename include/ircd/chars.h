@@ -22,7 +22,6 @@
 #ifndef SRC_CHARS_H
 #define SRC_CHARS_H
 
-#include "ircd/ircd.h"
 #include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
@@ -82,18 +81,18 @@ extern const uint32_t chars[];
 /* -------------------------------------------------------------------------- *
  * Check for a valid hostname                                                 *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) chars_valid_host(const char *s);
+extern int chars_valid_host(const char *s);
 /* -------------------------------------------------------------------------- *
  * Check for a valid username                                                 *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) chars_valid_user(const char *s);
+extern int chars_valid_user(const char *s);
 /* -------------------------------------------------------------------------- *
  * Check for a valid nickname                                                 *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) chars_valid_nick(const char *s);
+extern int chars_valid_nick(const char *s);
 /* -------------------------------------------------------------------------- *
  * Check for a valid channelname                                                 *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) chars_valid_chan(const char *s);
+extern int chars_valid_chan(const char *s);
 
 #endif /* CHARS_H */

@@ -64,73 +64,75 @@ struct oper
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_DATA(int          ) oper_log;
-IRCD_DATA(struct sheap ) oper_heap;
-IRCD_DATA(struct timer*) oper_timer;
-IRCD_DATA(struct list  ) oper_list;
-IRCD_DATA(struct dlog *) oper_drain;
+extern int           oper_log;
+extern struct sheap  oper_heap;
+extern struct timer *oper_timer;
+extern struct list   oper_list;
+extern struct dlog  *oper_drain;
 
 /* -------------------------------------------------------------------------- *
  * Initialize oper heap and add garbage collect timer.                        *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) oper_init(void);
+extern void         oper_init             (void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy oper heap and cancel timer.                                        *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) oper_shutdown(void);
+extern void         oper_shutdown         (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) oper_default(struct oper *optr);
+extern void         oper_default          (struct oper   *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct oper*) oper_add (const char *name,
-		const char *passwd,
-		struct class *clptr,
-		int level,
-		uint64_t sources,
-		uint32_t flags);
+extern struct oper *oper_add              (const char    *name,
+                                           const char    *passwd,
+                                           struct class  *clptr,
+                                           int            level,
+                                           uint64_t       sources,
+                                           uint32_t       flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) oper_update (struct oper *optr,
-		const char *passwd,
-		struct class *clptr,
-		int level,
-		uint64_t sources,
-		uint32_t flags);
+extern int          oper_update           (struct oper   *optr,
+                                           const char    *passwd,
+                                           struct class  *clptr,
+                                           int            level,
+                                           uint64_t       sources,
+                                           uint32_t       flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) oper_delete(struct oper *optr);
+extern void         oper_delete           (struct oper   *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct oper*) oper_find(const char *name);
+extern struct oper *oper_find             (const char    *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) oper_up(struct oper *optr, struct client *sptr);
+extern void         oper_up               (struct oper   *optr,
+                                           struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) oper_down(struct oper *optr, struct client *sptr);
+extern void         oper_down             (struct oper   *optr,
+                                           struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct oper*) oper_pop(struct oper *optr);
+extern struct oper *oper_pop              (struct oper   *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct oper*) oper_push(struct oper **optr);
+extern struct oper *oper_push             (struct oper  **optr);
 
 /* -------------------------------------------------------------------------- *
  * Dump opers and oper heap.                                                  *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-IRCD_API(void) oper_dump (void);
+extern void         oper_dump             (void);
 #endif /* DEBUG */
 
 #endif /* SRC_OPER_H */

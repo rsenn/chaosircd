@@ -44,87 +44,98 @@
  * ac      - argument count                                                   *
  * av      - argument vector                                                  *
  * -------------------------------------------------------------------------- */
-static int control_exec(control_t *cptr, int ac, char **av) {
-	struct cmd_table *cmdptr;
+static int control_exec(control_t *cptr, int ac, char **av)
+{
+  struct cmd_table *cmdptr;
 
-	if(ac < 1)
-		return -1;
+  if(ac < 1)
+    return -1;
 
-	cmdptr = command_get(cmds, av[0]);
+  cmdptr = command_get(cmds, av[0]);
 
-	if(cmdptr != NULL)
-		return cmdptr->func(cptr, ac, av);
+  if(cmdptr != NULL)
+    return cmdptr->func(cptr, ac, av);
 
-	return -1;
+  return -1;
 }
 
 /* -------------------------------------------------------------------------- *
  * parse a line                                                               *
  * -------------------------------------------------------------------------- */
-static int control_parse(control_t *cptr, char *line) {
-	int ac;
-	char *av[16];
+static int control_parse(control_t *cptr, char *line)
+{
+  int ac;
+  char *av[16];
 
-	ac = str_tokenize(line, av, 16);
+  ac = str_tokenize(line, av, 16);
 
-	if(ac == 0)
-		return 0;
+  if(ac == 0)
+    return 0;
 
-	return control_exec(cptr, ac, av);
+  return control_exec(cptr, ac, av);
 }
 
 /* -------------------------------------------------------------------------- *
  * control fd got readable, handle data                                       *
  * -------------------------------------------------------------------------- */
-static void control_readable(int fd, void *ptr) {
-	char buf[1024];
+static void control_readable(int fd, void *ptr)
+{
+  char buf[1024];
 
-	if(io_list[fd].status.closed || io_list[fd].status.err)
-		servauth_shutdown();
+  if(io_list[fd].status.closed || io_list[fd].status.err)
+    servauth_shutdown();
 
-	if(io_list[fd].recvq.lines) {
-		while(io_gets(fd, buf, 1024) > 0) {
-			if(control_parse(ptr, buf) == -1) {
-				servauth_shutdown();
-				return;
-			}
-		}
-	}
+  if(io_list[fd].recvq.lines)
+  {
+    while(io_gets(fd, buf, 1024) > 0)
+    {
+      if(control_parse(ptr, buf) == -1)
+      {
+        servauth_shutdown();
+        return;
+      }
+    }
+  }
 
-	return;
+  return;
 }
 
 /* -------------------------------------------------------------------------- *
  * set control connection fd.                                                 *
  * -------------------------------------------------------------------------- */
-void control_init(control_t *cptr, int recvfd, int sendfd) {
-	memset(cptr, 0, sizeof(control_t));
+void control_init(control_t *cptr, int recvfd, int sendfd)
+{
+  memset(cptr, 0, sizeof(control_t));
 
-	cptr->recvfd = recvfd;
-	cptr->sendfd = sendfd;
+  cptr->recvfd = recvfd;
+  cptr->sendfd = sendfd;
 
-	if(sendfd != recvfd) {
-		io_queue_control(recvfd, ON, OFF, ON);
-		io_queue_control(sendfd, OFF, ON, ON);
-	} else {
-		io_queue_control(recvfd, ON, ON, ON);
-	}
+  if(sendfd != recvfd)
+  {
+    io_queue_control(recvfd, ON, OFF, ON);
+    io_queue_control(sendfd, OFF, ON, ON);
+  }
+  else
+  {
+    io_queue_control(recvfd, ON, ON, ON);
+  }
 
-	io_register(recvfd, IO_CB_READ, control_readable, cptr);
+  io_register(recvfd, IO_CB_READ, control_readable, cptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int control_send(control_t *cptr, const char *format, ...) {
-	va_list args;
-	int ret;
+int control_send(control_t *cptr, const char *format, ...)
+{
+  va_list args;
+  int ret;
 
-	va_start(args, format);
+  va_start(args, format);
 
-	ret = io_vputs(cptr->sendfd, format, args);
+  ret = io_vputs(cptr->sendfd, format, args);
 
-	va_end(args);
+  va_end(args);
 
-	return ret;
+  return ret;
 }
 

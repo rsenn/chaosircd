@@ -44,14 +44,14 @@
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully CREATED a channel         *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr);
+static int cm_halfop_hook(struct list     *lptr,   struct chanuser  *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client tries to kick someone off a channel    *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_kick(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct chanuser *acuptr,
-		const char *reason);
+static int cm_halfop_kick(struct lclient  *lcptr,  struct client    *cptr,
+                          struct channel  *chptr,  struct chanuser  *cuptr,
+                          struct chanuser *acuptr, const char       *reason);
 
 /* -------------------------------------------------------------------------- *
  * Setup chanmode structure                                                   *
@@ -75,56 +75,61 @@ static struct chanmode cm_halfop_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_halfop_load(void) {
-	/* register the channel mode */
-	if(chanmode_register(&cm_halfop_mode) == NULL)
-		return -1;
+int cm_halfop_load(void)
+{
+  /* register the channel mode */
+  if(chanmode_register(&cm_halfop_mode) == NULL)
+    return -1;
 
-	hook_register(channel_join, HOOK_2ND, cm_halfop_hook);
-	hook_register(chanuser_kick, HOOK_DEFAULT, cm_halfop_kick);
+  hook_register(channel_join, HOOK_2ND, cm_halfop_hook);
+  hook_register(chanuser_kick, HOOK_DEFAULT, cm_halfop_kick);
 
-	server_default_caps |= CAP_HOP;
+  server_default_caps |= CAP_HOP;
 
-	return 0;
+  return 0;
 }
 
-void cm_halfop_unload(void) {
-	server_default_caps &= ~CAP_HOP;
+void cm_halfop_unload(void)
+{
+  server_default_caps &= ~CAP_HOP;
 
-	hook_unregister(chanuser_kick, HOOK_DEFAULT, cm_halfop_kick);
-	hook_unregister(channel_join, HOOK_DEFAULT, cm_halfop_hook);
+  hook_unregister(chanuser_kick, HOOK_DEFAULT, cm_halfop_kick);
+  hook_unregister(channel_join, HOOK_DEFAULT, cm_halfop_hook);
 
-	/* unregister the channel mode */
-	chanmode_unregister(&cm_halfop_mode);
+  /* unregister the channel mode */
+  chanmode_unregister(&cm_halfop_mode);
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully CREATED a channel         *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr) {
-	cuptr->flags |= CHFLG(h);
+static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr)
+{
+  cuptr->flags |= CHFLG(h);
 
-	chanmode_prefix_make(cuptr->prefix, cuptr->flags);
+  chanmode_prefix_make(cuptr->prefix, cuptr->flags);
 
-	chanmode_change_add(lptr, CHANMODE_ADD, CM_HALFOP_CHAR, NULL, cuptr);
+  chanmode_change_add(lptr, CHANMODE_ADD, CM_HALFOP_CHAR, NULL, cuptr);
 
-	return 0;
+  return 0;
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client tries to kick someone off a channel    *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_kick(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct chanuser *acuptr,
-		const char *reason) {
-	if(cuptr) {
-		if(cuptr->flags & CHFLG(o))
-			return 1;
+static int cm_halfop_kick(struct lclient  *lcptr,  struct client    *cptr,
+                          struct channel  *chptr,  struct chanuser  *cuptr,
+                          struct chanuser *acuptr, const char       *reason)
+{
+  if(cuptr)
+  {
+    if(cuptr->flags & CHFLG(o))
+      return 1;
 
-		if((cuptr->flags & CHFLG(h)) && !(acuptr->flags & CHFLG(o)))
-			return 1;
-	}
+    if((cuptr->flags & CHFLG(h)) && !(acuptr->flags & CHFLG(o)))
+      return 1;
+  }
 
-	return 0;
+  return 0;
 }
 

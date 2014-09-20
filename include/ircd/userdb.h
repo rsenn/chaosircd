@@ -75,48 +75,53 @@ typedef struct userdb {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_DATA(struct sheap) userdb_heap;
-IRCD_DATA(struct list) userdb_list;
-IRCD_DATA(uint32_t) userdb_serial;
-IRCD_DATA(struct timer*) userdb_timer;
-IRCD_DATA(struct timer*) userdb_rtimer;
-IRCD_DATA(struct child*) userdb_child;
-IRCD_DATA(int) userdb_log;
-IRCD_DATA(int) userdb_fds[2];
-IRCD_DATA(char) userdb_readbuf[BUFSIZE];
-//IRCD_DATA(const char *) userdb_types[6];
-//IRCD_DATA(const char *) userdb_replies[8];
-IRCD_DATA(const char* ) userdb_query_names[];
+CHAOS_API(struct sheap)  userdb_heap;
+CHAOS_API(struct list)   userdb_list;
+CHAOS_API(uint32_t)      userdb_serial;
+CHAOS_API(struct timer*) userdb_timer;
+CHAOS_API(struct timer*) userdb_rtimer;
+CHAOS_API(struct child*) userdb_child;
+CHAOS_API(int)           userdb_log;
+CHAOS_API(int)           userdb_fds[2];
+CHAOS_API(char)          userdb_readbuf[BUFSIZE];
+CHAOS_API(const char *)  userdb_types[6];
+CHAOS_API(const char *)  userdb_replies[8];
+CHAOS_DATA(const char* ) userdb_query_names[];
 
 /* ------------------------------------------------------------------------ */
-IRCD_API(int) userdb_get_log(void);
+CHAOS_API(int)
+userdb_get_log(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void) userdb_init(void);
+CHAOS_API(void)
+userdb_init(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void) userdb_shutdown(void);
+CHAOS_API(void)
+userdb_shutdown(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void) userdb_collect(void);
+CHAOS_API(void)
+userdb_collect(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *) userdb_query_search(const char *expr,void *callback, ...);
+CHAOS_API(struct userdb *)
+userdb_query_search(const char *expr,void *callback, ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_query_register(const char* uid, const char* values,
 		void *callback,
 		...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_query_mutate(const char* uid,
 		const char* values,
 		void *callback,
@@ -124,7 +129,7 @@ userdb_query_mutate(const char* uid,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_query_verify(const char* uid,
 		const char* password,
 		void *callback,
@@ -132,12 +137,12 @@ userdb_query_verify(const char* uid,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(int)
+CHAOS_API(int)
 userdb_launch(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_auth (net_addr_t address,
 		net_port_t local,
 		net_port_t remote,
@@ -146,50 +151,50 @@ userdb_auth (net_addr_t address,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(int)
+CHAOS_API(int)
 userdb_query_reply(const char *reply);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(int)
+CHAOS_API(int)
 userdb_query_type(const char *type);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
+CHAOS_API(void)
 userdb_delete(struct userdb *userdb);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_find (uint32_t id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_pop (struct userdb *userdb);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
+CHAOS_API(struct userdb *)
 userdb_push (struct userdb **userdb);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
+CHAOS_API(void)
 userdb_cancel(struct userdb *userdb);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
+CHAOS_API(void)
 userdb_vset_args(struct userdb *userdb, va_list args);
 
-IRCD_API(void)
+CHAOS_API(void)
 userdb_set_args(userdb_t *userdb, ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
+CHAOS_API(void)
 userdb_dump(struct userdb *saptr);
 
 #endif /* LIB_USERDB_H */

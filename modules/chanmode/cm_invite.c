@@ -42,12 +42,17 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_invite_hook(struct client *cptr, struct channel *chptr,
-		const char *key, int *reply);
-static int cm_invite_bounce(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr);
-static void cm_invite_clean(struct channel *chptr);
+static void cm_invite_hook   (struct client         *cptr,
+                              struct channel        *chptr,
+                              const char            *key,
+                              int                   *reply);
+static int  cm_invite_bounce (struct lclient        *lcptr,
+                              struct client         *cptr,
+                              struct channel        *chptr,
+                              struct chanuser       *cuptr,
+                              struct list           *lptr,
+                              struct chanmodechange *cmcptr);
+static void cm_invite_clean  (struct channel        *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -69,71 +74,77 @@ static struct chanmode cm_invite_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_invite_load(void) {
-	/* register the channel mode */
-	if(chanmode_register(&cm_invite_mode) == NULL)
-		return -1;
+int cm_invite_load(void)
+{
+  /* register the channel mode */
+  if(chanmode_register(&cm_invite_mode) == NULL)
+    return -1;
 
-	hook_register(channel_join, HOOK_1ST, cm_invite_hook);
+  hook_register(channel_join, HOOK_1ST, cm_invite_hook);
 
-	return 0;
+  return 0;
 }
 
-void cm_invite_unload(void) {
-	/* unregister the channel mode */
-	chanmode_unregister(&cm_invite_mode);
+void cm_invite_unload(void)
+{
+  /* unregister the channel mode */
+  chanmode_unregister(&cm_invite_mode);
 
-	hook_unregister(channel_join, HOOK_1ST, cm_invite_hook);
+  hook_unregister(channel_join, HOOK_1ST, cm_invite_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void cm_invite_hook(struct client *cptr, struct channel *chptr,
-		const char *key, int *reply) {
-	struct invite *ivptr;
+                           const char    *key,  int            *reply)
+{
+  struct invite *ivptr;
 
-	/* We're already denied or an invex matched */
-	if((*reply > 0 || *reply == -CM_INVEX_CHAR) && *reply != ERR_CHANNELISFULL
-			&& *reply != ERR_BADCHANNELKEY)
-		return;
+  /* We're already denied or an invex matched */
+  if((*reply > 0 || *reply == -CM_INVEX_CHAR) && *reply != ERR_CHANNELISFULL && *reply != ERR_BADCHANNELKEY)
+    return;
 
-	dlink_foreach(&cptr->user->invites, ivptr)
-	{
-		if(ivptr->channel == chptr) {
-			user_uninvite(ivptr);
+  dlink_foreach(&cptr->user->invites, ivptr)
+  {
+    if(ivptr->channel == chptr)
+    {
+      user_uninvite(ivptr);
 
-			*reply = -CM_INVITE_CHAR;
+      *reply = -CM_INVITE_CHAR;
 
-			return;
-		}
-	}
+      return;
+    }
+  }
 
-	if(chptr->modes & CHFLG(i))
-		*reply = ERR_INVITEONLYCHAN;
+  if(chptr->modes & CHFLG(i))
+    *reply = ERR_INVITEONLYCHAN;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int cm_invite_bounce(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
-		struct chanmodechange *cmcptr) {
-	if(cmcptr->what == CHANMODE_DEL) {
-		if(!(chptr->modes & cmcptr->mode->flag))
-			return 1;
+int cm_invite_bounce(struct lclient *lcptr, struct client         *cptr,
+                     struct channel *chptr, struct chanuser       *cuptr,
+                     struct list    *lptr,  struct chanmodechange *cmcptr)
+{
+  if(cmcptr->what == CHANMODE_DEL)
+  {
+    if(!(chptr->modes & cmcptr->mode->flag))
+      return 1;
 
-		cm_invite_clean(chptr);
-	}
+    cm_invite_clean(chptr);
+  }
 
-	return chanmode_bounce_simple(lcptr, cptr, chptr, cuptr, lptr, cmcptr);
+  return chanmode_bounce_simple(lcptr, cptr, chptr, cuptr, lptr, cmcptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void cm_invite_clean(struct channel *chptr) {
-	struct node *node;
-	struct node *next;
+void cm_invite_clean(struct channel *chptr)
+{
+  struct node *node;
+  struct node *next;
 
-	dlink_foreach_safe(&chptr->invites, node, next)
-		user_uninvite(node->data);
+  dlink_foreach_safe(&chptr->invites, node, next)
+    user_uninvite(node->data);
 }
 

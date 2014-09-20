@@ -324,32 +324,32 @@ _syscall3(int,                  syscall_poll,/* -1 on error, else active fds */
 /* ------------------------------------------------------------------------ *
  * const char *pathname, int flags, ...)                                    *
  * ------------------------------------------------------------------------ */
-psyscall3(int, syscall_open, /* -1 on error, else valid fd */
-		const char *, pathname, /* path to file to open */
-		int, flags, /* flags for new fd */
-		...,) /* modes if file gets created */
+psyscall3(int,               syscall_open,  /* -1 on error, else valid fd */
+          const char *,      pathname,      /* path to file to open */
+          int,               flags,         /* flags for new fd */
+          ...,)                             /* modes if file gets created */
 #ifdef __i386__
 {
-	int res;
-	va_list args;
+  int     res;
+  va_list args;
 
-	va_start(args, flags);
+  va_start(args, flags);
 
-	__asm__ volatile ("int $0x80"
-			: "=a" (res)
-			: "0" ((long)__NR_open),
-			"b" ((long)pathname),
-			"c" ((long)flags),
-			"d" (va_arg(args, long)));
-	va_end(args);
+  __asm__ volatile ("int $0x80"
+                    : "=a" (res)
+                    : "0" ((long)__NR_open),
+                      "b" ((long)pathname),
+                      "c" ((long)flags),
+                      "d" (va_arg(args, long)));
+  va_end(args);
 
-	if((unsigned long)res >= (unsigned long)-125)
-	{
-		syscall_errno = -res;
-		res = -1;
-	}
+  if((unsigned long)res >= (unsigned long)-125)
+  {
+    syscall_errno = -res;
+    res = -1;
+  }
 
-	return (int)res;
+  return (int)res;
 };
 #else
 #error "no open() syscall wrapper for non-x86"
@@ -358,31 +358,31 @@ psyscall3(int, syscall_open, /* -1 on error, else valid fd */
 /* ------------------------------------------------------------------------ *
  * int fcntl(int fd, int cmd, ...)                                          *
  * ------------------------------------------------------------------------ */
-psyscall3(int, syscall_fcntl,
-		int, fd,
-		int, cmd,
-		...,)
+psyscall3(int,                  syscall_fcntl,
+          int,                  fd,
+          int,                  cmd,
+          ...,)
 #ifdef __i386__
 {
-	int res;
-	long arg;
+  int res;
+  long arg;
 
-	arg = (&cmd)[1];
+  arg = (&cmd)[1];
 
-	__asm__ volatile ("int $0x80"
-			: "=a" (res)
-			: "0" ((long)__NR_fcntl),
-			"b" ((long)fd),
-			"c" ((long)cmd),
-			"d" ((long)arg));
+  __asm__ volatile ("int $0x80"
+                    : "=a" (res)
+                    : "0" ((long)__NR_fcntl),
+                      "b" ((long)fd),
+                      "c" ((long)cmd),
+                      "d" ((long)arg));
 
-	if((unsigned long)res >= (unsigned long)-125)
-	{
-		errno = -res;
-		res = -1;
-	}
+  if((unsigned long)res >= (unsigned long)-125)
+  {
+    errno = -res;
+    res = -1;
+  }
 
-	return (int)res;
+  return (int)res;
 };
 #else
 #error "no fcntl() syscall wrapper for non-x86"
@@ -391,182 +391,183 @@ psyscall3(int, syscall_fcntl,
 /* ------------------------------------------------------------------------ *
  * int kill(pid_t pid, int sig);                                            *
  * ------------------------------------------------------------------------ */
-_syscall2(int, syscall_kill, /* -1 on error */
-		pid_t, pid,
-		int, sig);
+_syscall2(int,                  syscall_kill,       /* -1 on error */
+          pid_t,                pid,
+          int,                  sig);
 
 /* ------------------------------------------------------------------------ *
  * int mprotect(const void *addr, size_t len, int prot)                     *
  * ------------------------------------------------------------------------ */
-_syscall3(int, syscall_mprotect, /* -1 on error */
-		const void *, addr,
-		size_t, len,
-		int, prot);
+_syscall3(int,                  syscall_mprotect,   /* -1 on error */
+          const void *,         addr,
+          size_t,               len,
+          int,                  prot);
 
 /* ------------------------------------------------------------------------ *
  * int readlink(const char *addr, char *buf, size_t n)                      *
  * ------------------------------------------------------------------------ */
-_syscall3(int, syscall_readlink, /* -1 on error */
-		const char *, path,
-		char *, buf,
-		size_t, n);
+_syscall3(int,                  syscall_readlink,   /* -1 on error */
+          const char *,         path,
+          char *,               buf,
+          size_t,               n);
 
 /* ------------------------------------------------------------------------ *
  * int select(int, fd_set *, fd_set *, fd_set *, struct timeval *)          *
  * ------------------------------------------------------------------------ */
 #ifdef USE_SELECT
-_syscall5(int, syscall_select,/* -1 on error, else active fds */
-		int, n, /* highest fd + 1 */
-		fd_set *, readfds, /* fd_set for read events */
-		fd_set *, writefds, /* fd_set for write events */
-		fd_set *, exceptfds, /* fd_set for exceptions */
-		struct timeval *, timeout); /* timeout value */
+_syscall5(int,               syscall_select,/* -1 on error, else active fds */
+          int,               n,             /* highest fd + 1 */
+          fd_set *,          readfds,       /* fd_set for read events */
+          fd_set *,          writefds,      /* fd_set for write events */
+          fd_set *,          exceptfds,     /* fd_set for exceptions */
+          struct timeval *,  timeout);      /* timeout value */
 #endif /* USE_SELECT */
 /* ------------------------------------------------------------------------ *
  * void *mmap(void *start, size_t length, int prot,                         *
  *            int flags, int fd, off_t offset)                              *
  * ------------------------------------------------------------------------ */
-_oldmmapcall(void *, syscall_mmap,
-		void *, start,
-		size_t, length,
-		int, prot,
-		int, flags,
-		int, fd,
-		off_t, offset);
+_oldmmapcall(void *,               syscall_mmap,
+             void *,               start,
+             size_t,               length,
+             int,                  prot,
+             int,                  flags,
+             int,                  fd,
+             off_t,                offset);
 
 /* ------------------------------------------------------------------------ *
  * int socket(int domain, int type, int protocol);                          *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_SOCKET,
-		int, syscall_socket,
-		int, domain,
-		int, type,
-		int, protocol);
+             int,               syscall_socket,
+             int,               domain,
+             int,               type,
+             int,               protocol);
 
 /* ------------------------------------------------------------------------ *
  * int bind(int sockfd, struct sockaddr *my_addr, socklen_t addrlen)        *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_BIND,
-		int, syscall_bind,
-		int, sockfd,
-		const struct sockaddr *, my_addr,
-		socklen_t, addrlen);
+             int,                     syscall_bind,
+             int,                     sockfd,
+             const struct sockaddr *, my_addr,
+             socklen_t,               addrlen);
 
 /* ------------------------------------------------------------------------ *
  * int connect(int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)   *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_CONNECT,
-		int, syscall_connect,
-		int, sockfd,
-		const struct sockaddr *, serv_addr,
-		socklen_t, addrlen);
+             int,                     syscall_connect,
+             int,                     sockfd,
+             const struct sockaddr *, serv_addr,
+             socklen_t,               addrlen);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_GETSOCKNAME,
-		int, syscall_getsockname,
-		int, sockfd,
-		const struct sockaddr *, serv_addr,
-		socklen_t *, addrlen);
+             int,                     syscall_getsockname,
+             int,                     sockfd,
+             const struct sockaddr *, serv_addr,
+             socklen_t *,             addrlen);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_GETPEERNAME,
-		int, syscall_getpeername,
-		int, sockfd,
-		const struct sockaddr *, serv_addr,
-		socklen_t *, addrlen);
+             int,                     syscall_getpeername,
+             int,                     sockfd,
+             const struct sockaddr *, serv_addr,
+             socklen_t *,             addrlen);
 
 /* ------------------------------------------------------------------------ *
  * int listen(int sockfd, int backlog)                                      *
  * ------------------------------------------------------------------------ */
 _socketcall2(SYS_LISTEN,
-		int, syscall_listen,
-		int, sockfd,
-		int, backlog);
+             int,               syscall_listen,
+             int,               sockfd,
+             int,               backlog);
 
 /* ------------------------------------------------------------------------ *
  * int accept(int s, struct sockaddr *addr, socklen_t *addrlen)             *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_ACCEPT,
-		int, syscall_accept,
-		int, s,
-		struct sockaddr *, addr,
-		socklen_t *, addrlen);
+             int,               syscall_accept,
+             int,               s,
+             struct sockaddr *, addr,
+             socklen_t *,       addrlen);
 
 /* ------------------------------------------------------------------------ *
  * int send(int s, const void *msg, size_t len, int flags)                  *
  * ------------------------------------------------------------------------ */
 _socketcall4(SYS_SEND,
-		int, syscall_send,
-		int, s,
-		const void *, msg,
-		size_t, len,
-		int, flags);
+             int,               syscall_send,
+             int,               s,
+             const void *,      msg,
+             size_t,            len,
+             int,               flags);
 
 /* ------------------------------------------------------------------------ *
  * int recv(int s, void *buf, size_t len, int flags)                        *
  * ------------------------------------------------------------------------ */
 _socketcall4(SYS_RECV,
-		int, syscall_recv,
-		int, s,
-		void *, buf,
-		size_t, len,
-		int, flags);
+             int,               syscall_recv,
+             int,               s,
+             void *,            buf,
+             size_t,            len,
+             int,               flags);
 
 /* ------------------------------------------------------------------------ *
  * int socketpair(int d, int type, int protocol, int sv[2]);                *
  * ------------------------------------------------------------------------ */
 _socketcall4(SYS_SOCKETPAIR,
-		int, syscall_socketpair,
-		int, d,
-		int, type,
-		int, protocol,
-		int *, sv);
+             int,               syscall_socketpair,
+             int,               d,
+             int,               type,
+             int,               protocol,
+             int *,             sv);
 
 /* ------------------------------------------------------------------------ *
  * int getsockopt(int, int, int, void *, socklen_t *);                      *
  * ------------------------------------------------------------------------ */
 _socketcall5(SYS_GETSOCKOPT,
-		int, syscall_getsockopt,
-		int, s,
-		int, level,
-		int, optname,
-		void *, optval,
-		socklen_t *, optlen);
+             int,               syscall_getsockopt,
+             int,               s,
+             int,               level,
+             int,               optname,
+             void *,            optval,
+             socklen_t *,       optlen);
 
 /* ------------------------------------------------------------------------ *
  * int setsockopt(int, int, int, void *, socklen_t *);                      *
  * ------------------------------------------------------------------------ */
 _socketcall5(SYS_SETSOCKOPT,
-		int, syscall_setsockopt,
-		int, s,
-		int, level,
-		int, optname,
-		const void *, optval,
-		socklen_t, optlen);
+             int,               syscall_setsockopt,
+             int,               s,
+             int,               level,
+             int,               optname,
+             const void *,      optval,
+             socklen_t,         optlen);
 #endif /* PIC */
 void w00t(char *argv0)
 {
-	/*  char **argv;
-	 char **envp;
-	 int argc;*/
-	int ret;
-	/*
-	 argv = &argv0;
+/*  char **argv;
+  char **envp;
+  int argc;*/
+  int ret;
+/*
+  argv = &argv0;
 
-	 envp = argv;
+  envp = argv;
 
-	 while(*envp) envp++;
+  while(*envp) envp++;
 
-	 argc = (size_t)(envp - argv);
+  argc = (size_t)(envp - argv);
 
-	 envp++;
-	 */
-	ret = main(0, NULL, NULL/*argc, argv, envp*/);
+  envp++;
+  */
+  ret = main(0, NULL, NULL/*argc, argv, envp*/);
 
-	syscall_exit(ret);
+  syscall_exit(ret);
 }
+
 
 #endif /* USE_IA32_LINUX_INLINE */
 

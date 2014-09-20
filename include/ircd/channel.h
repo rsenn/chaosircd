@@ -96,11 +96,11 @@ struct invite {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_DATA(int            ) channel_log;
-IRCD_DATA(struct sheap   ) channel_heap;
-IRCD_DATA(struct sheap   ) channel_invite_heap;
-IRCD_DATA(struct list    ) channel_list;
-IRCD_DATA(uint32_t       ) channel_serial;
+extern int             channel_log;
+extern struct sheap    channel_heap;
+extern struct sheap    channel_invite_heap;
+extern struct list     channel_list;
+extern uint32_t        channel_serial;
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) channel_get_log(void);
@@ -108,125 +108,147 @@ IRCD_API(int) channel_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize channel heap and add garbage collect timer.                     *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_init(void);
+extern void            channel_init           (void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy channel heap and cancel timer.                                     *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_shutdown(void);
+extern void            channel_shutdown       (void);
 
 /* -------------------------------------------------------------------------- *
  * Create a channel.                                                          *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct channel*) channel_new(const char *name);
+extern struct channel *channel_new            (const char      *name);
 
 /* -------------------------------------------------------------------------- *
  * Delete a channel.                                                          *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_delete(struct channel *chptr);
+extern void            channel_delete         (struct channel  *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Loose all references of a channel block.                                   *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_release(struct channel *chptr);
+extern void            channel_release        (struct channel  *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Find a channel by name.                                                    *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct channel*) channel_find_name(const char *name);
+extern struct channel *channel_find_name      (const char      *name);
 
 /* -------------------------------------------------------------------------- *
  * Find a channel by id.                                                      *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct channel*) channel_find_id(uint32_t id);
+extern struct channel *channel_find_id        (uint32_t         id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct channel*) channel_find_warn(struct client *cptr, const char *name);
+extern struct channel *channel_find_warn      (struct client   *cptr,
+                                               const char      *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_set_name(struct channel *chptr, const char *name);
+extern void            channel_set_name       (struct channel  *chptr,
+                                               const char      *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_send(struct lclient *lcptr, struct channel *chptr,
-		uint64_t flag, uint64_t noflag, const char *format, ...);
+extern void            channel_send           (struct lclient  *lcptr,
+                                               struct channel  *chptr,
+                                               uint64_t         flag,
+                                               uint64_t         noflag,
+                                               const char      *format,
+                                               ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_send_common(struct client *sptr, struct client *one,
-		const char *format, ...);
+extern void            channel_send_common    (struct client   *sptr,
+                                               struct client   *one,
+                                               const char      *format,
+                                               ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_delete_members(struct channel *chptr, struct list *list,
-		int delref);
+extern void            channel_delete_members (struct channel  *chptr,
+                                               struct list     *list,
+                                               int              delref);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) channel_welcome(struct channel *chptr);
+extern int             channel_welcome        (struct channel  *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_show_lusers(struct channel *chptr);
+extern void            channel_show_lusers    (struct channel  *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) channel_nick(struct channel *cptr, struct channel *sptr,
-		char *nick);
+extern int             channel_nick           (struct channel  *cptr,
+                                               struct channel  *sptr,
+                                               char            *nick);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(int) channel_can_join(struct channel *chptr, struct client *sptr,
-		const char *key);
+extern int             channel_can_join       (struct channel  *chptr,
+                                               struct client   *sptr,
+                                               const char      *key);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(uint64_t) channel_get_automode(struct channel *chptr,
-		struct client *sptr);
+extern uint64_t        channel_get_automode   (struct channel  *chptr,
+                                               struct client   *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_topic(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, struct chanuser *cuptr, const char *topic);
+extern void            channel_topic          (struct lclient  *lcptr,
+                                               struct client   *cptr,
+                                               struct channel  *chptr,
+                                               struct chanuser *cuptr,
+                                               const char      *topic);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(size_t) channel_burst(struct lclient *lcptr, struct channel *chptr);
+extern size_t          channel_burst          (struct lclient *lcptr,
+                                               struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_message(struct lclient *lcptr, struct client *cptr,
-		struct channel *chptr, intptr_t type, const char *text);
+extern void            channel_message        (struct lclient *lcptr,
+                                               struct client  *cptr,
+                                               struct channel *chptr,
+                                               intptr_t        type,
+                                               const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_join(struct lclient *lcptr, struct client *cptr,
-		const char *name, const char *key);
+extern void            channel_join           (struct lclient *lcptr,
+                                               struct client  *cptr,
+                                               const char     *name,
+                                               const char     *key);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_show(struct client *cptr);
+extern void            channel_show           (struct client  *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Get a reference to an channel block                                        *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct channel*) channel_pop(struct channel *chptr);
+extern struct channel *channel_pop            (struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Push back a reference to a channel block                                   *
  * -------------------------------------------------------------------------- */
-IRCD_API(struct channel*) channel_push(struct channel **chptrptr);
+extern struct channel *channel_push           (struct channel **chptrptr);
 
 /* -------------------------------------------------------------------------- *
  * Adds an entry to the channel backlog                                       *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_backlog(struct channel *chptr, struct client *cptr,
-		const char *cmd, const char *text);
+extern void            channel_backlog        (struct channel *chptr,
+                                               struct client  *cptr,
+                                               const char     *cmd,
+                                               const char     *text);
 
 /* -------------------------------------------------------------------------- *
  * Dump channels and channel heap.                                            *
  * -------------------------------------------------------------------------- */
-IRCD_API(void) channel_dump(struct channel *chptr);
+extern void            channel_dump           (struct channel *chptr);
 
 #endif /* SRC_CHANNEL_H */

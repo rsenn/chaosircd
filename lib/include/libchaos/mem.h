@@ -167,17 +167,17 @@ CHAOS_API(int) mem_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize allocator                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_init(void);
+CHAOS_API(void)  mem_init                (void);
 
 /* ------------------------------------------------------------------------ *
  * Close fd for allocator                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_shutdown(void);
+CHAOS_API(void)  mem_shutdown            (void);
 
 /* ------------------------------------------------------------------------ *
  * Whine and exit if we got no memory                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_fatal(void);
+CHAOS_API(void)  mem_fatal               (void);
 
 /* ------------------------------------------------------------------------ *
  * Create a static heap                                                       *
@@ -187,12 +187,15 @@ CHAOS_API(void) mem_fatal(void);
  *                  you want to store)                                        *
  * <count>          How many elements a block can contain                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_static_create(struct sheap *shptr, size_t size,
-		size_t count);
+CHAOS_API(void)  mem_static_create       (struct sheap *shptr,
+                                          size_t        size,
+                                          size_t        count);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_static_note(struct sheap *shptr, const char *format, ...);
+CHAOS_API(void)  mem_static_note         (struct sheap *shptr,
+                                          const char   *format,
+                                          ...);
 
 /* ------------------------------------------------------------------------ *
  * Return pointer to a free element on a static heap                          *
@@ -201,7 +204,7 @@ CHAOS_API(void) mem_static_note(struct sheap *shptr, const char *format, ...);
  *                                                                            *
  * Returns pointer to free element or exits the program if failed.            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)mem_static_alloc (struct sheap *shptr);
+CHAOS_API(void *)mem_static_alloc        (struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * Free an element on a static heap                                           *
@@ -210,24 +213,25 @@ CHAOS_API(void *)mem_static_alloc (struct sheap *shptr);
  *
  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_static_free(struct sheap *shptr, void *scptr);
+CHAOS_API(void)  mem_static_free         (struct sheap *shptr,
+                                          void         *scptr);
 
 /* ------------------------------------------------------------------------ *
  * Free all blocks which have no used elements.                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int) mem_static_collect(struct sheap *shptr);
+CHAOS_API(int)   mem_static_collect      (struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * Destroy the whole heap.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_static_destroy(struct sheap *shptr);
+CHAOS_API(void)  mem_static_destroy      (struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <element> is valid.                                 *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(int) mem_static_valid (struct sheap *shptr,
-		void *scptr);
+CHAOS_API(int)   mem_static_valid        (struct sheap *shptr,
+                                          void         *scptr);
 #endif /* DEBUG */
 
 /* ------------------------------------------------------------------------ *
@@ -236,54 +240,58 @@ CHAOS_API(int) mem_static_valid (struct sheap *shptr,
  * <dhptr>   Pointer to a dynamic heap structure                              *
  * <size>    How big the a chunk can be at the maximum                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_dynamic_create(struct dheap *dhptr, size_t size);
+CHAOS_API(void)  mem_dynamic_create      (struct dheap *dhptr,
+                                          size_t        size);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_dynamic_note(struct dheap *dhptr, const char *format, ...);
+CHAOS_API(void)  mem_dynamic_note        (struct dheap *dhptr,
+                                          const char   *format,
+                                          ...);
 
 /* ------------------------------------------------------------------------ *
  * Return pointer to a newly allocated chunk on the heap.                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)mem_dynamic_alloc (struct dheap *dhptr,
-		size_t size);
+CHAOS_API(void *)mem_dynamic_alloc       (struct dheap *dhptr,
+                                          size_t        size);
 
 /* ------------------------------------------------------------------------ *
  * Try to resize block, otherwise free and allocate new one.                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)mem_dynamic_realloc (struct dheap *dhptr,
-		void *ptr,
-		size_t size);
+CHAOS_API(void *)mem_dynamic_realloc     (struct dheap *dhptr,
+                                          void         *ptr,
+                                          size_t        size);
 
 /* ------------------------------------------------------------------------ *
  * Free a chunk. haha                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_dynamic_free(struct dheap *dhptr, void *ptr);
+CHAOS_API(void)  mem_dynamic_free        (struct dheap *dhptr,
+                                          void         *ptr);
 
 /* ------------------------------------------------------------------------ *
  * Free all blocks which have no chunks.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int) mem_dynamic_collect(struct dheap *dhptr);
+CHAOS_API(int)   mem_dynamic_collect     (struct dheap *dhptr);
 
 /* ------------------------------------------------------------------------ *
  * Destroy a dynamic heap, munmap() the blocks.                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) mem_dynamic_destroy(struct dheap *dhptr);
+CHAOS_API(void)  mem_dynamic_destroy     (struct dheap *dhptr);
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <chnk> is valid.                                    *
  * this is time-consuming and will not be built without -DDEBUG               *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(int) mem_dynamic_valid (struct dheap *dhptr,
-		void *dcptr);
+CHAOS_API(int)   mem_dynamic_valid       (struct dheap *dhptr,
+                                          void         *dcptr);
 #endif /* DEBUG */
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: dump a heap                                                *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(void) mem_dynamic_dump (struct dheap *dhptr);
+CHAOS_API(void)  mem_dynamic_dump        (struct dheap *dhptr);
 #endif /* DEBUG */
 
 /* ------------------------------------------------------------------------ *
@@ -291,250 +299,250 @@ CHAOS_API(void) mem_dynamic_dump (struct dheap *dhptr);
  * ------------------------------------------------------------------------ */
 #ifdef USE_IA32_LINUX_INLINE
 #undef memset
-CHAOS_API(void *)memset (void *s,
-		int c,
-		size_t n);
+CHAOS_API(void *)memset               (void       *s,
+                                   int         c,
+                                   size_t      n);
 
 #undef memcpy
-CHAOS_API(void *)memcpy (void *d,
-		const void *s,
-		size_t n);
+CHAOS_API(void *)memcpy               (void       *d,
+                                   const void *s,
+                                   size_t      n);
 
 #undef memcmp
-CHAOS_API(int) memcmp (const void *d,
-		const void *s,
-		size_t n);
+CHAOS_API(int)   memcmp               (const void *d,
+                                   const void *s,
+                                   size_t      n);
 
 #ifdef __GCC__
 CHAOS_API(inline) void *memset(void *s, int c, size_t n)
 {
-	size_t i;
+  size_t i;
 
-	/* n is a multiple of 8, so do 64bit copying */
-	if(!(n & 0x07) && (n >= 8))
-	{
-		int64_t q = ((int64_t)(c & 0xff) << 0) |
-		((int64_t)(c & 0xff) << 8) |
-		((int64_t)(c & 0xff) << 16) |
-		((int64_t)(c & 0xff) << 24) |
-		((int64_t)(c & 0xff) << 32) |
-		((int64_t)(c & 0xff) << 40) |
-		((int64_t)(c & 0xff) << 48) |
-		((int64_t)(c & 0xff) << 56);
-		n >>= 3;
+  /* n is a multiple of 8, so do 64bit copying */
+  if(!(n & 0x07) && (n >= 8))
+  {
+    int64_t q = ((int64_t)(c & 0xff) <<  0) |
+                ((int64_t)(c & 0xff) <<  8) |
+                ((int64_t)(c & 0xff) << 16) |
+                ((int64_t)(c & 0xff) << 24) |
+                ((int64_t)(c & 0xff) << 32) |
+                ((int64_t)(c & 0xff) << 40) |
+                ((int64_t)(c & 0xff) << 48) |
+                ((int64_t)(c & 0xff) << 56);
+    n >>= 3;
 
-		for(i = 0; i < n; i++)
-		((int64_t *)s)[i] = q;
-	}
-	/* n is a multiple of 4, so do 32bit copying */
-	else if(!(n & 0x03) && (n >= 4))
-	{
-		int32_t q = ((int32_t)(c & 0xff) << 0) |
-		((int32_t)(c & 0xff) << 8) |
-		((int32_t)(c & 0xff) << 16) |
-		((int32_t)(c & 0xff) << 24);
-		n >>= 2;
+    for(i = 0; i < n; i++)
+      ((int64_t *)s)[i] = q;
+  }
+  /* n is a multiple of 4, so do 32bit copying */
+  else if(!(n & 0x03) && (n >= 4))
+  {
+    int32_t q = ((int32_t)(c & 0xff) <<  0) |
+                ((int32_t)(c & 0xff) <<  8) |
+                ((int32_t)(c & 0xff) << 16) |
+                ((int32_t)(c & 0xff) << 24);
+    n >>= 2;
 
-		for(i = 0; i < n; i++)
-		((int32_t *)s)[i] = q;
-	}
-	/* n is a multiple of 2, so do 16bit copying */
-	else if(!(n & 0x01) && (n >= 2))
-	{
-		int16_t q = ((int16_t)(c & 0xff) << 0) |
-		((int16_t)(c & 0xff) << 8);
-		n >>= 1;
+    for(i = 0; i < n; i++)
+      ((int32_t *)s)[i] = q;
+  }
+  /* n is a multiple of 2, so do 16bit copying */
+  else if(!(n & 0x01) && (n >= 2))
+  {
+    int16_t q = ((int16_t)(c & 0xff) <<  0) |
+                ((int16_t)(c & 0xff) <<  8);
+    n >>= 1;
 
-		for(i = 0; i < n; i++)
-		((int16_t *)s)[i] = q;
-	}
-	/* otherwise do 8bit copying */
-	else
-	{
-		int8_t q = (int8_t)(c & 0xff);
+    for(i = 0; i < n; i++)
+      ((int16_t *)s)[i] = q;
+  }
+  /* otherwise do 8bit copying */
+  else
+  {
+    int8_t q = (int8_t)(c & 0xff);
 
-		for(i = 0; i < n; i++)
-		((int8_t *)s)[i] = q;
-	}
+    for(i = 0; i < n; i++)
+      ((int8_t *)s)[i] = q;
+  }
 
-	return s;
+  return s;
 }
 
 CHAOS_API(inline) void *memcpy(void *d, const void *s, size_t n)
 {
-	size_t i;
+  size_t i;
 
-	/* n is a multiple of 8, so do 64bit copying */
-	if(!(n & 0x07) && (n >= 8))
-	{
-		n >>= 3;
+  /* n is a multiple of 8, so do 64bit copying */
+  if(!(n & 0x07) && (n >= 8))
+  {
+    n >>= 3;
 
-		for(i = 0; i < n; i++)
-		((int64_t *)d)[i] = ((int64_t *)s)[i];
-	}
-	/* n is a multiple of 4, so do 32bit copying */
-	else if(!(n & 0x03) && (n >= 4))
-	{
-		n >>= 2;
+    for(i = 0; i < n; i++)
+      ((int64_t *)d)[i] = ((int64_t *)s)[i];
+  }
+  /* n is a multiple of 4, so do 32bit copying */
+  else if(!(n & 0x03) && (n >= 4))
+  {
+    n >>= 2;
 
-		for(i = 0; i < n; i++)
-		((int32_t *)d)[i] = ((int32_t *)s)[i];
-	}
-	/* n is a multiple of 2, so do 16bit copying */
-	else if(!(n & 0x01) && (n >= 2))
-	{
-		n >>= 1;
+    for(i = 0; i < n; i++)
+      ((int32_t *)d)[i] = ((int32_t *)s)[i];
+  }
+  /* n is a multiple of 2, so do 16bit copying */
+  else if(!(n & 0x01) && (n >= 2))
+  {
+    n >>= 1;
 
-		for(i = 0; i < n; i++)
-		((int16_t *)d)[i] = ((int16_t *)s)[i];
-	}
-	/* otherwise do 8bit copying */
-	else
-	{
-		for(i = 0; i < n; i++)
-		((int8_t *)d)[i] = ((int8_t *)s)[i];
-	}
+    for(i = 0; i < n; i++)
+      ((int16_t *)d)[i] = ((int16_t *)s)[i];
+  }
+  /* otherwise do 8bit copying */
+  else
+  {
+    for(i = 0; i < n; i++)
+      ((int8_t *)d)[i] = ((int8_t *)s)[i];
+  }
 
-	return d;
+  return d;
 }
 
 CHAOS_API(inline) void *memmove(void *d, const void *s, size_t n)
 {
-	size_t i;
-	ssize_t dist;
+  size_t i;
+  ssize_t dist;
 
-	dist = (size_t)d - (size_t)s;
+  dist = (size_t)d - (size_t)s;
 
-	if(dist <= 0)
-	{
-		/* n is a multiple of 8, so do 64bit copying */
-		if(!(n & 0x07) && (n >= 8) && (dist >= 8 || dist == 0))
-		{
-			n >>= 3;
+  if(dist <= 0)
+  {
+    /* n is a multiple of 8, so do 64bit copying */
+    if(!(n & 0x07) && (n >= 8) && (dist >= 8 || dist == 0))
+    {
+      n >>= 3;
 
-			for(i = 0; i < n; i++)
-			((int64_t *)d)[i] = ((int64_t *)s)[i];
-		}
-		/* n is a multiple of 4, so do 32bit copying */
-		else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
-		{
-			n >>= 2;
+      for(i = 0; i < n; i++)
+        ((int64_t *)d)[i] = ((int64_t *)s)[i];
+    }
+    /* n is a multiple of 4, so do 32bit copying */
+    else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
+    {
+      n >>= 2;
 
-			for(i = 0; i < n; i++)
-			((int32_t *)d)[i] = ((int32_t *)s)[i];
-		}
-		/* n is a multiple of 2, so do 16bit copying */
-		else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
-		{
-			n >>= 1;
+      for(i = 0; i < n; i++)
+        ((int32_t *)d)[i] = ((int32_t *)s)[i];
+    }
+    /* n is a multiple of 2, so do 16bit copying */
+    else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
+    {
+      n >>= 1;
 
-			for(i = 0; i < n; i++)
-			((int16_t *)d)[i] = ((int16_t *)s)[i];
-		}
-		/* otherwise do 8bit copying */
-		else
-		{
-			for(i = 0; i < n; i++)
-			((int8_t *)d)[i] = ((int8_t *)s)[i];
-		}
-	}
-	else
-	{
-		/* n is a multiple of 8, so do 64bit copying */
-		if(!(n & 0x07) && (n >= 8) && (dist <= -8))
-		{
-			n >>= 3;
+      for(i = 0; i < n; i++)
+        ((int16_t *)d)[i] = ((int16_t *)s)[i];
+    }
+    /* otherwise do 8bit copying */
+    else
+    {
+      for(i = 0; i < n; i++)
+        ((int8_t *)d)[i] = ((int8_t *)s)[i];
+    }
+  }
+  else
+  {
+    /* n is a multiple of 8, so do 64bit copying */
+    if(!(n & 0x07) && (n >= 8) && (dist <= -8))
+    {
+      n >>= 3;
 
-			for(i = n - 1;; i--)
-			{
-				((int64_t *)d)[i] = ((int64_t *)s)[i];
+      for(i = n - 1;; i--)
+      {
+        ((int64_t *)d)[i] = ((int64_t *)s)[i];
 
-				if(i == 0)
-				break;
-			}
-		}
-		/* n is a multiple of 4, so do 32bit copying */
-		else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
-		{
-			n >>= 2;
+        if(i == 0)
+          break;
+      }
+    }
+    /* n is a multiple of 4, so do 32bit copying */
+    else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
+    {
+      n >>= 2;
 
-			for(i = n - 1;; i--)
-			{
-				((int32_t *)d)[i] = ((int32_t *)s)[i];
+      for(i = n - 1;; i--)
+      {
+        ((int32_t *)d)[i] = ((int32_t *)s)[i];
 
-				if(i == 0)
-				break;
-			}
-		}
-		/* n is a multiple of 2, so do 16bit copying */
-		else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
-		{
-			n >>= 1;
+        if(i == 0)
+          break;
+      }
+    }
+    /* n is a multiple of 2, so do 16bit copying */
+    else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
+    {
+      n >>= 1;
 
-			for(i = n - 1;; i--)
-			{
-				((int16_t *)d)[i] = ((int16_t *)s)[i];
+      for(i = n - 1;; i--)
+      {
+        ((int16_t *)d)[i] = ((int16_t *)s)[i];
 
-				if(i == 0)
-				break;
-			}
-		}
-		/* otherwise do 8bit copying */
-		else
-		{
-			for(i = n - 1;; i--)
-			{
-				((int8_t *)d)[i] = ((int8_t *)s)[i];
+        if(i == 0)
+          break;
+      }
+    }
+    /* otherwise do 8bit copying */
+    else
+    {
+      for(i = n - 1;; i--)
+      {
+        ((int8_t *)d)[i] = ((int8_t *)s)[i];
 
-				if(i == 0)
-				break;
-			}
-		}
-	}
+        if(i == 0)
+          break;
+      }
+    }
+  }
 
-	return d;
+  return d;
 }
 
 CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
 {
-	size_t i;
+  size_t i;
 
-	/* n is a multiple of 8, so do 64bit comparing */
-	if(!(n & 0x07) && (n >= 8))
-	{
-		n >>= 3;
+  /* n is a multiple of 8, so do 64bit comparing */
+  if(!(n & 0x07) && (n >= 8))
+  {
+    n >>= 3;
 
-		for(i = 0; i < n; i++)
-		if(((int64_t *)d)[i] != ((int64_t *)s)[i])
-		return 1;
-	}
-	/* n is a multiple of 4, so do 32bit comparing */
-	else if(!(n & 0x03) && (n >= 4))
-	{
-		n >>= 2;
+    for(i = 0; i < n; i++)
+      if(((int64_t *)d)[i] != ((int64_t *)s)[i])
+        return 1;
+  }
+  /* n is a multiple of 4, so do 32bit comparing */
+  else if(!(n & 0x03) && (n >= 4))
+  {
+    n >>= 2;
 
-		for(i = 0; i < n; i++)
-		if(((int32_t *)d)[i] != ((int32_t *)s)[i])
-		return 1;
-	}
-	/* n is a multiple of 2, so do 16bit comparing */
-	else if(!(n & 0x01) && (n >= 2))
-	{
-		n >>= 1;
+    for(i = 0; i < n; i++)
+      if(((int32_t *)d)[i] != ((int32_t *)s)[i])
+        return 1;
+  }
+  /* n is a multiple of 2, so do 16bit comparing */
+  else if(!(n & 0x01) && (n >= 2))
+  {
+    n >>= 1;
 
-		for(i = 0; i < n; i++)
-		if(((int16_t *)d)[i] != ((int16_t *)s)[i])
-		return 1;
-	}
-	/* otherwise do 8bit comparing */
-	else
-	{
-		for(i = 0; i < n; i++)
-		if(((int8_t *)d)[i] != ((int8_t *)s)[i])
-		return 1;
-	}
+    for(i = 0; i < n; i++)
+      if(((int16_t *)d)[i] != ((int16_t *)s)[i])
+        return 1;
+  }
+  /* otherwise do 8bit comparing */
+  else
+  {
+    for(i = 0; i < n; i++)
+      if(((int8_t *)d)[i] != ((int8_t *)s)[i])
+        return 1;
+  }
 
-	return 0;
+  return 0;
 }
 
 #endif /* __GCC__ */
@@ -542,36 +550,36 @@ CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
 #endif /* USE_IA32_LINUX_INLINE */
 
 /*#undef malloc
- #undef realloc
- #undef free
+#undef realloc
+#undef free
 
- #define malloc(size)        mem_dynamic_alloc(&mem_dheap, (size))
- #define realloc(ptr, size)  mem_dynamic_realloc(&mem_dheap, (ptr), (size))
- #define free(ptr)           do { \
+#define malloc(size)        mem_dynamic_alloc(&mem_dheap, (size))
+#define realloc(ptr, size)  mem_dynamic_realloc(&mem_dheap, (ptr), (size))
+#define free(ptr)           do { \
                               if((ptr)) { \
                                 mem_dynamic_free(&mem_dheap, (ptr)); \
                                 (ptr) = NULL; \
                               } \
                             } while(0)*/
 /*
- * calloc is kludgy and we can't alloc memory
- * of 64bit sizes anyway (n * size), use heaps
- * for fixed size stuff anyway!!!
- */
+  * calloc is kludgy and we can't alloc memory
+  * of 64bit sizes anyway (n * size), use heaps
+  * for fixed size stuff anyway!!!
+  */
 /*
- #undef calloc
- #define calloc              __don_t_use_this_its_a_kludge__*/
+#undef calloc
+#define calloc              __don_t_use_this_its_a_kludge__*/
 
 /* ------------------------------------------------------------------------ *
  * Dump static heap information                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sheap *)mem_static_find (uint32_t id);
-CHAOS_API(void) mem_static_dump(struct sheap *shptr);
+CHAOS_API(struct sheap *)mem_static_find         (uint32_t      id);
+CHAOS_API(void)          mem_static_dump         (struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * Dump dynamic heap information                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct dheap *)mem_dynamic_find (uint32_t id);
-CHAOS_API(void) mem_dynamic_dump(struct dheap *dhptr);
+CHAOS_API(struct dheap *)mem_dynamic_find        (uint32_t      id);
+CHAOS_API(void)          mem_dynamic_dump        (struct dheap *dhptr);
 
 #endif /* __MEM_H */

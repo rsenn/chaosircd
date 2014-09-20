@@ -47,12 +47,14 @@ static void cm_aop_hook(struct list *lptr, struct chanuser *cuptr);
 /* -------------------------------------------------------------------------- *
  * Setup chanmode structure                                                   *
  * -------------------------------------------------------------------------- */
-static const char *cm_aop_help[] = {
+static const char *cm_aop_help[] =
+{
   "+O <mask>       Users matching the mask will get auto-opped on join.",
   NULL
 };
 
-static struct chanmode cm_ahalfop_mode = {
+static struct chanmode cm_ahalfop_mode =
+{
   CM_AOP_CHAR,             /* mode character */
   '\0',                    /* no prefix, because its not a privilege */
   CHANMODE_TYPE_LIST,      /* channel mode is a list */
@@ -65,46 +67,50 @@ static struct chanmode cm_ahalfop_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_aop_load(void) {
-	/* register the channel mode */
-	if(chanmode_register(&cm_ahalfop_mode) == NULL)
-		return -1;
+int cm_aop_load(void)
+{
+  /* register the channel mode */
+  if(chanmode_register(&cm_ahalfop_mode) == NULL)
+    return -1;
 
-	hook_register(channel_join, HOOK_3RD, cm_aop_hook);
+  hook_register(channel_join, HOOK_3RD, cm_aop_hook);
 
-	ircd_support_set("AUTOOP", NULL);
+  ircd_support_set("AUTOOP", NULL);
 
-	return 0;
+  return 0;
 }
 
-void cm_aop_unload(void) {
-	/* unregister the channel mode */
-	ircd_support_unset("AUTOOP");
+void cm_aop_unload(void)
+{
+  /* unregister the channel mode */
+  ircd_support_unset("AUTOOP");
 
-	chanmode_unregister(&cm_ahalfop_mode);
+  chanmode_unregister(&cm_ahalfop_mode);
 
-	hook_unregister(channel_join, HOOK_3RD, cm_aop_hook);
+  hook_unregister(channel_join, HOOK_3RD, cm_aop_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
  * -------------------------------------------------------------------------- */
-static void cm_aop_hook(struct list *lptr, struct chanuser *cuptr) {
-	struct channel *chptr = cuptr->channel;
-	struct list *mlptr;
+static void cm_aop_hook(struct list *lptr, struct chanuser *cuptr)
+{
+  struct channel *chptr = cuptr->channel;
+  struct list    *mlptr;
 
-	/* get the mode list for +O */
-	mlptr = &chptr->modelists[chanmode_index(CM_AOP_CHAR)];
+  /* get the mode list for +O */
+  mlptr = &chptr->modelists[chanmode_index(CM_AOP_CHAR)];
 
-	/* match the client against all masks in the list */
-	if(chanmode_match_amode(cuptr->client, chptr, mlptr)) {
-		/* if the client matched, then give him +o mode */
-		cuptr->flags |= CHFLG(o);
+  /* match the client against all masks in the list */
+  if(chanmode_match_amode(cuptr->client, chptr, mlptr))
+  {
+    /* if the client matched, then give him +o mode */
+    cuptr->flags |= CHFLG(o);
 
-		/* update the nickname prefix (@) */
-		chanmode_prefix_make(cuptr->prefix, cuptr->flags);
+    /* update the nickname prefix (@) */
+    chanmode_prefix_make(cuptr->prefix, cuptr->flags);
 
-		/* add the mode to the current mode change list */
-		chanmode_change_add(lptr, CHANMODE_ADD, CM_OP_CHAR, NULL, cuptr);
-	}
+    /* add the mode to the current mode change list */
+    chanmode_change_add(lptr, CHANMODE_ADD, CM_OP_CHAR, NULL, cuptr);
+  }
 }
