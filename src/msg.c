@@ -47,188 +47,163 @@ int msg_get_log() { return msg_log; }
 /* -------------------------------------------------------------------------- *
  * Initialize message heap.                                                   *
  * -------------------------------------------------------------------------- */
-void msg_init(void)
-{
-  msg_log = log_source_register("msg");
-  msg_id = 0;
+void msg_init(void) {
+	msg_log = log_source_register("msg");
+	msg_id = 0;
 
-  memset(msg_table, 0, MSG_HASH_SIZE * sizeof(struct list));
+	memset(msg_table, 0, MSG_HASH_SIZE * sizeof(struct list));
 
-  log(msg_log, L_status, "Initialised [msg] module.");
+	log(msg_log, L_status, "Initialised [msg] module.");
 }
 
 /* -------------------------------------------------------------------------- *
  * Destroy message heap.                                                      *
  * -------------------------------------------------------------------------- */
-void msg_shutdown(void)
-{
-  struct node *next;
-  struct msg  *mptr;
-  size_t       i;
+void msg_shutdown(void) {
+	struct node *next;
+	struct msg *mptr;
+	size_t i;
 
-  log(msg_log, L_status, "Shutting down [msg] module...");
+	log(msg_log, L_status, "Shutting down [msg] module...");
 
-  for(i = 0; i < MSG_HASH_SIZE; i++)
-  {
-    dlink_foreach_safe(&msg_table[i], mptr, next)
-      dlink_delete(&msg_table[i], &mptr->node);
-  }
+	for(i = 0; i < MSG_HASH_SIZE; i++) {
+		dlink_foreach_safe(&msg_table[i], mptr, next)
+			dlink_delete(&msg_table[i], &mptr->node);
+	}
 
-  log_source_unregister(msg_log);
+	log_source_unregister(msg_log);
 }
 
 /* -------------------------------------------------------------------------- *
  * Find a message.                                                            *
  * -------------------------------------------------------------------------- */
-struct msg *msg_find(const char *name)
-{
-  struct node *node;
-  struct msg  *m;
-  hash_t       hash;
-  
-  hash = str_ihash(name);
+struct msg *msg_find(const char *name) {
+	struct node *node;
+	struct msg *m;
+	hash_t hash;
 
-  dlink_foreach(&msg_table[hash % MSG_HASH_SIZE], node)
-  {
-    m = node->data;
+	hash = str_ihash(name);
 
-    if(m->hash == hash && !str_icmp(m->cmd, name))
-      return m;
-  }
+	dlink_foreach(&msg_table[hash % MSG_HASH_SIZE], node)
+	{
+		m = node->data;
 
-  return NULL;
+		if(m->hash == hash && !str_icmp(m->cmd, name))
+			return m;
+	}
+
+	return NULL;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct msg *msg_find_id(uint32_t id)
-{
-  struct node *nptr;
-  struct msg  *m = NULL;
-  uint32_t     i;
+struct msg *msg_find_id(uint32_t id) {
+	struct node *nptr;
+	struct msg *m = NULL;
+	uint32_t i;
 
-  for(i = 0; i < MSG_HASH_SIZE; i++)
-  {
-    dlink_foreach_data(&msg_table[i], nptr, m)
-      if(m->id == id)
-        return m;
-  }
+	for(i = 0; i < MSG_HASH_SIZE; i++) {
+		dlink_foreach_data(&msg_table[i], nptr, m)
+			if(m->id == id)
+				return m;
+	}
 
-  return NULL;
+	return NULL;
 }
 
 /* -------------------------------------------------------------------------- *
  * Register a message.                                                        *
  * -------------------------------------------------------------------------- */
-struct msg *msg_register(struct msg *msg)
-{
-  if(msg_find(msg->cmd))
-  {
-    log(msg_log, L_warning, "Message %s was already registered.", msg->cmd);
-    return NULL;
-  }
+struct msg *msg_register(struct msg *msg) {
+	if(msg_find(msg->cmd)) {
+		log(msg_log, L_warning, "Message %s was already registered.", msg->cmd);
+		return NULL;
+	}
 
-  msg->hash = str_ihash(msg->cmd);
-  msg->id = msg_id++;
+	msg->hash = str_ihash(msg->cmd);
+	msg->id = msg_id++;
 
-  dlink_add_tail(&msg_table[msg->hash % MSG_HASH_SIZE], &msg->node, msg);
+	dlink_add_tail(&msg_table[msg->hash % MSG_HASH_SIZE], &msg->node, msg);
 
-  return msg;
+	return msg;
 }
 
 /* -------------------------------------------------------------------------- *
  * Unregister a message.                                                      *
  * -------------------------------------------------------------------------- */
-void msg_unregister(struct msg *msg)
-{
-  dlink_delete(&msg_table[msg->hash % MSG_HASH_SIZE], &msg->node);
+void msg_unregister(struct msg *msg) {
+	dlink_delete(&msg_table[msg->hash % MSG_HASH_SIZE], &msg->node);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_unregistered(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
-  lclient_send(lcptr, numeric_format(ERR_NOTREGISTERED),
-               client_me->name, lcptr->name);
+void m_unregistered(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv) {
+	lclient_send(lcptr, numeric_format(ERR_NOTREGISTERED), client_me->name,
+			lcptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_registered(struct lclient *lcptr, struct client *cptr,
-                  int             argc,  char         **argv)
-{
-  lclient_send(lcptr, numeric_format(ERR_ALREADYREGISTRED),
-               client_me->name, cptr->name);
+void m_registered(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv) {
+	lclient_send(lcptr, numeric_format(ERR_ALREADYREGISTRED), client_me->name,
+			cptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_ignore(struct lclient *lcptr, struct client *cptr,
-              int             argc,  char         **argv)
-{
+void m_ignore(struct lclient *lcptr, struct client *cptr, int argc, char **argv) {
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_not_oper(struct lclient *lcptr, struct client *cptr,
-                int             argc,  char         **argv)
-{
-  lclient_send(lcptr, numeric_format(ERR_NOPRIVILEGES),
-               client_me->name, argv[0] ? argv[0] : "*");
+void m_not_oper(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv) {
+	lclient_send(lcptr, numeric_format(ERR_NOPRIVILEGES), client_me->name,
+			argv[0] ? argv[0] : "*");
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void msg_dump(struct msg *mptr)
-{
-  struct node *nptr;
-  uint32_t     i;
+void msg_dump(struct msg *mptr) {
+	struct node *nptr;
+	uint32_t i;
 
-  if(mptr == NULL)
-  {
-    dump(msg_log, "[================ msg summary ================]");
+	if(mptr == NULL) {
+		dump(msg_log, "[================ msg summary ================]");
 
-    for(i = 0; i < MSG_HASH_SIZE; i++)
-    {
-      dlink_foreach_data(&msg_table[i], nptr, mptr)
-        dump(msg_log, " #%03u: %-12s (%3u/%3u/%3u/%3u)",
-             mptr->id, mptr->cmd,
-             mptr->counts[MSG_UNREGISTERED],
-             mptr->counts[MSG_CLIENT],
-             mptr->counts[MSG_SERVER],
-             mptr->counts[MSG_OPER]);
-    }
+		for(i = 0; i < MSG_HASH_SIZE; i++) {
+			dlink_foreach_data(&msg_table[i], nptr, mptr)
+				dump(msg_log, " #%03u: %-12s (%3u/%3u/%3u/%3u)", mptr->id,
+						mptr->cmd, mptr->counts[MSG_UNREGISTERED],
+						mptr->counts[MSG_CLIENT], mptr->counts[MSG_SERVER],
+						mptr->counts[MSG_OPER]);
+		}
 
-    dump(msg_log, "[============= end of msg summary ============]");
-  }
-  else
-  {
-    dump(msg_log, "[================= msg dump =================]");
+		dump(msg_log, "[============= end of msg summary ============]");
+	} else {
+		dump(msg_log, "[================= msg dump =================]");
 
-    dump(msg_log, "        cmd: #%u", mptr->cmd);
-    dump(msg_log, "       args: #%u", mptr->args);
-    dump(msg_log, "    maxargs: #%u", mptr->maxargs);
-    dump(msg_log, "      flags:%s%s%s%s",
-         (mptr->flags & MFLG_UNREG ? " MFLG_UNREG" : ""),
-         (mptr->flags & MFLG_CLIENT ? " MFLG_CLIENT" : ""),
-         (mptr->flags & MFLG_OPER ? " MFLG_OPER" : ""),
-         (mptr->flags & MFLG_SERVER ? " MFLG_SERVER" : ""));
-    dump(msg_log, "   handlers: %p, %p, %p, %p",
-         mptr->handlers[MSG_UNREGISTERED],
-         mptr->handlers[MSG_CLIENT],
-         mptr->handlers[MSG_SERVER],
-         mptr->handlers[MSG_OPER]);
-    dump(msg_log, "       help: %p", mptr->help);
-    dump(msg_log, "       hash: %p", mptr->hash);
-    dump(msg_log, "     counts: %u, %u, %u, %u",
-         mptr->counts[MSG_UNREGISTERED],
-         mptr->counts[MSG_CLIENT],
-         mptr->counts[MSG_SERVER],
-         mptr->counts[MSG_OPER]);
-    dump(msg_log, "      bytes: %u", mptr->bytes);
-    dump(msg_log, "         id: %u", mptr->id);
+		dump(msg_log, "        cmd: #%u", mptr->cmd);
+		dump(msg_log, "       args: #%u", mptr->args);
+		dump(msg_log, "    maxargs: #%u", mptr->maxargs);
+		dump(msg_log, "      flags:%s%s%s%s",
+				(mptr->flags & MFLG_UNREG ? " MFLG_UNREG" : ""),
+				(mptr->flags & MFLG_CLIENT ? " MFLG_CLIENT" : ""),
+				(mptr->flags & MFLG_OPER ? " MFLG_OPER" : ""),
+				(mptr->flags & MFLG_SERVER ? " MFLG_SERVER" : ""));
+		dump(msg_log, "   handlers: %p, %p, %p, %p",
+				mptr->handlers[MSG_UNREGISTERED], mptr->handlers[MSG_CLIENT],
+				mptr->handlers[MSG_SERVER], mptr->handlers[MSG_OPER]);
+		dump(msg_log, "       help: %p", mptr->help);
+		dump(msg_log, "       hash: %p", mptr->hash);
+		dump(msg_log, "     counts: %u, %u, %u, %u",
+				mptr->counts[MSG_UNREGISTERED], mptr->counts[MSG_CLIENT],
+				mptr->counts[MSG_SERVER], mptr->counts[MSG_OPER]);
+		dump(msg_log, "      bytes: %u", mptr->bytes);
+		dump(msg_log, "         id: %u", mptr->id);
 
-    dump(msg_log, "[============== end of msg dump =============]");
-  }
+		dump(msg_log, "[============== end of msg dump =============]");
+	}
 }

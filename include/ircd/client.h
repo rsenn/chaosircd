@@ -117,12 +117,12 @@ struct history {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_log;
-extern struct client *client_me;
-extern uint32_t client_serial;
-extern struct list client_list; /* contains all clients */
-extern struct list client_lists[3][3];
-extern struct lclient *client_source;
+IRCD_DATA(int) client_log;
+IRCD_DATA(struct client*) client_me;
+IRCD_DATA(uint32_t) client_serial;
+IRCD_DATA(struct list) client_list; /* contains all clients */
+IRCD_DATA(struct list) client_lists[3][3];
+IRCD_DATA(struct lclient*) client_source;
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) client_get_log(void);
@@ -130,119 +130,119 @@ IRCD_API(int) client_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize client heap and add garbage collect timer.                      *
  * -------------------------------------------------------------------------- */
-extern void client_init(void);
+IRCD_API(void) client_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy client heap and cancel timer.                                      *
  * -------------------------------------------------------------------------- */
-extern void client_shutdown(void);
+IRCD_API(void) client_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Create a new client coming from a local connection.                        *
  * -------------------------------------------------------------------------- */
-extern struct client *client_new_local(int type, struct lclient *lcptr);
+IRCD_API(struct client*) client_new_local(int type, struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Create a new client coming from a remote connection                        *
  * -------------------------------------------------------------------------- */
-extern struct client *client_new_remote(int type, struct lclient *lcptr,
+IRCD_API(struct client*) client_new_remote(int type, struct lclient *lcptr,
 		struct user *uptr, struct client *origin, const char *name, int hops,
 		const char *host, const char *hostip, const char *info);
 
 /* -------------------------------------------------------------------------- *
  * Create a new client coming from a remote connection                        *
  * -------------------------------------------------------------------------- */
-extern struct client *client_new_service(struct user *uptr, const char *name,
+IRCD_API(struct client*) client_new_service(struct user *uptr, const char *name,
 		const char *host, const char *hostip, const char *info);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_delete(struct client *lcptr);
+IRCD_API(void) client_delete(struct client *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_release(struct client *cptr);
+IRCD_API(void) client_release(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-/*extern user_t   *client_user_new       (struct client  *client);*/
+/*IRCD_API(user_t  *) client_user_new       (struct client  *client);*/
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_id(uint32_t id);
+IRCD_API(struct client*) client_find_id(uint32_t id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_name(const char *name);
+IRCD_API(struct client*) client_find_name(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_nick(const char *nick);
+IRCD_API(struct client*) client_find_nick(const char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct history *client_history_find(const char *nick);
+IRCD_API(struct history*) client_history_find(const char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct history *client_history_add(struct client *cptr,
+IRCD_API(struct history*) client_history_add(struct client *cptr,
 		const char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_history_delete(struct history *hptr);
+IRCD_API(void) client_history_delete(struct history *hptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_history_clean(struct client *cptr);
+IRCD_API(void) client_history_clean(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_host(const char *host);
+IRCD_API(struct client*) client_find_host(const char *host);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_uid(const char *uid);
+IRCD_API(struct client*) client_find_uid(const char *uid);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_nickw(struct client *cptr, const char *nick);
+IRCD_API(struct client*) client_find_nickw(struct client *cptr, const char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_nickh(const char *nick);
+IRCD_API(struct client*) client_find_nickh(const char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct client *client_find_nickhw(struct client *cptr, const char *nick);
+IRCD_API(struct client*) client_find_nickhw(struct client *cptr, const char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_set_name(struct client *cptr, const char *name);
+IRCD_API(void) client_set_name(struct client *cptr, const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_register_local(struct client *cptr);
+IRCD_API(int) client_register_local(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_welcome(struct client *cptr);
+IRCD_API(int) client_welcome(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_lusers(struct client *cptr);
+IRCD_API(void) client_lusers(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_nick(struct lclient *lcptr, struct client *cptr, char *nick);
+IRCD_API(int) client_nick(struct lclient *lcptr, struct client *cptr, char *nick);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_nick_random(char *buf);
+IRCD_API(void) client_nick_random(char *buf);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_nick_rotate(const char *name, char *buf);
+IRCD_API(int) client_nick_rotate(const char *name, char *buf);
 
 /* -------------------------------------------------------------------------- *
  * introduce acptr to the rest of the net                                     *
@@ -250,55 +250,55 @@ extern int client_nick_rotate(const char *name, char *buf);
  * <lcptr>         the local connection the new client is coming from         *
  * <acptr>         the new client                                             *
  * -------------------------------------------------------------------------- */
-extern void client_introduce(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) client_introduce(struct lclient *lcptr, struct client *cptr,
 		struct client *acptr);
 
 /* -------------------------------------------------------------------------- *
  * burst acptr to cptr                                                        *
  * -------------------------------------------------------------------------- */
-extern void client_burst(struct lclient *cptr, struct client *acptr);
+IRCD_API(void) client_burst(struct lclient *cptr, struct client *acptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_vexit(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) client_vexit(struct lclient *lcptr, struct client *cptr,
 		const char *comment, va_list args);
 
-extern void client_exit(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) client_exit(struct lclient *lcptr, struct client *cptr,
 		const char *comment, ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void client_vsend(struct client *cptr, const char *format, va_list args);
+IRCD_API(void) client_vsend(struct client *cptr, const char *format, va_list args);
 
-extern void client_send(struct client *cptr, const char *format, ...);
+IRCD_API(void) client_send(struct client *cptr, const char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_relay(struct lclient *lcptr, struct client *cptr,
+IRCD_API(int) client_relay(struct lclient *lcptr, struct client *cptr,
 		struct client *acptr, const char *format, char **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int client_relay_always(struct lclient *lcptr, struct client *cptr,
+IRCD_API(int) client_relay_always(struct lclient *lcptr, struct client *cptr,
 		struct client **acptrptr, uint32_t cindex, const char *format,
 		int *argc, char **argv);
 
-extern void client_message(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) client_message(struct lclient *lcptr, struct client *cptr,
 		struct client *acptr, int type, const char *text);
 
 /* -------------------------------------------------------------------------- *
  * Get a reference to a client block                                          *
  * -------------------------------------------------------------------------- */
-extern struct client *client_pop(struct client *cptr);
+IRCD_API(struct client*) client_pop(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Push back a reference to a client block                                    *
  * -------------------------------------------------------------------------- */
-extern struct client *client_push(struct client **cptrptr);
+IRCD_API(struct client*) client_push(struct client **cptrptr);
 
 /* -------------------------------------------------------------------------- *
  * Dump clients and client heap.                                              *
  * -------------------------------------------------------------------------- */
-extern void client_dump(struct client *cptr);
+IRCD_API(void) client_dump(struct client *cptr);
 
 #endif /* SRC_CLIENT_H */

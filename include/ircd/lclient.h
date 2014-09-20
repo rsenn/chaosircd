@@ -98,20 +98,20 @@ struct lclient {
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct lclient*) lclient_me;       /* my local client info */
-CHAOS_API(struct lclient*) lclient_uplink;   /* the uplink if we're a leaf */
-CHAOS_API(struct sheap    lclient_heap;     /* heap for) lclient_t */
-CHAOS_API(struct timer  *) lclient_timer;    /* timer for heap gc */
-CHAOS_API(int            ) lclient_log;      /* lclient log source */
-CHAOS_API(uint32_t       ) lclient_id;
-CHAOS_API(uint32_t       ) lclient_serial;
-CHAOS_API(uint32_t       ) lclient_max;
-CHAOS_API(struct list    ) lclient_list;     /* list with all of them */
-CHAOS_API(struct list    ) lclient_lists[4]; /* unreg, clients, servers, opers */
-CHAOS_API(unsigned long  ) lclient_recvb[2];
-CHAOS_API(unsigned long  ) lclient_sendb[2];
-CHAOS_API(unsigned long  ) lclient_recvm[2];
-CHAOS_API(unsigned long  ) lclient_sendm[2];
+IRCD_API(struct lclient*) lclient_me;       /* my local client info */
+IRCD_API(struct lclient*) lclient_uplink;   /* the uplink if we're a leaf */
+IRCD_API(struct sheap)    lclient_heap;     /* heap for) lclient_t */
+IRCD_API(struct timer  *) lclient_timer;    /* timer for heap gc */
+IRCD_API(int            ) lclient_log;      /* lclient log source */
+IRCD_API(uint32_t       ) lclient_id;
+IRCD_API(uint32_t       ) lclient_serial;
+IRCD_API(uint32_t       ) lclient_max;
+IRCD_API(struct list    ) lclient_list;     /* list with all of them */
+IRCD_API(struct list    ) lclient_lists[4]; /* unreg, clients, servers, opers */
+IRCD_API(unsigned long  ) lclient_recvb[2];
+IRCD_API(unsigned long  ) lclient_sendb[2];
+IRCD_API(unsigned long  ) lclient_recvm[2];
+IRCD_API(unsigned long  ) lclient_sendm[2];
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) lclient_get_log(void);
@@ -126,57 +126,57 @@ IRCD_API(int) lclient_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize lclient module                                                  *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_init(void);
+IRCD_API(void) lclient_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown lclient module                                                    *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_shutdown(void);
+IRCD_API(void) lclient_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Garbage collect lclient data                                               *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_collect(void);
+IRCD_API(void) lclient_collect(void);
 
 /* -------------------------------------------------------------------------- *
  * A 32-bit PRNG for the ping cookies                                         *
  * -------------------------------------------------------------------------- */
-CHAOS_API(uint32_t) lclient_random(void);
+IRCD_API(uint32_t) lclient_random(void);
 
 /* -------------------------------------------------------------------------- *
  * Create a new lclient block                                                 *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct lclient*) lclient_new(int fd, net_addr_t addr, net_port_t port);
+IRCD_API(struct lclient*) lclient_new(int fd, net_addr_t addr, net_port_t port);
 
 /* -------------------------------------------------------------------------- *
  * Delete a  lclient block                                                    *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_delete(struct lclient *lcptr);
+IRCD_API(void) lclient_delete(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Loose all references of an lclient block                                    *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_release(struct lclient *lcptr);
+IRCD_API(void) lclient_release(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Get a reference to an lclient block                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct lclient*) lclient_pop(struct lclient *lcptr);
+IRCD_API(struct lclient*) lclient_pop(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Push back a reference to an lclient block                                  *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct lclient*) lclient_push(struct lclient **lcptrptr);
+IRCD_API(struct lclient*) lclient_push(struct lclient **lcptrptr);
 
 /* -------------------------------------------------------------------------- *
  * Set the type of an lclient and move it to the appropriate list             *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_set_type(struct lclient *lcptr, uint32_t type);
+IRCD_API(void) lclient_set_type(struct lclient *lcptr, uint32_t type);
 
 /* -------------------------------------------------------------------------- *
  * Set the name of an lclient block                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_set_name(struct lclient *lcptr, const char *name);
+IRCD_API(void) lclient_set_name(struct lclient *lcptr, const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Accept a local client                                                      *
@@ -185,119 +185,119 @@ CHAOS_API(void) lclient_set_name(struct lclient *lcptr, const char *name);
  *                            (may be invalid?)                               *
  * <listen>                 - the corresponding listen{} block                *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_accept(int fd, struct listen *listen);
+IRCD_API(void) lclient_accept(int fd, struct listen *listen);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_connect(int fd, struct connect *connect);
+IRCD_API(void) lclient_connect(int fd, struct connect *connect);
 
 /* -------------------------------------------------------------------------- *
  * Read data from a local connection and process it                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_recv(int fd, struct lclient *lcptr);
+IRCD_API(void) lclient_recv(int fd, struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Read a line from queue and process it                                      *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_process(int fd, struct lclient *lcptr);
+IRCD_API(void) lclient_process(int fd, struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Parse the prefix and the command                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_parse(struct lclient *lcptr, char *s, size_t n);
+IRCD_API(void) lclient_parse(struct lclient *lcptr, char *s, size_t n);
 
 /* -------------------------------------------------------------------------- *
  * Decide whether a message is numeric or not and call the appropriate        *
  * message handler.                                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_message(struct lclient *client, char **argv, char *arg,
+IRCD_API(void) lclient_message(struct lclient *client, char **argv, char *arg,
 		size_t n);
 
 /* -------------------------------------------------------------------------- *
  * Process a numeric message                                                  *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_numeric(struct lclient *lcptr, char **argv, char *arg);
+IRCD_API(void) lclient_numeric(struct lclient *lcptr, char **argv, char *arg);
 
 /* -------------------------------------------------------------------------- *
  * Process a command                                                          *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_command(struct lclient *lcptr, char **argv, char *arg,
+IRCD_API(void) lclient_command(struct lclient *lcptr, char **argv, char *arg,
 		size_t n);
 
 /* -------------------------------------------------------------------------- *
  * Parse the prefix and find the appropriate client                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct client*) lclient_prefix(struct lclient *lcptr, const char *pfx);
+IRCD_API(struct client*) lclient_prefix(struct lclient *lcptr, const char *pfx);
 
 /* -------------------------------------------------------------------------- *
  * Exit a local client and leave him an error message if he has registered.   *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_vexit(struct lclient *lcptr, char *format, va_list args);
+IRCD_API(void) lclient_vexit(struct lclient *lcptr, char *format, va_list args);
 
-CHAOS_API(int) lclient_exit(struct lclient *lcptr, char *format, ...);
+IRCD_API(int) lclient_exit(struct lclient *lcptr, char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * Update client message/byte counters                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_update_recvb(struct lclient *lcptr, size_t n);
+IRCD_API(void) lclient_update_recvb(struct lclient *lcptr, size_t n);
 
-CHAOS_API(void) lclient_update_sendb(struct lclient *lcptr, size_t n);
+IRCD_API(void) lclient_update_sendb(struct lclient *lcptr, size_t n);
 
 /* -------------------------------------------------------------------------- *
  * Send a line to a local client                                              *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_vsend(struct lclient *lcptr, const char *format,
+IRCD_API(void) lclient_vsend(struct lclient *lcptr, const char *format,
 		va_list args);
 
-CHAOS_API(void) lclient_send(struct lclient *lcptr, const char *format, ...);
+IRCD_API(void) lclient_send(struct lclient *lcptr, const char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * Send a line to a client list but one                                       *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_vsend_list(struct lclient *one, struct list *list,
+IRCD_API(void) lclient_vsend_list(struct lclient *one, struct list *list,
 		const char *format, va_list args);
 
-CHAOS_API(void) lclient_send_list(struct lclient *one, struct list *list,
+IRCD_API(void) lclient_send_list(struct lclient *one, struct list *list,
 		const char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * Check for valid USER/NICK and start handshake                              *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_handshake(struct lclient *lcptr);
+IRCD_API(void) lclient_handshake(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Register a local client to the global client pool                          *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) lclient_register(struct lclient *lcptr);
+IRCD_API(int) lclient_register(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Check if we got a PONG, if not exit the client otherwise send another PING *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) lclient_ping(struct lclient *lcptr);
+IRCD_API(int) lclient_ping(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * USER/NICK has been sent but not yet validated                              *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_login(struct lclient *lcptr);
+IRCD_API(void) lclient_login(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Send welcome messages to the client                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_welcome(struct lclient *lcptr);
+IRCD_API(void) lclient_welcome(struct lclient *lcptr);
 
 /* -------------------------------------------------------------------------- *
  * Find a lclient by its id                                                   *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct lclient*) lclient_find_id(int id);
+IRCD_API(struct lclient*) lclient_find_id(int id);
 
 /* -------------------------------------------------------------------------- *
  * Find a lclient by its name                                                 *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct lclient*) lclient_find_name(const char *name);
+IRCD_API(struct lclient*) lclient_find_name(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Dump lclients and lclient heap.                                            *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) lclient_dump(struct lclient *lcptr);
+IRCD_API(void) lclient_dump(struct lclient *lcptr);
 
 #endif /* SRC_LCLIENT_H */

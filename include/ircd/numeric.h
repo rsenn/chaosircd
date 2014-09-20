@@ -487,18 +487,18 @@
 /* -------------------------------------------------------------------------- *
  * Return format string for the given numeric.                                *
  * -------------------------------------------------------------------------- */
-CHAOS_API(const char*) numeric_format(int numeric);
+IRCD_API(const char*) numeric_format(int numeric);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) numeric_vsend(struct client *cptr, int numeric, va_list args);
+IRCD_API(void) numeric_vsend(struct client *cptr, int numeric, va_list args);
 
-CHAOS_API(void) numeric_send(struct client *cptr, int numeric, ...);
+IRCD_API(void) numeric_send(struct client *cptr, int numeric, ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) numeric_vlsend(struct lclient *lcptr, int numeric, va_list args);
+IRCD_API(void) numeric_vlsend(struct lclient *lcptr, int numeric, va_list args);
 
-CHAOS_API(void) numeric_lsend(struct lclient *lcptr, int numeric, ...);
+IRCD_API(void) numeric_lsend(struct lclient *lcptr, int numeric, ...);
 
 #endif /* SRC_NUMERIC_H */

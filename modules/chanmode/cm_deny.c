@@ -43,19 +43,17 @@
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_deny_hook(struct client *cptr, struct channel *chptr,
-                         const char    *key,  int            *reply);
+		const char *key, int *reply);
 
 /* -------------------------------------------------------------------------- *
  * Set up the channel mode structure                                          *
  * -------------------------------------------------------------------------- */
-static const char *cm_deny_help[] =
-{
+static const char *cm_deny_help[] = {
   "+d <mask>       Users having a realname matching the mask are banned.",
   NULL
 };
 
-static struct chanmode cm_deny_mode =
-{
+static struct chanmode cm_deny_mode = {
   CM_DENY_CHAR,            /* mode character */
   '\0',                    /* no prefix, because its not a privilege */
   CHANMODE_TYPE_LIST,      /* channel mode is a list */
@@ -68,45 +66,41 @@ static struct chanmode cm_deny_mode =
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_deny_load(void)
-{
-  /* register the channel mode */
-  if(chanmode_register(&cm_deny_mode) == NULL)
-    return -1;
+int cm_deny_load(void) {
+	/* register the channel mode */
+	if(chanmode_register(&cm_deny_mode) == NULL)
+		return -1;
 
-  /* register a hook in channel_join */
-  hook_register(channel_join, HOOK_1ST, cm_deny_hook);
+	/* register a hook in channel_join */
+	hook_register(channel_join, HOOK_1ST, cm_deny_hook);
 
-  return 0;
+	return 0;
 }
 
-void cm_deny_unload(void)
-{
-  /* unregister the channel mode */
-  chanmode_unregister(&cm_deny_mode);
+void cm_deny_unload(void) {
+	/* unregister the channel mode */
+	chanmode_unregister(&cm_deny_mode);
 
-  /* unregister the hook in channel_join */
-  hook_unregister(channel_join, HOOK_1ST, cm_deny_hook);
+	/* unregister the hook in channel_join */
+	hook_unregister(channel_join, HOOK_1ST, cm_deny_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_deny_hook(struct client *cptr, struct channel *chptr,
-                         const char    *key,  int            *reply)
-{
-  struct list *mlptr;
+		const char *key, int *reply) {
+	struct list *mlptr;
 
-  /* client is already denied or excepted */
-  if(*reply > 0 || *reply == -CM_EXCEPT_CHAR)
-    return;
+	/* client is already denied or excepted */
+	if(*reply > 0 || *reply == -CM_EXCEPT_CHAR)
+		return;
 
-  /* get the mode list for +d */
-  mlptr = &chptr->modelists[chanmode_index(CM_DENY_CHAR)];
+	/* get the mode list for +d */
+	mlptr = &chptr->modelists[chanmode_index(CM_DENY_CHAR)];
 
-  /* match all masks against the client */
-  if(chanmode_match_deny(cptr, chptr, mlptr))
-    *reply = ERR_DENIEDFROMCHAN;
+	/* match all masks against the client */
+	if(chanmode_match_deny(cptr, chptr, mlptr))
+		*reply = ERR_DENIEDFROMCHAN;
 }
-
 

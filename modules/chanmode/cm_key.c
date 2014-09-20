@@ -43,22 +43,15 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_key_hook     (struct client         *cptr,
-                             struct channel        *chptr,
-                             const char            *key,
-                             int                   *reply);
+static void cm_key_hook(struct client *cptr, struct channel *chptr,
+		const char *key, int *reply);
 
-static int  cm_key_bounce   (struct lclient        *lcptr,
-                             struct client         *cptr,
-                             struct channel        *chptr,
-                             struct chanuser       *cuptr,
-                             struct list           *lptr,
-                             struct chanmodechange *cmcptr);
+static int cm_key_bounce(struct lclient *lcptr, struct client *cptr,
+		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
+		struct chanmodechange *cmcptr);
 
-static void cm_key_build    (char                  *dst,
-                             struct channel        *chptr,
-                             uint32_t              *di,
-                             uint64_t              *flag);
+static void cm_key_build(char *dst, struct channel *chptr, uint32_t *di,
+		uint64_t *flag);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -80,95 +73,84 @@ static struct chanmode cm_key_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_key_load(void)
-{
-  /* register the channel mode */
-  if(chanmode_register(&cm_key_mode) == NULL)
-    return -1;
+int cm_key_load(void) {
+	/* register the channel mode */
+	if(chanmode_register(&cm_key_mode) == NULL)
+		return -1;
 
-  hook_register(channel_join, HOOK_1ST, cm_key_hook);
-  hook_register(chanmode_args_build, HOOK_1ST, cm_key_build);
+	hook_register(channel_join, HOOK_1ST, cm_key_hook);
+	hook_register(chanmode_args_build, HOOK_1ST, cm_key_build);
 
-  return 0;
+	return 0;
 }
 
-void cm_key_unload(void)
-{
-  /* unregister the channel mode */
-  chanmode_unregister(&cm_key_mode);
+void cm_key_unload(void) {
+	/* unregister the channel mode */
+	chanmode_unregister(&cm_key_mode);
 
-  hook_unregister(chanmode_args_build, HOOK_1ST, cm_key_build);
-  hook_unregister(channel_join, HOOK_1ST, cm_key_hook);
+	hook_unregister(chanmode_args_build, HOOK_1ST, cm_key_build);
+	hook_unregister(channel_join, HOOK_1ST, cm_key_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void cm_key_hook(struct client *cptr, struct channel *chptr,
-                        const char    *key,  int            *reply)
-{
-  /* We're already denied or an invex matched */
-  if(*reply > 0 || *reply == -CM_INVEX_CHAR || *reply == -CM_INVITE_CHAR)
-    return;
+		const char *key, int *reply) {
+	/* We're already denied or an invex matched */
+	if(*reply > 0 || *reply == -CM_INVEX_CHAR || *reply == -CM_INVITE_CHAR)
+		return;
 
-  if(chptr->modes & CHFLG(k))
-  {
-    if(key == NULL)
-    {
-      *reply = ERR_BADCHANNELKEY;
-      return;
-    }
+	if(chptr->modes & CHFLG(k)) {
+		if(key == NULL) {
+			*reply = ERR_BADCHANNELKEY;
+			return;
+		}
 
-    if(str_cmp(chptr->key, key))
-    {
-      *reply = ERR_BADCHANNELKEY;
-      return;
-    }
-  }
+		if(str_cmp(chptr->key, key)) {
+			*reply = ERR_BADCHANNELKEY;
+			return;
+		}
+	}
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int cm_key_bounce(struct lclient *lcptr, struct client         *cptr,
-                  struct channel *chptr, struct chanuser       *cuptr,
-                  struct list    *lptr,  struct chanmodechange *cmcptr)
-{
-  if(cmcptr->what == CHANMODE_DEL)
-  {
-    if(!(chptr->modes & cmcptr->mode->flag))
-      return 1;
+int cm_key_bounce(struct lclient *lcptr, struct client *cptr,
+		struct channel *chptr, struct chanuser *cuptr, struct list *lptr,
+		struct chanmodechange *cmcptr) {
+	if(cmcptr->what == CHANMODE_DEL) {
+		if(!(chptr->modes & cmcptr->mode->flag))
+			return 1;
 
-    chptr->key[0] = '\0';
-  }
+		chptr->key[0] = '\0';
+	}
 
-  if(cmcptr->what == CHANMODE_ADD)
-  {
-    if(cmcptr->arg[0] == '\0')
-      return 1;
+	if(cmcptr->what == CHANMODE_ADD) {
+		if(cmcptr->arg[0] == '\0')
+			return 1;
 
-    cmcptr->arg[IRCD_KEYLEN] = '\0';
+		cmcptr->arg[IRCD_KEYLEN] = '\0';
 
-    if((chptr->modes & cmcptr->mode->flag))
-    {
-      if(!str_cmp(chptr->key, cmcptr->arg))
-        chptr->modes &= ~cmcptr->mode->flag;
-    }
+		if((chptr->modes & cmcptr->mode->flag)) {
+			if(!str_cmp(chptr->key, cmcptr->arg))
+				chptr->modes &= ~cmcptr->mode->flag;
+		}
 
-    strlcpy(chptr->key, cmcptr->arg, sizeof(chptr->key));
-  }
+		strlcpy(chptr->key, cmcptr->arg, sizeof(chptr->key));
+	}
 
-  return chanmode_bounce_simple(lcptr, cptr, chptr, cuptr, lptr, cmcptr);
+	return chanmode_bounce_simple(lcptr, cptr, chptr, cuptr, lptr, cmcptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_key_build(char *dst, struct channel *chptr, uint32_t *di, uint64_t *flag)
-{
-  if(*flag == CHFLG(k) && (chptr->modes & CHFLG(k)) && chptr->key[0])
-  {
-    if(*di != 0)
-      dst[(*di)++] = ' ';
+static void cm_key_build(char *dst, struct channel *chptr, uint32_t *di,
+		uint64_t *flag) {
+	if(*flag == CHFLG(k) && (chptr->modes & CHFLG(k)) && chptr->key[0]) {
+		if(*di != 0)
+			dst[(*di)++] = ' ';
 
-    *di += strlcpy(&dst[*di], chptr->key, IRCD_KEYLEN * 8 + 1);
-  }
+		*di += strlcpy(&dst[*di], chptr->key, IRCD_KEYLEN * 8 + 1);
+	}
 }
 

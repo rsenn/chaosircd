@@ -91,31 +91,31 @@ IRCD_API(int) msg_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize message heap.                                                   *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) msg_init(void);
+IRCD_API(void) msg_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy message heap.                                                      *
  * -------------------------------------------------------------------------- */
 
-CHAOS_API(void) msg_shutdown(void);
+IRCD_API(void) msg_shutdown(void);
 /* -------------------------------------------------------------------------- *
  * Find a message.                                                            *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct msg*) msg_find(const char *name);
+IRCD_API(struct msg*) msg_find(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct msg*) msg_find_id(uint32_t id);
+IRCD_API(struct msg*) msg_find_id(uint32_t id);
 
 /* -------------------------------------------------------------------------- *
  * Register a message.                                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct msg*) msg_register(struct msg *msg);
+IRCD_API(struct msg*) msg_register(struct msg *msg);
 
 /* -------------------------------------------------------------------------- *
  * Unregister a message.                                                      *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) msg_unregister(struct msg *msg);
+IRCD_API(void) msg_unregister(struct msg *msg);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -140,6 +140,6 @@ extern void m_not_oper(struct lclient *lcptr, struct client *cptr, int argc,
 /* -------------------------------------------------------------------------- *
  * Dump message stack.                                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) msg_dump(struct msg *mptr);
+IRCD_API(void) msg_dump(struct msg *mptr);
 
 #endif /* SRC_MSG_H */

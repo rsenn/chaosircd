@@ -87,10 +87,10 @@ struct config {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct config) conf_current;
-CHAOS_API(struct config) conf_new;
-CHAOS_API(int          ) conf_fd;
-CHAOS_API(int          ) conf_log;
+IRCD_API(struct config) conf_current;
+IRCD_API(struct config) conf_new;
+IRCD_API(int          ) conf_fd;
+IRCD_API(int          ) conf_log;
 
 /* -------------------------------------------------------------------------- *
  * some declarations for flex/bison                                           *
@@ -107,7 +107,7 @@ extern char linebuf[IRCD_BUFSIZE];
 /* exporting to parser */
 extern int           yydebug;
 extern struct global globalopts;
-CHAOS_API(int          ) conf_fd;
+IRCD_API(int          ) conf_fd;
 extern void          yyerror(char *);
 extern int           yyparse(void);
 extern void          yy_fatal_error(const char *);
@@ -124,38 +124,38 @@ extern void          yy_fatal_error(const char *);
 /* -------------------------------------------------------------------------- *
  * Getopt and configfile coldstart.                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) conf_init(int argc, char **argv, char **envp);
+IRCD_API(void) conf_init(int argc, char **argv, char **envp);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown config code.                                                      *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) conf_shutdown(void);
+IRCD_API(void) conf_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Read the config file(s).                                                   *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) conf_read(void);
+IRCD_API(void) conf_read(void);
 
 /* -------------------------------------------------------------------------- *
  * This is called when a config file is read successfully.                    *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) conf_done(void);
+IRCD_API(void) conf_done(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) conf_rehash(void);
+IRCD_API(void) conf_rehash(void);
 
 /* -------------------------------------------------------------------------- *
  * Dump a config structure.                                                   *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-CHAOS_API(void) conf_dump (struct config *cfgptr);
+IRCD_API(void) conf_dump (struct config *cfgptr);
 #endif /* DEBUG */
 
 /* -------------------------------------------------------------------------- *
  * Bison parser error functions.                                              *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) conf_yy_error(char *msg);
-CHAOS_API(int) conf_yy_fatal(char *msg);
+IRCD_API(void) conf_yy_error(char *msg);
+IRCD_API(int) conf_yy_fatal(char *msg);
 
 #endif /* __CONF_H */

@@ -96,11 +96,11 @@ struct invite {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int            ) channel_log;
-CHAOS_API(struct sheap   ) channel_heap;
-CHAOS_API(struct sheap   ) channel_invite_heap;
-CHAOS_API(struct list    ) channel_list;
-CHAOS_API(uint32_t       ) channel_serial;
+IRCD_DATA(int            ) channel_log;
+IRCD_DATA(struct sheap   ) channel_heap;
+IRCD_DATA(struct sheap   ) channel_invite_heap;
+IRCD_DATA(struct list    ) channel_list;
+IRCD_DATA(uint32_t       ) channel_serial;
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) channel_get_log(void);
@@ -108,125 +108,125 @@ IRCD_API(int) channel_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize channel heap and add garbage collect timer.                     *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_init(void);
+IRCD_API(void) channel_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy channel heap and cancel timer.                                     *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_shutdown(void);
+IRCD_API(void) channel_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Create a channel.                                                          *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct channel*) channel_new(const char *name);
+IRCD_API(struct channel*) channel_new(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Delete a channel.                                                          *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_delete(struct channel *chptr);
+IRCD_API(void) channel_delete(struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Loose all references of a channel block.                                   *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_release(struct channel *chptr);
+IRCD_API(void) channel_release(struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Find a channel by name.                                                    *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct channel*) channel_find_name(const char *name);
+IRCD_API(struct channel*) channel_find_name(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Find a channel by id.                                                      *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct channel*) channel_find_id(uint32_t id);
+IRCD_API(struct channel*) channel_find_id(uint32_t id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct channel*) channel_find_warn(struct client *cptr, const char *name);
+IRCD_API(struct channel*) channel_find_warn(struct client *cptr, const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_set_name(struct channel *chptr, const char *name);
+IRCD_API(void) channel_set_name(struct channel *chptr, const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_send(struct lclient *lcptr, struct channel *chptr,
+IRCD_API(void) channel_send(struct lclient *lcptr, struct channel *chptr,
 		uint64_t flag, uint64_t noflag, const char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_send_common(struct client *sptr, struct client *one,
+IRCD_API(void) channel_send_common(struct client *sptr, struct client *one,
 		const char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_delete_members(struct channel *chptr, struct list *list,
+IRCD_API(void) channel_delete_members(struct channel *chptr, struct list *list,
 		int delref);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) channel_welcome(struct channel *chptr);
+IRCD_API(int) channel_welcome(struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_show_lusers(struct channel *chptr);
+IRCD_API(void) channel_show_lusers(struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) channel_nick(struct channel *cptr, struct channel *sptr,
+IRCD_API(int) channel_nick(struct channel *cptr, struct channel *sptr,
 		char *nick);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) channel_can_join(struct channel *chptr, struct client *sptr,
+IRCD_API(int) channel_can_join(struct channel *chptr, struct client *sptr,
 		const char *key);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(uint64_t) channel_get_automode(struct channel *chptr,
+IRCD_API(uint64_t) channel_get_automode(struct channel *chptr,
 		struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_topic(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) channel_topic(struct lclient *lcptr, struct client *cptr,
 		struct channel *chptr, struct chanuser *cuptr, const char *topic);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(size_t) channel_burst(struct lclient *lcptr, struct channel *chptr);
+IRCD_API(size_t) channel_burst(struct lclient *lcptr, struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_message(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) channel_message(struct lclient *lcptr, struct client *cptr,
 		struct channel *chptr, intptr_t type, const char *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_join(struct lclient *lcptr, struct client *cptr,
+IRCD_API(void) channel_join(struct lclient *lcptr, struct client *cptr,
 		const char *name, const char *key);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_show(struct client *cptr);
+IRCD_API(void) channel_show(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Get a reference to an channel block                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct channel*) channel_pop(struct channel *chptr);
+IRCD_API(struct channel*) channel_pop(struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Push back a reference to a channel block                                   *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct channel*) channel_push(struct channel **chptrptr);
+IRCD_API(struct channel*) channel_push(struct channel **chptrptr);
 
 /* -------------------------------------------------------------------------- *
  * Adds an entry to the channel backlog                                       *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_backlog(struct channel *chptr, struct client *cptr,
+IRCD_API(void) channel_backlog(struct channel *chptr, struct client *cptr,
 		const char *cmd, const char *text);
 
 /* -------------------------------------------------------------------------- *
  * Dump channels and channel heap.                                            *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) channel_dump(struct channel *chptr);
+IRCD_API(void) channel_dump(struct channel *chptr);
 
 #endif /* SRC_CHANNEL_H */

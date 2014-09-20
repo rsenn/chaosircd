@@ -64,54 +64,50 @@ static struct chanmode cm_avoice_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_avoice_load(void)
-{
-  /* register the channel mode */
-  if(chanmode_register(&cm_avoice_mode) == NULL)
-    return -1;
+int cm_avoice_load(void) {
+	/* register the channel mode */
+	if(chanmode_register(&cm_avoice_mode) == NULL)
+		return -1;
 
-  /* register a hook in channel_join */
-  hook_register(channel_join, HOOK_3RD, cm_avoice_hook);
+	/* register a hook in channel_join */
+	hook_register(channel_join, HOOK_3RD, cm_avoice_hook);
 
-  /* set support flag */
-  ircd_support_set("AUTOVOICE", NULL);
+	/* set support flag */
+	ircd_support_set("AUTOVOICE", NULL);
 
-  return 0;
+	return 0;
 }
 
-void cm_avoice_unload(void)
-{
-  /* unset the support flag */
-  ircd_support_unset("AUTOVOICE");
+void cm_avoice_unload(void) {
+	/* unset the support flag */
+	ircd_support_unset("AUTOVOICE");
 
-  /* unregister the channel mode */
-  chanmode_unregister(&cm_avoice_mode);
+	/* unregister the channel mode */
+	chanmode_unregister(&cm_avoice_mode);
 
-  /* unregister the hook in channel_join */
-  hook_unregister(channel_join, HOOK_3RD, cm_avoice_hook);
+	/* unregister the hook in channel_join */
+	hook_unregister(channel_join, HOOK_3RD, cm_avoice_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
  * -------------------------------------------------------------------------- */
-static void cm_avoice_hook(struct list *lptr, struct chanuser *cuptr)
-{
-  struct channel *chptr = cuptr->channel;
-  struct list    *mlptr;
+static void cm_avoice_hook(struct list *lptr, struct chanuser *cuptr) {
+	struct channel *chptr = cuptr->channel;
+	struct list *mlptr;
 
-  /* get the mode list for +V */
-  mlptr = &chptr->modelists[chanmode_index(CM_AVOICE_CHAR)];
+	/* get the mode list for +V */
+	mlptr = &chptr->modelists[chanmode_index(CM_AVOICE_CHAR)];
 
-  /* match the client against all masks in the list */
-  if(chanmode_match_amode(cuptr->client, chptr, mlptr))
-  {
-    /* if the client matched, then give him +v mode */
-    cuptr->flags |= CHFLG(v);
+	/* match the client against all masks in the list */
+	if(chanmode_match_amode(cuptr->client, chptr, mlptr)) {
+		/* if the client matched, then give him +v mode */
+		cuptr->flags |= CHFLG(v);
 
-    /* update the nickname prefix (+) */
-    chanmode_prefix_make(cuptr->prefix, cuptr->flags);
+		/* update the nickname prefix (+) */
+		chanmode_prefix_make(cuptr->prefix, cuptr->flags);
 
-    /* add the mode to the current mode change list */
-    chanmode_change_add(lptr, CHANMODE_ADD, CM_VOICE_CHAR, NULL, cuptr);
-  }
+		/* add the mode to the current mode change list */
+		chanmode_change_add(lptr, CHANMODE_ADD, CM_VOICE_CHAR, NULL, cuptr);
+	}
 }

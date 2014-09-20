@@ -111,13 +111,13 @@
 #define IRCD_API(type) type
 #endif
 
-CHAOS_API(int        ) ircd_log;
-CHAOS_API(int        ) ircd_log_in;
-CHAOS_API(int        ) ircd_log_out;
-CHAOS_API(const char*) ircd_package;
-CHAOS_API(const char*) ircd_version;
-CHAOS_API(const char*) ircd_release;
-CHAOS_API(struct list) ircd_support;
+IRCD_API(int        ) ircd_log;
+IRCD_API(int        ) ircd_log_in;
+IRCD_API(int        ) ircd_log_out;
+IRCD_API(const char*) ircd_package;
+IRCD_API(const char*) ircd_version;
+IRCD_API(const char*) ircd_release;
+IRCD_API(struct list) ircd_support;
 
 typedef enum {
    false = 0,
@@ -156,47 +156,47 @@ IRCD_API(void) ircd_loop(void);
 /* -------------------------------------------------------------------------- *
  * Assemble uptime string                                                     *
  * -------------------------------------------------------------------------- */
-CHAOS_API(const char*) ircd_uptime(void);
+IRCD_API(const char*) ircd_uptime(void);
 
 /* -------------------------------------------------------------------------- *
  * Garbage collect.                                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) ircd_collect(void);
+IRCD_API(void) ircd_collect(void);
 
 /* -------------------------------------------------------------------------- *
  * Restart the daemon.                                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) ircd_restart(void);
+IRCD_API(int) ircd_restart(void);
 
 /* -------------------------------------------------------------------------- *
  * Clean things up.                                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) ircd_shutdown(void);
+IRCD_API(void) ircd_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Add a new support value                                                    *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct support*) ircd_support_new(void);
+IRCD_API(struct support*) ircd_support_new(void);
 
 /* -------------------------------------------------------------------------- *
  * Find a support entry by name                                               *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct support*) ircd_support_find(const char *name);
+IRCD_API(struct support*) ircd_support_find(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Unset a support value                                                      *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) ircd_support_unset(const char *name);
+IRCD_API(void) ircd_support_unset(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Set a support value                                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct support*) ircd_support_set(const char *name, const char *value,
+IRCD_API(struct support*) ircd_support_set(const char *name, const char *value,
 		...);
 
 /* -------------------------------------------------------------------------- *
  * Show support numeric to a client                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) ircd_support_show(struct client *cptr);
+IRCD_API(void) ircd_support_show(struct client *cptr);
 
 #endif /* SRC_IRCD_H */

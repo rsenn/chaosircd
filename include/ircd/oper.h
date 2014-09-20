@@ -64,29 +64,29 @@ struct oper
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_DATA(int          ) oper_log;
-CHAOS_DATA(struct sheap ) oper_heap;
-CHAOS_DATA(struct timer*) oper_timer;
-CHAOS_DATA(struct list  ) oper_list;
-CHAOS_DATA(struct dlog *) oper_drain;
+IRCD_DATA(int          ) oper_log;
+IRCD_DATA(struct sheap ) oper_heap;
+IRCD_DATA(struct timer*) oper_timer;
+IRCD_DATA(struct list  ) oper_list;
+IRCD_DATA(struct dlog *) oper_drain;
 
 /* -------------------------------------------------------------------------- *
  * Initialize oper heap and add garbage collect timer.                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) opera_init(void);
+IRCD_API(void) oper_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy oper heap and cancel timer.                                        *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) opera_shutdown(void);
+IRCD_API(void) oper_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) opera_default(struct oper *optr);
+IRCD_API(void) oper_default(struct oper *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct oper*) opera_add (const char *name,
+IRCD_API(struct oper*) oper_add (const char *name,
 		const char *passwd,
 		struct class *clptr,
 		int level,
@@ -95,7 +95,7 @@ CHAOS_API(struct oper*) opera_add (const char *name,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(int) opera_update (struct oper *optr,
+IRCD_API(int) oper_update (struct oper *optr,
 		const char *passwd,
 		struct class *clptr,
 		int level,
@@ -104,33 +104,33 @@ CHAOS_API(int) opera_update (struct oper *optr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) opera_delete(struct oper *optr);
+IRCD_API(void) oper_delete(struct oper *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct oper*) opera_find(const char *name);
+IRCD_API(struct oper*) oper_find(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) opera_up(struct oper *optr, struct client *sptr);
+IRCD_API(void) oper_up(struct oper *optr, struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(void) opera_down(struct oper *optr, struct client *sptr);
+IRCD_API(void) oper_down(struct oper *optr, struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct oper*) opera_pop(struct oper *optr);
+IRCD_API(struct oper*) oper_pop(struct oper *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-CHAOS_API(struct oper*) opera_push(struct oper **optr);
+IRCD_API(struct oper*) oper_push(struct oper **optr);
 
 /* -------------------------------------------------------------------------- *
  * Dump opers and oper heap.                                                  *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-CHAOS_API(void) opera_dump (void);
+IRCD_API(void) oper_dump (void);
 #endif /* DEBUG */
 
 #endif /* SRC_OPER_H */

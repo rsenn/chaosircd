@@ -54,10 +54,10 @@ struct user {
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-CHAOS_DATA(int ) user_log; /* user log source */
-CHAOS_DATA(struct sheap) user_heap; /* heap for lclient_t */
-CHAOS_DATA(struct list ) user_list; /* list with all of them */
-CHAOS_DATA(uint32_t ) user_id;
+IRCD_DATA(int ) user_log; /* user log source */
+IRCD_DATA(struct sheap) user_heap; /* heap for lclient_t */
+IRCD_DATA(struct list ) user_list; /* list with all of them */
+IRCD_DATA(uint32_t ) user_id;
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) user_get_log(void);

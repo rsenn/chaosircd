@@ -43,7 +43,7 @@
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_ban_hook(struct client *cptr, struct channel *chptr,
-                        const char    *key,  int            *reply);
+		const char *key, int *reply);
 
 /* -------------------------------------------------------------------------- *
  * Set up the channel mode structure                                          *
@@ -66,43 +66,40 @@ static struct chanmode cm_ban_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_ban_load(void)
-{
-  /* register the channel mode */
-  if(chanmode_register(&cm_ban_mode) == NULL)
-    return -1;
+int cm_ban_load(void) {
+	/* register the channel mode */
+	if(chanmode_register(&cm_ban_mode) == NULL)
+		return -1;
 
-  /* register a hook in channel_join */
-  hook_register(channel_join, HOOK_DEFAULT, cm_ban_hook);
+	/* register a hook in channel_join */
+	hook_register(channel_join, HOOK_DEFAULT, cm_ban_hook);
 
-  return 0;
+	return 0;
 }
 
-void cm_ban_unload(void)
-{
-  /* unregister the channel mode */
-  chanmode_unregister(&cm_ban_mode);
+void cm_ban_unload(void) {
+	/* unregister the channel mode */
+	chanmode_unregister(&cm_ban_mode);
 
-  /* unregister the hook in channel_join */
-  hook_unregister(channel_join, HOOK_DEFAULT, cm_ban_hook);
+	/* unregister the hook in channel_join */
+	hook_unregister(channel_join, HOOK_DEFAULT, cm_ban_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_ban_hook(struct client *cptr, struct channel *chptr,
-                        const char    *key,  int            *reply)
-{
-  struct list *mlptr;
+		const char *key, int *reply) {
+	struct list *mlptr;
 
-  /* client is already denied or excepted */
-  if(*reply > 0 || *reply == -CM_EXCEPT_CHAR)
-    return;
+	/* client is already denied or excepted */
+	if(*reply > 0 || *reply == -CM_EXCEPT_CHAR)
+		return;
 
-  /* get the mode list for +b */
-  mlptr = &chptr->modelists[chanmode_index(CM_BAN_CHAR)];
+	/* get the mode list for +b */
+	mlptr = &chptr->modelists[chanmode_index(CM_BAN_CHAR)];
 
-  /* match all masks against the client */
-  if(chanmode_match_ban(cptr, chptr, mlptr))
-    *reply = ERR_BANNEDFROMCHAN;
+	/* match all masks against the client */
+	if(chanmode_match_ban(cptr, chptr, mlptr))
+		*reply = ERR_BANNEDFROMCHAN;
 }

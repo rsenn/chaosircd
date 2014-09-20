@@ -65,54 +65,50 @@ static struct chanmode cm_ahalfop_mode = {
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_ahalfop_load(void)
-{
-  /* register the channel mode */
-  if(chanmode_register(&cm_ahalfop_mode) == NULL)
-    return -1;
+int cm_ahalfop_load(void) {
+	/* register the channel mode */
+	if(chanmode_register(&cm_ahalfop_mode) == NULL)
+		return -1;
 
-  /* register a hook in channel_join */
-  hook_register(channel_join, HOOK_3RD, cm_ahalfop_hook);
+	/* register a hook in channel_join */
+	hook_register(channel_join, HOOK_3RD, cm_ahalfop_hook);
 
-  /* set support flag */
-  ircd_support_set("AUTOHALFOP", NULL);
+	/* set support flag */
+	ircd_support_set("AUTOHALFOP", NULL);
 
-  return 0;
+	return 0;
 }
 
-void cm_ahalfop_unload(void)
-{
-  /* unset the support flag */
-  ircd_support_unset("AUTOHALFOP");
+void cm_ahalfop_unload(void) {
+	/* unset the support flag */
+	ircd_support_unset("AUTOHALFOP");
 
-  /* unregister the channel mode */
-  chanmode_unregister(&cm_ahalfop_mode);
+	/* unregister the channel mode */
+	chanmode_unregister(&cm_ahalfop_mode);
 
-  /* unregister the hook in channel_join */
-  hook_unregister(channel_join, HOOK_3RD, cm_ahalfop_hook);
+	/* unregister the hook in channel_join */
+	hook_unregister(channel_join, HOOK_3RD, cm_ahalfop_hook);
 }
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
  * -------------------------------------------------------------------------- */
-static void cm_ahalfop_hook(struct list *lptr, struct chanuser *cuptr)
-{
-  struct channel *chptr = cuptr->channel;
-  struct list    *mlptr;
+static void cm_ahalfop_hook(struct list *lptr, struct chanuser *cuptr) {
+	struct channel *chptr = cuptr->channel;
+	struct list *mlptr;
 
-  /* get the mode list for +H */
-  mlptr = &chptr->modelists[chanmode_index(CM_AHALFOP_CHAR)];
+	/* get the mode list for +H */
+	mlptr = &chptr->modelists[chanmode_index(CM_AHALFOP_CHAR)];
 
-  /* match the client against all masks in the list */
-  if(chanmode_match_amode(cuptr->client, chptr, mlptr))
-  {
-    /* if the client matched, then give him +h mode */
-    cuptr->flags |= CHFLG(h);
+	/* match the client against all masks in the list */
+	if(chanmode_match_amode(cuptr->client, chptr, mlptr)) {
+		/* if the client matched, then give him +h mode */
+		cuptr->flags |= CHFLG(h);
 
-    /* update the nickname prefix (%) */
-    chanmode_prefix_make(cuptr->prefix, cuptr->flags);
+		/* update the nickname prefix (%) */
+		chanmode_prefix_make(cuptr->prefix, cuptr->flags);
 
-    /* add the mode to the current mode change list */
-    chanmode_change_add(lptr, CHANMODE_ADD, CM_HALFOP_CHAR, NULL, cuptr);
-  }
+		/* add the mode to the current mode change list */
+		chanmode_change_add(lptr, CHANMODE_ADD, CM_HALFOP_CHAR, NULL, cuptr);
+	}
 }

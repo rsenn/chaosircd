@@ -75,42 +75,37 @@ typedef struct userdb {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct sheap) userdb_heap;
-IRCD_API(struct list) userdb_list;
-IRCD_API(uint32_t) userdb_serial;
-IRCD_API(struct timer*) userdb_timer;
-IRCD_API(struct timer*) userdb_rtimer;
-IRCD_API(struct child*) userdb_child;
-IRCD_API(int) userdb_log;
-IRCD_API(int) userdb_fds[2];
-IRCD_API(char) userdb_readbuf[BUFSIZE];
-IRCD_API(const char *) userdb_types[6];
-IRCD_API(const char *) userdb_replies[8];
+IRCD_DATA(struct sheap) userdb_heap;
+IRCD_DATA(struct list) userdb_list;
+IRCD_DATA(uint32_t) userdb_serial;
+IRCD_DATA(struct timer*) userdb_timer;
+IRCD_DATA(struct timer*) userdb_rtimer;
+IRCD_DATA(struct child*) userdb_child;
+IRCD_DATA(int) userdb_log;
+IRCD_DATA(int) userdb_fds[2];
+IRCD_DATA(char) userdb_readbuf[BUFSIZE];
+//IRCD_DATA(const char *) userdb_types[6];
+//IRCD_DATA(const char *) userdb_replies[8];
 IRCD_DATA(const char* ) userdb_query_names[];
 
 /* ------------------------------------------------------------------------ */
-IRCD_API(int)
-userdb_get_log(void);
+IRCD_API(int) userdb_get_log(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
-userdb_init(void);
+IRCD_API(void) userdb_init(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
-userdb_shutdown(void);
+IRCD_API(void) userdb_shutdown(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(void)
-userdb_collect(void);
+IRCD_API(void) userdb_collect(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-IRCD_API(struct userdb *)
-userdb_query_search(const char *expr,void *callback, ...);
+IRCD_API(struct userdb *) userdb_query_search(const char *expr,void *callback, ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */

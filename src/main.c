@@ -48,72 +48,68 @@ extern void ircd_stack_install(void);
 /* -------------------------------------------------------------------------- *
  * Program entry.                                                             *
  * -------------------------------------------------------------------------- */
-int main(int argc, char **argv, char **envp)
-{
-  char          link[64];
-  int           n;
+int main(int argc, char **argv, char **envp) {
+	char link[64];
+	int n;
 
 #ifdef HAVE_SETRLIMIT
-  static struct rlimit 
+	static struct rlimit
 # ifdef __CYGWIN__
-   { unsigned long a; unsigned long b; } 
+	{	unsigned long a; unsigned long b;}
 # endif
-   stack = { 1024, 1024 }
-  ;
-  syscall_setrlimit(RLIMIT_STACK, &stack);
+	stack = {1024, 1024}
+	;
+	syscall_setrlimit(RLIMIT_STACK, &stack);
 #endif
-  ircd_stack_install();
+	ircd_stack_install();
 
-  ircd_argc = argc;
-  ircd_argv = argv;
-  ircd_envp = envp;
+	ircd_argc = argc;
+	ircd_argv = argv;
+	ircd_envp = envp;
 
-  /* Change to working directory */
-  syscall_chdir(PREFIX);
+	/* Change to working directory */
+	syscall_chdir(PREFIX);
 
-  /* Get argv0 */
+	/* Get argv0 */
 #ifndef WIN32
-  str_snprintf(link, sizeof(link), "/proc/%u/exe", syscall_getpid());
+	str_snprintf(link, sizeof(link), "/proc/%u/exe", syscall_getpid());
 
-  if((n = syscall_readlink(link, ircd_path, sizeof(ircd_path) - 1)) > -1)
-  {
-    ircd_path[n] = '\0';
-  }
-  else
-  {
-    ircd_path[0] = '\0';
-  }
+	if((n = syscall_readlink(link, ircd_path, sizeof(ircd_path) - 1)) > -1) {
+		ircd_path[n] = '\0';
+	} else {
+		ircd_path[0] = '\0';
+	}
 #endif /* WIN32 */
 
-  /* Catch some signals */
+	/* Catch some signals */
 #ifndef WIN32
-  syscall_signal(SIGINT, (void *)ircd_shutdown);
-  syscall_signal(SIGHUP, (void *)ircd_shutdown);
-  syscall_signal(SIGTERM, (void *)ircd_shutdown);
-  syscall_signal(SIGPIPE, (void *)1);
+	syscall_signal(SIGINT, (void *) ircd_shutdown);
+	syscall_signal(SIGHUP, (void *) ircd_shutdown);
+	syscall_signal(SIGTERM, (void *) ircd_shutdown);
+	syscall_signal(SIGPIPE, (void *) 1);
 #endif /* WIN32 */
 
-  /* Always dump core! */
+	/* Always dump core! */
 #ifdef HAVE_SETRLIMIT
-  struct rlimit 
+	struct rlimit
 # ifdef __CYGWIN__
-   { unsigned long a; unsigned long b; } 
+	{	unsigned long a; unsigned long b;}
 # endif
-  core = { RLIM_INFINITY, RLIM_INFINITY };
+	core = {RLIM_INFINITY, RLIM_INFINITY};
 
-  syscall_setrlimit(RLIMIT_CORE, &core);
+	syscall_setrlimit(RLIMIT_CORE, &core);
 #endif /* WIN32 */
 
-  /* Initialise all modules */
-  ircd_init(argc, argv, envp);
+	/* Initialise all modules */
+	ircd_init(argc, argv, envp);
 
-  /* Handle events */
-  ircd_loop();
+	/* Handle events */
+	ircd_loop();
 
-  /* Shutdown all modules */
-  ircd_shutdown();
+	/* Shutdown all modules */
+	ircd_shutdown();
 
-  return 0;
+	return 0;
 }
 
 /* -------------------------------------------------------------------------- */
