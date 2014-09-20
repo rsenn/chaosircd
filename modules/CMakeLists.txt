@@ -3,6 +3,7 @@ if(NOT CYGWIN AND NOT WINDOWS)
 endif()
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildSharedModules.cmake")
 
 #
 #if(NOT BUILD_SHARED)
@@ -21,7 +22,9 @@ include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
 #
 #message(STATUS "Scanning for modules...")
 
-add_definitions(-DBUILD_MODULES=1)
+if(BUILD_LOADABLE_MODULES)
+  add_definitions(-DBUILD_MODULES=1)
+endif()
 
 file(GLOB ALL_MODULES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" */??_*.c)
 
@@ -34,14 +37,15 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
 
     #string(REGEX REPLACE \\.c$ "" MODULE_NAME "${MODULE_SOURCE}")
 
-    add_library("${MODULE_NAME}" MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
-    set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
-    
     link_directories("${CMAKE_BINARY_DIR}/src" "${cgircd_BINARY_DIR}")
 
-    if(BUILD_SHARED)
-      target_compile_options("${MODULE_NAME}" BEFORE "-rdynamic ${CMAKE_CURRENT_BINARY_DIR}/../cgircd")
+    if(BUILD_LOADABLE_MODULES)
+      add_library("${MODULE_NAME}" MODULE SHARED "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
+      set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
+    
+      #      target_compile_options("${MODULE_NAME}" BEFORE "-rdynamic ${CMAKE_CURRENT_BINARY_DIR}/../cgircd")
     else()
+      add_library("${MODULE_NAME}" STATIC "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
       target_link_libraries("${MODULE_NAME}" ircd)
     endif()
 
