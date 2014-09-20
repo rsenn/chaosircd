@@ -44,7 +44,7 @@
 char       **ircd_argv = NULL;
 char       **ircd_envp = NULL;
 char         ircd_path[PATHLEN];*/
-
+extern void ircd_stack_install(void);
 /* -------------------------------------------------------------------------- *
  * Program entry.                                                             *
  * -------------------------------------------------------------------------- */

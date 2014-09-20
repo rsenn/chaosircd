@@ -53,10 +53,10 @@ DEFS += -DPID=\"$(relrundir)/$(PACKAGE_NAME).pid\"
 @DLM_FALSE@DEFS += -DSTATIC_IRCD
 
 INCLUDES             = \
-		       -I$(top_srcdir)/lib/include \
 		       -I$(top_srcdir)/include \
-                       -I../lib/include \
+		       -I$(top_srcdir)/lib/include \
                        -I../include \
+                       -I../lib/include \
                        -I. 
                        
 LEXERSRC             = $(srcdir)/lex.yy.c

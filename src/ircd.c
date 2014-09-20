@@ -117,8 +117,9 @@ char         ircd_path[PATHLEN];
 /* -------------------------------------------------------------------------- *
  * Install mmap()ed and mprotect()ed stack into ircd core                     *
  * -------------------------------------------------------------------------- */
-#if 0 /* (defined __linux__) && (defined __i386__)*/
 void ircd_stack_install(void) {
+
+#ifdef HAVE_MPROTECT
   void   *old_esp;
   void   *old_ebp;
   size_t  old_size;
@@ -149,8 +150,8 @@ void ircd_stack_install(void) {
   __asm__ __volatile__("movl\t%0,%%esp\n\t"
                        "movl\t%1,%%ebp\n\t"
                        : : "a" (new_esp), "b" (new_ebp));
+#endif
 }
-#endif /* (defined __linux__) && (defined __i386__) */
 
 /* -------------------------------------------------------------------------- *
  * Die if we cannot bind to a port during coldstart.                          *
