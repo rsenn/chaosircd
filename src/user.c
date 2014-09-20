@@ -36,13 +36,13 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/user.h>
-#include <ircd/oper.h>
-#include <ircd/usermode.h>
-#include <ircd/channel.h>
-#include <ircd/chanuser.h>
-#include <ircd/numeric.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/oper.h"
+#include "ircd/usermode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *

@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/msg.h>
-#include <ircd/user.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/numeric.h>
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

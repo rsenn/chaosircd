@@ -36,13 +36,13 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/numeric.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/ircd.h>
-#include <ircd/oper.h>
-#include <ircd/user.h>
-#include <ircd/msg.h>
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/ircd.h"
+#include "ircd/oper.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Heap for the opers.                                                        *

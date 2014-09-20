@@ -27,12 +27,12 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/user.h>
-#include <ircd/numeric.h>
-#include <ircd/channel.h>
-#include <ircd/chanmode.h>
-#include <ircd/chanuser.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode charachters                                                           *

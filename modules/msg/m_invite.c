@@ -28,15 +28,15 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/channel.h>
-#include <ircd/numeric.h>
-#include <ircd/msg.h>
-#include <ircd/service.h>
-#include <ircd/user.h>
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/msg.h"
+#include "ircd/service.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

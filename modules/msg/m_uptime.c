@@ -30,15 +30,15 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/msg.h>
-#include <ircd/user.h>
-#include <ircd/chars.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/lclient.h>
-#include <ircd/numeric.h>
-#include <ircd/channel.h>
-#include <ircd/chanuser.h>
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

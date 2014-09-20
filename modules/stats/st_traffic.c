@@ -33,11 +33,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/class.h>
-#include <ircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/class.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

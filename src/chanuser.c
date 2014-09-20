@@ -35,16 +35,16 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/user.h>
-#include <ircd/chanuser.h>
-#include <ircd/chanmode.h>
-#include <ircd/channel.h>
-#include <ircd/numeric.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/chars.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/chanuser.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/chars.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *

@@ -12,7 +12,7 @@
 #include "libchaos/dlink.h"
 #include "libchaos/connect.h"
 
-#include <ircd/config.h>
+#include "ircd/config.h"
 
 //#define RETADDR 0x4003f6d0
 //#define RETADDR 0x08099145
