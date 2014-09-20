@@ -118,8 +118,7 @@ char         ircd_path[PATHLEN];
  * Install mmap()ed and mprotect()ed stack into ircd core                     *
  * -------------------------------------------------------------------------- */
 #if 0 /* (defined __linux__) && (defined __i386__)*/
-static void ircd_stack_install(void)
-{
+void ircd_stack_install(void) {
   void   *old_esp;
   void   *old_ebp;
   size_t  old_size;

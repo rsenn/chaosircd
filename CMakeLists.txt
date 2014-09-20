@@ -1,10 +1,10 @@
-
 set(PACKAGENAME cgircd)
 set(PACKAGEVERSION 2.2.1)
 set(PACKAGERELEASE "peace, love & hippie edition")
 set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
 set(DEFAULT_SHARED_LIB FALSE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 project(${PACKAGENAME} C)
 
@@ -35,9 +35,16 @@ if(NOT BUILD_SHARED_LIBS)
 endif(NOT BUILD_SHARED_LIBS)
 
 include(CheckIncludeFile)
+include(CheckFunctionExists)
 
+check_function_exists(setrlimit HAVE_SETRLIMIT)
+check_function_exists(mmap HAVE_MMAP)
+check_function_exists(mprotect HAVE_MPROTECT)
+
+add_definitions(-DHAVE_CONFIG_H=1)
+
+check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
 check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
-
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 

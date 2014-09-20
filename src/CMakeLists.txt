@@ -5,6 +5,7 @@ set(PARSER_SOURCE src/ircd.y)
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSharedLib.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
+include_directories("${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_definitions(-DBUILD_IRCD=1)
 
@@ -18,7 +19,7 @@ add_executable(cgircd
    chanmode.c channel.c chanuser.c chars.c
    class.c client.c conf.c ircd.c
    lclient.c main.c msg.c numeric.c oper.c
-   server.c service.c user.c usermode.c
+   server.c service.c user.c usermode.c userdb.c
    ${MSINTTYPES_HEADERS}
    "${CMAKE_SOURCE_DIR}/include/ircd/chanmode.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/channel.h" "${CMAKE_SOURCE_DIR}/include/ircd/chanuser.h"

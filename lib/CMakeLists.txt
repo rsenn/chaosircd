@@ -23,9 +23,18 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 
+include(CheckLibraryExists)
 include(FindOpenSSL)
 include(FindFreetype)
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
+
+check_library_exists(owfat stralloc_init "${CMAKE_INSTALL_PREFIX}/lib" HAVE_LOWFAT)
+if(HAVE_LOWFAT)
+  set(LOWFAT_LIBRARY owfat)
+endif()
+
+add_definitions(-DHAVE_CONFIG_H=1)
+
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
@@ -41,7 +50,7 @@ set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
-substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
+substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
 	       
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
@@ -78,7 +87,7 @@ set_target_properties(libchaos PROPERTIES
                       SOVERSION "${LIBRARY_VERSION}"
                       PREFIX "")
 
-target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+target_link_libraries(libchaos LINK_PUBLIC ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 
 install(TARGETS libchaos
         RUNTIME DESTINATION bin
