@@ -76,7 +76,8 @@ endif(MAC)
 
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
-add_definitions(-DDLLEXT=\"${DLLEXT}\" -DPLUGINDIR=\"${PLUGINDIR}\")
+#add_definitions(-DDLLEXT=\"${DLLEXT}\")
+add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_LIBCHAOS=1)
 
