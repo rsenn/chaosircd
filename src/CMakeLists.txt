@@ -28,7 +28,7 @@ ${BISON_IRCD_PARSER_OUTPUTS}
 	
 	
 	
-if(WIN32 OR WINDOWS OR CYGWIN)
+if(WINDOWS OR CYGWIN)
 
 add_library(ircd SHARED ${SOURCES})
 	set_target_properties(ircd PROPERTIES PREFIX "")

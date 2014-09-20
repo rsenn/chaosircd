@@ -78,7 +78,7 @@ set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
     "9.1" "9.0" "8.4" "8.3" "8.2" "8.1" "8.0")
 
 # Define additional search paths for root directories.
-if ( WIN32 )
+if ( WINDOWS )
   foreach (suffix ${PostgreSQL_KNOWN_VERSIONS} )
     set(PostgreSQL_ADDITIONAL_SEARCH_PATHS ${PostgreSQL_ADDITIONAL_SEARCH_PATHS} "C:/Program Files/PostgreSQL/${suffix}" )
   endforeach()
@@ -123,7 +123,7 @@ find_path(PostgreSQL_TYPE_INCLUDE_DIR
 set (PostgreSQL_LIBRARY_TO_FIND pq)
 # Setting some more prefixes for the library
 set (PostgreSQL_LIB_PREFIX "")
-if ( WIN32 )
+if ( WINDOWS )
   set (PostgreSQL_LIB_PREFIX ${PostgreSQL_LIB_PREFIX} "lib")
   set ( PostgreSQL_LIBRARY_TO_FIND ${PostgreSQL_LIB_PREFIX}${PostgreSQL_LIBRARY_TO_FIND})
 endif()

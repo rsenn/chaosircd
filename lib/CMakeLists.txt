@@ -3,7 +3,7 @@ set(PACKAGE_VERSION 2.2.1)
 set(PACKAGE_RELEASE "peace, love & hippie edition")
 set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
 
-if(WINDOWS)
+if(WINDOWS OR CYGWIN)
   set(DEFAULT_SHARED_LIB TRUE)
 else()
   set(DEFAULT_SHARED_LIB FALSE)
@@ -44,13 +44,15 @@ include_directories("${MYSQL_INCLUDE_DIR}")
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
-endif(NOT DEFINED BUILD_SHARED_LIBS)
+if(NOT DEFINED BUILD_SHARED)
+  set(BUILD_SHARED "${DEFAULT_SHARED_LIB}" CACHE BOOL "Build dynamically linked binaries")
+endif(NOT DEFINED BUILD_SHARED)
 
-if(NOT BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED)
+  set(BUILD_STATIC true CACHE BOOL "Build statically linked binaries")
+
   add_definitions(-DSTATIC_LIBCHAOS=1)
-endif(NOT BUILD_SHARED_LIBS)
+endif(NOT BUILD_SHARED)
  
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
 
@@ -98,11 +100,15 @@ add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
-set_target_properties(libchaos PROPERTIES
-                      SOVERSION "${LIBRARY_VERSION}"
-                      PREFIX "")
+if(BUILD_SHARED)
+	set_target_properties(libchaos PROPERTIES
+												SOVERSION "${LIBRARY_VERSION}"
+												PREFIX "")
 
-target_link_libraries(libchaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+	target_link_libraries(libchaos ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+else()
+	target_link_libraries(libchaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+endif()
 
 install(TARGETS libchaos
         RUNTIME DESTINATION bin
