@@ -1,9 +1,9 @@
+if(NOT CYGWIN AND NOT WINDOWS)
+  set(DEFAULT_SHARED_LIB true)
+endif()
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
 
-#if(NOT DEFINED BUILD_SHARED)
-#  set(BUILD_SHARED ${DEFAULT_SHARED_LIB})
-#endif(NOT DEFINED BUILD_SHARED)
 #
 #if(NOT BUILD_SHARED)
 #  add_definitions(-DSTATIC_LIBCHAOS=1)
