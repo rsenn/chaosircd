@@ -1,3 +1,6 @@
+
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
+
 #if(NOT DEFINED BUILD_SHARED)
 #  set(BUILD_SHARED ${DEFAULT_SHARED_LIB})
 #endif(NOT DEFINED BUILD_SHARED)
@@ -35,7 +38,12 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
     
     link_directories("${CMAKE_BINARY_DIR}/src" "${cgircd_BINARY_DIR}")
-    target_link_libraries("${MODULE_NAME}" ircd)
+
+    if(BUILD_SHARED)
+      target_compile_options("${MODULE_NAME}" BEFORE "-rdynamic ${CMAKE_CURRENT_BINARY_DIR}/../cgircd")
+    else()
+      target_link_libraries("${MODULE_NAME}" ircd)
+    endif()
 
     install(TARGETS "${MODULE_NAME}"
             RUNTIME DESTINATION libexec/cgircd
