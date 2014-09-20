@@ -63,3 +63,6 @@
 
 /* The size of `uintptr_t', as computed by sizeof. */
 #cmakedefine SIZEOF_UINTPTR_T 32
+
+/* Dynamic linkable library filename extension */
+#cmakedefine DLLEXT "@DLLEXT@"

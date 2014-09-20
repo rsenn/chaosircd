@@ -9,6 +9,9 @@ else()
   set(DEFAULT_SHARED_LIB FALSE)
 endif()
 
+if(NOT DEFINED BUILD_SHARED)
+  set(BUILD_SHARED "${DEFAULT_SHARED_LIB}" CACHE BOOL "Build dynamically linked binaries")
+endif(NOT DEFINED BUILD_SHARED)
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
@@ -19,6 +22,13 @@ cmake_minimum_required(VERSION 2.6)
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
+if(NOT BUILD_SHARED)
+  set(BUILD_STATIC true CACHE BOOL "Build statically linked binaries")
+
+  add_definitions(-DSTATIC_IRCD=1)
+endif(NOT BUILD_SHARED)
+
+
 add_subdirectory(lib)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
@@ -27,20 +37,15 @@ include("${CMAKE_SOURCE_DIR}/CMakeModules/FindBISON.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/FindFLEX.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/PlatformChecks.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/ConfigBuildType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseOpenSSL.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseMySQL.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseFreeType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/DllExt.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
 endif()
-
-if(NOT DEFINED BUILD_SHARED)
-  set(BUILD_SHARED "${DEFAULT_SHARED_LIB}" CACHE BOOL "Build dynamically linked binaries")
-endif(NOT DEFINED BUILD_SHARED)
-
-if(NOT BUILD_SHARED)
-  set(BUILD_STATIC true CACHE BOOL "Build statically linked binaries")
-
-  add_definitions(-DSTATIC_IRCD=1)
-endif(NOT BUILD_SHARED)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)

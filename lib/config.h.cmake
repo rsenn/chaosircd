@@ -75,3 +75,6 @@
 
 /* Platform this server runs on */
 #cmakedefine PLATFORM "@PLATFORM@"
+
+/* Dynamic linkable library filename extension */
+#cmakedefine DLLEXT "@DLLEXT@"

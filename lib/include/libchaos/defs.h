@@ -53,17 +53,24 @@
 typedef uintptr_t hash_t;
 
 #ifdef _MSC_VER
-#define inline  __forceinline
+#include <Windows.h>
+# define inline  __forceinline
+typedef HANDLE pid_t;
+# ifdef WIN64
+typedef __int64 ssize_t;
+# else
+typedef int ssize_t;
+# endif
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
-#   define CHAOS_API(type) __attribute__((dllexport)) type
-#   define CHAOS_DATA(type) extern __attribute__((dllexport)) type
+#   define CHAOS_API(type) __declspec(dllexport) type
+#   define CHAOS_DATA(type) extern __declspec(dllexport) type
 #  else
 #   define CHAOS_API(type) type
-#   define CHAOS_DATA(type) extern __attribute__((dllimport)) type
+#   define CHAOS_DATA(type) extern __declspec(dllimport) type
 #  endif
 # endif
 #endif

@@ -35,6 +35,8 @@
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
 
+#include "config.h"
+
 #ifndef USE_DSO
 #define USE_DSO
 #endif
@@ -50,8 +52,6 @@
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
-#include "../config.h"
-
 #ifdef HAVE_ELF_H
 #include <elf.h>
 #endif /* HAVE_ELF_H */

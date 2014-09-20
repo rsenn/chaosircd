@@ -39,6 +39,8 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#include <math.h>
+
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */

@@ -18,21 +18,12 @@ include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DI
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
 
-add_executable(cfgtest cfgtest.c)
-target_link_libraries(cfgtest libchaos)
 
-add_executable(dbtest dbtest.c)
-target_link_libraries(dbtest libchaos)
+set(TESTS cfgtest dbtest giftest graphtest imagetest ttftest)
 
-add_executable(giftest giftest.c)
-target_link_libraries(giftest libchaos)
+foreach(TEST ${TESTS})
 
-add_executable(graphtest graphtest.c)
-target_link_libraries(graphtest libchaos)
+  add_executable("${TEST}" "${TEST}.c")
+  target_link_libraries("${TEST}" chaos ${MYSQL_LIBS} ${OPENSSL_LIBS})
 
-add_executable(imagetest imagetest.c)
-target_link_libraries(imagetest libchaos)
-
-add_executable(ttftest ttftest.c)
-target_link_libraries(ttftest libchaos)
-
+endforeach()

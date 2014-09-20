@@ -26,15 +26,41 @@ endif()
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/DllExt.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindMySQL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseOpenSSL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseMySQL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
-if(MYSQL_FOUND)
-  add_definitions(-DHAVE_MYSQL=1)
+
+if(FREETYPE_LIBRARY)
+  set(USE_FREETYPE true CACHE BOOL "Use FreeType")
+endif()
+if(FREETYPE_FOUND)
+  set(USE_FREETYPE true CACHE BOOL "Use FreeType")
+endif()
+if(USE_FREETYPE)
+  set(FREETYPE_LIBS "${FREETYPE_LIBRARIES}")
+  include_directories(${FREETYPE_INCLUDE_DIRS})
+  add_definitions(-DHAVE_FREETYPE=1)
 endif()
 
 include(CheckLibraryExists)
 include(FindOpenSSL)
+
+if(OPENSSL_LIBRARY)
+  set(USE_OPENSSL true CACHE BOOL "Use FreeType")
+endif()
+if(OPENSSL_FOUND)
+  set(USE_OPENSSL true CACHE BOOL "Use FreeType")
+endif()
+if(USE_OPENSSL)
+  set(OPENSSL_LIBS "${OPENSSL_SSL_LIBRARY}" "${OPENSSL_CRYPTO_LIBRARY}")
+  include_directories(${OPENSSL_INCLUDE_DIRS})
+  add_definitions(-DHAVE_OPENSSL=1)
+endif()
+
 include(FindFreetype)
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
 
@@ -44,7 +70,6 @@ if(HAVE_LOWFAT)
 endif()
 
 add_definitions(-DHAVE_CONFIG_H=1)
-include_directories("${MYSQL_INCLUDE_DIR}")
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
@@ -58,27 +83,15 @@ if(NOT BUILD_SHARED)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif(NOT BUILD_SHARED)
  
-set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
-
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
-
 substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
-
-if(LINUX)
-  set(DLLEXT ".so" CACHE "shared object extension")
-endif(LINUX)
-if(WINDOWS)
-  set(DLLEXT ".dll" CACHE "shared object extension")
-endif(WINDOWS)
-if(MAC)
-  set(DLLEXT ".dylib" CACHE "shared object extension")
-endif(MAC)
 
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
-add_definitions(-DDLLEXT=\"${DLLEXT}\" -DPLUGINDIR=\"${PLUGINDIR}\")
+add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_LIBCHAOS=1)
+
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 set(LIBCHAOS_HEADERS include/libchaos/cfg.h include/libchaos/child.h
    include/libchaos/connect.h include/libchaos/db.h include/libchaos/defs.h
@@ -109,11 +122,11 @@ if(BUILD_SHARED)
 												SOVERSION "${LIBRARY_VERSION}"
 												PREFIX "")
 
-	target_link_libraries(chaos ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+	target_link_libraries(chaos ${MYSQL_LIBS} ${FREETYPE_LIBS} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 else()
   add_library(chaos STATIC ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
-	target_link_libraries(chaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+	target_link_libraries(chaos LINK_PUBLIC ${MYSQL_LIBS} ${FREETYPE_LIBS} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 endif()
 
 install(TARGETS chaos

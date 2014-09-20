@@ -2,6 +2,8 @@ set(LEXER_SOURCE src/ircd.l)
 set(PARSER_SOURCE src/ircd.y)
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSharedLib.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseMySQL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 bison_target(IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c VERBOSE bison.log COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/y.tab.h")
@@ -36,18 +38,18 @@ if(WINDOWS OR CYGWIN)
 
 	add_executable(cgircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
 	
-	  link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "lib" "${LIBCHAOS_BINARY_DIR}")
+	  link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "${LIBCHAOS_BINARY_DIR}")
 
 	target_link_libraries(ircd chaos ${SOCKET_LIBRARIES})
 	target_link_libraries(cgircd ircd)
 
 else()
-  link_directories("${CMAKE_BINARY_DIR}/../libchaos/src")
+  link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
 	add_executable(cgircd ${SOURCES} main.c)
 
 	link_directories("${LIBCHAOS_BINARY_DIR}")
 		 
-	target_link_libraries(cgircd libchaos ${SOCKET_LIBRARIES})
+        target_link_libraries(cgircd chaos ${MYSQL_LIBS} ${OPENSSL_LIBS} ${SOCKET_LIBRARIES})
 endif()
 
 install(TARGETS cgircd 
