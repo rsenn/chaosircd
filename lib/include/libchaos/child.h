@@ -72,7 +72,7 @@ struct child
   uint32_t           refcount;
   hash_t             chash;
   hash_t             nhash;
-  uint32_t           status;
+  int                status;
   struct timer      *timer;
   uint32_t           chans;
   int                channels[CHILD_MAX_CHANNEL][2][2];

@@ -520,7 +520,7 @@ void graph_draw_grid(struct graph *graph)
  * ------------------------------------------------------------------------ */
 void graph_draw_columns(struct graph *graph)
 {
-  int16_t x1, y1, x2, y2;
+  size_t i;
   int i;
   struct rect rect;
 
@@ -529,7 +529,7 @@ void graph_draw_columns(struct graph *graph)
   x2 = graph->width - GRAPH_PADDING_RIGHT;
   y2 = graph->height - GRAPH_PADDING_BOTTOM;
 
-//  column_width = (graph->grid_width / graph->samples) - graph->column_spacing;
+//  column_width (size_t)= (graph->grid_width / graph->samples) - graph->column_spacing;
   for(i = 0; i < graph->samples; i++)
   {
     uint16_t height;

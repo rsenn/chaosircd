@@ -68,13 +68,13 @@ static inline char *db_trim(char *s)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void db_format_str(char   **pptr, size_t  *bptr,
-                          size_t   n,    int      padding,
-                          int      left, void    *arg)
-{
-  size_t len;
+static void
+db_format_str(char   **pptr, size_t  *bptr,
+              size_t   n,    int      padding,
+              int      left, void    *arg) {
+  (void)padding;
+  size_t i, len;
   char *escaped;
-  int i;
 
   len = str_len(arg) + 1024;
 
@@ -582,7 +582,7 @@ char **db_fetch_row(struct db_result *result)
     case DB_TYPE_MYSQL:
     {
       char **row;
-      int i;
+      size_t i;
 
       row = mysql_fetch_row(result->res.my);
 

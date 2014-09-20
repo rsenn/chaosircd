@@ -72,7 +72,7 @@ struct timer
 
   /* internally initialised */
   uint64_t    deadline;       /* time at which the callback will be called */
-  uint32_t    id;
+  int32_t         id;
 };
 /* Sorry for this leetness, but timer_t is already defined elsewhere */
 
