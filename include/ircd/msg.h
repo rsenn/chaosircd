@@ -91,63 +91,55 @@ IRCD_API(int) msg_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize message heap.                                                   *
  * -------------------------------------------------------------------------- */
-extern void        msg_init       (void);
+CHAOS_API(void) msg_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy message heap.                                                      *
  * -------------------------------------------------------------------------- */
 
-extern void        msg_shutdown   (void);
+CHAOS_API(void) msg_shutdown(void);
 /* -------------------------------------------------------------------------- *
  * Find a message.                                                            *
  * -------------------------------------------------------------------------- */
-extern struct msg *msg_find       (const char     *name);
+CHAOS_API(struct msg*) msg_find(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct msg *msg_find_id    (uint32_t        id);
+CHAOS_API(struct msg*) msg_find_id(uint32_t id);
 
 /* -------------------------------------------------------------------------- *
  * Register a message.                                                        *
  * -------------------------------------------------------------------------- */
-extern struct msg *msg_register   (struct msg     *msg);
+CHAOS_API(struct msg*) msg_register(struct msg *msg);
 
 /* -------------------------------------------------------------------------- *
  * Unregister a message.                                                      *
  * -------------------------------------------------------------------------- */
-extern void        msg_unregister (struct msg     *msg);
+CHAOS_API(void) msg_unregister(struct msg *msg);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void        m_unregistered (struct lclient *lcptr,
-                                   struct client  *cptr,
-                                   int             argc,
-                                   char          **argv);
+extern void m_unregistered(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void        m_registered   (struct lclient *lcptr,
-                                   struct client  *cptr,
-                                   int             argc,
-                                   char          **argv);
+extern void m_registered(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void        m_ignore       (struct lclient *lcptr,
-                                   struct client  *cptr,
-                                   int             argc,
-                                   char          **argv);
+extern void m_ignore(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void        m_not_oper     (struct lclient *lcptr,
-                                   struct client  *cptr,
-                                   int             argc,
-                                   char          **argv);
+extern void m_not_oper(struct lclient *lcptr, struct client *cptr, int argc,
+		char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Dump message stack.                                                        *
  * -------------------------------------------------------------------------- */
-extern void        msg_dump       (struct msg     *mptr);
+CHAOS_API(void) msg_dump(struct msg *mptr);
 
 #endif /* SRC_MSG_H */

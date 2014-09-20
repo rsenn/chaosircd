@@ -23,18 +23,16 @@
 #define channel_is_persistent(chptr) \
   ((chptr)->modes & CHFLG(P))
 
-static inline int
-client_is_participant(struct client *cptr)
-{
-  struct chanuser *cuptr;
+static inline int client_is_participant(struct client *cptr) {
+	struct chanuser *cuptr;
 
-  if(!client_is_user(cptr))
-    return 0;
+	if(!client_is_user(cptr))
+		return 0;
 
-  dlink_foreach(&cptr->user->channels, cuptr)
-  {
-    
-  }
+	dlink_foreach(&cptr->user->channels, cuptr)
+	{
+
+	}
 }
 
 #endif /* SRC_CROWDGUARD_H */

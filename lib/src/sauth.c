@@ -80,720 +80,653 @@ const char       *sauth_replies[] = {
 };
 
 /* ------------------------------------------------------------------------ */
-int sauth_get_log() { return sauth_log; }
+int sauth_get_log() {
+	return sauth_log;
+}
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int  sauth_recover(void);
-int  sauth_launch(void);
+static int sauth_recover(void);
+int sauth_launch(void);
 static void sauth_callback(struct sauth *sauth, int type);
 static void sauth_read(int fd, void *arg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int sauth_timeout(struct sauth *sauth)
-{
-  sauth_callback(sauth, SAUTH_TIMEOUT);
+static int sauth_timeout(struct sauth *sauth) {
+	sauth_callback(sauth, SAUTH_TIMEOUT);
 
-  timer_cancel(&sauth->timer);
+	timer_cancel(&sauth->timer);
 
-  return 0;
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int sauth_proxy_reply(const char *reply)
-{
-  uint32_t i;
+int sauth_proxy_reply(const char *reply) {
+	uint32_t i;
 
-  for(i = 0; sauth_replies[i]; i++)
-  {
-    if(!str_icmp(sauth_replies[i], reply))
-      return i;
-  }
+	for(i = 0; sauth_replies[i]; i++) {
+		if(!str_icmp(sauth_replies[i], reply))
+			return i;
+	}
 
-  return -1;
+	return -1;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int sauth_proxy_type(const char *type)
-{
-  uint32_t i;
+int sauth_proxy_type(const char *type) {
+	uint32_t i;
 
-  for(i = 0; sauth_types[i]; i++)
-  {
-    if(!str_icmp(sauth_types[i], type))
-      return i;
-  }
+	for(i = 0; sauth_types[i]; i++) {
+		if(!str_icmp(sauth_types[i], type))
+			return i;
+	}
 
-  return -1;
+	return -1;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void sauth_child_cb(struct child *child)
-{
-  log(sauth_log, L_status, "sauth child callback %u", sauth_child->status);
+static void sauth_child_cb(struct child *child) {
+	log(sauth_log, L_status, "sauth child callback %u", sauth_child->status);
 
-  switch(sauth_child->status)
-  {
-    case CHILD_IDLE:
-    {
-      sauth_launch();
-      break;
-    }
-    case CHILD_DEAD:
-    {
-      sauth_recover();
-      break;
-    }
-    case CHILD_RUNNING:
-    {
-      break;
-    }
-  }
+	switch(sauth_child->status) {
+		case CHILD_IDLE: {
+			sauth_launch();
+			break;
+		}
+		case CHILD_DEAD: {
+			sauth_recover();
+			break;
+		}
+		case CHILD_RUNNING: {
+			break;
+		}
+	}
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void sauth_callback(struct sauth *sauth, int type)
-{
-  const char *what;
+static void sauth_callback(struct sauth *sauth, int type) {
+	const char *what;
 
-  sauth->status = type;
+	sauth->status = type;
 
-  if(sauth->status == SAUTH_TIMEDOUT)
-    what = "timed out";
-  else if(sauth->status == SAUTH_DONE)
-    what = "done";
-  else
-    what = "failed";
+	if(sauth->status == SAUTH_TIMEDOUT)
+		what = "timed out";
+	else if(sauth->status == SAUTH_DONE)
+		what = "done";
+	else
+		what = "failed";
 
-  timer_cancel(&sauth->timer);
+	timer_cancel(&sauth->timer);
 
-  switch(sauth->type)
-  {
-    case SAUTH_TYPE_DNSF:
-    {
-      log(sauth_log, L_verbose, "DNS query (#%u) %s. (%s -> %s)",
-          sauth->id, what, sauth->host,
-          (sauth->addr == NET_ADDR_ANY ?
-           "NXDOMAIN" : net_ntoa(sauth->addr)));
+	switch(sauth->type) {
+		case SAUTH_TYPE_DNSF: {
+			log(sauth_log, L_verbose, "DNS query (#%u) %s. (%s -> %s)",
+					sauth->id, what, sauth->host,
+					(sauth->addr == NET_ADDR_ANY ?
+							"NXDOMAIN" : net_ntoa(sauth->addr)));
 
-      break;
-    }
-    case SAUTH_TYPE_DNSR:
-    {
-      log(sauth_log, L_verbose, "DNS query (#%u) %s. (%s -> %s)",
-          sauth->id, what, net_ntoa(sauth->addr),
-          (sauth->host[0] ? sauth->host : "NXDOMAIN"));
+			break;
+		}
+		case SAUTH_TYPE_DNSR: {
+			log(sauth_log, L_verbose, "DNS query (#%u) %s. (%s -> %s)",
+					sauth->id, what, net_ntoa(sauth->addr),
+					(sauth->host[0] ? sauth->host : "NXDOMAIN"));
 
-      break;
-    }
-    case SAUTH_TYPE_AUTH:
-    {
-      log(sauth_log, L_verbose, "AUTH query (#%u) %s. (%s:%u -> %s)",
-          sauth->id, what, net_ntoa(sauth->addr), sauth->local,
-          (sauth->ident[0] ? sauth->ident : "<unknown>"));
-      break;
-    }
-    case SAUTH_TYPE_PROXY:
-    {
-      char buf[32];
+			break;
+		}
+		case SAUTH_TYPE_AUTH: {
+			log(sauth_log, L_verbose, "AUTH query (#%u) %s. (%s:%u -> %s)",
+					sauth->id, what, net_ntoa(sauth->addr), sauth->local,
+					(sauth->ident[0] ? sauth->ident : "<unknown>"));
+			break;
+		}
+		case SAUTH_TYPE_PROXY: {
+			char buf[32];
 
-      net_ntoa_r(sauth->connect, buf);
+			net_ntoa_r(sauth->connect, buf);
 
-      log(sauth_log, L_verbose, "PROXY check (#%u) %s. (%s:%u -> %s:%u) [%s]: %s",
-          sauth->id, what,
-          net_ntoa(sauth->addr), (uint32_t)sauth->remote,
-          buf, (uint32_t)sauth->local, sauth_types[sauth->ptype], sauth_replies[sauth->reply]);
-      break;
-    }
-  }
+			log(sauth_log, L_verbose,
+					"PROXY check (#%u) %s. (%s:%u -> %s:%u) [%s]: %s",
+					sauth->id, what, net_ntoa(sauth->addr),
+					(uint32_t) sauth->remote, buf, (uint32_t) sauth->local,
+					sauth_types[sauth->ptype], sauth_replies[sauth->reply]);
+			break;
+		}
+	}
 
-  if(sauth->callback)
-    sauth->callback(sauth, sauth->args[0], sauth->args[1],
-                           sauth->args[2], sauth->args[3]);
+	if(sauth->callback)
+		sauth->callback(sauth, sauth->args[0], sauth->args[1], sauth->args[2],
+				sauth->args[3]);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int sauth_parse(char **argv)
-{
-  int      serial;
-  struct sauth *sauth;
+static int sauth_parse(char **argv) {
+	int serial;
+	struct sauth *sauth;
 
-  if(!str_icmp(argv[0], "dns"))
-  {
-    serial = str_toi(argv[2]);
+	if(!str_icmp(argv[0], "dns")) {
+		serial = str_toi(argv[2]);
 
-    sauth = sauth_find(serial);
+		sauth = sauth_find(serial);
 
-    if(sauth)
-    {
-      if(sauth->type == SAUTH_TYPE_DNSF)
-      {
-        if(!str_icmp(argv[1], "forward"))
-        {
-          if(argv[3])
-            net_aton(argv[3], &sauth->addr);
-          else
-            sauth->addr = NET_ADDR_ANY;
+		if(sauth) {
+			if(sauth->type == SAUTH_TYPE_DNSF) {
+				if(!str_icmp(argv[1], "forward")) {
+					if(argv[3])
+						net_aton(argv[3], &sauth->addr);
+					else
+						sauth->addr = NET_ADDR_ANY;
 
-          sauth_callback(sauth, SAUTH_DONE);
+					sauth_callback(sauth, SAUTH_DONE);
 
-          return 0;
-        }
-      }
+					return 0;
+				}
+			}
 
-      if(sauth->type == SAUTH_TYPE_DNSR)
-      {
-        if(!str_icmp(argv[1], "reverse"))
-        {
-          if(argv[3])
-            strlcpy(sauth->host, argv[3], sizeof(sauth->host));
-          else
-            sauth->host[0] = '\0';
+			if(sauth->type == SAUTH_TYPE_DNSR) {
+				if(!str_icmp(argv[1], "reverse")) {
+					if(argv[3])
+						strlcpy(sauth->host, argv[3], sizeof(sauth->host));
+					else
+						sauth->host[0] = '\0';
 
-          sauth_callback(sauth, SAUTH_DONE);
+					sauth_callback(sauth, SAUTH_DONE);
 
-          return 0;
-        }
-      }
+					return 0;
+				}
+			}
 
-      sauth_callback(sauth, SAUTH_ERROR);
+			sauth_callback(sauth, SAUTH_ERROR);
 
-      return -1;
-    }
+			return -1;
+		}
 
-    return 0;
-  }
-  else if(!str_icmp(argv[0], "auth"))
-  {
-    serial = str_toi(argv[1]);
+		return 0;
+	} else if(!str_icmp(argv[0], "auth")) {
+		serial = str_toi(argv[1]);
 
-    sauth = sauth_find(serial);
+		sauth = sauth_find(serial);
 
-    if(sauth)
-    {
-      if(argv[2])
-        strlcpy(sauth->ident, argv[2], sizeof(sauth->ident));
-      else
-        sauth->ident[0] = '\0';
+		if(sauth) {
+			if(argv[2])
+				strlcpy(sauth->ident, argv[2], sizeof(sauth->ident));
+			else
+				sauth->ident[0] = '\0';
 
-      sauth_callback(sauth, SAUTH_DONE);
-    }
+			sauth_callback(sauth, SAUTH_DONE);
+		}
 
-    return 0;
-  }
-  else if(!str_icmp(argv[0], "proxy"))
-  {
-    serial = str_toi(argv[1]);
+		return 0;
+	} else if(!str_icmp(argv[0], "proxy")) {
+		serial = str_toi(argv[1]);
 
-    sauth = sauth_find(serial);
+		sauth = sauth_find(serial);
 
-    if(sauth)
-    {
-      sauth->reply = sauth_proxy_reply(argv[2]);
+		if(sauth) {
+			sauth->reply = sauth_proxy_reply(argv[2]);
 
-      sauth_callback(sauth, SAUTH_DONE);
-    }
+			sauth_callback(sauth, SAUTH_DONE);
+		}
 
-    return 0;
-  }
+		return 0;
+	}
 
-  return -1;
+	return -1;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int sauth_recover(void)
-{
-  struct node *node;
-  struct node *next;
+static int sauth_recover(void) {
+	struct node *node;
+	struct node *next;
 
-  dlink_foreach_safe(&sauth_list, node, next)
-    sauth_callback((struct sauth *)node, SAUTH_ERROR);
+	dlink_foreach_safe(&sauth_list, node, next)
+		sauth_callback((struct sauth *) node, SAUTH_ERROR);
 
-  if(sauth_rtimer)
-  {
-    timer_remove(sauth_rtimer);
-    sauth_rtimer = NULL;
-  }
+	if(sauth_rtimer) {
+		timer_remove(sauth_rtimer);
+		sauth_rtimer = NULL;
+	}
 
-  sauth_fds[0] = -1;
-  sauth_fds[1] = -1;
+	sauth_fds[0] = -1;
+	sauth_fds[1] = -1;
 
-  sauth_rtimer = timer_start(sauth_launch, SAUTH_RELAUNCH);
+	sauth_rtimer = timer_start(sauth_launch, SAUTH_RELAUNCH);
 
-  timer_note(sauth_rtimer, "relaunch for sauth child");
+	timer_note(sauth_rtimer, "relaunch for sauth child");
 
-  sauth_child = NULL;
+	sauth_child = NULL;
 
-  return 0;
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void sauth_read(int fd, void *ptr)
-{
-  int   len;
-  char *argv[6];
+static void sauth_read(int fd, void *ptr) {
+	int len;
+	char *argv[6];
 
-  while(io_list[fd].recvq.lines)
-  {
-    if((len = io_gets(fd, sauth_readbuf, BUFSIZE)) == 0)
-      break;
+	while(io_list[fd].recvq.lines) {
+		if((len = io_gets(fd, sauth_readbuf, BUFSIZE)) == 0)
+			break;
 
-    str_tokenize(sauth_readbuf, argv, 5);
+		str_tokenize(sauth_readbuf, argv, 5);
 
-    if(sauth_parse(argv))
-    {
-      log(sauth_log, L_warning, "Invalid reply from sauth!");
+		if(sauth_parse(argv)) {
+			log(sauth_log, L_warning, "Invalid reply from sauth!");
 
-      io_shutup(fd);
-    }
-  }
+			io_shutup(fd);
+		}
+	}
 
-  if(io_list[fd].status.eof || io_list[fd].status.err)
-  {
-     child_kill(sauth_child);
-     child_cancel(sauth_child);
-     child_push(&sauth_child);
+	if(io_list[fd].status.eof || io_list[fd].status.err) {
+		child_kill(sauth_child);
+		child_cancel(sauth_child);
+		child_push(&sauth_child);
 
-     log(sauth_log, L_warning, "sauth channel closed!");
+		log(sauth_log, L_warning, "sauth channel closed!");
 
-     sauth_recover();
-  }
+		sauth_recover();
+	}
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int sauth_launch(void)
-{
-  if(sauth_child == NULL)
-  {
-    sauth_child = child_find_name("-sauth");
+int sauth_launch(void) {
+	if(sauth_child == NULL) {
+		sauth_child = child_find_name("-sauth");
 
-    if(sauth_child == NULL)
-    {
-      log(sauth_log, L_warning, "No servauth child block found!");
+		if(sauth_child == NULL) {
+			log(sauth_log, L_warning, "No servauth child block found!");
 
-      return 0;
-    }
+			return 0;
+		}
 
-    child_set_callback(sauth_child, sauth_child_cb);
+		child_set_callback(sauth_child, sauth_child_cb);
 
-    if(sauth_child->status != CHILD_RUNNING)
-    {
-      child_launch(sauth_child);
+		if(sauth_child->status != CHILD_RUNNING) {
+			child_launch(sauth_child);
 
-      if(sauth_child->channels[0][CHILD_PARENT][CHILD_READ] > -1)
-      {
-        sauth_fds[CHILD_READ] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
+			if(sauth_child->channels[0][CHILD_PARENT][CHILD_READ] > -1) {
+				sauth_fds[CHILD_READ] =
+						sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
 
 #ifdef HAVE_SOCKETPAIR
-        sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
-        io_queue_control(sauth_fds[CHILD_READ], ON, ON, ON);
+				sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
+				io_queue_control(sauth_fds[CHILD_READ], ON, ON, ON);
 #else
-        sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_WRITE];
-        io_queue_control(sauth_fds[CHILD_READ], ON, OFF, ON);
-        io_queue_control(sauth_fds[CHILD_WRITE], OFF, ON, ON);
+				sauth_fds[CHILD_WRITE] =
+						sauth_child->channels[0][CHILD_PARENT][CHILD_WRITE];
+				io_queue_control(sauth_fds[CHILD_READ], ON, OFF, ON);
+				io_queue_control(sauth_fds[CHILD_WRITE], OFF, ON, ON);
 #endif /* HAVE_SOCKETPAIR */
 
-        io_register(sauth_fds[CHILD_READ], IO_CB_READ, sauth_read, NULL);
-      }
+				io_register(sauth_fds[CHILD_READ], IO_CB_READ, sauth_read,
+				NULL);
+			}
 
-      sauth_rtimer = NULL;
+			sauth_rtimer = NULL;
 
-      return 1;
-    }
+			return 1;
+		}
 
-    return 0;
-  }
+		return 0;
+	}
 
-  sauth_rtimer = NULL;
+	sauth_rtimer = NULL;
 
-  return 1;
+	return 1;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static struct sauth *sauth_new(int type)
-{
-  struct sauth *sauth;
+static struct sauth *sauth_new(int type) {
+	struct sauth *sauth;
 
-  sauth = mem_static_alloc(&sauth_heap);
+	sauth = mem_static_alloc(&sauth_heap);
 
-  sauth->id = sauth_serial++;
-  sauth->type = type;
-  sauth->host[0] = '\0';
-  sauth->addr = NET_ADDR_ANY;
-  sauth->remote = 0;
-  sauth->local = 0;
-  sauth->refcount = 1;
+	sauth->id = sauth_serial++;
+	sauth->type = type;
+	sauth->host[0] = '\0';
+	sauth->addr = NET_ADDR_ANY;
+	sauth->remote = 0;
+	sauth->local = 0;
+	sauth->refcount = 1;
 
-  dlink_add_head(&sauth_list, &sauth->node, sauth);
+	dlink_add_head(&sauth_list, &sauth->node, sauth);
 
-  return sauth;
+	return sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * Initialize sauth heap and add garbage collect timer.                     *
  * ------------------------------------------------------------------------ */
-void sauth_init(void)
-{
-  sauth_log = log_source_register("sauth");
+void sauth_init(void) {
+	sauth_log = log_source_register("sauth");
 
-  /* Zero sauth block list */
-  dlink_list_zero(&sauth_list);
+	/* Zero sauth block list */
+	dlink_list_zero(&sauth_list);
 
-  sauth_serial = 0;
-  sauth_fds[0] = -1;
-  sauth_fds[1] = -1;
+	sauth_serial = 0;
+	sauth_fds[0] = -1;
+	sauth_fds[1] = -1;
 
-  /* Setup sauth heap & timer */
-  mem_static_create(&sauth_heap, sizeof(sauth_t), SAUTH_BLOCK_SIZE);
-  mem_static_note(&sauth_heap, "sauth query heap");
+	/* Setup sauth heap & timer */
+	mem_static_create(&sauth_heap, sizeof(sauth_t), SAUTH_BLOCK_SIZE);
+	mem_static_note(&sauth_heap, "sauth query heap");
 
-  sauth_rtimer = timer_start(sauth_launch, SAUTH_RELAUNCH);
+	sauth_rtimer = timer_start(sauth_launch, SAUTH_RELAUNCH);
 
-  timer_note(sauth_rtimer, "servauth relaunch timer");
+	timer_note(sauth_rtimer, "servauth relaunch timer");
 }
 
 /* ------------------------------------------------------------------------ *
  * Destroy sauth heap and cancel timer.                                     *
  * ------------------------------------------------------------------------ */
-void sauth_shutdown(void)
-{
-  struct node *node;
-  struct node *next;
+void sauth_shutdown(void) {
+	struct node *node;
+	struct node *next;
 
-  timer_cancel(&sauth_timer);
+	timer_cancel(&sauth_timer);
 
-  /* Remove all sauth blocks */
-  dlink_foreach_safe(&sauth_list, node, next)
-    sauth_delete((struct sauth *)node);
+	/* Remove all sauth blocks */
+	dlink_foreach_safe(&sauth_list, node, next)
+		sauth_delete((struct sauth *) node);
 
-  mem_static_destroy(&sauth_heap);
+	mem_static_destroy(&sauth_heap);
 
-  log_source_unregister(sauth_log);
+	log_source_unregister(sauth_log);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_collect(void)
-{
-  struct node  *node;
-  struct sauth *saptr;
+void sauth_collect(void) {
+	struct node *node;
+	struct sauth *saptr;
 
-  dlink_foreach(&sauth_list, node)
-  {
-    saptr = node->data;
+	dlink_foreach(&sauth_list, node)
+	{
+		saptr = node->data;
 
-    if(!saptr->refcount)
-      sauth_delete(saptr);
-  }
+		if(!saptr->refcount)
+			sauth_delete(saptr);
+	}
 
-  mem_static_collect(&sauth_heap);
+	mem_static_collect(&sauth_heap);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_dns_forward(const char *address, void *callback, ...)
-{
-  struct sauth *sauth;
-  va_list       args;
+struct sauth *sauth_dns_forward(const char *address, void *callback, ...) {
+	struct sauth *sauth;
+	va_list args;
 
-  if(!sauth_launch())
-    return NULL;
+	if(!sauth_launch())
+		return NULL;
 
-  sauth = sauth_new(SAUTH_TYPE_DNSF);
+	sauth = sauth_new(SAUTH_TYPE_DNSF);
 
-  sauth->callback = callback;
+	sauth->callback = callback;
 
-  strlcpy(sauth->host, address, sizeof(sauth->host));
+	strlcpy(sauth->host, address, sizeof(sauth->host));
 
-  va_start(args, callback);
-  sauth_vset_args(sauth, args);
-  va_end(args);
+	va_start(args, callback);
+	sauth_vset_args(sauth, args);
+	va_end(args);
 
-  io_puts(sauth_fds[CHILD_WRITE], "dns forward %u %s",
-          sauth->id, sauth->host);
+	io_puts(sauth_fds[CHILD_WRITE], "dns forward %u %s", sauth->id,
+			sauth->host);
 
-  sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
+	sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
 
-  timer_note(sauth->timer, "sauth timeout (dns forward %s)", address);
+	timer_note(sauth->timer, "sauth timeout (dns forward %s)", address);
 
-  log(sauth_log, L_verbose, "Started DNS query for %s (#%u)",
-      sauth->host, sauth->id);
+	log(sauth_log, L_verbose, "Started DNS query for %s (#%u)", sauth->host,
+			sauth->id);
 
-  return sauth;
+	return sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_dns_reverse(net_addr_t address, void *callback, ...)
-{
-  struct sauth *sauth;
-  va_list       args;
-  char          ipbuf[HOSTIPLEN + 1];
+struct sauth *sauth_dns_reverse(net_addr_t address, void *callback, ...) {
+	struct sauth *sauth;
+	va_list args;
+	char ipbuf[HOSTIPLEN + 1];
 
-  if(!sauth_launch())
-    return NULL;
+	if(!sauth_launch())
+		return NULL;
 
-  sauth = sauth_new(SAUTH_TYPE_DNSR);
+	sauth = sauth_new(SAUTH_TYPE_DNSR);
 
-  sauth->callback = callback;
-  sauth->addr = address;
+	sauth->callback = callback;
+	sauth->addr = address;
 
-  va_start(args, callback);
-  sauth_vset_args(sauth, args);
-  va_end(args);
+	va_start(args, callback);
+	sauth_vset_args(sauth, args);
+	va_end(args);
 
-  net_ntoa_r(sauth->addr, ipbuf);
+	net_ntoa_r(sauth->addr, ipbuf);
 
-  io_puts(sauth_fds[CHILD_WRITE], "dns reverse %u %s",
-          sauth->id, ipbuf);
+	io_puts(sauth_fds[CHILD_WRITE], "dns reverse %u %s", sauth->id, ipbuf);
 
-  sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
+	sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
 
-  timer_note(sauth->timer, "sauth timeout (dns reverse %s)",
-             ipbuf);
+	timer_note(sauth->timer, "sauth timeout (dns reverse %s)", ipbuf);
 
-  log(sauth_log, L_verbose, "Started DNS query for %s (#%u)",
-      ipbuf, sauth->id);
+	log(sauth_log, L_verbose, "Started DNS query for %s (#%u)", ipbuf,
+			sauth->id);
 
-  return sauth;
+	return sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_auth(net_addr_t address,  uint16_t local,
-                         uint16_t       remote,   void    *callback, ...)
-{
-  struct sauth *sauth;
-  va_list       args;
+struct sauth *sauth_auth(net_addr_t address, uint16_t local, uint16_t remote,
+		void *callback, ...) {
+	struct sauth *sauth;
+	va_list args;
 
-  if(!sauth_launch())
-    return NULL;
+	if(!sauth_launch())
+		return NULL;
 
-  sauth = sauth_new(SAUTH_TYPE_AUTH);
+	sauth = sauth_new(SAUTH_TYPE_AUTH);
 
-  sauth->addr = address;
-  sauth->local = local;
-  sauth->remote = remote;
-  sauth->callback = callback;
+	sauth->addr = address;
+	sauth->local = local;
+	sauth->remote = remote;
+	sauth->callback = callback;
 
-  va_start(args, callback);
-  sauth_vset_args(sauth, args);
-  va_end(args);
+	va_start(args, callback);
+	sauth_vset_args(sauth, args);
+	va_end(args);
 
-  io_puts(sauth_fds[CHILD_WRITE], "auth %u %s %u %u",
-          sauth->id, net_ntoa(sauth->addr), sauth->local, sauth->remote);
+	io_puts(sauth_fds[CHILD_WRITE], "auth %u %s %u %u", sauth->id,
+			net_ntoa(sauth->addr), sauth->local, sauth->remote);
 
-  sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
+	sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
 
-  timer_note(sauth->timer, "sauth timeout (auth %s %u %u)",
-             net_ntoa(sauth->addr), sauth->local, sauth->remote);
+	timer_note(sauth->timer, "sauth timeout (auth %s %u %u)",
+			net_ntoa(sauth->addr), sauth->local, sauth->remote);
 
-  return sauth;
+	return sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_proxy(int type,
-                          net_addr_t remote_addr, net_port_t remote_port,
-                          net_addr_t local_addr,  net_port_t local_port,
-                          void      *callback, ...)
-{
-  struct sauth *sauth;
-  va_list       args;
+struct sauth *sauth_proxy(int type, net_addr_t remote_addr,
+		net_port_t remote_port, net_addr_t local_addr, net_port_t local_port,
+		void *callback, ...) {
+	struct sauth *sauth;
+	va_list args;
 
-  if(!sauth_launch())
-    return NULL;
+	if(!sauth_launch())
+		return NULL;
 
-  sauth = sauth_new(SAUTH_TYPE_PROXY);
+	sauth = sauth_new(SAUTH_TYPE_PROXY);
 
-  sauth->addr = remote_addr;
-  sauth->connect = local_addr;
-  sauth->local = local_port;
-  sauth->remote = remote_port;
-  sauth->callback = callback;
-  sauth->ptype = type;
+	sauth->addr = remote_addr;
+	sauth->connect = local_addr;
+	sauth->local = local_port;
+	sauth->remote = remote_port;
+	sauth->callback = callback;
+	sauth->ptype = type;
 
-  va_start(args, callback);
-  sauth_vset_args(sauth, args);
-  va_end(args);
+	va_start(args, callback);
+	sauth_vset_args(sauth, args);
+	va_end(args);
 
-  io_puts(sauth_fds[CHILD_WRITE], "proxy %i %s:%u %s:%u %s",
-          sauth->id,
-          net_ntoa(sauth->addr), sauth->remote,
-          net_ntoa(sauth->connect), sauth->local,
-          sauth_types[sauth->ptype]);
+	io_puts(sauth_fds[CHILD_WRITE], "proxy %i %s:%u %s:%u %s", sauth->id,
+			net_ntoa(sauth->addr), sauth->remote, net_ntoa(sauth->connect),
+			sauth->local, sauth_types[sauth->ptype]);
 
-  sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
+	sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
 
-  timer_note(sauth->timer, "sauth timeout (proxy x %s:%u %s:%u %s)",
-             net_ntoa(sauth->addr), sauth->remote,
-             net_ntoa(sauth->connect), sauth->local,
-             sauth_types[sauth->ptype]);
+	timer_note(sauth->timer, "sauth timeout (proxy x %s:%u %s:%u %s)",
+			net_ntoa(sauth->addr), sauth->remote, net_ntoa(sauth->connect),
+			sauth->local, sauth_types[sauth->ptype]);
 
-  return sauth;
+	return sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_find(uint32_t id)
-{
-  struct sauth *sauth;
-  struct node  *node;
+struct sauth *sauth_find(uint32_t id) {
+	struct sauth *sauth;
+	struct node *node;
 
-  dlink_foreach(&sauth_list, node)
-  {
-    sauth = node->data;
+	dlink_foreach(&sauth_list, node)
+	{
+		sauth = node->data;
 
-    if(sauth->id == id)
-      return sauth;
-  }
+		if(sauth->id == id)
+			return sauth;
+	}
 
-  return NULL;
+	return NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_pop(struct sauth *sauth)
-{
-  if(sauth)
-  {
-    if(!sauth->refcount)
-      log(sauth_log, L_warning, "Poping deprecated sauth #%u",
-          sauth->id);
+struct sauth *sauth_pop(struct sauth *sauth) {
+	if(sauth) {
+		if(!sauth->refcount)
+			log(sauth_log, L_warning, "Poping deprecated sauth #%u", sauth->id);
 
-    sauth->refcount++;
-  }
+		sauth->refcount++;
+	}
 
-  return sauth;
+	return sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_push(struct sauth **sauth)
-{
-  if(*sauth)
-  {
-    if((*sauth)->refcount == 0)
-    {
-      log(sauth_log, L_warning, "Trying to push deprecated sauth #%u",
-          (*sauth)->id);
-    }
-    else
-    {
-      if(--(*sauth)->refcount == 0)
-        sauth_delete(*sauth);
+struct sauth *sauth_push(struct sauth **sauth) {
+	if(*sauth) {
+		if((*sauth)->refcount == 0) {
+			log(sauth_log, L_warning, "Trying to push deprecated sauth #%u",
+					(*sauth)->id);
+		} else {
+			if(--(*sauth)->refcount == 0)
+				sauth_delete(*sauth);
 
-      (*sauth) = NULL;
-    }
-  }
+			(*sauth) = NULL;
+		}
+	}
 
-  return *sauth;
+	return *sauth;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_delete(struct sauth *sauth)
-{
-  timer_cancel(&sauth->timer);
+void sauth_delete(struct sauth *sauth) {
+	timer_cancel(&sauth->timer);
 
-  dlink_delete(&sauth_list, &sauth->node);
+	dlink_delete(&sauth_list, &sauth->node);
 
-  mem_static_free(&sauth_heap, sauth);
+	mem_static_free(&sauth_heap, sauth);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_vset_args(struct sauth *sauth, va_list args)
-{
-  sauth->args[0] = va_arg(args, void *);
-  sauth->args[1] = va_arg(args, void *);
-  sauth->args[2] = va_arg(args, void *);
-  sauth->args[3] = va_arg(args, void *);
+void sauth_vset_args(struct sauth *sauth, va_list args) {
+	sauth->args[0] = va_arg(args, void *);
+	sauth->args[1] = va_arg(args, void *);
+	sauth->args[2] = va_arg(args, void *);
+	sauth->args[3] = va_arg(args, void *);
 }
 
-void sauth_set_args(struct sauth *sauth, ...)
-{
-  va_list args;
+void sauth_set_args(struct sauth *sauth, ...) {
+	va_list args;
 
-  va_start(args, sauth);
-  sauth_vset_args(sauth, args);
-  va_end(args);
+	va_start(args, sauth);
+	sauth_vset_args(sauth, args);
+	va_end(args);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_dump(struct sauth *saptr)
-{
-  if(saptr == NULL)
-  {
-    dump(sauth_log, "[================ sauth summary ================]");
+void sauth_dump(struct sauth *saptr) {
+	if(saptr == NULL) {
+		dump(sauth_log, "[================ sauth summary ================]");
 
-    dump(sauth_log, "------------------ dns reverse ------------------");
+		dump(sauth_log, "------------------ dns reverse ------------------");
 
-    dlink_foreach(&sauth_list, saptr)
-    {
-      if(saptr->type == SAUTH_TYPE_DNSR)
-        dump(sauth_log, " #%u: [%u] %-20s (%p)",
-             saptr->id, saptr->refcount, net_ntoa(saptr->addr),
-             saptr->callback);
-    }
+		dlink_foreach(&sauth_list, saptr)
+		{
+			if(saptr->type == SAUTH_TYPE_DNSR)
+				dump(sauth_log, " #%u: [%u] %-20s (%p)", saptr->id,
+						saptr->refcount, net_ntoa(saptr->addr),
+						saptr->callback);
+		}
 
-    dump(sauth_log, "------------------ dns forward ------------------");
+		dump(sauth_log, "------------------ dns forward ------------------");
 
-    dlink_foreach(&sauth_list, saptr)
-    {
-      if(saptr->type == SAUTH_TYPE_DNSF)
-        dump(sauth_log, " #%u: [%u] %-20s (%p)",
-             saptr->id, saptr->refcount, saptr->host,
-             saptr->callback);
-    }
+		dlink_foreach(&sauth_list, saptr)
+		{
+			if(saptr->type == SAUTH_TYPE_DNSF)
+				dump(sauth_log, " #%u: [%u] %-20s (%p)", saptr->id,
+						saptr->refcount, saptr->host, saptr->callback);
+		}
 
-    dump(sauth_log, "---------------------- auth ---------------------");
+		dump(sauth_log, "---------------------- auth ---------------------");
 
-    dlink_foreach(&sauth_list, saptr)
-    {
-      if(saptr->type == SAUTH_TYPE_AUTH)
-        dump(sauth_log, " #%u: [%u] %-20s (%p)",
-             saptr->id, saptr->refcount, net_ntoa(saptr->addr),
-             saptr->callback);
-    }
+		dlink_foreach(&sauth_list, saptr)
+		{
+			if(saptr->type == SAUTH_TYPE_AUTH)
+				dump(sauth_log, " #%u: [%u] %-20s (%p)", saptr->id,
+						saptr->refcount, net_ntoa(saptr->addr),
+						saptr->callback);
+		}
 
-    dump(sauth_log, "[============= end of sauth summary ============]");
-  }
-  else
-  {
-    dump(sauth_log, "[================= sauth dump ==================]");
+		dump(sauth_log, "[============= end of sauth summary ============]");
+	} else {
+		dump(sauth_log, "[================= sauth dump ==================]");
 
-    dump(sauth_log, "         id: #%u", saptr->id);
-    dump(sauth_log, "   refcount: %u", saptr->refcount);
-    dump(sauth_log, "       type: %s",
-         saptr->type == SAUTH_TYPE_DNSR ? "dns reverse" :
-         saptr->type == SAUTH_TYPE_DNSF ? "dns forward" :
-         saptr->type == SAUTH_TYPE_AUTH ? "auth" : "proxy");
-    dump(sauth_log, "     status: %s",
-         saptr->status == SAUTH_DONE ? "done" :
-         saptr->status == SAUTH_ERROR ? "error" : "timed out");
-    dump(sauth_log, "       host: %s", saptr->host);
-    dump(sauth_log, "      ident: %s", saptr->ident);
-    dump(sauth_log, "       addr: %s", net_ntoa(saptr->addr));
-    dump(sauth_log, "    connect: %s", net_ntoa(saptr->connect));
-    dump(sauth_log, "     remote: %u", (uint32_t)saptr->remote);
-    dump(sauth_log, "      local: %u", (uint32_t)saptr->local);
-    dump(sauth_log, "      timer: %i", saptr->timer ? saptr->timer->id : -1);
-    dump(sauth_log, "       args: %p, %p, %p, %p",
-         saptr->args[0], saptr->args[1], saptr->args[2], saptr->args[3]);
-    dump(sauth_log, "   callback: %p", saptr->callback);
+		dump(sauth_log, "         id: #%u", saptr->id);
+		dump(sauth_log, "   refcount: %u", saptr->refcount);
+		dump(sauth_log, "       type: %s",
+				saptr->type == SAUTH_TYPE_DNSR ? "dns reverse" : saptr->type == SAUTH_TYPE_DNSF ? "dns forward" : saptr->type == SAUTH_TYPE_AUTH ? "auth" : "proxy");
+		dump(sauth_log, "     status: %s",
+				saptr->status == SAUTH_DONE ? "done" : saptr->status == SAUTH_ERROR ? "error" : "timed out");
+		dump(sauth_log, "       host: %s", saptr->host);
+		dump(sauth_log, "      ident: %s", saptr->ident);
+		dump(sauth_log, "       addr: %s", net_ntoa(saptr->addr));
+		dump(sauth_log, "    connect: %s", net_ntoa(saptr->connect));
+		dump(sauth_log, "     remote: %u", (uint32_t )saptr->remote);
+		dump(sauth_log, "      local: %u", (uint32_t )saptr->local);
+		dump(sauth_log, "      timer: %i",
+				saptr->timer ? saptr->timer->id : -1);
+		dump(sauth_log, "       args: %p, %p, %p, %p", saptr->args[0],
+				saptr->args[1], saptr->args[2], saptr->args[3]);
+		dump(sauth_log, "   callback: %p", saptr->callback);
 
-    dump(sauth_log, "[============== end of sauth dump ==============]");
-  }
+		dump(sauth_log, "[============== end of sauth dump ==============]");
+	}
 }

@@ -76,23 +76,23 @@
 /* -------------------------------------------------------------------------- *
  * Char attribute table.                                                      *
  * -------------------------------------------------------------------------- */
-extern const uint32_t chars[];
+CHAOS_DATA(const uint32_t) chars[];
 
 /* -------------------------------------------------------------------------- *
  * Check for a valid hostname                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_host(const char *s);
+CHAOS_API(int) chars_valid_host(const char *s);
 /* -------------------------------------------------------------------------- *
  * Check for a valid username                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_user(const char *s);
+CHAOS_API(int) chars_valid_user(const char *s);
 /* -------------------------------------------------------------------------- *
  * Check for a valid nickname                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_nick(const char *s);
+CHAOS_API(int) chars_valid_nick(const char *s);
 /* -------------------------------------------------------------------------- *
  * Check for a valid channelname                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_chan(const char *s);
+CHAOS_API(int) chars_valid_chan(const char *s);
 
 #endif /* CHARS_H */

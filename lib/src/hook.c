@@ -38,110 +38,101 @@ struct timer *hook_timer;
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static struct hook *hook_find(void *function, int type, void *callback)
-{
-  struct node *node;
-  struct hook *hook;
+static struct hook *hook_find(void *function, int type, void *callback) {
+	struct node *node;
+	struct hook *hook;
 
-  dlink_foreach(&hook_list, node)
-  {
-    hook = (struct hook *)node;
+	dlink_foreach(&hook_list, node)
+	{
+		hook = (struct hook *) node;
 
-    if(hook->function == function &&
-       hook->type == type &&
-       hook->callback == callback)
-      return hook;
-  }
+		if(hook->function == function && hook->type == type
+				&& hook->callback == callback)
+			return hook;
+	}
 
-  return NULL;
+	return NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void hook_init()
-{
-  dlink_list_zero(&hook_list);
+void hook_init() {
+	dlink_list_zero(&hook_list);
 
-  mem_static_create(&hook_heap, sizeof(struct hook), HOOK_BLOCK_SIZE);
-  mem_static_note(&hook_heap, "hook heap");
+	mem_static_create(&hook_heap, sizeof(struct hook), HOOK_BLOCK_SIZE);
+	mem_static_note(&hook_heap, "hook heap");
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void hook_shutdown(void)
-{
-  mem_static_destroy(&hook_heap);
+void hook_shutdown(void) {
+	mem_static_destroy(&hook_heap);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct hook *hook_register(void *function, int type, void *callback)
-{
-  struct hook *hook;
+struct hook *hook_register(void *function, int type, void *callback) {
+	struct hook *hook;
 
-  if((hook = hook_find(function, type, callback)))
-    return NULL;
+	if((hook = hook_find(function, type, callback)))
+		return NULL;
 
-  hook = mem_static_alloc(&hook_heap);
+	hook = mem_static_alloc(&hook_heap);
 
-  hook->function = function;
-  hook->type = type;
-  hook->callback = callback;
+	hook->function = function;
+	hook->type = type;
+	hook->callback = callback;
 
-  dlink_add_tail(&hook_list, &hook->node, hook);
+	dlink_add_tail(&hook_list, &hook->node, hook);
 
-  return hook;
-}
-
-
-/* ------------------------------------------------------------------------ *
- * ------------------------------------------------------------------------ */
-int hook_unregister(void *function, int type, void *callback)
-{
-  struct hook *hook;
-
-  hook = hook_find(function, type, callback);
-
-  if(hook == NULL)
-    return -1;
-
-  dlink_delete(&hook_list, &hook->node);
-
-  mem_static_free(&hook_heap, hook);
-
-  return 0;
+	return hook;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int hooks_call(void *function, int type, ...)
-{
-  struct node  *node;
-  struct node  *next;
-  void         *arga[4];
-  va_list       args;
-  struct hook  *hook;
-  int           ret = 0;
+int hook_unregister(void *function, int type, void *callback) {
+	struct hook *hook;
 
-  va_start(args, type);
+	hook = hook_find(function, type, callback);
 
-  arga[0] = va_arg(args, void *);
-  arga[1] = va_arg(args, void *);
-  arga[2] = va_arg(args, void *);
-  arga[3] = va_arg(args, void *);
+	if(hook == NULL)
+		return -1;
 
-  dlink_foreach_safe(&hook_list, node, next)
-  {
-    hook = (struct hook *)node;
+	dlink_delete(&hook_list, &hook->node);
 
-    if(hook->function == function && hook->type == type)
-    {
-      ret += hook->callback(arga[0], arga[1], arga[2], arga[3]);
-    }
-  }
+	mem_static_free(&hook_heap, hook);
 
-  va_end(args);
+	return 0;
+}
 
-  return ret;
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+int hooks_call(void *function, int type, ...) {
+	struct node *node;
+	struct node *next;
+	void *arga[4];
+	va_list args;
+	struct hook *hook;
+	int ret = 0;
+
+	va_start(args, type);
+
+	arga[0] = va_arg(args, void *);
+	arga[1] = va_arg(args, void *);
+	arga[2] = va_arg(args, void *);
+	arga[3] = va_arg(args, void *);
+
+	dlink_foreach_safe(&hook_list, node, next)
+	{
+		hook = (struct hook *) node;
+
+		if(hook->function == function && hook->type == type) {
+			ret += hook->callback(arga[0], arga[1], arga[2], arga[3]);
+		}
+	}
+
+	va_end(args);
+
+	return ret;
 }
 

@@ -64,75 +64,73 @@ struct oper
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int           oper_log;
-extern struct sheap  oper_heap;
-extern struct timer *oper_timer;
-extern struct list   oper_list;
-extern struct dlog  *oper_drain;
+CHAOS_DATA(int          ) oper_log;
+CHAOS_DATA(struct sheap ) oper_heap;
+CHAOS_DATA(struct timer*) oper_timer;
+CHAOS_DATA(struct list  ) oper_list;
+CHAOS_DATA(struct dlog *) oper_drain;
 
 /* -------------------------------------------------------------------------- *
  * Initialize oper heap and add garbage collect timer.                        *
  * -------------------------------------------------------------------------- */
-extern void         oper_init             (void);
+CHAOS_API(void) opera_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy oper heap and cancel timer.                                        *
  * -------------------------------------------------------------------------- */
-extern void         oper_shutdown         (void);
+CHAOS_API(void) opera_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         oper_default          (struct oper   *optr);
+CHAOS_API(void) opera_default(struct oper *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_add              (const char    *name,
-                                           const char    *passwd,
-                                           struct class  *clptr,
-                                           int            level,
-                                           uint64_t       sources,
-                                           uint32_t       flags);
+CHAOS_API(struct oper*) opera_add (const char *name,
+		const char *passwd,
+		struct class *clptr,
+		int level,
+		uint64_t sources,
+		uint32_t flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int          oper_update           (struct oper   *optr,
-                                           const char    *passwd,
-                                           struct class  *clptr,
-                                           int            level,
-                                           uint64_t       sources,
-                                           uint32_t       flags);
+CHAOS_API(int) opera_update (struct oper *optr,
+		const char *passwd,
+		struct class *clptr,
+		int level,
+		uint64_t sources,
+		uint32_t flags);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         oper_delete           (struct oper   *optr);
+CHAOS_API(void) opera_delete(struct oper *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_find             (const char    *name);
+CHAOS_API(struct oper*) opera_find(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         oper_up               (struct oper   *optr,
-                                           struct client *sptr);
+CHAOS_API(void) opera_up(struct oper *optr, struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         oper_down             (struct oper   *optr,
-                                           struct client *sptr);
+CHAOS_API(void) opera_down(struct oper *optr, struct client *sptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_pop              (struct oper   *optr);
+CHAOS_API(struct oper*) opera_pop(struct oper *optr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct oper *oper_push             (struct oper  **optr);
+CHAOS_API(struct oper*) opera_push(struct oper **optr);
 
 /* -------------------------------------------------------------------------- *
  * Dump opers and oper heap.                                                  *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-extern void         oper_dump             (void);
+CHAOS_API(void) opera_dump (void);
 #endif /* DEBUG */
 
 #endif /* SRC_OPER_H */

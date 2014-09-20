@@ -28,51 +28,43 @@
 
 //#include "dlfcn_win32.h"
 
-static void dl_convert_path(char *buf, size_t n, const char *path)
-{
-  while(--n)
-  {
-    *buf++ = (*path == '/' ? '\\' : *path);
-    path++;
-  }
+static void dl_convert_path(char *buf, size_t n, const char *path) {
+	while(--n) {
+		*buf++ = (*path == '/' ? '\\' : *path);
+		path++;
+	}
 
-  *buf = '\0';
+	*buf = '\0';
 }
 
-void *dlopen(const char *filename, int flag)
-{
-  void *handle;
-  char path[MAX_PATH];
+void *dlopen(const char *filename, int flag) {
+	void *handle;
+	char path[MAX_PATH];
 
-  dl_convert_path(path, MAX_PATH, filename);
+	dl_convert_path(path, MAX_PATH, filename);
 
-  return LoadLibrary(path);
+	return LoadLibrary(path);
 }
 
-void *dlsym(void *handle, const char *symbol)
-{
-  return GetProcAddress(handle, symbol);
+void *dlsym(void *handle, const char *symbol) {
+	return GetProcAddress(handle, symbol);
 }
 
-void dlclose(void *handle)
-{
-  FreeLibrary(handle);
+void dlclose(void *handle) {
+	FreeLibrary(handle);
 }
 
-const char *dlerror()
-{
-  static char msg[256];
-  DWORD error = GetLastError();
+const char *dlerror() {
+	static char msg[256];
+	DWORD error = GetLastError();
 
-  if(error == 0)
-    return NULL;
+	if(error == 0)
+		return NULL;
 
-  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, error,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR)msg, sizeof(msg), NULL);
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+	NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) msg,
+			sizeof(msg), NULL);
 
-  SetLastError(0);
-  return msg;
+	SetLastError(0);
+	return msg;
 }

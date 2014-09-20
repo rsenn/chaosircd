@@ -55,66 +55,66 @@ IRCD_API(int) class_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize class heap and add garbage collect timer.                       *
  * -------------------------------------------------------------------------- */
-extern void          class_init             (void);
+extern void class_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Destroy class heap and cancel timer.                                       *
  * -------------------------------------------------------------------------- */
-extern void          class_shutdown         (void);
+extern void class_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void          class_default          (struct class    *clptr);
+extern void class_default (struct class *clptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct class *class_add              (const char    *name,
-                                             uint64_t       ping_freq,
-                                             uint32_t       max_clients,
-                                             uint32_t       clients_per_ip,
-                                             uint32_t       recvq,
-                                             uint32_t       sendq,
-                                             uint32_t       flood_trigger,
-                                             uint64_t       flood_interval,
-                                             uint32_t       throttle_trigger,
-                                             uint64_t       throttle_interval);
+extern struct class *class_add (const char *name,
+		uint64_t ping_freq,
+		uint32_t max_clients,
+		uint32_t clients_per_ip,
+		uint32_t recvq,
+		uint32_t sendq,
+		uint32_t flood_trigger,
+		uint64_t flood_interval,
+		uint32_t throttle_trigger,
+		uint64_t throttle_interval);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern int           class_update           (struct class  *clptr,
-                                             uint64_t       ping_freq,
-                                             uint32_t       max_clients,
-                                             uint32_t       clients_per_ip,
-                                             uint32_t       recvq,
-                                             uint32_t       sendq,
-                                             uint32_t       flood_trigger,
-                                             uint64_t       flood_interval,
-                                             uint32_t       throttle_trigger,
-                                             uint64_t       throttle_interval);
+extern int class_update (struct class *clptr,
+		uint64_t ping_freq,
+		uint32_t max_clients,
+		uint32_t clients_per_ip,
+		uint32_t recvq,
+		uint32_t sendq,
+		uint32_t flood_trigger,
+		uint64_t flood_interval,
+		uint32_t throttle_trigger,
+		uint64_t throttle_interval);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void          class_delete           (struct class  *clptr);
+extern void class_delete (struct class *clptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct class *class_find_name        (const char    *name);
+extern struct class *class_find_name (const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct class *class_find_id          (uint32_t       id);
+extern struct class *class_find_id (uint32_t id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct class *class_pop              (struct class  *clptr);
+extern struct class *class_pop (struct class *clptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct class *class_push             (struct class **clptr);
+extern struct class *class_push (struct class **clptr);
 
 /* -------------------------------------------------------------------------- *
  * Dump classes and class heap.                                               *
  * -------------------------------------------------------------------------- */
-extern void          class_dump             (struct class  *clptr);
+extern void class_dump (struct class *clptr);
 
 #endif /* SRC_CLASS_H */

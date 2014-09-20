@@ -87,10 +87,10 @@ struct config {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct config conf_current;
-extern struct config conf_new;
-extern int           conf_fd;
-extern int           conf_log;
+CHAOS_API(struct config) conf_current;
+CHAOS_API(struct config) conf_new;
+CHAOS_API(int          ) conf_fd;
+CHAOS_API(int          ) conf_log;
 
 /* -------------------------------------------------------------------------- *
  * some declarations for flex/bison                                           *
@@ -107,7 +107,7 @@ extern char linebuf[IRCD_BUFSIZE];
 /* exporting to parser */
 extern int           yydebug;
 extern struct global globalopts;
-extern int           conf_fd;
+CHAOS_API(int          ) conf_fd;
 extern void          yyerror(char *);
 extern int           yyparse(void);
 extern void          yy_fatal_error(const char *);
@@ -121,44 +121,41 @@ extern void          yy_fatal_error(const char *);
 
 //#define isatty(x) 0
 
-
 /* -------------------------------------------------------------------------- *
  * Getopt and configfile coldstart.                                           *
  * -------------------------------------------------------------------------- */
-extern void               conf_init         (int            argc,
-                                             char         **argv,
-                                             char         **envp);
+CHAOS_API(void) conf_init(int argc, char **argv, char **envp);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown config code.                                                      *
  * -------------------------------------------------------------------------- */
-extern void               conf_shutdown     (void);
+CHAOS_API(void) conf_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Read the config file(s).                                                   *
  * -------------------------------------------------------------------------- */
-extern void               conf_read         (void);
+CHAOS_API(void) conf_read(void);
 
 /* -------------------------------------------------------------------------- *
  * This is called when a config file is read successfully.                    *
  * -------------------------------------------------------------------------- */
-extern void               conf_done         (void);
+CHAOS_API(void) conf_done(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void               conf_rehash       (void);
+CHAOS_API(void) conf_rehash(void);
 
 /* -------------------------------------------------------------------------- *
  * Dump a config structure.                                                   *
  * -------------------------------------------------------------------------- */
 #ifdef DEBUG
-extern void               conf_dump         (struct config *cfgptr);
+CHAOS_API(void) conf_dump (struct config *cfgptr);
 #endif /* DEBUG */
 
 /* -------------------------------------------------------------------------- *
  * Bison parser error functions.                                              *
  * -------------------------------------------------------------------------- */
-extern void conf_yy_error  (char     *msg);
-extern int  conf_yy_fatal  (char     *msg);
+CHAOS_API(void) conf_yy_error(char *msg);
+CHAOS_API(int) conf_yy_fatal(char *msg);
 
 #endif /* __CONF_H */

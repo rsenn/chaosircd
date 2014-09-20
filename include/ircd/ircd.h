@@ -111,13 +111,13 @@
 #define IRCD_API(type) type
 #endif
 
-extern int         ircd_log;
-extern int         ircd_log_in;
-extern int         ircd_log_out;
-extern const char *ircd_package;
-extern const char *ircd_version;
-extern const char *ircd_release;
-extern struct list ircd_support;
+CHAOS_API(int        ) ircd_log;
+CHAOS_API(int        ) ircd_log_in;
+CHAOS_API(int        ) ircd_log_out;
+CHAOS_API(const char*) ircd_package;
+CHAOS_API(const char*) ircd_version;
+CHAOS_API(const char*) ircd_release;
+CHAOS_API(struct list) ircd_support;
 
 typedef enum {
    false = 0,
@@ -156,47 +156,47 @@ IRCD_API(void) ircd_loop(void);
 /* -------------------------------------------------------------------------- *
  * Assemble uptime string                                                     *
  * -------------------------------------------------------------------------- */
-extern const char     *ircd_uptime       (void);
+CHAOS_API(const char*) ircd_uptime(void);
 
 /* -------------------------------------------------------------------------- *
  * Garbage collect.                                                           *
  * -------------------------------------------------------------------------- */
-extern void            ircd_collect      (void);
+CHAOS_API(void) ircd_collect(void);
 
 /* -------------------------------------------------------------------------- *
  * Restart the daemon.                                                        *
  * -------------------------------------------------------------------------- */
-extern int             ircd_restart      (void);
+CHAOS_API(int) ircd_restart(void);
 
 /* -------------------------------------------------------------------------- *
  * Clean things up.                                                           *
  * -------------------------------------------------------------------------- */
-extern void            ircd_shutdown     (void);
+CHAOS_API(void) ircd_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * Add a new support value                                                    *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_new  (void);
+CHAOS_API(struct support*) ircd_support_new(void);
 
 /* -------------------------------------------------------------------------- *
  * Find a support entry by name                                               *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_find (const char *name);
+CHAOS_API(struct support*) ircd_support_find(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Unset a support value                                                      *
  * -------------------------------------------------------------------------- */
-extern void            ircd_support_unset(const char *name);
+CHAOS_API(void) ircd_support_unset(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * Set a support value                                                        *
  * -------------------------------------------------------------------------- */
-extern struct support *ircd_support_set  (const char *name,
-                                          const char *value, ...);
+CHAOS_API(struct support*) ircd_support_set(const char *name, const char *value,
+		...);
 
 /* -------------------------------------------------------------------------- *
  * Show support numeric to a client                                           *
  * -------------------------------------------------------------------------- */
-extern void            ircd_support_show (struct client *cptr);
+CHAOS_API(void) ircd_support_show(struct client *cptr);
 
 #endif /* SRC_IRCD_H */

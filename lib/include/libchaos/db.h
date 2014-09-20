@@ -41,125 +41,121 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct db_result
-{
-  struct db  *db;
-  union
-  {
+struct db_result {
+	struct db *db;
+	union {
 #ifdef HAVE_PGSQL
-    PGresult  *pg;
+		PGresult *pg;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-    MYSQL_RES *my;
+		MYSQL_RES *my;
 #endif /* HAVE_MYSQL */
-    void      *common;
-  } res;
+		void *common;
+	} res;
 
-  uint64_t    row;
-  uint64_t    rows;
-  uint32_t    fields;
-  char      **data;
-  char      **fdata;
+	uint64_t row;
+	uint64_t rows;
+	uint32_t fields;
+	char **data;
+	char **fdata;
 };
 
-struct db
-{
-  struct node              node;
-  uint32_t                 id;
-  uint32_t                 refcount;
-  int                      type;
+struct db {
+	struct node node;
+	uint32_t id;
+	uint32_t refcount;
+	int type;
 
-  union
-  {
+	union {
 #ifdef HAVE_SQLITE
-    sqlite3               *sq;
+		sqlite3 *sq;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_PGSQL
-    PGconn                *pg;
+		PGconn *pg;
 #endif /* HAVE_PGSQL */
 #ifdef HAVE_MYSQL
-    MYSQL                 *my;
+		MYSQL *my;
 #endif /* HAVE_MYSQL */
-    void                  *common;
-  } handle;
-  uint64_t                 affected_rows;
-  int                     error;
-  char                     errormsg[256];
+		void *common;
+	} handle;
+	uint64_t affected_rows;
+	int error;
+	char errormsg[256];
 };
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA(int)                 db_log;
-CHAOS_DATA(struct sheap)        db_heap;
-CHAOS_DATA(struct list)         db_list;
-CHAOS_DATA(uint32_t)            db_serial;
+CHAOS_DATA(int) db_log;
+CHAOS_DATA(struct sheap) db_heap;
+CHAOS_DATA(struct list) db_list;
+CHAOS_DATA(uint32_t) db_serial;
 
 /* ------------------------------------------------------------------------ *
  * Initialize DB heap                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                db_init              (void);
+CHAOS_API(void) db_init (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB heap                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                db_shutdown          (void);
+CHAOS_API(void) db_shutdown (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB instance                                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                db_destroy           (struct db  *db);
+CHAOS_API(void) db_destroy (struct db *db);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct db*)         db_new               (int         type);
+CHAOS_API(struct db*) db_new (int type);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)                 db_connect           (struct db  *db,
-                                                 const char* host,
-                                                 const char* user,
-                                                 const char* pass,
-                                                 const char* dbname);
+CHAOS_API(int) db_connect (struct db *db,
+		const char* host,
+		const char* user,
+		const char* pass,
+		const char* dbname);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct db_result*)   db_query             (struct db  *db,
-                                                 const char *format,
-                                                 ...);
+CHAOS_API(struct db_result*) db_query (struct db *db,
+		const char *format,
+		...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                db_close             (struct db  *db);
+CHAOS_API(void) db_close (struct db *db);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t)              db_escape_string     (struct db *db,
-                                                 char* to,
-                                                 const char *from,
-                                                 size_t      len);
+CHAOS_API(size_t) db_escape_string (struct db *db,
+		char* to,
+		const char *from,
+		size_t len);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char*)              db_escape_string_dup     (struct db *db,
-                                                 const char *from);
+CHAOS_API(char*) db_escape_string_dup (struct db *db,
+		const char *from);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                db_free_result       (struct db_result *result);
+CHAOS_API(void) db_free_result (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char**)              db_fetch_row         (struct db_result *result);
+CHAOS_API(char**) db_fetch_row (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint64_t)            db_num_rows          (struct db_result *result);
+CHAOS_API(uint64_t) db_num_rows (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint32_t)            db_num_fields        (struct db_result *result);
+CHAOS_API(uint32_t) db_num_fields (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(uint64_t)            db_affected_rows     (struct db *db);
+CHAOS_API(uint64_t) db_affected_rows (struct db *db);
 
 #endif /* LIB_DB_H */

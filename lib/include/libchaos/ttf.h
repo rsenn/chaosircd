@@ -111,159 +111,158 @@ CHAOS_DATA(int)           ttf_dirty;
 /* ------------------------------------------------------------------------ *
  * Initialize ttf heap and add garbage collect timer.                        *
  * ------------------------------------------------------------------------ */
-extern void              ttf_init            (void);
+CHAOS_API(void) ttf_init (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy ttf heap and cancel timer.                                        *
  * ------------------------------------------------------------------------ */
-extern void              ttf_shutdown        (void);
+CHAOS_API(void) ttf_shutdown (void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-extern int               ttf_collect         (void);
+CHAOS_API(int) ttf_collect (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void              ttf_default         (struct ttf      *iptr);
+CHAOS_API(void) ttf_default (struct ttf *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct ttf       *ttf_new             (const char      *name);
+CHAOS_API(struct ttf*) ttf_new (const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern int               ttf_open            (struct ttf      *ttf,
-                                              const char      *path);
+CHAOS_API(int) ttf_open (struct ttf *ttf,
+		const char *path);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern int               ttf_load            (struct ttf      *ttf,
-                                              void            *data,
-                                              size_t           len);
+CHAOS_API(int) ttf_load (struct ttf *ttf,
+		void *data,
+		size_t len);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct ttf       *ttf_new             (const char      *name);
-
-
-/* ------------------------------------------------------------------------ *
- * ------------------------------------------------------------------------ */
-extern int               ttf_calc            (struct ttf      *ttf,
-                                              int              ptsize,
-                                              int              style);
+CHAOS_API(struct ttf*) ttf_new (const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_glyph_solid     (struct ttf      *ttf,
-                                              uint16_t         ch,
-                                              struct color    *c);
+CHAOS_API(int) ttf_calc (struct ttf *ttf,
+		int ptsize,
+		int style);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern uint32_t          ttf_glyph_width     (struct ttf      *ttf,
-                                              uint16_t         ch);
+CHAOS_API(struct image*) ttf_glyph_solid (struct ttf *ttf,
+		uint16_t ch,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_unicode_solid   (struct ttf      *ttf,
-                                              const uint16_t  *text,
-                                              struct color    *c);
+CHAOS_API(uint32_t) ttf_glyph_width (struct ttf *ttf,
+		uint16_t ch);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_text_solid      (struct ttf      *ttf,
-                                              const char      *text,
-                                              struct color    *c);
+CHAOS_API(struct image*) ttf_unicode_solid (struct ttf *ttf,
+		const uint16_t *text,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_utf8_solid      (struct ttf      *ttf,
-                                              const char      *utf8,
-                                              struct color    *c);
+CHAOS_API(struct image*) ttf_text_solid (struct ttf *ttf,
+		const char *text,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_glyph_shaded    (struct ttf      *ttf,
-                                              uint16_t         ch,
-                                              struct color    *bg,
-                                              struct color    *fg);
+CHAOS_API(struct image*) ttf_utf8_solid (struct ttf *ttf,
+		const char *utf8,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_unicode_shaded  (struct ttf      *ttf,
-                                              const uint16_t  *text,
-                                              struct color    *bg,
-                                              struct color    *fg);
+CHAOS_API(struct image*) ttf_glyph_shaded (struct ttf *ttf,
+		uint16_t ch,
+		struct color *bg,
+		struct color *fg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_text_shaded     (struct ttf      *ttf,
-                                              const char      *text,
-                                              struct color    *bg,
-                                              struct color    *fg);
+CHAOS_API(struct image*) ttf_unicode_shaded (struct ttf *ttf,
+		const uint16_t *text,
+		struct color *bg,
+		struct color *fg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_utf8_shaded     (struct ttf      *ttf,
-                                              const char      *utf8,
-                                              struct color    *bg,
-                                              struct color    *fg);
+CHAOS_API(struct image*) ttf_text_shaded (struct ttf *ttf,
+		const char *text,
+		struct color *bg,
+		struct color *fg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_glyph_blended    (struct ttf     *ttf,
-                                               uint16_t        ch,
-                                               struct color   *c);
+CHAOS_API(struct image*) ttf_utf8_shaded (struct ttf *ttf,
+		const char *utf8,
+		struct color *bg,
+		struct color *fg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_unicode_blended  (struct ttf     *ttf,
-                                               const uint16_t *ch,
-                                               struct color   *c);
+CHAOS_API(struct image*) ttf_glyph_blended (struct ttf *ttf,
+		uint16_t ch,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_text_blended     (struct ttf     *ttf,
-                                               const char     *text,
-                                               struct color   *c);
+CHAOS_API(struct image*) ttf_unicode_blended (struct ttf *ttf,
+		const uint16_t *ch,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct image     *ttf_utf8_blended     (struct ttf     *ttf,
-                                               const char     *utf8,
-                                               struct color   *c);
+CHAOS_API(struct image*) ttf_text_blended (struct ttf *ttf,
+		const char *text,
+		struct color *c);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void              ttf_delete          (struct ttf      *iptr);
+CHAOS_API(struct image*) ttf_utf8_blended (struct ttf *ttf,
+		const char *utf8,
+		struct color *c);
+
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+CHAOS_API(void) ttf_delete (struct ttf *iptr);
 
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
-extern void              ttf_release         (struct ttf      *iptr);
+CHAOS_API(void) ttf_release (struct ttf *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void              ttf_set_name        (struct ttf      *iptr,
-                                              const char      *name);
+CHAOS_API(void) ttf_set_name (struct ttf *iptr,
+		const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern const char       *ttf_get_name        (struct ttf      *iptr);
+CHAOS_API(const char*) ttf_get_name (struct ttf *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct ttf       *ttf_find_name       (const char      *name);
+CHAOS_API(struct ttf*) ttf_find_name (const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct ttf       *ttf_find_id         (uint32_t         id);
+CHAOS_API(struct ttf*) ttf_find_id (uint32_t id);
 
 /* ------------------------------------------------------------------------ *
  * Dump ttfers and ttf heap.                                            *
  * ------------------------------------------------------------------------ */
-extern void              ttf_dump            (struct ttf      *iptr);
+CHAOS_API(void) ttf_dump (struct ttf *iptr);
 
 #endif /* HAVE_FT2 */
 

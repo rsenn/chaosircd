@@ -60,50 +60,50 @@ CHAOS_API(int) mfile_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Initialize mfile heap.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          mfile_init      (void);
+CHAOS_API(void) mfile_init(void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy mfile heap.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          mfile_shutdown  (void);
+CHAOS_API(void) mfile_shutdown(void);
 
 /* ------------------------------------------------------------------------ *
  * Add a mfile.                                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_add       (const char    *path);
+CHAOS_API(struct mfile *)mfile_add (const char *path);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)           mfile_update    (struct mfile  *mfile);
+CHAOS_API(int) mfile_update(struct mfile *mfile);
 
 /* ------------------------------------------------------------------------ *
  * Remove a mfile.                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          mfile_delete    (struct mfile *mfile);
+CHAOS_API(void) mfile_delete(struct mfile *mfile);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_find_path (const char    *path);
+CHAOS_API(struct mfile *)mfile_find_path (const char *path);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_find_name (const char    *name);
+CHAOS_API(struct mfile *)mfile_find_name (const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_find_id   (uint32_t       id);
+CHAOS_API(struct mfile *)mfile_find_id (uint32_t id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_pop       (struct mfile  *mfile);
+CHAOS_API(struct mfile *)mfile_pop (struct mfile *mfile);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct mfile *)mfile_push      (struct mfile **mfileptr);
+CHAOS_API(struct mfile *)mfile_push (struct mfile **mfileptr);
 
 /* ------------------------------------------------------------------------ *
  * Dump mfiles.                                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)          mfile_dump     (struct mfile   *mfptr);
+CHAOS_API(void) mfile_dump(struct mfile *mfptr);
 
 #endif /* LIB_MFILE_H */

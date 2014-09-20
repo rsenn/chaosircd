@@ -73,62 +73,59 @@ static struct dlog *servauth_drain;
 /* -------------------------------------------------------------------------- *
  * Initialize things.                                                         *
  * -------------------------------------------------------------------------- */
-void servauth_init(void)
-{
+void servauth_init(void) {
 //  log_init(0, 0, 0);
-  
-  mem_init();
-  timer_init();
-  queue_init();
-  dlink_init();
-  connect_init();
-  db_init();
 
-  log_init(1, LOG_ALL, L_debug);
+	mem_init();
+	timer_init();
+	queue_init();
+	dlink_init();
+	connect_init();
+	db_init();
+
+	log_init(1, LOG_ALL, L_debug);
 
 #ifdef SIGPIPE
-  syscall_signal(SIGPIPE, SIG_IGN);
+	syscall_signal(SIGPIPE, SIG_IGN);
 #endif /* SIGPIPE */
 
-  servauth_log = log_source_register("servauth");
+	servauth_log = log_source_register("servauth");
 
-  servauth_drain = log_drain_open("servauth.log", LOG_ALL, L_debug, 1, 1);
+	servauth_drain = log_drain_open("servauth.log", LOG_ALL, L_debug, 1, 1);
 
-  log(servauth_log, L_status, "Done initialising ircd library");
+	log(servauth_log, L_status, "Done initialising ircd library");
 }
 
 /* -------------------------------------------------------------------------- *
  * Clean things up.                                                           *
  * -------------------------------------------------------------------------- */
-void servauth_shutdown(void)
-{
-  log(servauth_log, L_status, "Shutting down libircd...");
+void servauth_shutdown(void) {
+	log(servauth_log, L_status, "Shutting down libircd...");
 
-  connect_shutdown();
-  io_shutdown();
-  queue_shutdown();
-  dlink_shutdown();
-  mem_shutdown();
-  log_shutdown();
-  timer_shutdown();
+	connect_shutdown();
+	io_shutdown();
+	queue_shutdown();
+	dlink_shutdown();
+	mem_shutdown();
+	log_shutdown();
+	timer_shutdown();
 
-  log_source_unregister(servauth_log);
+	log_source_unregister(servauth_log);
 
-  syscall_exit(0);
+	syscall_exit(0);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void servauth_collect(void)
-{
-  connect_collect();
-  dlink_collect();
-  log_collect();
-  timer_collect();
+void servauth_collect(void) {
+	connect_collect();
+	dlink_collect();
+	log_collect();
+	timer_collect();
 
-  log_source_unregister(servauth_log);
+	log_source_unregister(servauth_log);
 
-  exit(0);
+	exit(0);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -137,116 +134,111 @@ void servauth_collect(void)
 #ifdef DEBUG
 void servauth_dump(void)
 {
-  debug(servauth_log, "--- sauth complete dump ---");
+	debug(servauth_log, "--- sauth complete dump ---");
 
-  connect_dump(NULL);
-/*  log_dump(NULL);*/
-  timer_dump(NULL);
-/*  queue_dump(NULL);*/
-  dlink_dump();
+	connect_dump(NULL);
+	/*  log_dump(NULL);*/
+	timer_dump(NULL);
+	/*  queue_dump(NULL);*/
+	dlink_dump();
 
-  debug(servauth_log, "--- end of sauth complete dump ---");
+	debug(servauth_log, "--- end of sauth complete dump ---");
 }
 #endif /* DEBUG */
 
 /* -------------------------------------------------------------------------- *
  * Loop around some timer stuff and the i/o multiplexer.                      *
  * -------------------------------------------------------------------------- */
-void servauth_loop(void)
-{
-  int ret = 0;
-  int64_t *timeout;
-  int64_t remain = 0LL;
+void servauth_loop(void) {
+	int ret = 0;
+	int64_t *timeout;
+	int64_t remain = 0LL;
 
-  while(ret >= 0)
-  {
-    /* Calculate timeout value */
-    timeout = timer_timeout();
+	while(ret >= 0) {
+		/* Calculate timeout value */
+		timeout = timer_timeout();
 
-    /* Do I/O multiplexing and event handling */
+		/* Do I/O multiplexing and event handling */
 #ifdef USE_POLL
-    ret = io_poll(&remain, timeout);
+		ret = io_poll(&remain, timeout);
 #else
-    ret = io_select(&remain, timeout);
+		ret = io_select(&remain, timeout);
 #endif /* USE_SELECT | USE_POLL */
 
-    /* Remaining time is 0msecs, we need to run a timer */
-    if(remain == 0LL)
-      timer_run();
+		/* Remaining time is 0msecs, we need to run a timer */
+		if(remain == 0LL)
+			timer_run();
 
-    if(timeout)
-      timer_drift(*timeout - remain);
+		if(timeout)
+			timer_drift(*timeout - remain);
 
-    io_handle();
-  }
+		io_handle();
+	}
 }
 
 /* -------------------------------------------------------------------------- *
  * Program entry.                                                             *
  * -------------------------------------------------------------------------- */
-int main(int argc, char *argv[])
-{
-  int i, j;
-  int recvfd = 0, sendfd = 1;
-  net_addr_t localhost = net_addr_loopback;
+int main(int argc, char *argv[]) {
+	int i, j;
+	int recvfd = 0, sendfd = 1;
+	net_addr_t localhost = net_addr_loopback;
 
-  /* get control connection */
-  if(argc >= 2)
-    recvfd = str_tol(argv[1], NULL, 10);
+	/* get control connection */
+	if(argc >= 2)
+		recvfd = str_tol(argv[1], NULL, 10);
 
-  if(argc >= 3)
-    sendfd = str_tol(argv[2], NULL, 10);
+	if(argc >= 3)
+		sendfd = str_tol(argv[2], NULL, 10);
 
-  io_init_except(recvfd, sendfd, -1);
+	io_init_except(recvfd, sendfd, -1);
 
-  if(recvfd == sendfd)
-  {
-    /* socketpair() */
-    io_new(recvfd, FD_SOCKET);
-  }
-  else
-  {
-    /* 2x pipe() */
-    io_new(recvfd, FD_PIPE);
-    io_new(sendfd, FD_PIPE);
-  }
+	if(recvfd == sendfd) {
+		/* socketpair() */
+		io_new(recvfd, FD_SOCKET);
+	} else {
+		/* 2x pipe() */
+		io_new(recvfd, FD_PIPE);
+		io_new(sendfd, FD_PIPE);
+	}
 
-  /* initialize library */
-  servauth_init();
+	/* initialize library */
+	servauth_init();
 
-  /* Make sure we are running under hybrid.. */
-/*  if(str_ncmp(argv[0], "-sauth", 6))
-    sauth_usage();*/
+	/* Make sure we are running under hybrid.. */
+	/*  if(str_ncmp(argv[0], "-sauth", 6))
+	 sauth_usage();*/
 
-  /* clear argv */
-  for(i = 1; i < argc; i++)
-    for(j = 0; argv[i][j]; j++)
-      argv[i][j] = '\0';
+	/* clear argv */
+	for(i = 1; i < argc; i++)
+		for(j = 0; argv[i][j]; j++)
+			argv[i][j] = '\0';
 
-  /* set file descriptor to nonblocking mode */
-/*  io_nonblock(recvfd);
-  io_nonblock(sendfd);*/
+	/* set file descriptor to nonblocking mode */
+	/*  io_nonblock(recvfd);
+	 io_nonblock(sendfd);*/
 
-  /* initialize dns client */
-  dns_init();
-  dns_updatedb();
+	/* initialize dns client */
+	dns_init();
+	dns_updatedb();
 
-  /* initialize caches */
-  cache_auth_new(&servauth_authcache, CACHE_AUTH_SIZE);
-  cache_dns_new(&servauth_dnscache, CACHE_DNS_SIZE);
-  cache_proxy_new(&servauth_proxycache, CACHE_PROXY_SIZE);
+	/* initialize caches */
+	cache_auth_new(&servauth_authcache, CACHE_AUTH_SIZE);
+	cache_dns_new(&servauth_dnscache, CACHE_DNS_SIZE);
+	cache_proxy_new(&servauth_proxycache, CACHE_PROXY_SIZE);
 
-  cache_dns_put(&servauth_dnscache, CACHE_DNS_REVERSE, localhost, "localhost", (uint64_t)-1LL);
+	cache_dns_put(&servauth_dnscache, CACHE_DNS_REVERSE, localhost, "localhost",
+			(uint64_t) -1LL);
 
-  /* initialize control connection */
-  control_init(&servauth_control, recvfd, sendfd);
+	/* initialize control connection */
+	control_init(&servauth_control, recvfd, sendfd);
 
-  /* clear query structs */
-  memset(servauth_queries, 0, sizeof(servauth_queries));
+	/* clear query structs */
+	memset(servauth_queries, 0, sizeof(servauth_queries));
 
-  /* enter io loop */
-  servauth_loop();
+	/* enter io loop */
+	servauth_loop();
 
-  /* NOTREACHED */
-  return(0);
+	/* NOTREACHED */
+	return (0);
 }

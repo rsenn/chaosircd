@@ -44,116 +44,104 @@ struct channel;
 struct invite;
 
 typedef void (service_callback_t)(struct lclient *, struct client *,
-                                  struct channel *, const char *msg);
+		struct channel *, const char *msg);
 
 struct service_handler {
-  struct node         node;
-  char                name[32];
-  hash_t              hash;
-  service_callback_t *callback;
+	struct node node;
+	char name[32];
+	hash_t hash;
+	service_callback_t *callback;
 };
 
 struct service {
-  struct node    node;          /* node for service_list */
-  struct node    hnode;         /* node for service_lists[] */
-  uint32_t       id;            /* a unique id */
-  uint32_t       refcount;      /* how many times this block is referenced */
-  hash_t         nhash;
-  hash_t         uhash;
-  struct client *client;
-  struct user   *user;
-  struct list    handlers;
-  char           name[IRCD_NICKLEN + 1];
+	struct node node; /* node for service_list */
+	struct node hnode; /* node for service_lists[] */
+	uint32_t id; /* a unique id */
+	uint32_t refcount; /* how many times this block is referenced */
+	hash_t nhash;
+	hash_t uhash;
+	struct client *client;
+	struct user *user;
+	struct list handlers;
+	char name[IRCD_NICKLEN + 1];
 };
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-extern int              service_log;      /* service log source */
-extern struct sheap     service_heap;     /* heap for lclient_t */
-extern struct list      service_list;     /* list with all of them */
-extern uint32_t         service_id;
+IRCD_DATA(int) service_log; /* service log source */
+IRCD_DATA(struct sheap) service_heap; /* heap for lclient_t */
+IRCD_DATA(struct list) service_list; /* list with all of them */
+IRCD_DATA(uint32_t) service_id;
 
 /* -------------------------------------------------------------------------- *
  * Initialize service module.                                                    *
  * -------------------------------------------------------------------------- */
-extern void             service_init         (void);
+IRCD_API(void) service_init(void);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown the service module.                                                  *
  * -------------------------------------------------------------------------- */
-extern void             service_shutdown     (void);
+IRCD_API(void) service_shutdown(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             service_collect      (void);
+IRCD_API(void) service_collect(void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct service  *service_new          (const char     *name,
-                                              const char     *user,
-                                              const char     *host,
-                                              const char     *info);
+IRCD_API(struct service*) service_new(const char *name, const char *user,
+		const char *host, const char *info);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             service_delete       (struct service *svptr);
+IRCD_API(void) service_delete(struct service *svptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct service  *service_find_id      (uint32_t        id);
+IRCD_API(struct service*) service_find_id(uint32_t id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct service  *service_find_uid     (const char     *uid);
+IRCD_API(struct service*) service_find_uid(const char *uid);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct service  *service_find_name    (const char     *name);
+IRCD_API(struct service*) service_find_name(const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             service_set_name     (struct service *svptr,
-                                              const char     *name);
+IRCD_API(void) service_set_name(struct service *svptr, const char *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service_handler *service_register     (struct service     *svptr,
-                                              const char         *msg,
-                                              service_callback_t *callback);
+struct service_handler *service_register(struct service *svptr, const char *msg,
+		service_callback_t *callback);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void                    service_vhandle      (struct service     *svptr,
-                                              struct lclient     *lcptr,
-                                              struct client      *cptr,
-                                              struct channel     *chptr,
-                                              const char         *cmd,
-                                              const char         *format,
-                                              va_list             args);
+void service_vhandle(struct service *svptr, struct lclient *lcptr,
+		struct client *cptr, struct channel *chptr, const char *cmd,
+		const char *format, va_list args);
 
-void                    service_handle       (struct service     *svptr,
-                                              struct lclient     *lcptr,
-                                              struct client      *cptr,
-                                              struct channel     *chptr,
-                                              const char         *cmd,
-                                              const char         *format,
-                                              ...);
+void service_handle(struct service *svptr, struct lclient *lcptr,
+		struct client *cptr, struct channel *chptr, const char *cmd,
+		const char *format, ...);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             service_release      (struct service *svptr);
+IRCD_API(void) service_release(struct service *svptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct service  *service_pop          (struct service *svptr);
+IRCD_API(struct service*) service_pop(struct service *svptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct service  *service_push         (struct service **ucptrptr);
+IRCD_API(struct service*) service_push(struct service **ucptrptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void             service_dump         (struct service  *svptr);
+IRCD_API(void) service_dump(struct service *svptr);
 
 #endif /* SRC_SERVICE_H */
