@@ -16,6 +16,8 @@ AC_ARG_ENABLE([werror],
   yes) ac_cv_werror=yes ;;
 esac])
 
+WARNFLAGS="$WARNFLAGS -Wno-unused"
+
 # set -Werror compoiler flag
 if test "$ac_cv_werror" = "yes"; then
   WARNFLAGS="$WARNFLAGS -Werror"

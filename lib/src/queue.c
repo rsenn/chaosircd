@@ -25,11 +25,11 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "dlink.h"
-#include "queue.h"
-#include "mem.h"
-#include "log.h"
+#include "libchaos/defs.h"
+#include "libchaos/dlink.h"
+#include "libchaos/queue.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *

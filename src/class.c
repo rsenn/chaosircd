@@ -23,12 +23,12 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

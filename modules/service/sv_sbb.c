@@ -22,12 +22,12 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "log.h"
-#include "timer.h"
-#include "hook.h"
-#include "str.h"
-#include "httpc.h"
-#include "htmlp.h"
+#include "libchaos/log.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/str.h"
+#include "libchaos/httpc.h"
+#include "libchaos/htmlp.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

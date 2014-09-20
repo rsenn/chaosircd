@@ -22,9 +22,9 @@
 #ifndef SERVAUTH_CONTROL_H
 #define SERVAUTH_CONTROL_H
 
-#include "queue.h"
-#include "io.h"
-#include "net.h"
+#include "libchaos/queue.h"
+#include "libchaos/io.h"
+#include "libchaos/net.h"
 
 typedef struct control {
   int        recvfd;

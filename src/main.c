@@ -22,9 +22,9 @@
 #define _GNU_SOURCE
 
 /* -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "syscall.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/syscall.h"
+#include "libchaos/str.h"
 /* -------------------------------------------------------------------------- */
 
 #include "../config.h"

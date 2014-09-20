@@ -1,8 +1,8 @@
-#include "io.h"
-#include "mem.h"
-#include "log.h"
-#include "gif.h"
-#include "image.h"
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
+#include "libchaos/gif.h"
+#include "libchaos/image.h"
 
 void imagetest_write(void)
 {

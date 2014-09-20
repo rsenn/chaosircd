@@ -27,9 +27,9 @@
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
 
-#include "log.h"
-#include "dlink.h"
-#include "io.h"
+#include "libchaos/log.h"
+#include "libchaos/dlink.h"
+#include "libchaos/io.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                *

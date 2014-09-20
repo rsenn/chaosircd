@@ -1,10 +1,10 @@
-#include "io.h"
-#include "mem.h"
-#include "timer.h"
-#include "log.h"
-#include "gif.h"
-#include "image.h"
-#include "graph.h"
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/gif.h"
+#include "libchaos/image.h"
+#include "libchaos/graph.h"
 
 uint32_t bytes_in = 666;
 uint32_t bytes_out = 666;

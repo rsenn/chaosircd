@@ -27,12 +27,12 @@
  * ------------------------------------------------------------------------ */
 #include <math.h>
 
-#include "defs.h"
-#include "mem.h"
-#include "image.h"
-#include "log.h"
-#include "str.h"
-#include "gif.h"
+#include "libchaos/defs.h"
+#include "libchaos/mem.h"
+#include "libchaos/image.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/gif.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -53,12 +53,12 @@ struct dheap       image_data_heap;  /* heap containing image data */
 struct list        image_list;       /* list linking image blocks */
 uint32_t           image_id;
 int                image_dirty;
-#include "image_defpal.h"
+#include "libchaos/image_defpal.h"
 
 /* bitmap fonts (not ttf!) */
-/*#include "font_6x10.h"
-#include "font_8x13.h"
-#include "font_8x13b.h"*/
+/*#include "libchaos/font_6x10.h"
+#include "libchaos/font_8x13.h"
+#include "libchaos/font_8x13b.h"*/
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */

@@ -23,7 +23,7 @@
 #ifndef SERVAUTH_USERDB_H
 #define SERVAUTH_USERDB_H
 
-#include "db.h"
+#include "libchaos/db.h"
 
 #define USERDB_TIMEOUT   10000 /* msecs timeout */
 

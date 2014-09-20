@@ -2,15 +2,15 @@
  * This exploits cgircd and spawns /bin/sh on the socket                   *
  * -------------------------------------------------------------------------- */
 
-#include "config.h"
-#include "io.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "ssl.h"
-#include "timer.h"
-#include "dlink.h"
-#include "connect.h"
+#include "ircd/config.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/connect.h"
 
 #include <ircd/config.h>
 

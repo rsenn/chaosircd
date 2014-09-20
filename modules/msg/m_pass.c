@@ -22,10 +22,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "io.h"
-#include "timer.h"
-#include "log.h"
-#include "str.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

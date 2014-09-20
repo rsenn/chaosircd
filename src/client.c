@@ -24,10 +24,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "timer.h"
-#include "hook.h"
-#include "str.h"
-#include "log.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/str.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

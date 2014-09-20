@@ -21,25 +21,25 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "timer.h"
-#include "queue.h"
-#include "log.h"
-#include "net.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/queue.h"
+#include "libchaos/log.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "commands.h"
-#include "control.h"
-#include "servauth.h"
-#include "cache.h"
-#include "dns.h"
-#include "auth.h"
-#include "proxy.h"
-#include "query.h"
-#include "userdb.h"
+#include "servauth/commands.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
+#include "servauth/cache.h"
+#include "servauth/dns.h"
+#include "servauth/auth.h"
+#include "servauth/proxy.h"
+#include "servauth/query.h"
+#include "servauth/userdb.h"
 
 /* -------------------------------------------------------------------------- *
  * command prototypes                                                         *

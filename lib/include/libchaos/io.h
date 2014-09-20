@@ -33,10 +33,10 @@ struct io;
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include "config.h"
-#include "defs.h"
-#include "syscall.h"
-#include "queue.h"
+#include "libchaos/config.h"
+#include "libchaos/defs.h"
+#include "libchaos/syscall.h"
+#include "libchaos/queue.h"
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -45,7 +45,7 @@ struct io;
 #endif
 
 #ifdef HAVE_SSL
-#include "ssl.h"
+#include "libchaos/ssl.h"
 #endif /* HAVE_SSL */
 
 #ifdef USE_POLL

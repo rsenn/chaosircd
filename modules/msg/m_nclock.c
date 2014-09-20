@@ -40,12 +40,12 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "io.h"
-#include "defs.h"
-#include "timer.h"
-#include "hook.h"
-#include "log.h"
-#include "str.h"
+#include "libchaos/io.h"
+#include "libchaos/defs.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

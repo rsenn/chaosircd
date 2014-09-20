@@ -24,15 +24,15 @@
  * -------------------------------------------------------------------------- */
 #include <libowfat/stralloc.h>
 
-#include "defs.h"
-#include "io.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "net.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
 #include "libchaos/str.h"
 
-#include "userdb.h"
+#include "servauth/userdb.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
@@ -296,19 +296,19 @@ userdb_fields       (struct userdb_client *userdb, size_t* nfields, const char* 
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int
-is_var(char* a) {
-  if(!(str_isalpha(*a) || *a == '_'))
-    return 0;
-  
-  do {
-    ++a;
-    if(!(str_isalnum(*a) || *a == '_'))
-      return 0;
-  } while(*a && *a != '=');
-
-  return 1;
-}
+//static int
+//is_var(char* a) {
+//  if(!(str_isalpha(*a) || *a == '_'))
+//    return 0;
+//  
+//  do {
+//    ++a;
+//    if(!(str_isalnum(*a) || *a == '_'))
+//      return 0;
+//  } while(*a && *a != '=');
+//
+//  return 1;
+//}
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

@@ -22,10 +22,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "io.h"
-#include "log.h"
-#include "mfile.h"
-#include "module.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mfile.h"
+#include "libchaos/module.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

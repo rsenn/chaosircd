@@ -1,10 +1,10 @@
-#include "mem.h"
-#include "log.h"
-#include "gif.h"
-#include "image.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
+#include "libchaos/gif.h"
+#include "libchaos/image.h"
 
 #ifdef HAVE_FT2
-#include "ttf.h"
+#include "libchaos/ttf.h"
 
 int ttftest_log;
 

@@ -25,7 +25,7 @@
 #ifndef LIB_SYSCALL_H
 #define LIB_SYSCALL_H
 
-#include "defs.h"
+#include "libchaos/defs.h"
 
 #if 0 //(defined __linux) && (defined __i386__)
 

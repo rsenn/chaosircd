@@ -30,13 +30,13 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "io.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "dlink.h"
-#include "syscall.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/dlink.h"
+#include "libchaos/syscall.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *

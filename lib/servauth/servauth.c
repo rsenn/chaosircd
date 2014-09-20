@@ -43,13 +43,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "control.h"
-#include "servauth.h"
-#include "cache.h"
-#include "auth.h"
-#include "dns.h"
-#include "proxy.h"
-#include "query.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
+#include "servauth/cache.h"
+#include "servauth/auth.h"
+#include "servauth/dns.h"
+#include "servauth/proxy.h"
+#include "servauth/query.h"
 
 struct servauth_query servauth_queries[MAX_QUERIES];
 struct control        servauth_control;              /* control connection :D */

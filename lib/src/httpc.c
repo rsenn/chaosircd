@@ -24,15 +24,15 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#include "io.h"
-#include "syscall.h"
-#include "connect.h"
-#include "httpc.h"
-#include "timer.h"
-#include "dlink.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/connect.h"
+#include "libchaos/httpc.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 #include "../config.h"
 

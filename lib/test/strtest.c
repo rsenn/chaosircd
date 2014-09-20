@@ -1,8 +1,8 @@
-#include "mem.h"
-#include "str.h"
-#include "log.h"
-#include "io.h"
-#include "timer.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
 
 #include <time.h>
 
@@ -16,16 +16,18 @@ int main()
   mem_init();
   timer_init();
 
+    int strtest_log = log_source_register("strtest");
+
+
  uint64_t t = time(NULL)  * 1000llu;
   str_snprintf(buffer, sizeof(buffer), "%i %T", 1337, &t);
 
-	log(LOG_ALL, L_status, "str_nprintf() result: %s", buffer);
+  log(strtest_log, L_status, "str_nprintf() result: %s", buffer);
+  int r = str_cmp("test", "test");
+  log(strtest_log, L_status, "str_cmp(test,test) result: %i", r);
 
-	int r = str_cmp("test", "test");
-	log(LOG_ALL, L_status, "str_cmp(test,test) result: %i", r);
-
-	int r2 = str_cmp("test", "blah");
-	log(LOG_ALL, L_status, "str_cmp(test,blah) result: %i", r2);
+  int r2 = str_cmp("test", "blah");
+  log(strtest_log, L_status, "str_cmp(test,blah) result: %i", r2);
 
 
   timer_shutdown();

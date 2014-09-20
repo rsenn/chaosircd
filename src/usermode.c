@@ -24,11 +24,11 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "dlink.h"
-#include "log.h"
-#include "mem.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

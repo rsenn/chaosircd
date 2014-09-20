@@ -66,8 +66,9 @@ LIBS     += -lowfat
 CPPFLAGS += -DHAVE_CONFIG_H
 @A_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 
-INCLUDES += -I$(srcdir) \
-            -I$(top_srcdir)/include/libchaos \
+INCLUDES += \
+            -I$(top_srcdir) \
+            -I$(top_srcdir)/include \
             -I$(builddir) \
             -I$(top_builddir)/include/libchaos \
             -I. \

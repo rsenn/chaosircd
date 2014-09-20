@@ -22,21 +22,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "io.h"
-#include "ini.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "child.h"
-#include "htmlp.h"
-#include "httpc.h"
-#include "sauth.h"
-#include "timer.h"
-#include "mfile.h"
-#include "filter.h"
-#include "module.h"
-#include "listen.h"
-#include "connect.h"
+#include "libchaos/io.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/child.h"
+#include "libchaos/htmlp.h"
+#include "libchaos/httpc.h"
+#include "libchaos/sauth.h"
+#include "libchaos/timer.h"
+#include "libchaos/mfile.h"
+#include "libchaos/filter.h"
+#include "libchaos/module.h"
+#include "libchaos/listen.h"
+#include "libchaos/connect.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

@@ -22,14 +22,14 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "io.h"
-#include "ini.h"
-#include "log.h"
-#include "net.h"
-#include "str.h"
-#include "hook.h"
-#include "module.h"
-#include "timer.h"
+#include "libchaos/io.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/hook.h"
+#include "libchaos/module.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

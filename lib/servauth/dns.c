@@ -24,14 +24,14 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "syscall.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "net.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
@@ -48,9 +48,9 @@
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "dns.h"
-#include "control.h"
-#include "servauth.h"
+#include "servauth/dns.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
 
 #ifdef WIN32
 #define EPROTONOSUPPORT WSAEPROTONOSUPPORT

@@ -33,8 +33,8 @@
 #define CACHE_DNS_SIZE   256
 #define CACHE_PROXY_SIZE 256
 
-#include "control.h"
-#include "query.h"
+#include "servauth/control.h"
+#include "servauth/query.h"
 
 extern struct servauth_query servauth_queries[MAX_QUERIES];
 extern control_t             servauth_control;
