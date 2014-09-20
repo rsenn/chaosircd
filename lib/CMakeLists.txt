@@ -35,7 +35,7 @@ if(HAVE_LOWFAT)
 endif()
 
 add_definitions(-DHAVE_CONFIG_H=1)
-
+include_directories("${MYSQL_INCLUDE_DIR}")
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
@@ -53,10 +53,19 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
 substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
-	       
+if(LINUX)
+  set(DLLEXT ".so" CACHE "shared object extension")
+endif(LINUX)
+if(WINDOWS)
+  set(DLLEXT ".dll" CACHE "shared object extension")
+endif(WINDOWS)
+if(MAC)
+  set(DLLEXT ".dylib" CACHE "shared object extension")
+endif(MAC)
+
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
-add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
+add_definitions(-DDLLEXT=\"${DLLEXT}\" -DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_LIBCHAOS=1)
 
