@@ -22,6 +22,7 @@ endif()
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindMySQL.cmake")
 
 include(CheckLibraryExists)
 include(FindOpenSSL)
