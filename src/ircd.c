@@ -448,7 +448,7 @@ void ircd_loop(void)
 #warning No I/O
 #endif /* USE_SELECT | USE_POLL */
 
-		log(ircd_log, L_debug, "I/O multiplex returned: %d", ret);
+//log(ircd_log, L_debug, "I/O multiplex returned: %d", ret);
 
     /* Remaining time is 0msecs, we need to run a timer */
     if(remain == 0LL)
