@@ -8,27 +8,27 @@
 # check for werror mode
 # ---------------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_WERROR], 
-[ac_cv_werror="no"
-
-AC_MSG_CHECKING([whether to enable werrorging mode])
-
+[ac_cv_werror=no
+AC_MSG_CHECKING([whether to enable -Werror])
 AC_ARG_ENABLE([werror],
 [  --enable-werror          treat warnings as errors],
 [case "$enableval" in
   yes) ac_cv_werror=yes ;;
-  no | *) ac_cv_werror=no ;;
 esac])
 
-# set WERROR variable
+# set -Werror compoiler flag
 if test "$ac_cv_werror" = "yes"; then
-  CFLAGS=`echo $CFLAGS -Werror`
-  WERROR=yes
+  WARNFLAGS="$WARNFLAGS -Werror"
+  CFLAGS="$CFLAGS $WARNFLAGS"
+  #CPPFLAGS="$CPPFLAGS $WARNFLAGS"
   AC_MSG_RESULT([yes])
 else
+  WARNFLAGS=`echo "$WARNFLAGS" | sed 's|\s*-Werror| |g'`
   CPPFLAGS=`echo $CPPFLAGS | sed 's|\s*-Werror\s*| |g'`
   CFLAGS=`echo $CFLAGS | sed 's|\s*-Werror\s*| |g'`
-  WERROR=no
   AC_MSG_RESULT([no])
 fi
   
-AC_SUBST(WERROR)])
+AC_SUBST([WARNFLAGS])
+AM_CONDITIONAL([WERROR], [test "$ac_cv_werror" = yes])
+])

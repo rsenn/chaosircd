@@ -160,7 +160,7 @@ static void db_set_error(struct db *db)
       break;
 #endif /* HAVE_MYSQL */
       default:
-        strcpy(db->error, "no database support");
+        strcpy(db->errormsg, "no database support");
     }
 
     if(error)
@@ -168,7 +168,7 @@ static void db_set_error(struct db *db)
   }
   else
   {
-    strcpy(db->error, "no database connection");
+    strcpy(db->errormsg, "no database connection");
   }
 }
 
