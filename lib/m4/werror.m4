@@ -8,7 +8,9 @@
 # check for werror mode
 # ---------------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_WERROR], 
-[ac_cv_werror=no
+[WARNFLAGS="-Wall -Wextra"
+
+ac_cv_werror=no
 AC_MSG_CHECKING([whether to enable -Werror])
 AC_ARG_ENABLE([werror],
 [  --enable-werror          treat warnings as errors],

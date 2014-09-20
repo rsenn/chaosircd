@@ -52,11 +52,12 @@ DEFS += -DPID=\"$(relrundir)/$(PACKAGE_NAME).pid\"
 
 @DLM_FALSE@DEFS += -DSTATIC_IRCD
 
-INCLUDES             = -I$(top_srcdir)/include \
-                       -I$(srcdir) \
+INCLUDES             = \
+		       -I$(top_srcdir)/lib/include \
+		       -I$(top_srcdir)/include \
+                       -I../lib/include \
                        -I../include \
-                       -I. \
-                       -I../lib/include/libchaos
+                       -I. 
                        
 LEXERSRC             = $(srcdir)/lex.yy.c
 LEXEROBJ             = lex.yy.o

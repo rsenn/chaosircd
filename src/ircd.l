@@ -31,13 +31,13 @@
 
 #include "y.tab.h"
 
-#include "dlink.h"
-#include "str.h"
-#include "syscall.h"
-#include "log.h"
+#include "libchaos/dlink.h"
+#include "libchaos/str.h"
+#include "libchaos/syscall.h"
+#include "libchaos/log.h"
   
-#include <ircd/ircd.h>
-#include <ircd/conf.h>
+#include "ircd/ircd.h"
+#include "ircd/conf.h"
   
 #undef isatty
 #undef YY_INPUT
