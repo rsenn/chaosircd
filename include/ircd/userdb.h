@@ -75,28 +75,17 @@ typedef struct userdb {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sheap)
-userdb_heap;
-CHAOS_API(struct list)
-userdb_list;
-CHAOS_API(uint32_t)
-userdb_serial;
-CHAOS_API(struct timer *)
-userdb_timer;
-CHAOS_API(struct timer *)
-userdb_rtimer;
-CHAOS_API(struct child *)
-userdb_child;
-CHAOS_API(int)
-userdb_log;
-CHAOS_API(int)
-userdb_fds[2];
-CHAOS_API(char)
-userdb_readbuf[BUFSIZE];
-CHAOS_API(const char *)
-userdb_types[6];
-CHAOS_API(const char *)
-userdb_replies[8];
+CHAOS_API(struct sheap)  userdb_heap;
+CHAOS_API(struct list)   userdb_list;
+CHAOS_API(uint32_t)      userdb_serial;
+CHAOS_API(struct timer*) userdb_timer;
+CHAOS_API(struct timer*) userdb_rtimer;
+CHAOS_API(struct child*) userdb_child;
+CHAOS_API(int)           userdb_log;
+CHAOS_API(int)           userdb_fds[2];
+CHAOS_API(char)          userdb_readbuf[BUFSIZE];
+CHAOS_API(const char *)  userdb_types[6];
+CHAOS_API(const char *)  userdb_replies[8];
 CHAOS_DATA(const char* ) userdb_query_names[];
 
 /* ------------------------------------------------------------------------ */

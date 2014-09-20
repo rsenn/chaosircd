@@ -52,7 +52,8 @@
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
  * -------------------------------------------------------------------------- */
-struct m_userdb_s {
+struct m_userdb_query {
+	uint32_t serial;
   struct node     node;
   struct lclient *lclient;
   struct timer   *timer;
@@ -65,18 +66,20 @@ struct m_userdb_s {
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
 static int m_userdb_register(struct lclient *lcptr);
+static int m_userdb_login(struct lclient *lcptr);
 static void m_userdb_handshake(struct lclient *lcptr);
 static void m_userdb_release(struct lclient *lcptr);
 static void m_userdb(struct lclient* lcptr, struct client* cptr,
                      int             argc,  char         **argv);
-
-static void m_userdb_done(struct m_userdb_s *arg);
+static struct m_userdb_query* m_userdb_newquery();
+static void m_userdb_done(struct m_userdb_query *arg);
 /* -------------------------------------------------------------------------- *
  * Local variables                                                            *
  * -------------------------------------------------------------------------- */
 
 static struct list   m_userdb_list;
 static struct sheap  m_userdb_heap;
+static uint32_t m_userdb_serial;
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
@@ -102,26 +105,30 @@ static struct msg m_userdb_msg = {
  * -------------------------------------------------------------------------- */
 int
 m_userdb_load(void) {
-//  if(hook_register(lclient_handshake, HOOK_DEFAULT, m_userdb_handshake) == NULL)
+ // hook_register(lclient_handshake, HOOK_DEFAULT, m_userdb_handshake);
 //    return -1;
 
   hook_register(lclient_release, HOOK_DEFAULT, m_userdb_release);
-//  hook_register(lclient_register, HOOK_DEFAULT, m_userdb_register);
+  hook_register(lclient_register, HOOK_DEFAULT, m_userdb_register);
+  hook_register(lclient_login, HOOK_DEFAULT, m_userdb_login);
 
-  mem_static_create(&m_userdb_heap, sizeof(struct m_userdb_s),
+
+  mem_static_create(&m_userdb_heap, sizeof(struct m_userdb_query),
                     SAUTH_BLOCK_SIZE / 2);
-  mem_static_note(&m_userdb_heap, "udb client heap");
+  mem_static_note(&m_userdb_heap, "userdb query heap");
 
   dlink_list_zero(&m_userdb_list);
 
   msg_register(&m_userdb_msg);
+
+
 
   return 0;
 }
 
 void
 m_userdb_unload(void) {
-  struct m_userdb_s *arg = NULL;
+  struct m_userdb_query *arg = NULL;
   struct node     *node;
   struct node     *next;
 
@@ -137,19 +144,33 @@ m_userdb_unload(void) {
 
   mem_static_destroy(&m_userdb_heap);
 }
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+static int
+m_userdb_login(struct lclient *lcptr) {
+	struct m_userdb_query* q = m_userdb_newquery();
+
+	q->lclient = lcptr;
+
+
+	return 0;
+}
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void
-m_userdb_handshake(struct lclient *lcptr) {
-  struct m_userdb_s *arg;
+static struct m_userdb_query*
+m_userdb_newquery() {
+  struct m_userdb_query *arg;
 
   /* Keep track of the lclient if the module gets unloaded */
   arg = mem_static_alloc(&m_userdb_heap);
 
-  arg->lclient = lclient_pop(lcptr);
+  //arg->lclient = lclient_pop(lcptr);
+  arg->serial = userdb_serial++;
 
   dlink_add_tail(&m_userdb_list, &arg->node, arg);
+
+  return arg;
 }
 
 
@@ -157,7 +178,7 @@ m_userdb_handshake(struct lclient *lcptr) {
  * -------------------------------------------------------------------------- */
 static void
 m_userdb_release(struct lclient *lcptr) {
-  struct m_userdb_s *udb;
+  struct m_userdb_query *udb;
 
   udb = lcptr->plugdata[LCLIENT_PLUGDATA_USERDB];
 
@@ -173,7 +194,7 @@ m_userdb_release(struct lclient *lcptr) {
  * -------------------------------------------------------------------------- */
 static int
 m_userdb_register(struct lclient *lcptr) {
-  struct m_userdb_s *udb;
+  struct m_userdb_query *udb;
 
   udb = lcptr->plugdata[LCLIENT_PLUGDATA_USERDB];
 
@@ -189,7 +210,7 @@ m_userdb_register(struct lclient *lcptr) {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
-m_userdb_done(struct m_userdb_s *arg) {
+m_userdb_done(struct m_userdb_query *arg) {
   struct node *nptr;
 
   if(arg->timer) {
@@ -209,7 +230,7 @@ m_userdb_done(struct m_userdb_s *arg) {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
-m_userdb_verify_query(struct m_userdb_s *arg) {
+m_userdb_verify_query(struct m_userdb_query *arg) {
   /* Start reverse lookup */
 //  arg->sauth_userdb = userdb_verify(m_userdb_verify, arg);
 //
@@ -236,7 +257,7 @@ m_userdb_verify_query(struct m_userdb_s *arg) {
  * Start an AUTH lookup for a local client                                    *
  * -------------------------------------------------------------------------- */
 static int
-m_userdb_lookup_auth(struct m_userdb_s *arg) {
+m_userdb_lookup_auth(struct m_userdb_query *arg) {
   return 0;
 }
 
