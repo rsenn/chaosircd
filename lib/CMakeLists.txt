@@ -88,7 +88,7 @@ set_target_properties(libchaos PROPERTIES
                       SOVERSION "${LIBRARY_VERSION}"
                       PREFIX "")
 
-target_link_libraries(libchaos LINK_PUBLIC ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+target_link_libraries(libchaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 
 install(TARGETS libchaos
         RUNTIME DESTINATION bin
