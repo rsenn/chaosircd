@@ -29,6 +29,10 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindMySQL.cmake")
 
+if(MYSQL_FOUND)
+  add_definitions(-DHAVE_MYSQL=1)
+endif()
+
 include(CheckLibraryExists)
 include(FindOpenSSL)
 include(FindFreetype)
@@ -96,21 +100,23 @@ set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/log.c src/mem.c src/mfile.c src/module.c src/net.c src/queue.c
    src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c ${DLFCN_SOURCES})
 
-add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
-
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
 if(BUILD_SHARED)
-	set_target_properties(libchaos PROPERTIES
+  add_library(chaos SHARED ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+
+	set_target_properties(chaos PROPERTIES
 												SOVERSION "${LIBRARY_VERSION}"
 												PREFIX "")
 
-	target_link_libraries(libchaos ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+	target_link_libraries(chaos ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 else()
-	target_link_libraries(libchaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+  add_library(chaos STATIC ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+
+	target_link_libraries(chaos LINK_PUBLIC ${MYSQL_LIBRARIES} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 endif()
 
-install(TARGETS libchaos
+install(TARGETS chaos
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)

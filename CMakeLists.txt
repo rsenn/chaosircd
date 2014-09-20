@@ -3,7 +3,7 @@ set(PACKAGEVERSION 2.2.1)
 set(PACKAGERELEASE "peace, love & hippie edition")
 set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
-if(WINDOWS)
+if(WINDOWS OR CYGWIN)
   set(DEFAULT_SHARED_LIB TRUE)
 else()
   set(DEFAULT_SHARED_LIB FALSE)
@@ -33,11 +33,13 @@ if(NOT HAVE_UNISTD_H)
 endif()
 
 if(NOT DEFINED BUILD_SHARED)
-  set(BUILD_SHARED ${DEFAULT_SHARED_LIB})
+  set(BUILD_SHARED "${DEFAULT_SHARED_LIB}" CACHE BOOL "Build dynamically linked binaries")
 endif(NOT DEFINED BUILD_SHARED)
 
 if(NOT BUILD_SHARED)
-  add_definitions(-DSTATIC_LIBCHAOS=1)
+  set(BUILD_STATIC true CACHE BOOL "Build statically linked binaries")
+
+  add_definitions(-DSTATIC_IRCD=1)
 endif(NOT BUILD_SHARED)
 
 include(CheckIncludeFile)

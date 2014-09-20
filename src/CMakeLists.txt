@@ -30,13 +30,15 @@ ${BISON_IRCD_PARSER_OUTPUTS}
 	
 if(WINDOWS OR CYGWIN)
 
-add_library(ircd SHARED ${SOURCES})
+  add_library(ircd SHARED ${SOURCES})
 	set_target_properties(ircd PROPERTIES PREFIX "")
 	target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
 	add_executable(cgircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
-	target_link_libraries(ircd libchaos ${SOCKET_LIBRARIES})
+	
+	  link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "lib" "${LIBCHAOS_BINARY_DIR}")
 
+	target_link_libraries(ircd chaos ${SOCKET_LIBRARIES})
 	target_link_libraries(cgircd ircd)
 
 else()
