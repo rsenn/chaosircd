@@ -8,7 +8,7 @@ add_executable(servauth ${SERVAUTH_SOURCES})
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
    
-target_link_libraries(servauth libchaos ${SOCKET_LIBRARIES})
+target_link_libraries(servauth libchaos ${MYSQL_LIBRARIES} ${OPENSSL_SSL_LIBRARY} ${SOCKET_LIBRARIES})
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}"/include "${CMAKE_CURRENT_SOURCE_DIR}/.." "${CMAKE_CURRENT_SOURCE_DIR}/../include" "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include")
 
