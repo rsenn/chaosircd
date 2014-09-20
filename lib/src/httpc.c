@@ -34,7 +34,7 @@
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
 
-#include "libchaos/config.h"
+#include "../config.h"
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -46,7 +46,7 @@ struct list      httpc_list;
 uint32_t         httpc_id;
 struct protocol *httpc_proto;
 char             httpc_hexchars[] = "0123456789ABCDEF";
-char             httpc_version[] = LIBPACKAGE_NAME" v"LIBPACKAGE_VERSION" ("LIBPACKAGE_RELEASE")";
+char             httpc_version[] = PACKAGE_NAME" v"PACKAGE_VERSION" ("PACKAGE_RELEASE")";
 uint8_t          httpc_hextable[256] = {
   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,

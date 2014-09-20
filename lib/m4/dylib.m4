@@ -128,7 +128,7 @@ dnl   fi
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
-        PIE_LDFLAGS="-shared -Wl,-soname -Wl,${LIBPACKAGE_NAME}.${PIE_LIBEXT}.${VERSION_MAJOR}"
+        PIE_LDFLAGS="-shared -Wl,-soname -Wl,${PACKAGE_NAME}.${PIE_LIBEXT}.${VERSION_MAJOR}"
         PIE_VERSION_SUFFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
         PIE_LINKS='$(PIE_NAME).$(PIE_LIBEXT).$(VERSION_MAJOR).$(VERSION_MINOR) $(PIE_NAME).$(PIE_LIBEXT).$(VERSION_MAJOR) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LIBDIR='$(libdir)'
@@ -145,7 +145,7 @@ dnl   fi
         PIE_PREPEND='lib'
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
-        PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$LIBPACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_LIBEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
+        PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$PACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_LIBEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
         PIE_VERSION_PREFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
         PIE_LINKS='$(PIE_NAME).$(VERSION_MAJOR).$(VERSION_MINOR).$(PIE_LIBEXT) $(PIE_NAME).$(VERSION_MAJOR).$(PIE_LIBEXT) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LOADER='dlfcn_darwin'
