@@ -58,9 +58,6 @@
 /* Define to 1 if you have the <winsock2.h> header file. */
 #cmakedefine HAVE_WINSOCK2_H 1
 
-/* Suffix for shared loadable modules */
-#define DLLEXT ".dll"
-
 /* The size of `uintptr_t', as computed by sizeof. */
 #cmakedefine SIZEOF_UINTPTR_T 32
 
