@@ -187,7 +187,7 @@ int log_source_register(const char *name)
  * ------------------------------------------------------------------------ */
 int log_source_unregister(int id)
 {
-  if(id < 0 || id >= LOG_SOURCE_COUNT)
+  if(id < 0 || id >= (int)LOG_SOURCE_COUNT)
     return -1;
 
 /*  log(log_log, L_verbose, "Unregistered log source: %s",
@@ -756,11 +756,11 @@ void log_drain_dump(struct dlog *dlptr)
 
 void log_source_dump(int id)
 {
-  if(id < 0 || id > LOG_SOURCE_COUNT)
+  if(id < 0 || id > (int)LOG_SOURCE_COUNT)
   {
     dump(log_log, "[============= log source summary ==============]");
 
-    for(id = 0; id < LOG_SOURCE_COUNT; id++)
+    for(id = 0; id < (int)LOG_SOURCE_COUNT; id++)
     {
       if(log_sources[id].name[0] == '\0')
         continue;

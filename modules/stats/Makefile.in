@@ -7,9 +7,9 @@ thisdir              = modules/stats/
 CATEGORY             = stats
 MODULES              = st_traffic
 
-INCLUDES             = -I$(top_srcdir)/lib/include/libchaos \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../lib/include/libchaos \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)

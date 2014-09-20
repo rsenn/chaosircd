@@ -20,6 +20,7 @@ esac])
 
 WARNFLAGS="$WARNFLAGS -Wno-unused"
 WARNFLAGS="$WARNFLAGS -Wno-unused-parameter"
+WARNFLAGS="$WARNFLAGS -Wno-missing-field-initializers"
 
 # set -Werror compoiler flag
 if test "$ac_cv_werror" = "yes"; then

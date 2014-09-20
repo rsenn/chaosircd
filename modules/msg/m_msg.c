@@ -144,8 +144,7 @@ static void m_multimsg(int            type, const char *cmd,  struct lclient *lc
                        struct client *cptr, int         argc, char          **argv)
 {
   char  *recipients[IRCD_MAXTARGETS + 1];
-  size_t n;
-  int    i;
+  size_t i, n;
 
   if(argc < 3)
   {

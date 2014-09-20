@@ -261,12 +261,11 @@ const char *module_expand(const char *name)
 
   strlcpy(ret, name, sizeof(ret));
 
-  if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_')));
-  {
-    for(i = 0; module_table[i][0]; i++)
-    {
-      if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret))
-      {
+  if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_'))) {
+
+    for(i = 0; module_table[i][0]; i++) {
+
+      if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret)) {
         *p++ = '\0';
 
         strlcpy(lala, p, sizeof(lala));

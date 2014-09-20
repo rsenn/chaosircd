@@ -11,9 +11,9 @@ MODULES              = lc_clones \
                        lc_sauth \
                        lc_crowdguard
 
-INCLUDES             = -I$(top_srcdir)/lib/include/libchaos \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../lib/include/libchaos \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)

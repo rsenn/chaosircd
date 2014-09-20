@@ -114,7 +114,7 @@ static size_t httpc_parse_protocol(struct httpc *hcptr)
     hcptr->port = 80;
   }
 
-  return s ? s - hcptr->url + 3 : i;
+  return s ? (size_t)(s - hcptr->url + 3) : i;
 }
 
 /* ------------------------------------------------------------------------ *

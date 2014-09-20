@@ -89,9 +89,7 @@ static void mr_capab(struct lclient *lcptr, struct client *cptr,
                      int             argc,  char         **argv)
 {
   char  *capv[64];
-  int    capc;
-  int    capi;
-  size_t i;
+  ssize_t    capc,capi,i;
 
   /* Ooops, already got caps? */
   if(lcptr->caps)

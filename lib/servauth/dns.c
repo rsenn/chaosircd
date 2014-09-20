@@ -511,12 +511,10 @@ static int dns_dn_cmp(const uint8_t *domain1, const uint8_t *domain2)
    Convert domain style to dotted.
    ------------------------------------------------------------------------- */
 
-static size_t dns_dn_to_dot(char *out, const uint8_t *d, size_t n)
-{
-
-  char ch;
-  char ch2;
-  int idx = 0;
+static size_t
+dns_dn_to_dot(char *out, const uint8_t *d, size_t n) {
+  char ch, ch2;
+  size_t idx = 0;
 
   if(!n)
     return 0;
@@ -527,8 +525,7 @@ static size_t dns_dn_to_dot(char *out, const uint8_t *d, size_t n)
     return 0;
   }
 
-  for(;idx < n;)
-  {
+  for(; idx < n;) {
     ch = *d++;
 
     while(ch--)
@@ -1719,7 +1716,7 @@ static void dns_event_rd(int fd, void *ptr)
   if(res->stype == NET_SOCKET_DGRAM)
   {
     uint8_t buf[513];
-    int     ret;
+    ssize_t     ret;
 
     ret = io_read(res->sock - 1, buf, sizeof(buf));
 
@@ -1730,7 +1727,7 @@ static void dns_event_rd(int fd, void *ptr)
       return;
     }
 
-    if(ret > sizeof(buf) - 1 || dns_irrelevant(res, buf, ret))
+    if(ret > (ssize_t)(sizeof(buf) - 1) || dns_irrelevant(res, buf, ret))
     {
       dns_error(DNS_ESERVFAIL);
 

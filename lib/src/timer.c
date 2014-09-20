@@ -90,7 +90,7 @@ static uint64_t timer_freq;
 #define EPOCH 1970
 
 /* Days per month -- nonleap! */
-static const short dpm[12] = {
+static const unsigned dpm[12] = {
   0,
   (31),
   (31 + 28),
@@ -166,7 +166,8 @@ struct tm *timer_gmtime(uint64_t mtime)
   }
 
   /* Find the month */
-  for(i = 11; i && (dpm[i] > work); i--);
+  for(i = 11; i && (dpm[i] > work); i--) {
+  }
 
   ret.tm_mon = i;
 
@@ -977,7 +978,7 @@ struct timer *timer_find(void *callback, ...)
 /* ------------------------------------------------------------------------ *
  * Find a timer by id                                                       *
  * ------------------------------------------------------------------------ */
-struct timer *timer_find_id(uint32_t id)
+struct timer *timer_find_id(int id)
 {
   struct timer *timer;
 

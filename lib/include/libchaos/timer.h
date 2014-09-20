@@ -222,7 +222,7 @@ CHAOS_API(struct timer *)timer_find       (void           *callback,
 /* ------------------------------------------------------------------------ *
  * Find a timer by id.                                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct timer *)timer_find_id    (uint32_t        id);
+CHAOS_API(struct timer *)timer_find_id    (int        id);
 
 /* ------------------------------------------------------------------------ *
  * Stop and remove a timer by callback and userarg.                           *

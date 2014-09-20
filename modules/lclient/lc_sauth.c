@@ -524,9 +524,9 @@ static struct node *m_proxy_find(uint16_t port, int service)
 
   dlink_foreach(&m_proxy_list, node)
   {
-    size_t val = (size_t)node->data & 0xfffffffflu;
+    size_t val = (size_t)node->data & 0xffffffff;
 
-    if((val >> 16) == port && (val & 0xffff) == service)
+    if((val >> 16) == port && (val & 0xffff) == (uint16_t)service)
       return node;
   }
 

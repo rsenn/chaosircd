@@ -1371,7 +1371,7 @@ struct lclient *lclient_find_id(int id)
   struct lclient *lcptr;
 
   dlink_foreach(&lclient_list, lcptr)
-    if(lcptr->id == id)
+    if(lcptr->id == (uint32_t)id)
       return lcptr;
 
   return NULL;

@@ -73,7 +73,7 @@ struct client
   uint32_t         refcount;    /* how many times this block is referenced */
   hash_t           hash;
   uint32_t         type;
-  uint32_t         location;
+  int              location;
   struct lclient  *lclient;     /* if its a local client */
   struct lclient  *source;      /* local server the client comes from */
   struct client   *origin;      /* remote server the client comes from */

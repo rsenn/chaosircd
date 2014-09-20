@@ -440,7 +440,7 @@ struct palette *image_quantize(struct image *iptr, int maxcolors, int *ckey)
         {
           struct node *node;
 
-          if(++counts[bitcount] > maxcolors)
+          if(++counts[bitcount] > (unsigned)maxcolors)
           {
             dlink_destroy(&levels[depth]);
             depth++;
@@ -1376,7 +1376,7 @@ struct palette *image_palette_new(uint32_t ncolors)
   pal->colors = (struct color *)&pal[1];
 
   /* Initialize colors */
-  for(n = 0; n < pal->count; n++)
+  for(n = 0; n < (unsigned)pal->count; n++)
   {
     pal->colors[n].r = 0x00;
     pal->colors[n].g = 0x00;
@@ -1490,8 +1490,7 @@ uint8_t image_palette_match(struct palette *palette, struct color *c, int colork
                (gdiff * gdiff) +
                (bdiff * bdiff);
 
-    if(distance < ldist)
-    {
+    if((unsigned)distance < ldist) {
       index = i;
       ldist = distance;
 

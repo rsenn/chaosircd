@@ -693,15 +693,16 @@ void io_init(void)
  * ------------------------------------------------------------------------ */
 void io_init_except(int fd0, int fd1, int fd2)
 {
-  size_t i;
+  int i;
 
   io_log = log_source_register("i/o");
 
 #if !(defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(__MSYS__))
   /* Close all fds */
-  for(i = 0; i < IO_MAX_FDS; i++)
+  for(i = 0; i < IO_MAX_FDS; i++) {
     if(i != fd0 && i != fd1 && i != fd2)
       syscall_close(i);
+  }
 #endif
 
   memset(io_list, 0, IO_MAX_FDS * sizeof(struct io));
@@ -1230,8 +1231,7 @@ int io_select(int64_t *remain, int64_t *timeout)
 {
   struct timeval  tv;
   struct timeval *tp = NULL;
-  int             ret;
-  size_t          i;
+  int ret, i;
 
   /* timeout is present, set timeout pointer */
   if(timeout) if(*timeout >= 0LL)
@@ -1251,8 +1251,7 @@ int io_select(int64_t *remain, int64_t *timeout)
   timer_update();
 
   /* Now set the returned events */
-  if(io_top >= 0) for(i = 0; i <= io_top; i++)
-  {
+  if(io_top >= 0) for(i = 0; i <= io_top; i++) {
     if(!io_list[i].type)
       continue;
 

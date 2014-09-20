@@ -90,7 +90,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
   struct chanuser *cuptr = NULL;
   struct channel  *chptr;
   struct node     *nptr;
-  unsigned long    ts;
+  time_t ts;
   struct list      chanusers;
 //  int              dropts = 0;
   int              dropremote = 0;
