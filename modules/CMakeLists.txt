@@ -42,11 +42,14 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
     if(BUILD_LOADABLE_MODULES)
       add_library("${MODULE_NAME}" MODULE SHARED "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
       set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
-    
+      
+      if(WINDOWS OR CYGWIN)
+          target_link_libraries("${MODULE_NAME}" ircd)
+      endif()
+
       #      target_compile_options("${MODULE_NAME}" BEFORE "-rdynamic ${CMAKE_CURRENT_BINARY_DIR}/../cgircd")
     else()
       add_library("${MODULE_NAME}" STATIC "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
-      target_link_libraries("${MODULE_NAME}" ircd)
     endif()
 
     install(TARGETS "${MODULE_NAME}"
