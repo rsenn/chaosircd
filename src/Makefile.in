@@ -92,7 +92,7 @@ DEPS                 = $(MODULES:%=%.d)
 
 #@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/lib/src -lchaos
 @SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
-@DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.dll
+@DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/src/ircd.@PIE_LIBEXT@
 
 @DLM_FALSE@LDPRE += -Wl,--whole-archive
 @DLM_FALSE@LDPOST += -Wl,--no-whole-archive

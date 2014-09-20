@@ -21,6 +21,11 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 # compilation rules by file extension
 # ---------------------------------------------------------------------------
+.c.pi@OBJEXT@:
+	@$(ECHO_CC)
+@DEPS_TRUE@	@QUIET@$(COMPILE) -fPIC -MD -c -o $@ $<
+@DEPS_FALSE@	@QUIET@$(COMPILE) -fPIC -c -o $@ $<
+
 .c.@OBJEXT@:
 	@$(ECHO_CC)
 @DEPS_TRUE@	@QUIET@$(COMPILE) -MD -c -o $@ $<
