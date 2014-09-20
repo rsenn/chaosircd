@@ -1,24 +1,24 @@
 #if 1
 /* Define to the address where bug reports for this package should be sent. */
-#cmakedefine PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
+#cmakedefine LIBPACKAGE_BUGREPORT "@LIBPACKAGE_BUGREPORT@"
 
 /* Define to the full name of this package. */
-#cmakedefine PACKAGE_NAME "@PACKAGE_NAME@"
+#cmakedefine LIBPACKAGE_NAME "@LIBPACKAGE_NAME@"
 
 /* Define to the release name of this package. */
-#cmakedefine PACKAGE_RELEASE "@PACKAGE_RELEASE@"
+#cmakedefine LIBPACKAGE_RELEASE "@LIBPACKAGE_RELEASE@"
 
 /* Define to the full name and version of this package. */
-#cmakedefine PACKAGE_STRING "@PACKAGE_STRING@"
+#cmakedefine LIBPACKAGE_STRING "@LIBPACKAGE_STRING@"
 
 /* Define to the one symbol short name of this package. */
-#cmakedefine PACKAGE_TARNAME "@PACKAGE_TARNAME@"
+#cmakedefine LIBPACKAGE_TARNAME "@LIBPACKAGE_TARNAME@"
 
 /* Define to the home page for this package. */
-#cmakedefine PACKAGE_URL "@PACKAGE_URL@"
+#cmakedefine LIBPACKAGE_URL "@LIBPACKAGE_URL@"
 
 /* Define to the version of this package. */
-#cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
+#cmakedefine LIBPACKAGE_VERSION "@LIBPACKAGE_VERSION@"
 
 /* Platform this server runs on */
 #cmakedefine PLATFORM "@PLATFORM@"

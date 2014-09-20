@@ -15,10 +15,10 @@ AC_CHECK_COLOR
 # set some info stuff
 # ---------------------------------------------------------------------------
 AC_SET_ARGS
-PACKAGE_RELEASE="peace & love hippie edition"
-AC_DEFINE_UNQUOTED(PACKAGE_RELEASE, "$PACKAGE_RELEASE", [Define to the release name of this package.])
+LIBPACKAGE_RELEASE="peace & love hippie edition"
+AC_DEFINE_UNQUOTED(LIBPACKAGE_RELEASE, "$LIBPACKAGE_RELEASE", [Define to the release name of this package.])
 
-VERSION=${PACKAGE_VERSION%%[[a-z]]*}
+VERSION=${LIBPACKAGE_VERSION%%[[a-z]]*}
 
 VERSION_MAJOR=${VERSION%%.[[0-9]]*}
 VERSION_MINOR=${VERSION#*[0-9].}

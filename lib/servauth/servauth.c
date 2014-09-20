@@ -63,9 +63,9 @@ static struct dlog *servauth_drain;
 /* usage - display usage message */
 /*static void sauth_usage(void)
 {
-  log(F_startup, L_status, PACKAGE_NAME" server auth "PACKAGE_VERSION);
+  log(F_startup, L_status, LIBPACKAGE_NAME" server auth "LIBPACKAGE_VERSION);
   log(F_startup, L_status, "$Id: servauth.c,v 1.2 2006/09/28 08:38:31 roman Exp $\n");
-  log(F_startup, L_status, "This program is called by "PACKAGE_NAME".");
+  log(F_startup, L_status, "This program is called by "LIBPACKAGE_NAME".");
   log(F_startup, L_status, "It cannot be used on its own.");
   exit(1);
 }*/

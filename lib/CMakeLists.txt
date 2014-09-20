@@ -1,7 +1,7 @@
-set(PACKAGE_NAME libchaos)
-set(PACKAGE_VERSION 2.2.1)
-set(PACKAGE_RELEASE "peace, love & hippie edition")
-set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
+set(LIBPACKAGE_NAME libchaos)
+set(LIBPACKAGE_VERSION 2.2.1)
+set(LIBPACKAGE_RELEASE "peace, love & hippie edition")
+set(LIBPACKAGE_TARNAME ${LIBPACKAGE_NAME}-${LIBPACKAGE_VERSION})
 
 if(WINDOWS OR CYGWIN)
   set(DEFAULT_SHARED_LIB TRUE)
@@ -10,7 +10,7 @@ else()
 endif()
 
 
-project(${PACKAGE_NAME} C)
+project(${LIBPACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -52,7 +52,7 @@ check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
 substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
-set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
+set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${LIBPACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
@@ -80,7 +80,7 @@ set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/log.c src/mem.c src/mfile.c src/module.c src/net.c src/queue.c
    src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c ${DLFCN_SOURCES})
 
-string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
+string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${LIBPACKAGE_VERSION}")
 
 if(BUILD_SHARED)
   add_library(chaos SHARED ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
