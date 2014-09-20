@@ -3,6 +3,15 @@
 /* Creation time of this server */
 #cmakedefine CREATION @CREATION@
 
+/* Define to 1 if you have the setrlimit() function. */
+#cmakedefine HAVE_SETRLIMIT 1
+
+/* Define to 1 if you have the mmap() function. */
+#cmakedefine HAVE_MMAP 1
+
+/* Define to 1 if you have the mprotect() function. */
+#cmakedefine HAVE_MPROTECT 1
+
 /* Define to 1 if you have the <cygwin/in.h> header file. */
 #cmakedefine HAVE_CYGWIN_IN_H 1
 

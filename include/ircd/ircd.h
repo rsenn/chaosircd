@@ -30,7 +30,7 @@
 
 #include <stddef.h>
 
-#include "dlink.h"
+#include "libchaos/dlink.h"
 
 #define CLIENT_BLOCK_SIZE    64
 #define LCLIENT_BLOCK_SIZE   32
@@ -47,6 +47,7 @@
 #define SUPPORT_BLOCK_SIZE   32
 #define STATS_BLOCK_SIZE     16
 #define SERVICE_BLOCK_SIZE   16
+#define USERDB_BLOCK_SIZE   16
 
 #define IRCD_IDLEN      8
 #define IRCD_CIPHERLEN  8
@@ -87,13 +88,13 @@
 
 #if defined(WIN32) && !defined(STATIC_IRCD)
 # ifdef BUILD_MODULES
-#  define IRCD_MODULE(type) extern __attribute__((dllexport)) type
+#  define IRCD_MODULE(type) extern __declspec(dllexport) type
 # endif
 # ifdef BUILD_IRCD
-#  define IRCD_DATA(type) extern __attribute__((dllexport)) type
-#  define IRCD_API(type)         __attribute__((dllexport)) type
+#  define IRCD_DATA(type) extern __declspec(dllexport) type
+#  define IRCD_API(type)         __declspec(dllexport) type
 # else
-#  define IRCD_DATA(type) extern __attribute__((dllimport)) type
+#  define IRCD_DATA(type) extern __declspec(dllimport) type
 #  define IRCD_API(type)                                    type
 # endif
 #endif

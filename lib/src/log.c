@@ -25,13 +25,13 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "io.h"
-#include "syscall.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -187,7 +187,7 @@ int log_source_register(const char *name)
  * ------------------------------------------------------------------------ */
 int log_source_unregister(int id)
 {
-  if(id < 0 || id >= LOG_SOURCE_COUNT)
+  if(id < 0 || id >= (int)LOG_SOURCE_COUNT)
     return -1;
 
 /*  log(log_log, L_verbose, "Unregistered log source: %s",
@@ -539,7 +539,7 @@ void log_drain_level(struct dlog *drain, int level)
 /* ------------------------------------------------------------------------ *
  * Log a line.                                                              *
  * ------------------------------------------------------------------------ */
-void log_voutput(int src, int level, const char *format, va_list ap)
+void log_voutput(uint64_t src, int level, const char *format, va_list ap)
 {
   struct slog *source;
   struct dlog *drain;
@@ -600,7 +600,7 @@ void log_voutput(int src, int level, const char *format, va_list ap)
 }
 
 #if 1 //ndef DEBUG
-void log_output(int src, int level, const char *format, ...)
+void log_output(uint64_t src, int level, const char *format, ...)
 {
   va_list ap;
 
@@ -615,7 +615,7 @@ void log_output(int src, int level, const char *format, ...)
  * Log a line.                                                              *
  * ------------------------------------------------------------------------ */
 #ifndef HAVE_VARARG_MACROS
-void log_output_debug(int src, const char *format, ...)
+void log_output_debug(uint64_t src, const char *format, ...)
 {
   va_list ap;
 
@@ -630,7 +630,7 @@ void log_output_debug(int src, const char *format, ...)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifndef HAVE_VARARG_MACROS
-void log_output_dummy(int src, const char *format, ...)
+void log_output_dummy(uint64_t src, const char *format, ...)
 {
 }
 #endif /* HAVE_VARARG_MACROS */
@@ -640,7 +640,7 @@ void log_output_dummy(int src, const char *format, ...)
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
 void log_debug(const char *file,  int line,
-               int         src,   int level,
+               uint64_t    src,   int level,
                const char *format, ...)
 {
   struct slog *source;
@@ -756,11 +756,11 @@ void log_drain_dump(struct dlog *dlptr)
 
 void log_source_dump(int id)
 {
-  if(id < 0 || id > LOG_SOURCE_COUNT)
+  if(id < 0 || id > (int)LOG_SOURCE_COUNT)
   {
     dump(log_log, "[============= log source summary ==============]");
 
-    for(id = 0; id < LOG_SOURCE_COUNT; id++)
+    for(id = 0; id < (int)LOG_SOURCE_COUNT; id++)
     {
       if(log_sources[id].name[0] == '\0')
         continue;

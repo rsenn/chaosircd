@@ -26,11 +26,11 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "mem.h"
-#include "net.h"
-#include "dlink.h"
-#include "ssl.h"
+#include "libchaos/defs.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/dlink.h"
+#include "libchaos/ssl.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *

@@ -26,7 +26,8 @@ MODULES = auth \
           dns \
           proxy \
           query \
-          servauth
+          servauth \
+	  userdb
 
 SOURCES = $(MODULES:%=%.c)
 HEADERS = $(MODULES:%=%.h)
@@ -58,12 +59,16 @@ install: install-exec
 @SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
 @SSL_TRUE@@SSL_STATIC_FALSE@LIBS     += $(SSL_LIBS)
 @SSL_TRUE@@SSL_STATIC_TRUE@LDADD     += $(SSL_LIBS)
+@MYSQL_TRUE@LIBS += $(MYSQL_LIBS)
+@MYSQL_TRUE@CPPFLAGS += $(MYSQL_CFLAGS)
 LIBS     += $(DLFCN_LIBS)
+LIBS     += -lowfat
 CPPFLAGS += -DHAVE_CONFIG_H
 @A_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 
-INCLUDES += -I$(srcdir) \
-            -I$(top_srcdir)/include/libchaos \
+INCLUDES += \
+            -I$(top_srcdir) \
+            -I$(top_srcdir)/include \
             -I$(builddir) \
             -I$(top_builddir)/include/libchaos \
             -I. \

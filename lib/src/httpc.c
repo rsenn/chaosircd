@@ -24,17 +24,17 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#include "io.h"
-#include "syscall.h"
-#include "connect.h"
-#include "httpc.h"
-#include "timer.h"
-#include "dlink.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/connect.h"
+#include "libchaos/httpc.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
-#include "../config.h"
+#include "libchaos/config.h"
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -46,7 +46,7 @@ struct list      httpc_list;
 uint32_t         httpc_id;
 struct protocol *httpc_proto;
 char             httpc_hexchars[] = "0123456789ABCDEF";
-char             httpc_version[] = PACKAGE_NAME" v"PACKAGE_VERSION" ("PACKAGE_RELEASE")";
+char             httpc_version[] = LIBPACKAGE_NAME" v"LIBPACKAGE_VERSION" ("LIBPACKAGE_RELEASE")";
 uint8_t          httpc_hextable[256] = {
   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
@@ -114,7 +114,7 @@ static size_t httpc_parse_protocol(struct httpc *hcptr)
     hcptr->port = 80;
   }
 
-  return s ? s - hcptr->url + 3 : i;
+  return s ? (size_t)(s - hcptr->url + 3) : i;
 }
 
 /* ------------------------------------------------------------------------ *

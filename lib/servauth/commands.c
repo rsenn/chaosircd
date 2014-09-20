@@ -21,24 +21,25 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "timer.h"
-#include "queue.h"
-#include "log.h"
-#include "net.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/queue.h"
+#include "libchaos/log.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "commands.h"
-#include "control.h"
-#include "servauth.h"
-#include "cache.h"
-#include "dns.h"
-#include "auth.h"
-#include "proxy.h"
-#include "query.h"
+#include "servauth/commands.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
+#include "servauth/cache.h"
+#include "servauth/dns.h"
+#include "servauth/auth.h"
+#include "servauth/proxy.h"
+#include "servauth/query.h"
+#include "servauth/userdb.h"
 
 /* -------------------------------------------------------------------------- *
  * command prototypes                                                         *
@@ -48,6 +49,7 @@ static int cmd_auth        (control_t *cptr, int ac, char **av);
 static int cmd_dns_forward (control_t *cptr, int ac, char **av);
 static int cmd_dns_reverse (control_t *cptr, int ac, char **av);
 static int cmd_proxy       (control_t *cptr, int ac, char **av);
+static int cmd_userdb      (control_t *cptr, int ac, char **av);
 
 /* -------------------------------------------------------------------------- *
  * main commands                                                              *
@@ -56,6 +58,7 @@ struct cmd_table cmds[] = {
   { "dns",     &cmd_dns   },
   { "auth",    &cmd_auth  },
   { "proxy",   &cmd_proxy },
+  { "userdb",  &cmd_userdb },
   { NULL,      NULL       }
 };
 
@@ -127,6 +130,49 @@ static int cmd_auth(control_t *cptr, int ac, char **av)
 
   if(query_start(q, QUERY_AUTH, timer_systime) == -1)
     return -1;
+
+  return 0;
+}
+
+/* -------------------------------------------------------------------------- *
+ * cmd_userdb() -
+ *                                                                            *
+ * av[0] = "userdb"                                                             *
+ * av[1] = "verify"|"register"|"mutate"
+ * -------------------------------------------------------------------------- */
+static int cmd_userdb(control_t *cptr, int ac, char **av)
+{
+  static struct userdb_client *udb;
+
+  if(!udb) {
+    udb = calloc(sizeof(struct userdb_client),1);
+
+    if(   userdb_connect(udb, "127.0.0.1", "root", "") )
+      log(servauth_log, L_status, "userdb connection succeeded");
+
+
+  }
+
+  if(!strcmp(av[1], "verify")) {
+    char *s;
+    int v = userdb_verify(udb, (const char*)av[2], av[3] ? av[3] : "", &s);
+    control_send(&servauth_control, "userdb verify %s %d %s", av[2], !!v, s ? s : "");
+    free(s);
+
+  } else if(!strcmp(av[1], "register")) {
+    int v = userdb_register(udb, ( char*)av[2], &av[3], ac - 3);
+    control_send(&servauth_control, "userdb register %s %d", av[2], !v);
+  } else if(!strcmp(av[1], "mutate")) {
+    int v = userdb_mutate(udb, ( char*)&av[2], &av[3], ac - 3);
+    control_send(&servauth_control, "userdb mutate %s %d", av[2], !v);
+  } else if(!strcmp(av[1], "search")) {
+    char *s;
+    //int v = userdb_search(udb, av[2], &av[3], ac - 3);
+    //control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
+    int v = userdb_search(udb, &av[2], ac - 2, &s);
+    control_send(&servauth_control, "userdb search %s %d %s", av[2], v, s ? s : "");
+    if(s) free(s);
+  }
 
   return 0;
 }

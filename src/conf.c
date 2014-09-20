@@ -24,18 +24,18 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "connect.h"
-#include "syscall.h"
-#include "listen.h"
-#include "module.h"
-#include "mfile.h"
-#include "hook.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "ssl.h"
-#include "io.h"
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/syscall.h"
+#include "libchaos/listen.h"
+#include "libchaos/module.h"
+#include "libchaos/mfile.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

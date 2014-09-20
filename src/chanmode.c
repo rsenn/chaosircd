@@ -24,29 +24,29 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "dlink.h"
-#include "hook.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "timer.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/class.h>
-#include <ircd/chanmode.h>
-#include <ircd/chanuser.h>
-#include <ircd/channel.h>
-#include <ircd/numeric.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/chars.h>
-#include <ircd/user.h>
+#include "ircd/ircd.h"
+#include "ircd/class.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/chars.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -1260,18 +1260,16 @@ void chanmode_prefix_make(char *pfx, uint64_t flags)
   uint32_t         top = (uint32_t)-1;
   struct chanmode *mode;
 
-  for(;;)
-  {
+  for(;;) {
     current = 0;
     mode = NULL;
 
-    for(i = 0; i < 64; i++)
-    {
+    for(i = 0; i < 64; i++) {
       if(chanmode_table[i].type != CHANMODE_TYPE_PRIVILEGE)
         continue;
 
-      if(chanmode_table[i].order < top &&
-         chanmode_table[i].order > current &&
+      if((uint32_t)chanmode_table[i].order < top &&
+         (uint32_t)chanmode_table[i].order > current &&
          chanmode_table[i].flag & flags)
       {
         mode = &chanmode_table[i];
@@ -1312,8 +1310,8 @@ void chanmode_changes_make(struct list *list, int what, struct chanuser *cuptr)
       if(chanmode_table[i].type != CHANMODE_TYPE_PRIVILEGE)
         continue;
 
-      if(chanmode_table[i].order < top &&
-         chanmode_table[i].order > current &&
+      if((uint32_t)chanmode_table[i].order < top &&
+         (uint32_t)chanmode_table[i].order > current &&
          chanmode_table[i].flag & cuptr->flags)
       {
         mode = &chanmode_table[i];

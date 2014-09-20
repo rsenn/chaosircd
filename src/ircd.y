@@ -28,21 +28,20 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "defs.h"
-#include "dlink.h"
-#include "str.h"
-#include "ini.h"
-#include "log.h"
-#include "child.h"
-#include "mfile.h"
-#include "module.h"
-#include "listen.h"
-#include "connect.h"
-#include "ssl.h"
-
-#include <ircd/ircd.h>
-#include <ircd/conf.h>
-#include <ircd/oper.h>
+#include "libchaos/defs.h"
+#include "libchaos/dlink.h"
+#include "libchaos/str.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/child.h"
+#include "libchaos/mfile.h"
+#include "libchaos/module.h"
+#include "libchaos/listen.h"
+#include "libchaos/connect.h"
+#include "libchaos/ssl.h"
+#include "ircd/ircd.h"
+#include "ircd/conf.h"
+#include "ircd/oper.h"
 
   
 #define YY_FATAL_ERROR(x) log(conf_log, L_warning, x)

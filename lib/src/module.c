@@ -25,15 +25,17 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "io.h"
-#include "syscall.h"
-#include "module.h"
-#include "timer.h"
-#include "dlink.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/module.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+
+#include "config.h"
 
 #ifndef USE_DSO
 #define USE_DSO
@@ -50,8 +52,6 @@
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
-#include "../config.h"
-
 #ifdef HAVE_ELF_H
 #include <elf.h>
 #endif /* HAVE_ELF_H */
@@ -261,12 +261,11 @@ const char *module_expand(const char *name)
 
   strlcpy(ret, name, sizeof(ret));
 
-  if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_')));
-  {
-    for(i = 0; module_table[i][0]; i++)
-    {
-      if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret))
-      {
+  if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_'))) {
+
+    for(i = 0; module_table[i][0]; i++) {
+
+      if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret)) {
         *p++ = '\0';
 
         strlcpy(lala, p, sizeof(lala));

@@ -25,14 +25,14 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "connect.h"
-#include "sauth.h"
-#include "defs.h"
-#include "log.h"
-#include "mem.h"
-#include "net.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/sauth.h"
+#include "libchaos/defs.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *

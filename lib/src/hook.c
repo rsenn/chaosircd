@@ -24,11 +24,11 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "timer.h"
-#include "dlink.h"
-#include "hook.h"
-#include "mem.h"
+#include "libchaos/defs.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/hook.h"
+#include "libchaos/mem.h"
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */

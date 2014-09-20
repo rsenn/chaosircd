@@ -62,15 +62,16 @@ MODULES              = m_away \
                        m_user \
                        m_userhost \
                        m_userip \
+                       m_userdb \
                        m_version \
                        m_who \
                        m_whois 
 
 #                       m_vuln 
 
-INCLUDES             = -I$(top_srcdir)/lib/include/libchaos \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../lib/include/libchaos \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)

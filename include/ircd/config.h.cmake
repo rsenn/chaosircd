@@ -25,3 +25,6 @@
 /* Platform this server runs on */
 #cmakedefine PLATFORM
 
+/* Define to 1 if you have the setrlimit() function. */
+#cmakedefine HAVE_SETRLIMIT 1
+

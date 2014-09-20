@@ -1,10 +1,14 @@
-#if(NOT DEFINED BUILD_SHARED_LIBS)
-#  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
-#endif(NOT DEFINED BUILD_SHARED_LIBS)
+if(NOT CYGWIN AND NOT WINDOWS)
+  set(DEFAULT_SHARED_LIB true)
+endif()
+
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildSharedModules.cmake")
+
 #
-#if(NOT BUILD_SHARED_LIBS)
+#if(NOT BUILD_SHARED)
 #  add_definitions(-DSTATIC_LIBCHAOS=1)
-#endif(NOT BUILD_SHARED_LIBS)
+#endif(NOT BUILD_SHARED)
 #
 #set(PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "runtime prefix dir")
 #set(SYSCONFDIR ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME} CACHE FILEPATH "configuration directory")
@@ -18,7 +22,9 @@
 #
 #message(STATUS "Scanning for modules...")
 
-add_definitions(-DBUILD_MODULES=1)
+if(BUILD_LOADABLE_MODULES)
+  add_definitions(-DBUILD_MODULES=1)
+endif()
 
 file(GLOB ALL_MODULES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" */??_*.c)
 
@@ -31,8 +37,20 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
 
     #string(REGEX REPLACE \\.c$ "" MODULE_NAME "${MODULE_SOURCE}")
 
-    add_library("${MODULE_NAME}" MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
-    set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
+    link_directories("${CMAKE_BINARY_DIR}/src" "${cgircd_BINARY_DIR}")
+
+    if(BUILD_LOADABLE_MODULES)
+      add_library("${MODULE_NAME}" MODULE SHARED "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
+      set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
+      
+      if(WINDOWS OR CYGWIN)
+          target_link_libraries("${MODULE_NAME}" ircd)
+      endif()
+
+      #      target_compile_options("${MODULE_NAME}" BEFORE "-rdynamic ${CMAKE_CURRENT_BINARY_DIR}/../cgircd")
+    else()
+      add_library("${MODULE_NAME}" STATIC "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
+    endif()
 
     install(TARGETS "${MODULE_NAME}"
             RUNTIME DESTINATION libexec/cgircd

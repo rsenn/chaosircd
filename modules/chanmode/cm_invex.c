@@ -22,18 +22,18 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "hook.h"
+#include "libchaos/hook.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/user.h>
-#include <ircd/server.h>
-#include <ircd/numeric.h>
-#include <ircd/channel.h>
-#include <ircd/chanmode.h>
-#include <ircd/chanuser.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/server.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *

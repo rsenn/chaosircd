@@ -24,7 +24,7 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "net.h"
+#include "libchaos/net.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -41,14 +41,14 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "dlink.h"
-#include "net.h"
+#include "libchaos/dlink.h"
+#include "libchaos/net.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-/*#include "channel.h"
-#include "lclient.h"
-#include "ircd.h"*/
+/*#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/ircd.h"*/
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -73,7 +73,7 @@ struct client
   uint32_t         refcount;    /* how many times this block is referenced */
   hash_t           hash;
   uint32_t         type;
-  uint32_t         location;
+  int              location;
   struct lclient  *lclient;     /* if its a local client */
   struct lclient  *source;      /* local server the client comes from */
   struct client   *origin;      /* remote server the client comes from */

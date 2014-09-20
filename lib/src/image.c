@@ -27,17 +27,19 @@
  * ------------------------------------------------------------------------ */
 #include <math.h>
 
-#include "defs.h"
-#include "mem.h"
-#include "image.h"
-#include "log.h"
-#include "str.h"
-#include "gif.h"
+#include "libchaos/defs.h"
+#include "libchaos/mem.h"
+#include "libchaos/image.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/gif.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
 #include "../config.h"
+
+#include <math.h>
 
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -53,12 +55,12 @@ struct dheap       image_data_heap;  /* heap containing image data */
 struct list        image_list;       /* list linking image blocks */
 uint32_t           image_id;
 int                image_dirty;
-#include "image_defpal.h"
+#include "libchaos/image_defpal.h"
 
 /* bitmap fonts (not ttf!) */
-/*#include "font_6x10.h"
-#include "font_8x13.h"
-#include "font_8x13b.h"*/
+/*#include "libchaos/font_6x10.h"
+#include "libchaos/font_8x13.h"
+#include "libchaos/font_8x13b.h"*/
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -440,7 +442,7 @@ struct palette *image_quantize(struct image *iptr, int maxcolors, int *ckey)
         {
           struct node *node;
 
-          if(++counts[bitcount] > maxcolors)
+          if(++counts[bitcount] > (unsigned)maxcolors)
           {
             dlink_destroy(&levels[depth]);
             depth++;
@@ -1376,7 +1378,7 @@ struct palette *image_palette_new(uint32_t ncolors)
   pal->colors = (struct color *)&pal[1];
 
   /* Initialize colors */
-  for(n = 0; n < pal->count; n++)
+  for(n = 0; n < (unsigned)pal->count; n++)
   {
     pal->colors[n].r = 0x00;
     pal->colors[n].g = 0x00;
@@ -1490,8 +1492,7 @@ uint8_t image_palette_match(struct palette *palette, struct color *c, int colork
                (gdiff * gdiff) +
                (bdiff * bdiff);
 
-    if(distance < ldist)
-    {
+    if((unsigned)distance < ldist) {
       index = i;
       ldist = distance;
 

@@ -83,78 +83,83 @@ struct db
     void                  *common;
   } handle;
   uint64_t                 affected_rows;
-  char                     error[256];
+  int                     error;
+  char                     errormsg[256];
 };
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern int                 db_log;
-extern struct sheap        db_heap;
-extern struct list         db_list;
-extern uint32_t            db_serial;
+CHAOS_DATA(int)                 db_log;
+CHAOS_DATA(struct sheap)        db_heap;
+CHAOS_DATA(struct list)         db_list;
+CHAOS_DATA(uint32_t)            db_serial;
 
 /* ------------------------------------------------------------------------ *
  * Initialize DB heap                                                       *
  * ------------------------------------------------------------------------ */
-extern void                db_init              (void);
+CHAOS_API(void)                db_init              (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB heap                                                          *
  * ------------------------------------------------------------------------ */
-extern void                db_shutdown          (void);
+CHAOS_API(void)                db_shutdown          (void);
 
 /* ------------------------------------------------------------------------ *
  * Destroy DB instance                                                      *
  * ------------------------------------------------------------------------ */
-extern void                db_destroy           (struct db  *db);
+CHAOS_API(void)                db_destroy           (struct db  *db);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct db          *db_new               (int         type);
+CHAOS_API(struct db*)         db_new               (int         type);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern int                 db_connect           (struct db  *db,
-                                                 char       *host,
-                                                 char       *user,
-                                                 char       *pass,
-                                                 char       *dbname);
+CHAOS_API(int)                 db_connect           (struct db  *db,
+                                                 const char* host,
+                                                 const char* user,
+                                                 const char* pass,
+                                                 const char* dbname);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct db_result   *db_query             (struct db  *db,
+CHAOS_API(struct db_result*)   db_query             (struct db  *db,
                                                  const char *format,
                                                  ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void                db_close             (struct db  *db);
+CHAOS_API(void)                db_close             (struct db  *db);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern size_t              db_escape_string     (struct db  *db,
-                                                 char       *to,
+CHAOS_API(size_t)              db_escape_string     (struct db *db,
+                                                 char* to,
                                                  const char *from,
                                                  size_t      len);
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+CHAOS_API(char*)              db_escape_string_dup     (struct db *db,
+                                                 const char *from);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void                db_free_result       (struct db_result *result);
+CHAOS_API(void)                db_free_result       (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern char              **db_fetch_row         (struct db_result *result);
+CHAOS_API(char**)              db_fetch_row         (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern uint64_t            db_num_rows          (struct db_result *result);
+CHAOS_API(uint64_t)            db_num_rows          (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern uint32_t            db_num_fields        (struct db_result *result);
+CHAOS_API(uint32_t)            db_num_fields        (struct db_result *result);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern uint64_t            db_affected_rows     (struct db *db);
+CHAOS_API(uint64_t)            db_affected_rows     (struct db *db);
 
 #endif /* LIB_DB_H */

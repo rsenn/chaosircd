@@ -26,14 +26,19 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "dlink.h"
+#include "libchaos/defs.h"
+#include "libchaos/dlink.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                             *
  * ------------------------------------------------------------------------ */
+//#include "../config.h"
+
 #include <stdarg.h>
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif /* HAVE_SYS_TIME_H */
+
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *
@@ -72,7 +77,7 @@ struct timer
 
   /* internally initialised */
   uint64_t    deadline;       /* time at which the callback will be called */
-  uint32_t    id;
+  int32_t         id;
 };
 /* Sorry for this leetness, but timer_t is already defined elsewhere */
 
@@ -222,7 +227,7 @@ CHAOS_API(struct timer *)timer_find       (void           *callback,
 /* ------------------------------------------------------------------------ *
  * Find a timer by id.                                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct timer *)timer_find_id    (uint32_t        id);
+CHAOS_API(struct timer *)timer_find_id    (int        id);
 
 /* ------------------------------------------------------------------------ *
  * Stop and remove a timer by callback and userarg.                           *

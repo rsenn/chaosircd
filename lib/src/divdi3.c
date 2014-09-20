@@ -18,11 +18,11 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include "defs.h"
+#include "libchaos/defs.h"
 
 #if __WORDSIZE == 32
 
-#include "divdi3.h"
+#include "libchaos/divdi3.h"
 
 typedef unsigned int uint128_t	__attribute__ ((mode (QI)));
 

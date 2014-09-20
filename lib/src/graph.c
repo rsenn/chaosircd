@@ -25,13 +25,13 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "mem.h"
-#include "graph.h"
-#include "log.h"
-#include "str.h"
-#include "image.h"
-#include "timer.h"
+#include "libchaos/defs.h"
+#include "libchaos/mem.h"
+#include "libchaos/graph.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/image.h"
+#include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -520,16 +520,15 @@ void graph_draw_grid(struct graph *graph)
  * ------------------------------------------------------------------------ */
 void graph_draw_columns(struct graph *graph)
 {
-  int16_t x1, y1, x2, y2;
-  int i;
+  size_t i;
   struct rect rect;
 
-  x1 = GRAPH_PADDING_LEFT;
-  y1 = GRAPH_PADDING_TOP;
-  x2 = graph->width - GRAPH_PADDING_RIGHT;
-  y2 = graph->height - GRAPH_PADDING_BOTTOM;
+  size_t x1 = GRAPH_PADDING_LEFT;
+  size_t y1 = GRAPH_PADDING_TOP;
+  size_t x2 = graph->width - GRAPH_PADDING_RIGHT;
+  size_t y2 = graph->height - GRAPH_PADDING_BOTTOM;
 
-//  column_width = (graph->grid_width / graph->samples) - graph->column_spacing;
+//  column_width (size_t)= (graph->grid_width / graph->samples) - graph->column_spacing;
   for(i = 0; i < graph->samples; i++)
   {
     uint16_t height;

@@ -1,3 +1,29 @@
+#if 1
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine LIBPACKAGE_BUGREPORT "@LIBPACKAGE_BUGREPORT@"
+
+/* Define to the full name of this package. */
+#cmakedefine LIBPACKAGE_NAME "@LIBPACKAGE_NAME@"
+
+/* Define to the release name of this package. */
+#cmakedefine LIBPACKAGE_RELEASE "@LIBPACKAGE_RELEASE@"
+
+/* Define to the full name and version of this package. */
+#cmakedefine LIBPACKAGE_STRING "@LIBPACKAGE_STRING@"
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine LIBPACKAGE_TARNAME "@LIBPACKAGE_TARNAME@"
+
+/* Define to the home page for this package. */
+#cmakedefine LIBPACKAGE_URL "@LIBPACKAGE_URL@"
+
+/* Define to the version of this package. */
+#cmakedefine LIBPACKAGE_VERSION "@LIBPACKAGE_VERSION@"
+
+/* Platform this server runs on */
+#cmakedefine PLATFORM "@PLATFORM@"
+#endif
+
 /* Use select() for i/o multiplexing */
 #cmakedefine USE_SELECT 1
 
@@ -58,8 +84,9 @@
 /* Define to 1 if you have the <winsock2.h> header file. */
 #cmakedefine HAVE_WINSOCK2_H 1
 
-/* Suffix for shared loadable modules */
-#define DLLEXT ".dll"
-
 /* The size of `uintptr_t', as computed by sizeof. */
 #cmakedefine SIZEOF_UINTPTR_T 32
+
+/* Dynamic linkable library filename extension */
+#cmakedefine DLLEXT "@DLLEXT@"
+

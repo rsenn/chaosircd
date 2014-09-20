@@ -1,11 +1,16 @@
-set(PACKAGE_NAME libchaos)
-set(PACKAGE_VERSION 2.2.1)
-set(PACKAGE_RELEASE "peace, love & hippie edition")
-set(PACKAGE_TARNAME ${PACKAGE_NAME}-${PACKAGE_VERSION})
+set(LIBPACKAGE_NAME libchaos)
+set(LIBPACKAGE_VERSION 2.2.1)
+set(LIBPACKAGE_RELEASE "peace, love & hippie edition")
+set(LIBPACKAGE_TARNAME ${LIBPACKAGE_NAME}-${LIBPACKAGE_VERSION})
 
-set(DEFAULT_SHARED_LIB FALSE)
+if(WINDOWS OR CYGWIN)
+  set(DEFAULT_SHARED_LIB TRUE)
+else()
+  set(DEFAULT_SHARED_LIB FALSE)
+endif()
 
-project(${PACKAGE_NAME} C)
+
+project(${LIBPACKAGE_NAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -21,34 +26,39 @@ endif()
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/BuildShared.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/DllExt.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
-
-include(FindOpenSSL)
-include(FindFreetype)
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseOpenSSL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseMySQL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
+
+if(BUILD_STATIC)
+  add_definitions(-DSTATIC_LIBCHAOS=1)
+endif()
+
+include(CheckLibraryExists)
+
+check_library_exists(owfat stralloc_init "${CMAKE_INSTALL_PREFIX}/lib" HAVE_LOWFAT)
+if(HAVE_LOWFAT)
+  set(LOWFAT_LIBRARY owfat)
+endif()
+
+add_definitions(-DHAVE_CONFIG_H=1)
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
-endif(NOT DEFINED BUILD_SHARED_LIBS)
+substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
-if(NOT BUILD_SHARED_LIBS)
-  add_definitions(-DSTATIC_LIBCHAOS=1)
-endif(NOT BUILD_SHARED_LIBS)
- 
-set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
-
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
-
-substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
-
-	       
-set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
+set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${LIBPACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_LIBCHAOS=1)
+
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 set(LIBCHAOS_HEADERS include/libchaos/cfg.h include/libchaos/child.h
    include/libchaos/connect.h include/libchaos/db.h include/libchaos/defs.h
@@ -70,17 +80,23 @@ set(LIBCHAOS_SOURCES src/cfg.c src/child.c src/connect.c src/db.c
    src/log.c src/mem.c src/mfile.c src/module.c src/net.c src/queue.c
    src/sauth.c src/ssl.c src/str.c src/syscall.c src/timer.c src/ttf.c ${DLFCN_SOURCES})
 
-add_library(libchaos ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${LIBPACKAGE_VERSION}")
 
-string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
+if(BUILD_SHARED)
+  add_library(chaos SHARED ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
+  
+  set_target_properties(chaos PROPERTIES
+                        SOVERSION "${LIBRARY_VERSION}"
+                        PREFIX "")
 
-set_target_properties(libchaos PROPERTIES
-                      SOVERSION "${LIBRARY_VERSION}"
-                      PREFIX "")
+  target_link_libraries(chaos ${OPENSSL_LIBS} ${MYSQL_LIBS} ${FREETYPE_LIBS} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+else()
+  add_library(chaos STATIC ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
-target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+  target_link_libraries(chaos LINK_PUBLIC ${OPENSSL_LIBS} ${MYSQL_LIBS} ${FREETYPE_LIBS} ${LOWFAT_LIBRARY} ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+endif()
 
-install(TARGETS libchaos
+install(TARGETS chaos
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)

@@ -24,31 +24,31 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "config.h"
-#include "connect.h"
-#include "syscall.h"
-#include "filter.h"
-#include "listen.h"
-#include "module.h"
-#include "child.h"
-#include "dlink.h"
-#include "graph.h"
-#include "htmlp.h"
-#include "httpc.h"
-#include "image.h"
-#include "mfile.h"
-#include "queue.h"
-#include "sauth.h"
-#include "timer.h"
-#include "hook.h"
-#include "gif.h"
-#include "ini.h"
-#include "log.h"
-#include "mem.h"
-#include "net.h"
-#include "str.h"
-#include "ssl.h"
-#include "io.h"
+#include "ircd/config.h"
+#include "libchaos/connect.h"
+#include "libchaos/syscall.h"
+#include "libchaos/filter.h"
+#include "libchaos/listen.h"
+#include "libchaos/module.h"
+#include "libchaos/child.h"
+#include "libchaos/dlink.h"
+#include "libchaos/graph.h"
+#include "libchaos/htmlp.h"
+#include "libchaos/httpc.h"
+#include "libchaos/image.h"
+#include "libchaos/mfile.h"
+#include "libchaos/queue.h"
+#include "libchaos/sauth.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/gif.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
@@ -117,9 +117,9 @@ char         ircd_path[PATHLEN];
 /* -------------------------------------------------------------------------- *
  * Install mmap()ed and mprotect()ed stack into ircd core                     *
  * -------------------------------------------------------------------------- */
-#if 0 /* (defined __linux__) && (defined __i386__)*/
-static void ircd_stack_install(void)
-{
+void ircd_stack_install(void) {
+
+#ifdef HAVE_MPROTECT
   void   *old_esp;
   void   *old_ebp;
   size_t  old_size;
@@ -150,8 +150,8 @@ static void ircd_stack_install(void)
   __asm__ __volatile__("movl\t%0,%%esp\n\t"
                        "movl\t%1,%%ebp\n\t"
                        : : "a" (new_esp), "b" (new_ebp));
+#endif
 }
-#endif /* (defined __linux__) && (defined __i386__) */
 
 /* -------------------------------------------------------------------------- *
  * Die if we cannot bind to a port during coldstart.                          *
@@ -448,7 +448,7 @@ void ircd_loop(void)
 #warning No I/O
 #endif /* USE_SELECT | USE_POLL */
 
-//		log(ircd_log, L_debug, "I/O multiplex returned: %d", ret);
+//log(ircd_log, L_debug, "I/O multiplex returned: %d", ret);
 
     /* Remaining time is 0msecs, we need to run a timer */
     if(remain == 0LL)

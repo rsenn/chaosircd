@@ -26,9 +26,9 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "config.h"
-#include "defs.h"
-#include "io.h"
+#include "libchaos/config.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                *

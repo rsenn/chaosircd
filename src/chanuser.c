@@ -24,27 +24,27 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "dlink.h"
-#include "hook.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/user.h>
-#include <ircd/chanuser.h>
-#include <ircd/chanmode.h>
-#include <ircd/channel.h>
-#include <ircd/numeric.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/chars.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/chanuser.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/chars.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *

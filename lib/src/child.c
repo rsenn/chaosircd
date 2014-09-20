@@ -25,15 +25,15 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "io.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "child.h"
-#include "dlink.h"
-#include "timer.h"
-#include "syscall.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/child.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
+#include "libchaos/syscall.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -299,8 +299,7 @@ struct child *child_push(struct child **ciptrptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_callback(struct child *child, int type)
-{
+void child_callback(struct child *child, int type) {
 #ifndef WIN32
   int status = WEXITSTATUS(child->exitcode);
 
@@ -730,7 +729,6 @@ void child_dump(struct child *cdptr)
     dump(child_log, "     status: %u", cdptr->status);
     dump(child_log, "        pid: %i", cdptr->pid);
     dump(child_log, "      timer: %i", cdptr->timer ? cdptr->timer->id : -1);
-
     dump(child_log, "      chans: %u", cdptr->chans);
     dump(child_log, "   channels: [%i:%i] [%i:%i] [%i:%i] [%i:%i]",
          cdptr->channels[0][CHILD_PARENT][0], cdptr->channels[0][CHILD_PARENT][1],

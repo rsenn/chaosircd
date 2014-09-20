@@ -22,26 +22,26 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "dlink.h"
-#include "io.h"
-#include "ini.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "hook.h"
-#include "sauth.h"
-#include "timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/io.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/hook.h"
+#include "libchaos/sauth.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/user.h>
-#include <ircd/msg.h>
-#include <ircd/lclient.h>
-#include <ircd/server.h>
-#include <ircd/client.h>
-#include <ircd/numeric.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
+#include "ircd/lclient.h"
+#include "ircd/server.h"
+#include "ircd/client.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
@@ -524,9 +524,9 @@ static struct node *m_proxy_find(uint16_t port, int service)
 
   dlink_foreach(&m_proxy_list, node)
   {
-    size_t val = (size_t)node->data & 0xfffffffflu;
+    size_t val = (size_t)node->data & 0xffffffff;
 
-    if((val >> 16) == port && (val & 0xffff) == service)
+    if((val >> 16) == port && (val & 0xffff) == (uint16_t)service)
       return node;
   }
 

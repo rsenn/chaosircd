@@ -24,33 +24,33 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "connect.h"
-#include "listen.h"
-#include "dlink.h"
-#include "timer.h"
-#include "sauth.h"
-#include "hook.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "io.h"
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/listen.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
+#include "libchaos/sauth.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/msg.h>
-#include <ircd/ircd.h>
-#include <ircd/conf.h>
-#include <ircd/user.h>
-#include <ircd/chars.h>
-#include <ircd/class.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/lclient.h>
-#include <ircd/numeric.h>
-#include <ircd/chanmode.h>
-#include <ircd/usermode.h>
+#include "ircd/msg.h"
+#include "ircd/ircd.h"
+#include "ircd/conf.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/class.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -1371,7 +1371,7 @@ struct lclient *lclient_find_id(int id)
   struct lclient *lcptr;
 
   dlink_foreach(&lclient_list, lcptr)
-    if(lcptr->id == id)
+    if(lcptr->id == (uint32_t)id)
       return lcptr;
 
   return NULL;

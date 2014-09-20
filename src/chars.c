@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 
-#include <ircd/chars.h>
+#include "ircd/chars.h"
 
 /* -------------------------------------------------------------------------- *
  * char attribute table                                                       *

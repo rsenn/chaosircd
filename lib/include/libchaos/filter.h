@@ -26,9 +26,9 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "net.h"
-#include "dlink.h"
+#include "libchaos/defs.h"
+#include "libchaos/net.h"
+#include "libchaos/dlink.h"
 
 /* ------------------------------------------------------------------------ *
  * Constants                                                                  *

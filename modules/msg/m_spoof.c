@@ -22,27 +22,27 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "io.h"
-#include "ini.h"
-#include "log.h"
-#include "net.h"
-#include "str.h"
-#include "hook.h"
-#include "module.h"
-#include "timer.h"
+#include "libchaos/io.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/hook.h"
+#include "libchaos/module.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/msg.h>
-#include <ircd/user.h>
-#include <ircd/chars.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/lclient.h>
-#include <ircd/numeric.h>
-#include <ircd/channel.h>
-#include <ircd/chanuser.h>
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

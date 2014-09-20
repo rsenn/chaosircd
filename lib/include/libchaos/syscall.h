@@ -25,7 +25,7 @@
 #ifndef LIB_SYSCALL_H
 #define LIB_SYSCALL_H
 
-#include "defs.h"
+#include "libchaos/defs.h"
 
 #if 0 //(defined __linux) && (defined __i386__)
 
@@ -48,7 +48,9 @@ extern int syscall_errno;*/
 #include <stdint.h>
 #include <sys/poll.h>
 #include <sys/stat.h>
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif /* HAVE_SYS_TIME_H */
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>

@@ -19,19 +19,20 @@
  * $Id: servauth.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#include "defs.h"
-#include "connect.h"
-#include "dlink.h"
-#include "queue.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "io.h"
-#include "syscall.h"
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/dlink.h"
+#include "libchaos/queue.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/db.h"
 
 #ifdef HAVE_CONFIG_H
-#include "../config.h"
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #ifdef HAVE_SIGNAL_H
@@ -42,13 +43,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "control.h"
-#include "servauth.h"
-#include "cache.h"
-#include "auth.h"
-#include "dns.h"
-#include "proxy.h"
-#include "query.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
+#include "servauth/cache.h"
+#include "servauth/auth.h"
+#include "servauth/dns.h"
+#include "servauth/proxy.h"
+#include "servauth/query.h"
 
 struct servauth_query servauth_queries[MAX_QUERIES];
 struct control        servauth_control;              /* control connection :D */
@@ -62,9 +63,9 @@ static struct dlog *servauth_drain;
 /* usage - display usage message */
 /*static void sauth_usage(void)
 {
-  log(F_startup, L_status, PACKAGE_NAME" server auth "PACKAGE_VERSION);
+  log(F_startup, L_status, LIBPACKAGE_NAME" server auth "LIBPACKAGE_VERSION);
   log(F_startup, L_status, "$Id: servauth.c,v 1.2 2006/09/28 08:38:31 roman Exp $\n");
-  log(F_startup, L_status, "This program is called by "PACKAGE_NAME".");
+  log(F_startup, L_status, "This program is called by "LIBPACKAGE_NAME".");
   log(F_startup, L_status, "It cannot be used on its own.");
   exit(1);
 }*/
@@ -74,12 +75,16 @@ static struct dlog *servauth_drain;
  * -------------------------------------------------------------------------- */
 void servauth_init(void)
 {
-  log_init(0, 0, 0);
+//  log_init(0, 0, 0);
+  
   mem_init();
   timer_init();
   queue_init();
   dlink_init();
   connect_init();
+  db_init();
+
+  log_init(1, LOG_ALL, L_debug);
 
 #ifdef SIGPIPE
   syscall_signal(SIGPIPE, SIG_IGN);

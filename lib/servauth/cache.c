@@ -22,15 +22,15 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "net.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
  * -------------------------------------------------------------------------- */
 #ifdef HAVE_CONFIG_H
-#include "../config.h"
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include <stdarg.h>
@@ -47,9 +47,9 @@
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "cache.h"
-#include "control.h"
-#include "servauth.h"
+#include "servauth/cache.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
 
 /* -------------------------------------------------------------------------- *
  * Get oldest entry with specified status                                     *

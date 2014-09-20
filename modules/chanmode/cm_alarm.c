@@ -8,17 +8,17 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "hook.h"
-#include "log.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/numeric.h>
-#include <ircd/channel.h>
-#include <ircd/chanmode.h>
-#include <ircd/chanuser.h>
+#include "ircd/ircd.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

@@ -22,21 +22,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "timer.h"
-#include "log.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/msg.h>
-#include <ircd/conf.h>
-#include <ircd/user.h>
-#include <ircd/server.h>
-#include <ircd/client.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/conf.h"
+#include "ircd/user.h"
+#include "ircd/server.h"
+#include "ircd/client.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

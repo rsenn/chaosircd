@@ -4,13 +4,13 @@ set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/cmake")
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
-endif(NOT DEFINED BUILD_SHARED_LIBS)
+if(NOT DEFINED BUILD_SHARED)
+  set(BUILD_SHARED ${DEFAULT_SHARED_LIB})
+endif(NOT DEFINED BUILD_SHARED)
 
-if(NOT BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED)
   add_definitions(-DSTATIC_LIBCHAOS=1)
-endif(NOT BUILD_SHARED_LIBS)
+endif(NOT BUILD_SHARED)
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
@@ -18,21 +18,12 @@ include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DI
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
 
-add_executable(cfgtest cfgtest.c)
-target_link_libraries(cfgtest libchaos)
 
-add_executable(dbtest dbtest.c)
-target_link_libraries(dbtest libchaos)
+set(TESTS cfgtest dbtest giftest graphtest imagetest ttftest)
 
-add_executable(giftest giftest.c)
-target_link_libraries(giftest libchaos)
+foreach(TEST ${TESTS})
 
-add_executable(graphtest graphtest.c)
-target_link_libraries(graphtest libchaos)
+  add_executable("${TEST}" "${TEST}.c")
+  target_link_libraries("${TEST}" chaos ${MYSQL_LIBS} ${OPENSSL_LIBS})
 
-add_executable(imagetest imagetest.c)
-target_link_libraries(imagetest libchaos)
-
-add_executable(ttftest ttftest.c)
-target_link_libraries(ttftest libchaos)
-
+endforeach()

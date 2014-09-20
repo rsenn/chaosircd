@@ -1,13 +1,13 @@
-#include "io.h"
-#include "mem.h"
-#include "log.h"
-#include "db.h"
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
+#include "libchaos/db.h"
 
 int dbtest_type = DB_TYPE_MYSQL;
-char *dbtest_host = "localhost";
-char *dbtest_user = "visualize";
-char *dbtest_pass = "***";
-char *dbtest_dbname = "visualize";
+char *dbtest_host = "127.0.0.1";
+char *dbtest_user = "root";
+char *dbtest_pass = ""; //OttovPauwid";
+char *dbtest_dbname = "cgircd";
 /*int dbtest_type = DB_TYPE_PGSQL;
 char *dbtest_host = "localhost";
 char *dbtest_user = "enki";
@@ -26,8 +26,10 @@ void dbtest()
 
   if(!db_connect(db, dbtest_host, dbtest_user, dbtest_pass, dbtest_dbname))
     log(dbtest_log, L_status, "Database connection OK (Type = %s)", (db->type == DB_TYPE_PGSQL ? "PostgreSQL" : "MySQL"));
+  else
+    return;
 
-  result = db_query(db, "SELECT * FROM nodes ORDER BY id");
+  result = db_query(db, "SELECT * FROM cgircd.users ORDER BY uid;");
 
   while((row = db_fetch_row(result)))
   {

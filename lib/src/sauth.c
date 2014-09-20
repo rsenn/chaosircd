@@ -25,15 +25,15 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "child.h"
-#include "timer.h"
-#include "sauth.h"
-#include "log.h"
-#include "mem.h"
-#include "net.h"
-#include "str.h"
-#include "io.h"
+#include "libchaos/defs.h"
+#include "libchaos/child.h"
+#include "libchaos/timer.h"
+#include "libchaos/sauth.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *

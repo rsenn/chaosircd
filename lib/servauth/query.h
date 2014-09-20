@@ -22,9 +22,9 @@
 #ifndef SERVAUTH_QUERY_H
 #define SERVAUTH_QUERY_H
 
-#include "dns.h"
-#include "auth.h"
-#include "proxy.h"
+#include "servauth/dns.h"
+#include "servauth/auth.h"
+#include "servauth/proxy.h"
 
 #define QUERY_DNS_FORWARD 1
 #define QUERY_DNS_REVERSE 2

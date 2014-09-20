@@ -7,9 +7,9 @@ thisdir              = modules/service/
 CATEGORY             = service
 MODULES              = sv_sbb
 
-INCLUDES             = -I$(top_srcdir)/lib/include/libchaos \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../lib/include/libchaos \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)

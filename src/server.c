@@ -21,28 +21,28 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "connect.h"
-#include "timer.h"
-#include "net.h"
-#include "str.h"
-#include "log.h"
-#include "hook.h"
-#include "ssl.h"
+#include "libchaos/connect.h"
+#include "libchaos/timer.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/log.h"
+#include "libchaos/hook.h"
+#include "libchaos/ssl.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <ircd/msg.h>
-#include <ircd/conf.h>
-#include <ircd/user.h>
-#include <ircd/ircd.h>
-#include <ircd/chars.h>
-#include <ircd/class.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/channel.h>
-#include <ircd/lclient.h>
-#include <ircd/numeric.h>
-#include <ircd/chanuser.h>
+#include "ircd/msg.h"
+#include "ircd/conf.h"
+#include "ircd/user.h"
+#include "ircd/ircd.h"
+#include "ircd/chars.h"
+#include "ircd/class.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

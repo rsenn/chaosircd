@@ -22,22 +22,22 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "log.h"
-#include "dlink.h"
+#include "libchaos/log.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/msg.h>
-#include <ircd/user.h>
-#include <ircd/chars.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/channel.h>
-#include <ircd/numeric.h>
-#include <ircd/chanmode.h>
-#include <ircd/chanuser.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -90,7 +90,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
   struct chanuser *cuptr = NULL;
   struct channel  *chptr;
   struct node     *nptr;
-  unsigned long    ts;
+  time_t ts;
   struct list      chanusers;
 //  int              dropts = 0;
   int              dropremote = 0;

@@ -29,7 +29,7 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "dlink.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -62,7 +62,7 @@ struct channel {
   struct list      modelists[64];
   uint64_t         modes;
   uint32_t         serial;      /* burst serial */
-  int              limit;
+  size_t           limit;
   char             name      [IRCD_CHANNELLEN + 1];
   char             topic     [IRCD_TOPICLEN + 1];
   char             topic_info[IRCD_PREFIXLEN + 1];

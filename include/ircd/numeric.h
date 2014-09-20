@@ -22,8 +22,8 @@
 #ifndef SRC_NUMERIC_H
 #define SRC_NUMERIC_H
 
-#include "ircd.h"
-#include "client.h"
+#include "ircd/ircd.h"
+#include "ircd/client.h"
 
 /* -------------------------------------------------------------------------- *
  * Numeric constants                                                          *

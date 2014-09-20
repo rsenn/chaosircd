@@ -42,9 +42,9 @@ static void dl_convert_path(char *buf, size_t n, const char *path)
 void *dlopen(const char *filename, int flag)
 {
   void *handle;
-  char path[PATH_MAX];
+  char path[MAX_PATH];
 
-  dl_convert_path(path, PATH_MAX, filename);
+  dl_convert_path(path, MAX_PATH, filename);
 
   return LoadLibrary(path);
 }

@@ -22,7 +22,7 @@
 #ifndef SRC_CHARS_H
 #define SRC_CHARS_H
 
-#include "str.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *

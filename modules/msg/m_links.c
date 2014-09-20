@@ -22,17 +22,17 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "dlink.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/msg.h>
-#include <ircd/user.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/numeric.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

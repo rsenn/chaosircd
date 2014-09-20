@@ -22,19 +22,19 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "log.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/msg.h>
-#include <ircd/chars.h>
-#include <ircd/client.h>
-#include <ircd/lclient.h>
-#include <ircd/numeric.h>
-#include <ircd/usermode.h>
+#include "ircd/msg.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

@@ -1,10 +1,9 @@
-
 set(PACKAGENAME cgircd)
 set(PACKAGEVERSION 2.2.1)
 set(PACKAGERELEASE "peace, love & hippie edition")
 set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
-set(DEFAULT_SHARED_LIB FALSE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 project(${PACKAGENAME} C)
 
@@ -19,30 +18,40 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/FindBISON.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/FindFLEX.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/PlatformChecks.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/ConfigBuildType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseOpenSSL.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseMySQL.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseFreeType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/DllExt.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
+
+#if(NOT BUILD_SHARED)                                                                                                                                              add_definitions(-DSTATIC_LIBCHAOS=1)
+#  add_definitions(-DSTATIC_IRCD=1)
+#endif()
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
 endif()
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
-endif(NOT DEFINED BUILD_SHARED_LIBS)
-
-if(NOT BUILD_SHARED_LIBS)
-  add_definitions(-DSTATIC_LIBCHAOS=1)
-endif(NOT BUILD_SHARED_LIBS)
-
 include(CheckIncludeFile)
+include(CheckFunctionExists)
 
+check_function_exists(setrlimit HAVE_SETRLIMIT)
+check_function_exists(mmap HAVE_MMAP)
+check_function_exists(mprotect HAVE_MPROTECT)
+
+add_definitions(-DHAVE_CONFIG_H=1)
+
+check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
 check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
-
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
-substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+#substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 

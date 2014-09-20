@@ -1,17 +1,17 @@
-#include "io.h"
-#include "mem.h"
-#include "log.h"
-#include "gif.h"
+#include "libchaos/io.h"
+#include "libchaos/mem.h"
+#include "libchaos/log.h"
+#include "libchaos/gif.h"
 
 int giftest_write(void)
 {
   struct gif     *gif;
   struct palette *pal;
   struct color    colors[4] = {
-    {  0,    0,   0 },
-    { 64,   64,  64 },
-    { 128, 128, 128 },
-    { 192, 192, 192 }
+    {  0,    0,   0, 0xff },
+    { 64,   64,  64, 0xff },
+    { 128, 128, 128, 0xff },
+    { 192, 192, 192, 0xff }
   };
   uint32_t        i;
   uint8_t         data;

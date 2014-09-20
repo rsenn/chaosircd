@@ -25,12 +25,12 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "mem.h"
-#include "gif.h"
-#include "log.h"
-#include "str.h"
-#include "io.h"
+#include "libchaos/defs.h"
+#include "libchaos/mem.h"
+#include "libchaos/gif.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -679,11 +679,10 @@ static int gif_compress_init(struct gif *gif)
 
 static int gif_compress_line(struct gif *gif, uint8_t *line, uint32_t len)
 {
-  int                   i = 0;
-  int                   crnt_code;
-  int                   new_code;
-  uint32_t              new_key;
-  uint8_t               pixel;
+  size_t i = 0;
+  int crnt_code, new_code;
+  uint32_t new_key;
+  uint8_t pixel;
   struct gif_hashtable *table;
 
   table = gif->lzw.table;
@@ -957,7 +956,7 @@ void gif_close(struct gif *gif)
  * ------------------------------------------------------------------------ */
 int gif_screen_get(struct gif *gif)
 {
-  uint32_t i;
+  int i;
   uint32_t bpp;
   uint8_t  buf[3];
 
@@ -1016,7 +1015,7 @@ int gif_screen_put(struct gif *gif,        uint16_t        width,
                    uint8_t     background, struct palette *pal)
 {
   uint8_t  buf[3];
-  uint32_t i;
+  int i;
 
   if(gif->status & GIF_STATE_SCREEN)
     return -1;
@@ -1069,11 +1068,11 @@ int gif_screen_put(struct gif *gif,        uint16_t        width,
  * ------------------------------------------------------------------------ */
 int gif_image_get(struct gif *gif)
 {
-  uint32_t          i;
-  uint32_t          bpp;
-  uint8_t           buf[3];
+  int i;
+ uint32_t bpp;
+ uint8_t           buf[3];
   struct gif_image *image;
-  size_t            n;
+ size_t            n;
 
   if(!(gif->status & GIF_STATE_READ))
     return -1;
@@ -1145,7 +1144,7 @@ int gif_image_put(struct gif     *gif,   int16_t  left,   int16_t top,
                   uint16_t        width, uint16_t height, int     interlace,
                   struct palette *pal)
 {
-  uint32_t i;
+  int i;
   uint8_t  buf[3];
 
   if(gif->status & GIF_STATE_IMAGE)
@@ -1305,7 +1304,7 @@ int gif_extension_get(struct gif *gif, uint32_t *type, uint8_t **ext)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 int gif_extension_put(struct gif *gif, uint8_t  extcode,
-                      void       *ext, uint32_t extlen)
+                      void       *ext, size_t extlen)
 {
   uint8_t buf[3];
 
@@ -1327,7 +1326,7 @@ int gif_extension_put(struct gif *gif, uint8_t  extcode,
       return -1;
   }
 
-  if(gif_write(gif, ext, extlen) != extlen)
+  if(gif_write(gif, ext, extlen) != (signed)extlen)
     return -1;
 
   if(gif_put_byte(gif, 0))

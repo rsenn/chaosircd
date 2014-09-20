@@ -25,13 +25,13 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "io.h"
-#include "syscall.h"
-#include "defs.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/defs.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -249,7 +249,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
     if(c == '%') 
     {
       register int  left    = 0;
-      register int  padding = 0;
+      register unsigned padding = 0;
       register char pad     = ' ';
  again:
       c = *f++;
@@ -334,7 +334,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(longlev == 2 && c == 'u') 
       {
         char         is[22];
-        register int len = str_llutoa(is, va_arg(args, uint64_t));
+        register size_t len = str_llutoa(is, va_arg(args, uint64_t));
         register int idx = 0;
               
         /* if right aligned, do padding now */
@@ -376,7 +376,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 'u') 
       {
         char         is[11];
-        register int len = str_lutoa(is, va_arg(args, uint32_t));
+        register size_t len = str_lutoa(is, va_arg(args, uint32_t));
         register int idx = 0;
               
         /* if right aligned, do padding now */
@@ -418,7 +418,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(longlev == 2 && (c == 'i' || c == 'd'))
       {
         char         is[24];
-        register int len = str_lltoa(is, va_arg(args, int64_t));
+        register size_t len = str_lltoa(is, va_arg(args, int64_t));
         register int idx = 0;
         
         /* if right aligned, do padding now */
@@ -460,7 +460,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 'i' || c == 'd') 
       {
         char         is[12];
-        register int len = str_ltoa(is, va_arg(args, int32_t));
+        register size_t len = str_ltoa(is, va_arg(args, int32_t));
         register int idx = 0;
         
         /* if right aligned, do padding now */
@@ -502,7 +502,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 'x')
       {
         char         is[12];
-        register int len = str_ptoa(is, va_arg(args, void *));
+        register size_t len = str_ptoa(is, va_arg(args, void *));
         register int idx = 0;
         
         /* if right aligned, do padding now */
@@ -1514,10 +1514,11 @@ int str_imatch(const char *str, const char *mask)
  * ------------------------------------------------------------------------ */
 void str_trim(char *s)
 {
-  int  i;
+  ssize_t i;
   char buf[1024];
   
-  for(i = 0; s[i] && i < sizeof(buf) - 1 && str_isspace(s[i]); i++);
+  for(i = 0; s[i] && (unsigned)i < sizeof(buf) - 1 && str_isspace(s[i]); i++) {
+  }
   
   i = strlcpy(buf, &s[i], sizeof(buf)) - 2;
   

@@ -7,30 +7,19 @@
 
 # check for dependencies
 # ---------------------------------------------------------------------------
-AC_DEFUN([AC_CHECK_DEP], 
-[AC_MSG_CHECKING([whether to enable dependencies])
-
-AC_ARG_ENABLE([dep],
-[  --enable-dependency-tracking             dependency tracking
-  --disable-dependency-tracking            no dependency tracking (default)],
-[case $enableval in
-  yes)
-    DEP="yes"
-    AC_MSG_RESULT([yes])
-    ;;
-  *)
-    DEP="no"
-    AC_MSG_RESULT([no])
-    ;;
-  esac], 
-  [DEP="no"
-  AC_MSG_RESULT([no])])
-if test "$DEP" = "yes"; then
+AC_DEFUN([AC_CHECK_DEP], [ac_cv_dependency_tracking=no
+AC_MSG_CHECKING([whether to enable dependencies])
+AC_ARG_ENABLE([dependency-tracking],[ --enable-dependency-tracking             dependency tracking
+  --disable-dependency-tracking            no dependency tracking (default)], [case $enableval in
+  yes) ac_cv_dependency_tracking=yes ;;
+esac])
+AC_MSG_RESULT([$ac_cv_dependency_tracking])
+if test "$ac_cv_dependency_tracking" = yes; then
   DEP_DISABLED="#"
 else
   DEP_ENABLED="# "
 fi
-AM_CONDITIONAL([DEPS],[test "$DEP" = yes])
+AM_CONDITIONAL([DEPS],[test "$ac_cv_dependency_tracking" = yes])
 AC_SUBST(DEP_ENABLED,[$DEP_ENABLED])
 AC_SUBST(DEP_DISABLED, [$DEP_DISABLED])
-AC_SUBST(DEP)])
+])

@@ -27,8 +27,8 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "dlink.h"
+#include "libchaos/defs.h"
+#include "libchaos/dlink.h"
 
 /* ------------------------------------------------------------------------ *
  * Log levels                                                                 *
@@ -44,12 +44,13 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+typedef uint64_t log_source_t;
 
-#define LOG_ALL 0xffffffffffffffffull
+#define LOG_ALL (log_source_t)(int64_t)(-1)
 #define LOG_SOURCE_COUNT (sizeof(uint64_t) << 3)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-typedef void (log_drain_cb_t)(uint64_t    src,   int         lvl,
+typedef void (log_drain_cb_t)(log_source_t src,   int         lvl,
                               const char *level, const char *source,
                               const char *date,  const char *msg,
                               void       *arg0,  void       *arg1,
@@ -70,7 +71,7 @@ struct dlog {
   hash_t          hash;
   uint32_t        refcount;
   uint32_t        id;
-  uint64_t        sources;
+  log_source_t    sources;
   int             level;
   int             fd;
   int             prefix;
@@ -82,10 +83,10 @@ struct dlog {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA(int          )log_log;
-CHAOS_DATA(struct list  )log_list;
-CHAOS_DATA(struct slog  )log_sources[LOG_SOURCE_COUNT];
-CHAOS_DATA(uint64_t     )log_source_filter;
+CHAOS_DATA(int) log_log;
+CHAOS_DATA(struct list) log_list;
+CHAOS_DATA(struct slog) log_sources[LOG_SOURCE_COUNT];
+CHAOS_DATA(log_source_t) log_source_filter;
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) log_get_log(void);
@@ -94,12 +95,12 @@ CHAOS_API(int) log_get_log(void);
  * Initialize logging engine.                                                 *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)         log_init              (int           fd,
-                                               uint64_t      sources,
+                                               log_source_t  sources,
                                                int           level);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)         log_level             (uint64_t      sources,
+CHAOS_API(void)         log_level             (log_source_t  sources,
                                                int           level);
 
 /* ------------------------------------------------------------------------ *
@@ -126,7 +127,7 @@ CHAOS_API(int)          log_source_find       (const char   *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char *)       log_source_assemble   (uint64_t      flags);
+CHAOS_API(char *)       log_source_assemble   (log_source_t  flags);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -144,7 +145,7 @@ CHAOS_API(void)         log_drain_default     (struct dlog  *drain);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct dlog *)log_drain_open        (const char   *path,
-                                               uint64_t      sources,
+                                               log_source_t  sources,
                                                int           level,
                                                int           prefix,
                                                int           truncate);
@@ -152,14 +153,14 @@ CHAOS_API(struct dlog *)log_drain_open        (const char   *path,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct dlog *)log_drain_setfd       (int           fd,
-                                               uint64_t      sources,
+                                               log_source_t  sources,
                                                int           level,
                                                int           prefix);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct dlog *)log_drain_callback    (void         *callback,
-                                               uint64_t      sources,
+                                               log_source_t  sources,
                                                int           level,
                                                ...);
 
@@ -177,13 +178,13 @@ CHAOS_API(struct dlog *)log_drain_find_id     (uint32_t      id);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct dlog *)log_drain_add         (uint64_t      sources,
+CHAOS_API(struct dlog *)log_drain_add         (log_source_t  sources,
                                                int           level);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)          log_drain_update      (struct dlog  *dlptr,
-                                               uint64_t      sources,
+                                               log_source_t  sources,
                                                int           level,
                                                int           prefix);
 
@@ -208,7 +209,7 @@ CHAOS_API(void)         log_drain_level       (struct dlog  *dlptr,
  * Write a log line.                                                          *
  * ------------------------------------------------------------------------ */
 #if 1 //ndef DEBUG
-CHAOS_API(void)         log_output            (int           src,
+CHAOS_API(void)         log_output            (log_source_t  src,
                                                int           level,
                                                const char   *format,
                                                ...);
@@ -228,7 +229,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
 #endif
 /*#if 1*/
 
-#if 0 //def DEBUG
+#ifdef DEBUG
 /*
  * when DEBUG is defined the normal log
  * messages get file/line instead of
@@ -245,7 +246,7 @@ CHAOS_API(void)         log_drain_dump        (struct dlog *dlptr);
             log_debug(__FILE__, __LINE__, (src), L_debug, format)
 
 CHAOS_API(void log_debug)(const char *file, int line,
-                      int src, int level, const char *format, ...);
+                      log_source_t src, int level, const char *format, ...);
 #else
 
 /*
@@ -288,8 +289,8 @@ CHAOS_API(void log_debug)(const char *file, int line,
 
 #define puts(x) log_output(log_log, L_verbose, x)
 
-CHAOS_API(void) log_output_debug(int src, const char *format, ...);
-CHAOS_API(void) log_output_dummy(int src, const char *format, ...);
+CHAOS_API(void) log_output_debug(uint64_t src, const char *format, ...);
+CHAOS_API(void) log_output_dummy(uint64_t src, const char *format, ...);
 
 #endif *//* HAVE_VARARG_MACROS */
 

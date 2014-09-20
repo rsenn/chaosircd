@@ -61,13 +61,13 @@ PIE_LIBEXT      = @PIE_LIBEXT@
 
 # package info
 # ---------------------------------------------------------------------------
-PACKAGE_NAME    = @PACKAGE_NAME@
-PACKAGE_VERSION = @PACKAGE_VERSION@
+LIBPACKAGE_NAME    = @LIBPACKAGE_NAME@
+LIBPACKAGE_VERSION = @LIBPACKAGE_VERSION@
 
 # be backward compatible with older autoconf
 # ---------------------------------------------------------------------------
-PACKAGE         = $(PACKAGE_NAME)
-VERSION         = $(PACKAGE_VERSION)
+PACKAGE         = $(LIBPACKAGE_NAME)
+VERSION         = $(LIBPACKAGE_VERSION)
 
 # detailed version info
 # ---------------------------------------------------------------------------

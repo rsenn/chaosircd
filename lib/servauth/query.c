@@ -19,21 +19,21 @@
  * $Id: query.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#include "defs.h"
-#include "io.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "net.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
-#include "control.h"
-#include "servauth.h"
-#include "cache.h"
-#include "auth.h"
-#include "dns.h"
-#include "proxy.h"
-#include "query.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
+#include "servauth/cache.h"
+#include "servauth/auth.h"
+#include "servauth/dns.h"
+#include "servauth/proxy.h"
+#include "servauth/query.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

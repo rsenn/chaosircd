@@ -22,26 +22,26 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "dlink.h"
-#include "defs.h"
-#include "io.h"
-#include "log.h"
-#include "str.h"
-#include "timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <ircd/ircd.h>
-#include <ircd/usermode.h>
-#include <ircd/lclient.h>
-#include <ircd/numeric.h>
-#include <ircd/client.h>
-#include <ircd/server.h>
-#include <ircd/chars.h>
-#include <ircd/service.h>
-#include <ircd/user.h>
-#include <ircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/usermode.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/chars.h"
+#include "ircd/service.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

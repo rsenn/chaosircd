@@ -14,7 +14,7 @@ host=$(gcc -dumpmachine)
 	--disable-color \
 	--disable-silent-rules \
 	--build=`gcc -dumpmachine` \
-        --with-sqlite=/usr \
+        --with-mysql=/usr \
         ${DEBUG:+--${DEBUG}-debug} \
 	"$@" 
 )

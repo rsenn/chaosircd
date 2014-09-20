@@ -102,7 +102,7 @@ install: install-exec install-data
 CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_LIBEXT)\" -DBUILD_LIBCHAOS
 FILES    += $(SYS_SOURCES)
 INCLUDES += -I$(thisdir) \
-            -I$(top_srcdir)/include/libchaos \
+            -I$(top_srcdir)/include \
             -I. \
             -I$(top_builddir)/include/libchaos
 

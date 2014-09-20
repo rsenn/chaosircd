@@ -1,3 +1,28 @@
+/* Define to the address where bug reports for this package should be sent. */
+#undef LIBPACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef LIBPACKAGE_NAME
+
+/* Define to the release name of this package. */
+#undef LIBPACKAGE_RELEASE
+
+/* Define to the full name and version of this package. */
+#undef LIBPACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef LIBPACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef LIBPACKAGE_URL
+
+/* Define to the version of this package. */
+#undef LIBPACKAGE_VERSION
+
+/* Platform this server runs on */
+#undef PLATFORM
+
+
 /* Use select() for i/o multiplexing */
 #undef USE_SELECT
 

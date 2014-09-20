@@ -30,13 +30,13 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "io.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "dlink.h"
-#include "syscall.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/dlink.h"
+#include "libchaos/syscall.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -320,7 +320,7 @@ static int mem_static_block_valid(struct sblock *sbptr, struct schunk *scptr)
 
   offs /= ees;
 
-  if(offs >= sbptr->heap->chunks_per_block)
+  if(offs >= (ssize_t)sbptr->heap->chunks_per_block)
     return 0;
 
   return 1;
@@ -1045,7 +1045,7 @@ void *mem_dynamic_realloc(struct dheap *dhptr, void *ptr, size_t size)
   struct dchunk *dcptr;
   struct dblock *dbptr;
   void          *top;
-  int            avail;
+  ssize_t      avail;
   size_t         oldsize;
 
   if(ptr == NULL)
@@ -1079,7 +1079,7 @@ void *mem_dynamic_realloc(struct dheap *dhptr, void *ptr, size_t size)
     dcptr->size = size;
   }
   /* Rocks, chunk still fits with new size */
-  else if(avail >= size)
+  else if((size_t)avail >= size)
   {
     if(size - oldsize)
       memset((void *)((size_t)ptr + oldsize), 0, size - oldsize);
@@ -1101,7 +1101,7 @@ void *mem_dynamic_realloc(struct dheap *dhptr, void *ptr, size_t size)
     return top;
   }
 
-  if(avail == dbptr->max_bytes)
+  if((size_t)avail == dbptr->max_bytes)
   {
     avail += oldsize - size;
 

@@ -27,12 +27,12 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "defs.h"
-#include "mem.h"
-#include "cfg.h"
-#include "log.h"
-#include "str.h"
-#include "gif.h"
+#include "libchaos/defs.h"
+#include "libchaos/mem.h"
+#include "libchaos/cfg.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/gif.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -173,6 +173,8 @@ struct cfg *cfg_new(const char *name)
  * ------------------------------------------------------------------------ */
 int cfg_load(struct cfg *cfptr, const char *path)
 {
+  (void)cfptr;
+  (void)path;
   return 0;
 }
 
@@ -192,6 +194,8 @@ void cfg_delete(struct cfg *cfptr)
  * ------------------------------------------------------------------------ */
 void cfg_release(struct cfg *cfptr)
 {
+  (void)cfptr;
+
   cfg_dirty = 1;
 }
 

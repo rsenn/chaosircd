@@ -8,10 +8,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "log.h"
-#include "str.h"
-#include "timer.h"
-#include "dlink.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
@@ -208,9 +208,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
                           int             argc,  char         **argv)
 {
   enum { SET, SEARCH } mode;
-  int minlen = 9;
-  int i;
-  int len,  hashcount;
+  size_t minlen = 9, i, len,  hashcount;
   char **hasharray;
 
   if(argc <= 3)
@@ -273,8 +271,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
 
      count = 0;
 
-     dlink_foreach_data(&user_list, node, user)
-     {
+     dlink_foreach_data(&user_list, node, user) {
        if(!user->client) continue;
        if(user->client == cptr) continue;
        if(str_len(user->name) < len) continue;

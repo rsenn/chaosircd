@@ -21,19 +21,19 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "defs.h"
-#include "io.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <ircd/numeric.h>
-#include <ircd/lclient.h>
-#include <ircd/client.h>
-#include <ircd/ircd.h>
-#include <ircd/msg.h>
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
