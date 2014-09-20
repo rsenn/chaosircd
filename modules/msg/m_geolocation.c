@@ -196,7 +196,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
       }
     }
 
-    server_send(lcptr, NULL, CAP_NONE, CAP_NONE, ":%C GEOLOCATION SET :%s", argv[3]);
+    server_send(lcptr, NULL, CAP_NONE, CAP_NONE, ":%C GEOLOCATION SET :%s", cptr, argv[3]);
   }
 }
 
