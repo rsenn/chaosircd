@@ -69,11 +69,15 @@ extern int   userdb_verify       (struct userdb_client *userdb,
                                   const char*           msisdn,
                                   char**           retstr);
 extern int   userdb_register     (struct userdb_client *userdb,
-                                  const char*           uid,
-                                  const char**           values,
+                                  char*           uid,
+                                  char**           values,
                                   size_t num_values);
+extern int   userdb_search     (struct userdb_client *userdb,
+                                char**           v, size_t,
+                                char**          s);
 extern int   userdb_mutate       (struct userdb_client *userdb,
-                                  const char*           values,
+                                  const char*       uid,
+                                  char**           values,
                                   size_t num_values);
 extern void  userdb_set_userarg  (struct userdb_client *userdb,
                                   void               *arg);

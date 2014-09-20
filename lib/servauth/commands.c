@@ -155,15 +155,23 @@ static int cmd_userdb(control_t *cptr, int ac, char **av)
 
   if(!strcmp(av[1], "verify")) {
     char *s;
-    int v = userdb_verify(udb, av[2], av[3] ? av[3] : "", &s);
+    int v = userdb_verify(udb, (const char*)av[2], av[3] ? av[3] : "", &s);
     control_send(&servauth_control, "userdb verify %s %d %s", av[2], !!v, s ? s : "");
     free(s);
 
   } else if(!strcmp(av[1], "register")) {
-    int v = userdb_register(udb, av[2], &av[3], ac - 3);
-    control_send(&servauth_control, "userdb register %s %d", av[2], v);
+    int v = userdb_register(udb, ( char*)av[2], &av[3], ac - 3);
+    control_send(&servauth_control, "userdb register %s %d", av[2], !v);
   } else if(!strcmp(av[1], "mutate")) {
-    int v = userdb_mutate(udb, &av[2], ac - 2);
+    int v = userdb_mutate(udb, ( char*)&av[2], &av[3], ac - 3);
+    control_send(&servauth_control, "userdb mutate %s %d", av[2], !v);
+  } else if(!strcmp(av[1], "search")) {
+    char *s;
+    //int v = userdb_search(udb, av[2], &av[3], ac - 3);
+    //control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
+    int v = userdb_search(udb, &av[2], ac - 2, &s);
+    control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
+    if(s) free(s);
   }
 
   return 0;

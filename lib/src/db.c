@@ -137,6 +137,8 @@ static struct db_result *db_new_result(struct db *db, uint32_t fields, uint64_t 
  * ------------------------------------------------------------------------ */
 static void db_set_error(struct db *db)
 {
+
+  db->error = 1;
   if(db->handle.common)
   {
     const char *error = NULL;
@@ -162,7 +164,7 @@ static void db_set_error(struct db *db)
     }
 
     if(error)
-      strlcpy(db->error, error, sizeof(db->error));
+      strlcpy(db->errormsg, error, sizeof(db->error));
   }
   else
   {
@@ -250,7 +252,8 @@ struct db *db_new(int type)
   db->type = type;
   db->refcount = 0;
   db->id = db_serial++;
-  db->error[0] = '\0';
+  db->error = 0;
+  db->errormsg[0] = '\0';
   db->handle.common = NULL;
 
   dlink_add_tail(&db_list, &db->node, db);
@@ -346,6 +349,14 @@ void db_close(struct db *db)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+char* db_escape_string_dup(struct db *db, const char *from) {
+  char* ret = malloc(str_len(from)*2+1);
+  if(ret)
+    db_escape_string(db, ret, from, str_len(from));
+  return ret;
+}
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
 size_t db_escape_string(struct db *db, char *to, const char *from, size_t len)
 {
   db_current = db;
@@ -371,7 +382,6 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
 {
   str_vsnprintf(db_tmpbuf, DB_TMPBUF_SIZE, format, args);
 
-  log(db_log, L_debug, "Query: %s", db_tmpbuf);
 
   switch(db->type)
   {
@@ -451,16 +461,16 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
     case DB_TYPE_MYSQL:
     {
       MYSQL_RES *res;
-      int ret;
+      int num_rows = 0; 
       struct db_result *result = NULL;
 
-      ret = mysql_query(db->handle.my, db_tmpbuf);
+      db->error = mysql_query(db->handle.my, db_tmpbuf);
 
-      db_set_error(db);
-
-      if(ret)
+      if(db->error) {
+  log(db_log, L_debug, "Query: %s = %d",db_tmpbuf,db->error);
+        db_set_error(db);
         return NULL;
-
+      }
       db->affected_rows = mysql_affected_rows(db->handle.my);
 
       res = mysql_store_result(db->handle.my);
@@ -471,9 +481,12 @@ struct db_result *db_vquery(struct db *db, const char *format, va_list args)
 
         result->res.my = res;
         result->row = 0;
+
+        num_rows = db_num_rows(result);
       }
 
-      return result;
+  log(db_log, L_debug, "Query: %s = affected_rows=%d num_rows=%d",db_tmpbuf, db->affected_rows, num_rows);
+        return result;
     }
 #endif /* HAVE_MYSQL */
   }

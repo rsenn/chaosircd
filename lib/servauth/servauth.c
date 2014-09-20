@@ -19,16 +19,17 @@
  * $Id: servauth.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
-#include "defs.h"
-#include "connect.h"
-#include "dlink.h"
-#include "queue.h"
-#include "timer.h"
-#include "log.h"
-#include "mem.h"
-#include "str.h"
-#include "io.h"
-#include "syscall.h"
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/dlink.h"
+#include "libchaos/queue.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
+#include "libchaos/syscall.h"
+#include "libchaos/db.h"
 
 #ifdef HAVE_CONFIG_H
 #include "../config.h"
@@ -75,7 +76,6 @@ static struct dlog *servauth_drain;
 void servauth_init(void)
 {
 //  log_init(0, 0, 0);
-  log_init(2, LOG_ALL, L_debug);
   
   mem_init();
   timer_init();
@@ -83,6 +83,8 @@ void servauth_init(void)
   dlink_init();
   connect_init();
   db_init();
+
+  log_init(1, LOG_ALL, L_debug);
 
 #ifdef SIGPIPE
   syscall_signal(SIGPIPE, SIG_IGN);
