@@ -1,27 +1,28 @@
+#if 0
 /* Define to the address where bug reports for this package should be sent. */
-#undef LIBPACKAGE_BUGREPORT
+#undef PACKAGE_BUGREPORT
 
 /* Define to the full name of this package. */
-#undef LIBPACKAGE_NAME
+#undef PACKAGE_NAME
 
 /* Define to the release name of this package. */
-#undef LIBPACKAGE_RELEASE
+#undef PACKAGE_RELEASE
 
 /* Define to the full name and version of this package. */
-#undef LIBPACKAGE_STRING
+#undef PACKAGE_STRING
 
 /* Define to the one symbol short name of this package. */
-#undef LIBPACKAGE_TARNAME
+#undef PACKAGE_TARNAME
 
 /* Define to the home page for this package. */
-#undef LIBPACKAGE_URL
+#undef PACKAGE_URL
 
 /* Define to the version of this package. */
-#undef LIBPACKAGE_VERSION
+#undef PACKAGE_VERSION
 
 /* Platform this server runs on */
 #undef PLATFORM
-
+#endif
 
 /* Use select() for i/o multiplexing */
 #undef USE_SELECT

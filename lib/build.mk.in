@@ -686,10 +686,10 @@ devdistdir: makefiles
 	! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \
 	|| chmod -R a+r $(devdistdir)
 
-cvsdir = $(LIBPACKAGE_NAME)
-distdir = $(LIBPACKAGE_NAME)-$(LIBPACKAGE_VERSION)
-distpkg = $(LIBPACKAGE_NAME)-$(LIBPACKAGE_VERSION)
-devdistdir = $(LIBPACKAGE_NAME)
+cvsdir = $(PACKAGE_NAME)
+distdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
+distpkg = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
+devdistdir = $(PACKAGE_NAME)
 devdistpkg = $(devdistdir)-`date +%Y%m%d | sed s/-// | sed s/-//`
 
 remove_distdir = \
