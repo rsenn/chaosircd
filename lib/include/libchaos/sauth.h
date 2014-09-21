@@ -93,17 +93,17 @@ typedef struct sauth {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sheap)  sauth_heap;
-CHAOS_API(struct list)   sauth_list;
-CHAOS_API(uint32_t)      sauth_serial;
-CHAOS_API(struct timer *)sauth_timer;
-CHAOS_API(struct timer *)sauth_rtimer;
-CHAOS_API(struct child *)sauth_child;
-CHAOS_API(int)           sauth_log;
-CHAOS_API(int)           sauth_fds[2];
-CHAOS_API(char)          sauth_readbuf[BUFSIZE];
-CHAOS_API(const char *)  sauth_types[6];
-CHAOS_API(const char *)  sauth_replies[8];
+CHAOS_DATA(struct sheap)  sauth_heap;
+CHAOS_DATA(struct list)   sauth_list;
+CHAOS_DATA(uint32_t)      sauth_serial;
+CHAOS_DATA(struct timer *)sauth_timer;
+CHAOS_DATA(struct timer *)sauth_rtimer;
+CHAOS_DATA(struct child *)sauth_child;
+CHAOS_DATA(int)           sauth_log;
+CHAOS_DATA(int)           sauth_fds[2];
+CHAOS_DATA(char)          sauth_readbuf[BUFSIZE];
+CHAOS_DATA(const char *)  sauth_types[6];
+CHAOS_DATA(const char *)  sauth_replies[8];
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) sauth_get_log(void);
