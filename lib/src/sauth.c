@@ -663,45 +663,6 @@ struct sauth *sauth_find(uint32_t id)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_pop(struct sauth *sauth)
-{
-  if(sauth)
-  {
-    if(!sauth->refcount)
-      log(sauth_log, L_warning, "Poping deprecated sauth #%u",
-          sauth->id);
-
-    sauth->refcount++;
-  }
-
-  return sauth;
-}
-
-/* ------------------------------------------------------------------------ *
- * ------------------------------------------------------------------------ */
-struct sauth *sauth_push(struct sauth **sauth)
-{
-  if(*sauth)
-  {
-    if((*sauth)->refcount == 0)
-    {
-      log(sauth_log, L_warning, "Trying to push deprecated sauth #%u",
-          (*sauth)->id);
-    }
-    else
-    {
-      if(--(*sauth)->refcount == 0)
-        sauth_delete(*sauth);
-
-      (*sauth) = NULL;
-    }
-  }
-
-  return *sauth;
-}
-
-/* ------------------------------------------------------------------------ *
- * ------------------------------------------------------------------------ */
 void sauth_delete(struct sauth *sauth)
 {
   timer_cancel(&sauth->timer);
