@@ -182,6 +182,8 @@ CHAOS_API(void) sauth_set_args(sauth_t *sauth, ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+CHAOS_API(void) sauth_push(struct sauth **);
+CHAOS_API(void) sauth_pop(struct sauth **);
 CHAOS_API(void) sauth_dump(struct sauth *saptr);
 
 #endif /* LIB_SAUTH_H */
