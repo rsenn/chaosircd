@@ -211,11 +211,15 @@ if test "$with_mysql" != no; then
   fi
 
   AC_MSG_CHECKING(for MySQL client library)
+	MYSQL_LIB_NAME="mysqlclient"
 
-  for i in lib64 lib lib64/mysql lib/mysql; do
-    str="$MYSQL_DIR/$i/libmysqlclient.*"
-    for j in `echo $str`; do
+  for i in lib64 lib/x86_64-linux-gnu lib64/mysql lib lib/i386-linux-gnu lib/mysql; do
+    str="$MYSQL_DIR/$i/lib{mariadb,mysql}client.*"
+    for j in `eval echo $str`; do
       if test -r $j; then
+				case "$j" in
+				  *mariadb*) MYSQL_LIB_NAME="mariadbclient" ;;
+				esac
         MYSQL_LIB_DIR="$MYSQL_DIR/$i"
         break
       fi
@@ -236,7 +240,7 @@ if test "$with_mysql" != no; then
   else
     AC_MSG_RESULT($MYSQL_LIB_DIR)
     MYSQL=true
-    MYSQL_LIBS="-L${MYSQL_LIB_DIR} -Wl,-rpath,${MYSQL_LIB_DIR} -lmysqlclient"
+    MYSQL_LIBS="-L${MYSQL_LIB_DIR} -Wl,-rpath,${MYSQL_LIB_DIR} -l${MYSQL_LIB_NAME}"
     MYSQL_CFLAGS="-I${MYSQL_INC_DIR}"
     AC_CHECK_LIB(z, compress)
     DBSUPPORT="$DBSUPPORT MySQL"
