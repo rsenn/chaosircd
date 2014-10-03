@@ -72,6 +72,7 @@ AC_CHECK_FT2
 AC_CHECK_SQLITE
 AC_CHECK_PSQL
 AC_CHECK_MYSQL
+AC_CHECK_LIBOWFAT
 
 dnl AC_CHECK_FUNC([ltoa], AC_DEFINE_UNQUOTED([HAVE_LTOA], [Define this if you have the ltoa() function (defined in stdlib.h usually)]))
 dnl AC_CHECK_FUNC([lltoa], AC_DEFINE_UNQUOTED([HAVE_LLTOA], [Define this if you have the ltoa() function (defined in stdlib.h usually)]))

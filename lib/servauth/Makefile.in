@@ -61,6 +61,8 @@ install: install-exec
 @SSL_TRUE@@SSL_STATIC_TRUE@LDADD     += $(SSL_LIBS)
 @MYSQL_TRUE@LIBS += $(MYSQL_LIBS)
 @MYSQL_TRUE@CPPFLAGS += $(MYSQL_CFLAGS)
+@LIBOWFAT_TRUE@CPPFLAGS += $(LIBOWFAT_CFLAGS)
+@LIBOWFAT_TRUE@LIBS += $(LIBOWFAT_LIBS)
 LIBS     += $(DLFCN_LIBS)
 LIBS     += -lowfat
 CPPFLAGS += -DHAVE_CONFIG_H
@@ -78,7 +80,7 @@ INCLUDES += \
 $(PROGRAM): $(OBJECTS)
 $(PROGRAM): 
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LDADD) $(LIBS)
+	@QUIET@$(COMPLINK) $(CFLAGS) $(CPPFLAGS) $(INCLUDES) -o $@ $^ $(LDADD) $(LIBS)
 
 # include global make targets
 # ---------------------------------------------------------------------------

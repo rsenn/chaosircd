@@ -500,9 +500,24 @@ AC_SUBST(SSL_CFLAGS)
 
 # check for libowfat
 # ------------------------------------------------------------------
-AC_DEFUN([AC_LOWFAT],
-[AC_MSG_CHECKING([for libofatipv6 support])
-], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])])
+AC_DEFUN([AC_CHECK_LIBOWFAT], [dnl AC_MSG_CHECKING([for libowfatipv6 support])
+
+
+AC_CHECK_HEADER([stralloc.h], [ac_cv_libowfat_stralloc_h_found=yes])
+AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I/usr/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes])
+AC_MSG_CHECKING([for libowfat])
+
+if test "$ac_cv_libowfat_stralloc_h_found" = yes; then
+  AC_MSG_RESULT([yes])
+  LIBOWFAT_LIBS="-lowfat"
+else
+  AC_MSG_RESULT([no])
+fi
+
+AM_CONDITIONAL([LIBOWFAT], [test "$ac_cv_libowfat_stralloc_h_found" = yes])
+AC_SUBST([LIBOWFAT_CFLAGS])
+AC_SUBST([LIBOWFAT_LIBS])
+])
 
 # check for termios
 # ------------------------------------------------------------------
