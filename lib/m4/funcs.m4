@@ -240,7 +240,7 @@ if test "$with_mysql" != no; then
   else
     AC_MSG_RESULT($MYSQL_LIB_DIR)
     MYSQL=true
-    MYSQL_LIBS="-L${MYSQL_LIB_DIR} -Wl,-rpath,${MYSQL_LIB_DIR} -l${MYSQL_LIB_NAME}"
+    MYSQL_LIBS="-L${MYSQL_LIB_DIR} -Wl,-rpath,${MYSQL_LIB_DIR} -l${MYSQL_LIB_NAME} -lpthread -ldl -lm -lz"
     MYSQL_CFLAGS="-I${MYSQL_INC_DIR}"
     AC_CHECK_LIB(z, compress)
     DBSUPPORT="$DBSUPPORT MySQL"
