@@ -1,22 +1,21 @@
 # DNS resolver and auth client child
 
 child {
-name      = "-sauth";                 # Name MUST be "-sauth" so the 
-                                      # [sauth] module can find it!!!
+  name      = "-sauth";                 # Name MUST be "-sauth" so the 
+                                        # [sauth] module can find it!!!
 
-path      = "@rellibexecdir@/servauth";  # Path to the servauth executable
+  path      = "@rellibexecdir@/servauth";  # Path to the servauth executable
 
-channels  = 1;                        # Number of bidirectional channels 
-                                      # to the child (pipes/socketpairs)
-       
-argv      = "%r0 %w0";                # Argument list for the child.
-                                      # %r0      - read side of channel 0
-                                      # %w0      - write side of channel 0
- 
-interval  = 30000;                    # Interval to check for the child
+  channels  = 1;                        # Number of bidirectional channels 
+                                        # to the child (pipes/socketpairs)
+         
+  argv      = "%r0 %w0";                # Argument list for the child.
+                                        # %r0      - read side of channel 0
+                                        # %w0      - write side of channel 0
+   
+  interval  = 30000;                    # Interval to check for the child
 
-auto      = no;                       # Auto-launch the child?
-
+  auto      = yes;                      # Auto-launch the child?
 };
 
 ################# UNIMPLEMENTED ###############
