@@ -21,7 +21,7 @@ host=$(gcc -dumpmachine)
 (set -x
 ./config.status)
 
-cat <<EOF | tee build-linux.sh |sed -u "s|^|build-linux.sh: |"
+cat <<EOF | tee build-linux.sh |sed "s|^|build-linux.sh: |"
 #!/bin/sh
 
 DESTDIR="\$PWD-linux"
