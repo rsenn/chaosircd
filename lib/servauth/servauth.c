@@ -102,7 +102,9 @@ void servauth_init(void)
  * -------------------------------------------------------------------------- */
 void servauth_shutdown(void)
 {
-  log(servauth_log, L_status, "Shutting down libircd...");
+  log(servauth_log, L_status, "Shutting down servauth...");
+
+  syscall_exit(0);
 
   connect_shutdown();
   io_shutdown();
@@ -113,8 +115,6 @@ void servauth_shutdown(void)
   timer_shutdown();
 
   log_source_unregister(servauth_log);
-
-  syscall_exit(0);
 }
 
 /* -------------------------------------------------------------------------- *

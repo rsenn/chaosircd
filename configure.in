@@ -168,6 +168,8 @@ AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.
 dnl AC_FUNC_MMAP
 
 AC_CHECK_SSL
+AC_CHECK_LIBOWFAT
+AC_CHECK_EFENCE
 dnl AC_CHECK_FT2
 dnl AC_CHECK_PSQL
 dnl AC_CHECK_MYSQL

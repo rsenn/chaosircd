@@ -114,6 +114,7 @@ $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 @SSL_STATIC_TRUE@LDADD += $(SSL_LIBS)
 
 @DLM_TRUE@LIBS += -ldl
+LIBS += $(EFENCE_LIBS)
 
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
 @WIN32_TRUE@LIBS += -lws2_32 -ldnsapi
