@@ -66,6 +66,8 @@ autogen() {
 	ag_aclocal="aclocal"
 	ag_autoheader="autoheader"
 	ag_autoconf="autoconf"
+
+	type glibtoolize >/dev/null 2>/dev/null && ag_libtoolize=glibtoolize ||
 	ag_libtoolize="libtoolize"
 
 	ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
@@ -77,7 +79,7 @@ autogen() {
 	#  cat $ag_libdir/m4/*.m4 > $ag_srcdir/aclocal.m4
 	 rm -f aclocal.m4
 		 set -x
-	 $ag_aclocal $(ls -d $ag_libdir/m4 2>/dev/null | sed 's,^,-I\n,')
+	 $ag_aclocal $(ls -d $ag_libdir/m4 2>/dev/null | sed 's,^,-I,')
 
 	 if test "$ag_headers"; then
 		 $ag_autoheader
