@@ -91,7 +91,8 @@ static void sauth_read(int fd, void *arg);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int sauth_timeout(struct sauth *sauth)
+static int
+sauth_timeout(struct sauth *sauth)
 {
   sauth_callback(sauth, SAUTH_TIMEOUT);
 
@@ -102,7 +103,8 @@ static int sauth_timeout(struct sauth *sauth)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int sauth_proxy_reply(const char *reply)
+int
+sauth_proxy_reply(const char *reply)
 {
   uint32_t i;
 
@@ -117,7 +119,8 @@ int sauth_proxy_reply(const char *reply)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int sauth_proxy_type(const char *type)
+int
+sauth_proxy_type(const char *type)
 {
   uint32_t i;
 
@@ -132,7 +135,8 @@ int sauth_proxy_type(const char *type)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void sauth_child_cb(struct child *child)
+static void
+sauth_child_cb(struct child *child)
 {
   log(sauth_log, L_status, "sauth child callback %u", sauth_child->status);
 
@@ -157,7 +161,8 @@ static void sauth_child_cb(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void sauth_callback(struct sauth *sauth, int type)
+static void
+sauth_callback(struct sauth *sauth, int type)
 {
   const char *what;
 
@@ -219,7 +224,8 @@ static void sauth_callback(struct sauth *sauth, int type)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int sauth_parse(char **argv)
+static int
+sauth_parse(char **argv)
 {
   int      serial;
   struct sauth *sauth;
@@ -308,7 +314,8 @@ static int sauth_parse(char **argv)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static int sauth_recover(void)
+static int
+sauth_recover(void)
 {
   struct node *node;
   struct node *next;
@@ -336,7 +343,8 @@ static int sauth_recover(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void sauth_read(int fd, void *ptr)
+static void
+sauth_read(int fd, void *ptr)
 {
   int   len;
   char *argv[6];
@@ -370,7 +378,8 @@ static void sauth_read(int fd, void *ptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int sauth_launch(void)
+int
+sauth_launch(void)
 {
   if(sauth_child == NULL)
   {
@@ -420,7 +429,8 @@ int sauth_launch(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static struct sauth *sauth_new(int type)
+static struct sauth*
+sauth_new(int type)
 {
   struct sauth *sauth;
 
@@ -442,7 +452,8 @@ static struct sauth *sauth_new(int type)
 /* ------------------------------------------------------------------------ *
  * Initialize sauth heap and add garbage collect timer.                     *
  * ------------------------------------------------------------------------ */
-void sauth_init(void)
+void
+sauth_init(void)
 {
   sauth_log = log_source_register("sauth");
 
@@ -465,7 +476,8 @@ void sauth_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy sauth heap and cancel timer.                                     *
  * ------------------------------------------------------------------------ */
-void sauth_shutdown(void)
+void
+sauth_shutdown(void)
 {
   struct node *node;
   struct node *next;
@@ -483,7 +495,8 @@ void sauth_shutdown(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_collect(void)
+void
+sauth_collect(void)
 {
   struct node  *node;
   struct sauth *saptr;
@@ -501,7 +514,8 @@ void sauth_collect(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_dns_forward(const char *address, void *callback, ...)
+struct sauth*
+sauth_dns_forward(const char *address, void *callback, ...)
 {
   struct sauth *sauth;
   va_list       args;
@@ -534,7 +548,8 @@ struct sauth *sauth_dns_forward(const char *address, void *callback, ...)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_dns_reverse(net_addr_t address, void *callback, ...)
+struct sauth*
+sauth_dns_reverse(net_addr_t address, void *callback, ...)
 {
   struct sauth *sauth;
   va_list       args;
@@ -570,7 +585,8 @@ struct sauth *sauth_dns_reverse(net_addr_t address, void *callback, ...)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_auth(net_addr_t address,  uint16_t local,
+struct sauth*
+sauth_auth(net_addr_t address,  uint16_t local,
                          uint16_t       remote,   void    *callback, ...)
 {
   struct sauth *sauth;
@@ -603,16 +619,17 @@ struct sauth *sauth_auth(net_addr_t address,  uint16_t local,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_proxy(int type,
+struct sauth*
+sauth_proxy(int type,
                           net_addr_t remote_addr, net_port_t remote_port,
                           net_addr_t local_addr,  net_port_t local_port,
                           void      *callback, ...)
 {
-  struct sauth *sauth;
-  va_list       args;
+	  struct sauth *sauth;
+	  va_list       args;
 
-  if(!sauth_launch())
-    return NULL;
+	  if(!sauth_launch())
+	    return NULL;
 
   sauth = sauth_new(SAUTH_TYPE_PROXY);
 
@@ -645,7 +662,29 @@ struct sauth *sauth_proxy(int type,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct sauth *sauth_find(uint32_t id)
+struct sauth*
+sauth_userdb(const char* cmd, const char* args) {
+  struct sauth *sauth;
+
+  if(!sauth_launch())
+    return NULL;
+
+	sauth = sauth_new(SAUTH_TYPE_USERDB);
+
+  sauth->usercmd = str_dup(cmd);
+  sauth->userargs = str_dup(args);
+
+  sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
+
+  timer_note(sauth->timer, "sauth timeout (userdb %s %-20s)", cmd, args);
+
+  return sauth;
+}
+
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+struct sauth*
+sauth_find(uint32_t id)
 {
   struct sauth *sauth;
   struct node  *node;
@@ -663,8 +702,12 @@ struct sauth *sauth_find(uint32_t id)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_delete(struct sauth *sauth)
+void
+sauth_delete(struct sauth *sauth)
 {
+  if(sauth->usercmd) free(sauth->usercmd);
+  if(sauth->userargs) free(sauth->userargs);
+
   timer_cancel(&sauth->timer);
 
   dlink_delete(&sauth_list, &sauth->node);
@@ -674,7 +717,8 @@ void sauth_delete(struct sauth *sauth)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_vset_args(struct sauth *sauth, va_list args)
+void
+sauth_vset_args(struct sauth *sauth, va_list args)
 {
   sauth->args[0] = va_arg(args, void *);
   sauth->args[1] = va_arg(args, void *);
@@ -682,7 +726,8 @@ void sauth_vset_args(struct sauth *sauth, va_list args)
   sauth->args[3] = va_arg(args, void *);
 }
 
-void sauth_set_args(struct sauth *sauth, ...)
+void
+sauth_set_args(struct sauth *sauth, ...)
 {
   va_list args;
 
@@ -693,7 +738,8 @@ void sauth_set_args(struct sauth *sauth, ...)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void sauth_dump(struct sauth *saptr)
+void
+sauth_dump(struct sauth *saptr)
 {
   if(saptr == NULL)
   {
