@@ -264,7 +264,7 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
 		if(!client_is_local(cptr))
 			return;
 
-	 if(!client_is_oper(lcptr)) {
+	 if(!lclient_is_oper(lcptr)) {
 				numeric_lsend(lcptr, ERR_NOPRIVILEGES, argv[1]);
        return;
 	 }
