@@ -30,6 +30,7 @@
 #include "libchaos/str.h"
 #include "libchaos/hook.h"
 #include "libchaos/timer.h"
+#include "libchaos/sauth.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
@@ -56,16 +57,13 @@ struct m_userdb_s {
   struct node     node;
   struct lclient *lclient;
   struct timer   *timer;
-  struct timer   *timer_auth;
-  struct userdb   *h;
+  struct sauth   *sauth;
   int             done;
 };
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int m_userdb_register(struct lclient *lcptr);
-static void m_userdb_handshake(struct lclient *lcptr);
 static void m_userdb_release(struct lclient *lcptr);
 static void m_userdb(struct lclient* lcptr, struct client* cptr,
                      int             argc,  char         **argv);
@@ -93,7 +91,7 @@ static char *m_userdb_help[] = {
 
 static struct msg m_userdb_msg = {
   "USERDB", 1, 0, MFLG_CLIENT,
-  { NULL, m_userdb, m_userdb, m_userdb }, 
+  { NULL, m_userdb, m_userdb, m_userdb },
   m_userdb_help
 };
 
@@ -110,7 +108,7 @@ m_userdb_load(void) {
 
   mem_static_create(&m_userdb_heap, sizeof(struct m_userdb_s),
                     SAUTH_BLOCK_SIZE / 2);
-  mem_static_note(&m_userdb_heap, "udb client heap");
+  mem_static_note(&m_userdb_heap, "m_userdb client heap");
 
   dlink_list_zero(&m_userdb_list);
 
@@ -142,14 +140,14 @@ m_userdb_unload(void) {
  * -------------------------------------------------------------------------- */
 static void
 m_userdb_handshake(struct lclient *lcptr) {
-  struct m_userdb_s *arg;
+	 struct m_userdb_s *arg;
 
-  /* Keep track of the lclient if the module gets unloaded */
-  arg = mem_static_alloc(&m_userdb_heap);
+	  /* Keep track of the lclient if the module gets unloaded */
+	  arg = mem_static_alloc(&m_userdb_heap);
 
-  arg->lclient = lclient_pop(lcptr);
+	  arg->lclient = lclient_pop(lcptr);
 
-  dlink_add_tail(&m_userdb_list, &arg->node, arg);
+	  dlink_add_tail(&m_userdb_list, &arg->node, arg);
 }
 
 
@@ -196,9 +194,9 @@ m_userdb_done(struct m_userdb_s *arg) {
     timer_cancel(&arg->timer);
   }
 
-  if(arg->h) {
-    userdb_delete(arg->h);
-    arg->h = NULL;
+  if(arg->sauth) {
+    sauth_delete(arg->sauth);
+    arg->sauth = NULL;
   }
 
   dlink_delete(&m_userdb_list, &arg->node);
@@ -209,7 +207,25 @@ m_userdb_done(struct m_userdb_s *arg) {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
-m_userdb_verify_query(struct m_userdb_s *arg) {
+m_userdb_callback(struct sauth* saptr) {
+
+}
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+static void
+m_userdb_query(struct lclient* lcptr) {
+
+	 struct m_userdb_s *arg;
+
+	  /* Keep track of the lclient if the module gets unloaded */
+	  arg = mem_static_alloc(&m_userdb_heap);
+
+	  arg->lclient = lclient_pop(lcptr);
+
+	  dlink_add_tail(&m_userdb_list, &arg->node, arg);
+
+
   /* Start reverse lookup */
 //  arg->sauth_userdb = userdb_verify(m_userdb_verify, arg);
 //

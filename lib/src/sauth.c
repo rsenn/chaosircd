@@ -215,6 +215,12 @@ sauth_callback(struct sauth *sauth, int type)
           buf, (uint32_t)sauth->local, sauth_types[sauth->ptype], sauth_replies[sauth->reply]);
       break;
     }
+    case SAUTH_TYPE_USERDB:
+    {
+      log(sauth_log, L_verbose, "USERDB query (#%u) %s %-20s",
+          sauth->id, sauth->usercmd, sauth->userargs);
+      break;
+    }
   }
 
   if(sauth->callback)
@@ -302,6 +308,21 @@ sauth_parse(char **argv)
     if(sauth)
     {
       sauth->reply = sauth_proxy_reply(argv[2]);
+
+      sauth_callback(sauth, SAUTH_DONE);
+    }
+
+    return 0;
+  }
+  else if(!str_icmp(argv[0], "userdb"))
+  {
+    serial = str_toi(argv[1]);
+
+    sauth = sauth_find(serial);
+
+    if(sauth)
+    {
+      sauth->reply = sauth_userdb_reply(argv[2]);
 
       sauth_callback(sauth, SAUTH_DONE);
     }
@@ -669,7 +690,7 @@ sauth_userdb(const char* cmd, const char* args) {
   if(!sauth_launch())
     return NULL;
 
-	sauth = sauth_new(SAUTH_TYPE_USERDB);
+  sauth = sauth_new(SAUTH_TYPE_USERDB);
 
   sauth->usercmd = str_dup(cmd);
   sauth->userargs = str_dup(args);
@@ -677,6 +698,10 @@ sauth_userdb(const char* cmd, const char* args) {
   sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
 
   timer_note(sauth->timer, "sauth timeout (userdb %s %-20s)", cmd, args);
+
+  io_puts(sauth_fds[CHILD_WRITE], "userdb %s %u %s", sauth->usercmd, sauth->id, sauth->userargs);
+
+  log(sauth_log, L_verbose, "Started UserDB query %s %s (#%u)", sauth->usercmd, sauth->userargs, sauth->id);
 
   return sauth;
 }
@@ -775,6 +800,16 @@ sauth_dump(struct sauth *saptr)
              saptr->callback);
     }
 
+    dump(sauth_log, "--------------------- userdb --------------------");
+
+    dlink_foreach(&sauth_list, saptr)
+    {
+      if(saptr->type == SAUTH_TYPE_USERDB)
+        dump(sauth_log, " #%u: [%u] %s %-20s (%p)",
+             saptr->id, saptr->refcount, saptr->usercmd, saptr->userargs,
+             saptr->callback);
+    }
+
     dump(sauth_log, "[============= end of sauth summary ============]");
   }
   else
@@ -799,6 +834,9 @@ sauth_dump(struct sauth *saptr)
     dump(sauth_log, "      timer: %i", saptr->timer ? saptr->timer->id : -1);
     dump(sauth_log, "       args: %p, %p, %p, %p",
          saptr->args[0], saptr->args[1], saptr->args[2], saptr->args[3]);
+    dump(sauth_log, "    usercmd: %s", saptr->usercmd);
+    dump(sauth_log, "   userargs: %s", saptr->userargs);
+
     dump(sauth_log, "   callback: %p", saptr->callback);
 
     dump(sauth_log, "[============== end of sauth dump ==============]");
