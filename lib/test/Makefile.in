@@ -46,10 +46,11 @@ ttftest: LIB      += $(FT2_LIBS)
 @SQLITE_TRUE@dbtest: LIB      += $(SQLITE_LIBS)
 @PSQL_TRUE@dbtest: LIB      += $(PSQL_LIBS)
 @MYSQL_TRUE@dbtest: LIB      += $(MYSQL_LIBS)
+LIB      += $(LIBOWFAT_LIBS)
 LIB += $(EFENCE_LIBS)
 LIB      += $(LIBS)
-CFLAGS   += $(SSL_CFLAGS) $(SQLITE_CFLAGS) $(PSQL_CFLAGS) $(MYSQL_CFLAGS) $(FT2_CFLAGS)
-INCLUDES += -I$(top_srcdir)/include -I../include
+CFLAGS   += $(SSL_CFLAGS) $(SQLITE_CFLAGS) $(PSQL_CFLAGS) $(MYSQL_CFLAGS) $(FT2_CFLAGS) $(LIBOWFAT_CFLAGS)
+INCLUDES += -I$(top_srcdir)/include -I../include 
 
 # local make targets
 # ---------------------------------------------------------------------------

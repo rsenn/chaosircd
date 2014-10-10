@@ -160,6 +160,7 @@ AC_CHECK_LIB([m], [cos])
 AC_CANONICAL_HOST
 
 AC_CONFIG_HOST
+AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
 
 dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])

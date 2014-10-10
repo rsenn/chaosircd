@@ -51,3 +51,9 @@
 /* The size of `uintptr_t', as computed by sizeof. */                                                                                
 #undef SIZEOF_UINTPTR_T                                                                                                              
 
+/* Define to 1 if you have the strlcpy function */
+#undef HAVE_STRLCPY
+
+/* Define to 1 if you have the strlcat function */
+#undef HAVE_STRLCAT
+

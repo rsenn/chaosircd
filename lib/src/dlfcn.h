@@ -6,7 +6,7 @@
 extern void *dlopen (const char *, int);
 extern void *dlsym  (void *, const char *);
 extern int   dlclose(void *);
-extern char *dlerror(void);
+extern const char *dlerror(void);
 
 #define RTLD_DEFAULT 0
 

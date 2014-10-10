@@ -500,16 +500,32 @@ AC_SUBST(SSL_CFLAGS)
 
 # check for libowfat
 # ------------------------------------------------------------------
-AC_DEFUN([AC_CHECK_LIBOWFAT], [dnl AC_MSG_CHECKING([for libowfatipv6 support])
+AC_DEFUN([AC_CHECK_LIBOWFAT], [
+ AC_MSG_CHECKING([for libowfat prefix])
 
 
+ac_cv_with_libowfat=/usr
+AC_ARG_WITH(libowfat,
+[  --with-libowfat[[=DIR]]   libowfat [[auto]]],
+[
+  case "$withval" in
+    yes|no ) ;;
+    *) ac_cv_with_libowfat="$withval" ;;
+  esac
+])
+AC_MSG_RESULT($ac_cv_with_libowfat)
+
+
+old_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I${ac_cv_with_libowfat}/include"
 AC_CHECK_HEADER([stralloc.h], [ac_cv_libowfat_stralloc_h_found=yes])
-AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I/usr/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes])
+AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I${ac_cv_with_libowfat}/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes])
+CPPFLAGS="$old_CPPFLAGS"
 AC_MSG_CHECKING([for libowfat])
 
 if test "$ac_cv_libowfat_stralloc_h_found" = yes; then
   AC_MSG_RESULT([yes])
-  LIBOWFAT_LIBS="-lowfat"
+  LIBOWFAT_LIBS="-L${ac_cv_with_libowfat}/lib -lowfat"
 else
   AC_MSG_RESULT([no])
 fi
@@ -517,6 +533,22 @@ fi
 AM_CONDITIONAL([LIBOWFAT], [test "$ac_cv_libowfat_stralloc_h_found" = yes])
 AC_SUBST([LIBOWFAT_CFLAGS])
 AC_SUBST([LIBOWFAT_LIBS])
+])
+
+# check for libdl
+# ------------------------------------------------------------------
+AC_DEFUN([AC_CHECK_DLFCN], [
+AC_CHECK_HEADER([dlfcn.h], [ac_cv_have_dlfcn_h=yes
+AC_DEFINE_UNQUOTED([HAVE_DLFCN_H], [1], [Define this if you have <dlfcn.h>])
+])
+AC_CHECK_LIB([dl],[dlopen], [ac_cv_have_libdl_dlopen=yes])
+
+if test "$ac_cv_have_dlfcn_h" = yes -a "$ac_cv_have_libdl_dlopen" = yes; then
+  HAVE_DLFCN_DLOPEN=yes
+fi
+
+AM_CONDITIONAL([DLFCN], [test "$HAVE_DLFCN_DLOPEN" = yes])
+
 ])
 
 # check for electric-fence
