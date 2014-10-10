@@ -2,9 +2,9 @@
 
 oper {
 
-  name     = "enki";           # Operator name
+  name     = "teamcg";           # Operator name
    
-  password = "lala";             # Operator password
+  password = "AcElp6ShryflujAf";             # Operator password
   
   class    = "opers";            # Connection class (see classes.conf)
   
