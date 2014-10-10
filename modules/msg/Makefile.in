@@ -102,6 +102,8 @@ shobjects: $(SHOBJECTS)
 
 include $(top_builddir)/config.mk
 
+
+CFLAGS += $(LIBOWFAT_CFLAGS)
 @PIE_TRUE@LDFLAGS += $(PIE_LDFLAGS)
 
 #INSTALL = @INSTALL@

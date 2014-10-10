@@ -44,6 +44,8 @@
 #include "ircd/numeric.h"
 #include "ircd/userdb.h"
 
+#include "stralloc.h"
+
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
  * -------------------------------------------------------------------------- */
@@ -253,7 +255,18 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
     return;
   }
 
-  struct m_userdb_s* s = m_userdb_new(lcptr);
+  stralloc args;
+  stralloc_init(&args);
+
+  size_t i;
+  for(i = 3; i < argc; ++i) {
+    stralloc_catb(&args, " ", 1);
+    stralloc_catb(&args, argv[i], strlen(argv[i]));
+  }
+
+  stralloc_catb(&args, "\0", 1);
+
+  struct m_userdb_s* s = m_userdb_query(lcptr, argv[2], args.s);
 
    
 }

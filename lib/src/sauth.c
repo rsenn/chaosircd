@@ -684,8 +684,9 @@ sauth_proxy(int type,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 struct sauth*
-sauth_userdb(const char* cmd, const char* args) {
+sauth_userdb(const char* cmd, const char* args, void* callback, ...) {
   struct sauth *sauth;
+  va_list       arglist;
 
   if(!sauth_launch())
     return NULL;
@@ -694,6 +695,11 @@ sauth_userdb(const char* cmd, const char* args) {
 
   sauth->usercmd = str_dup(cmd);
   sauth->userargs = str_dup(args);
+  sauth->callback = callback;
+
+  va_start(arglist, callback);
+  sauth_vset_args(sauth, arglist);
+  va_end(arglist);
 
   sauth->timer = timer_start(sauth_timeout, SAUTH_TIMEOUT, sauth);
 
