@@ -8,6 +8,8 @@ CREATE TABLE `users` (
   `flag_reason` varchar(256) DEFAULT '',
   `last_login` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `last_location` point DEFAULT NULL,
+  `phone_hw` varchar(255) DEFAULT '',
+  `phone_os` varchar(255) DEFAULT '',
   PRIMARY KEY (`uid`),
   UNIQUE KEY `msisdn` (`msisdn`),
   UNIQUE KEY `imsi` (`imsi`)
