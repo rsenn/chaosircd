@@ -707,7 +707,7 @@ sauth_userdb(const char* cmd, const char* args, void* callback, ...) {
 
   io_puts(sauth_fds[CHILD_WRITE], "userdb %s %u %s", sauth->usercmd, sauth->id, sauth->userargs);
 
-  log(sauth_log, L_verbose, "Started UserDB query %s %s (#%u)", sauth->usercmd, sauth->userargs, sauth->id);
+  log(sauth_log, L_verbose, "Started UserDB query: [%s] (#%u) %s", sauth->usercmd, sauth->id, sauth->userargs);
 
   return sauth;
 }

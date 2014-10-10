@@ -260,7 +260,7 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
 
   size_t i;
   for(i = 3; i < argc; ++i) {
-    stralloc_catb(&args, " ", 1);
+		if(args.len) stralloc_catb(&args, " ", 1);
     stralloc_catb(&args, argv[i], strlen(argv[i]));
   }
 
