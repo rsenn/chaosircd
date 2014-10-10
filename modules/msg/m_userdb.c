@@ -57,15 +57,15 @@ struct m_userdb_s {
   struct lclient *lclient;
   struct timer   *timer;
   struct timer   *timer_auth;
-  struct userdb   *h;
+  struct sauth   *sa;
   int             done;
 };
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int m_userdb_register(struct lclient *lcptr);
-static void m_userdb_handshake(struct lclient *lcptr);
+//static int m_userdb_register(struct lclient *lcptr);
+//static void m_userdb_handshake(struct lclient *lcptr);
 static void m_userdb_release(struct lclient *lcptr);
 static void m_userdb(struct lclient* lcptr, struct client* cptr,
                      int             argc,  char         **argv);
@@ -140,8 +140,8 @@ m_userdb_unload(void) {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void
-m_userdb_handshake(struct lclient *lcptr) {
+static m_userdb_s*
+m_userdb_new(struct lclient *lcptr) {
   struct m_userdb_s *arg;
 
   /* Keep track of the lclient if the module gets unloaded */
@@ -150,6 +150,8 @@ m_userdb_handshake(struct lclient *lcptr) {
   arg->lclient = lclient_pop(lcptr);
 
   dlink_add_tail(&m_userdb_list, &arg->node, arg);
+
+  return arg;
 }
 
 
@@ -171,7 +173,7 @@ m_userdb_release(struct lclient *lcptr) {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int
+/*static int
 m_userdb_register(struct lclient *lcptr) {
   struct m_userdb_s *udb;
 
@@ -185,7 +187,12 @@ m_userdb_register(struct lclient *lcptr) {
 
   return 0;
 }
+*/
 
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+static void
+m_userdb_done(struct m_userdb_s *arg) {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
@@ -236,7 +243,8 @@ m_userdb_verify_query(struct m_userdb_s *arg) {
  * Start an AUTH lookup for a local client                                    *
  * -------------------------------------------------------------------------- */
 static int
-m_userdb_lookup_auth(struct m_userdb_s *arg) {
+m_userdb_query(struct m_userdb_s *arg, const char* cmd, const char *args) {
+  arg->sa = 
   return 0;
 }
 
@@ -249,5 +257,11 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
   } else if(!str_icmp(argv[2],"register"))  {
   } else if(!str_icmp(argv[2],"mutate"))  {
   } else if(!str_icmp(argv[2],"search"))  {
+  } else {
+    return;
   }
+
+  struct m_userdb_s* s = m_userdb_new(lcptr);
+
+   
 }
