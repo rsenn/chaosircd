@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `uid` varchar(64) NOT NULL,
   `msisdn` varchar(15) DEFAULT '',
@@ -7,8 +8,7 @@ CREATE TABLE `users` (
   `flag_reason` varchar(256) DEFAULT '',
   `last_login` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `last_location` point DEFAULT NULL,
-  `password` varchar(256) DEFAULT '',
   PRIMARY KEY (`uid`),
-  UNIQUE KEY `msisdn` (`msisdn`,`imsi`,`imei`),
-  UNIQUE KEY `uid` (`uid`,`msisdn`,`imsi`,`imei`)
+  UNIQUE KEY `msisdn` (`msisdn`),
+  UNIQUE KEY `imsi` (`imsi`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
