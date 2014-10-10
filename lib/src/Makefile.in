@@ -49,10 +49,11 @@ MODULES     = cfg \
               str \
               syscall \
               timer \
-              ttf \
-              $(PIE_LOADER)
+              ttf
 
 PIE_LOADER  = @PIE_LOADER@
+
+@DLFCN_FALSE@MODULES += $(PIE_LOADER)
 
 SOURCES     = $(MODULES:%=%.c)
 OBJECTS     = $(MODULES:%=%.@OBJEXT@)
@@ -101,7 +102,7 @@ install: install-exec install-data
 # build config
 # ---------------------------------------------------------------------------
 CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_LIBEXT)\" -DBUILD_LIBCHAOS
-FILES    += $(SYS_SOURCES)
+@DLFCN_FALSE@FILES    += $(SYS_SOURCES)
 INCLUDES += -I$(thisdir) \
             -I$(top_srcdir)/include \
             -I. \

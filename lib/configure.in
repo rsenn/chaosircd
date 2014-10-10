@@ -61,6 +61,7 @@ AC_PROG_DLLWRAP
 AC_CANONICAL_HOST
 
 AC_CONFIG_HOST
+AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
 
 dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h])
@@ -73,7 +74,6 @@ AC_CHECK_SQLITE
 AC_CHECK_PSQL
 AC_CHECK_MYSQL
 AC_CHECK_LIBOWFAT
-AC_CHECK_DLFCN
 AC_CHECK_EFENCE
 
 
