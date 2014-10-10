@@ -82,7 +82,7 @@ void str_unregister(char c)
 /* ------------------------------------------------------------------------ *
  * Convert long long (signed 64bit) to string                               *
  * ------------------------------------------------------------------------ */
-static inline size_t str_lltoa(char *s, int64_t ll)
+static size_t str_lltoa(char *s, int64_t ll)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -112,7 +112,7 @@ static inline size_t str_lltoa(char *s, int64_t ll)
 /* ------------------------------------------------------------------------ *
  * Convert unsigned long long (unsigned 64bit) to string                    *
  * ------------------------------------------------------------------------ */
-static inline size_t str_llutoa(char *s, uint64_t llu)
+static  size_t str_llutoa(char *s, uint64_t llu)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -136,7 +136,7 @@ static inline size_t str_llutoa(char *s, uint64_t llu)
 /* ------------------------------------------------------------------------ *
  * Convert long (signed 32bit) to string                                    *
  * ------------------------------------------------------------------------ */
-static inline size_t str_ltoa(char *s, long l)
+static size_t str_ltoa(char *s, long l)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -166,7 +166,7 @@ static inline size_t str_ltoa(char *s, long l)
 /* ------------------------------------------------------------------------ *
  * Convert unsigned long (unsigned 32bit) to string                         *
  * ------------------------------------------------------------------------ */
-static inline size_t str_lutoa(char *s, unsigned long l)
+static size_t str_lutoa(char *s, unsigned long l)
 {
   char bbuf[32];
   size_t bi = 0;
@@ -190,7 +190,7 @@ static inline size_t str_lutoa(char *s, unsigned long l)
 /* ------------------------------------------------------------------------ *
  * Converts a pointer to a hex string. returns length of the string         *
  * ------------------------------------------------------------------------ */
-static inline unsigned int str_ptoa(char *buf, void *i) 
+static  unsigned int str_ptoa(char *buf, void *i) 
 {
   register char *p = buf;
   register int n = 0; /* buffer index */
@@ -666,7 +666,7 @@ char *str_cat(char *d, const char *s)
 /* ------------------------------------------------------------------------ *
  * Copy string from <s> to <d>.                                             *
  * ------------------------------------------------------------------------ */
-size_t str_copy(char *d, const char *s)
+/*size_t str_copy(char *d, const char *s)
 {
   size_t i = 0;
   
@@ -681,7 +681,7 @@ size_t str_copy(char *d, const char *s)
   d[i] = '\0';
   
   return i;
-}
+}*/
 
 /* ------------------------------------------------------------------------ *
  * Copy string from <s> to <d>. Write max <n> bytes to <d> and always       *
@@ -756,7 +756,6 @@ size_t strlcat(char *d, const char *s, size_t n)
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-#if 1 //def __i386__
 int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
@@ -772,7 +771,6 @@ int str_cmp(const char *s1, const char *s2)
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
 }
-#endif /* __i386__ */
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
@@ -796,7 +794,6 @@ int str_icmp(const char *s1, const char *s2)
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-#if 1 //def __i386__
 int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
@@ -815,7 +812,6 @@ int str_ncmp(const char *s1, const char *s2, size_t n)
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
 }
-#endif /* __i386__ */
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
@@ -1126,7 +1122,6 @@ size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
 char *str_dup(const char *s)
 {
   char *r;
@@ -1138,12 +1133,9 @@ char *str_dup(const char *s)
 
   return r;
 }
-#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
-
 #define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
 #define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
 hash_t str_hash(const char *s)
@@ -1171,11 +1163,9 @@ hash_t str_hash(const char *s)
 
   return ret;
 }
-#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#ifdef NO_C99
 hash_t str_ihash(const char *s)
 {  
   hash_t ret = 0xdefaced;
@@ -1203,7 +1193,6 @@ hash_t str_ihash(const char *s)
 }
 #undef ROL
 #undef ROR
-#endif
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                    *

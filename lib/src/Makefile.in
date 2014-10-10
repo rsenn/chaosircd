@@ -59,7 +59,8 @@ OBJECTS     = $(MODULES:%=%.@OBJEXT@)
 PIC_OBJECTS = $(MODULES:%=%.@PIC_OBJEXT@)
 DEPS        = $(MODULES:%=%.d)
 
-SYS_SOURCES = dlfcn_darwin.c dlfcn_win32.c
+@DLFCN_FALSE@SYS_SOURCES += dlfcn_win32.c
+@DLFCN_FALSE@SYS_SOURCES += dlfcn_darwin.c 
 
 CONFIG_H_IN  = $(top_srcdir)/include/libchaos/config.h.in
 CONFIG_H     = $(top_builddir)/include/libchaos/config.h
