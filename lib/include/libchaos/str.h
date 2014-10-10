@@ -88,29 +88,6 @@ CHAOS_API(size_t) str_len(const char *s);
 #endif /* USE_IA32_LINUX_INLINE */
 
 /* ------------------------------------------------------------------------ *
- * Get first occurance of char <c> in string <s>                              *
- * ------------------------------------------------------------------------ */
-#if 0
-CHAOS_API(char *)str_chr(const char *s, int c);
-
-CHAOS_INLINE( char *str_chr(const char *s, int c)
-{
-  size_t i = 0;
-
-  for(EVER)
-  {
-    /* 32-bit unroll for faster prefetch */
-    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-    if(c != '\0' && !s[i]) break; if(s[i] == c) return (char *)&s[i]; i++;
-  }
-
-  return NULL;
-})
-#endif /* __i386__ */
-
-/* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 /*
 CHAOS_API(char *)str_cat(char *d, const char *s);

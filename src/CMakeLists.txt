@@ -16,7 +16,7 @@ ${BISON_IRCD_PARSER_OUTPUTS}
    chanmode.c channel.c chanuser.c chars.c
    class.c client.c conf.c
    lclient.c msg.c numeric.c oper.c ircd.c
-   server.c service.c user.c usermode.c userdb.c
+   server.c service.c user.c usermode.c 
    ${MSINTTYPES_HEADERS}
    "${CMAKE_SOURCE_DIR}/include/ircd/chanmode.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/channel.h" "${CMAKE_SOURCE_DIR}/include/ircd/chanuser.h"

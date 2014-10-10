@@ -162,8 +162,8 @@ userdb_lookup(struct userdb_client *userdb, const char* uid) {
 static void
 quote_escape(stralloc* sa, const char* str, char sep, char q) {
 
-	int quote = (sep != '\0' && str_chr(str, sep));
-	int escape = (q != '\0' && str_chr(str, q));
+	int quote = (sep != '\0' && strchr(str, sep));
+	int escape = (q != '\0' && strchr(str, q));
 
 	if(quote) stralloc_catb(sa, &q, 1);
 

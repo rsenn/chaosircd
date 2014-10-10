@@ -69,7 +69,7 @@ static void m_userdb_release(struct lclient *lcptr);
 static void m_userdb(struct lclient* lcptr, struct client* cptr,
                      int             argc,  char         **argv);
 
-static void m_userdb_done(struct m_userdb_s *arg);
+static void m_userdb_done(struct sauth* saptr, struct m_userdb_s *arg);
 /* -------------------------------------------------------------------------- *
  * Local variables                                                            *
  * -------------------------------------------------------------------------- */
@@ -128,7 +128,7 @@ m_userdb_unload(void) {
 
   /* Remove all pending udb stuff */
   dlink_foreach_safe_data(&m_userdb_list, node, next, arg)
-    m_userdb_done(arg);
+    m_userdb_done(arg->sauth, arg);
 
  // hook_unregister(lclient_register, HOOK_DEFAULT, m_userdb_register);
   hook_unregister(lclient_release, HOOK_DEFAULT, m_userdb_release);
@@ -158,16 +158,15 @@ m_userdb_new(struct lclient *lcptr) {
  * -------------------------------------------------------------------------- */
 static void
 m_userdb_release(struct lclient *lcptr) {
-  struct m_userdb_s *udb;
 
-  udb = lcptr->plugdata[LCLIENT_PLUGDATA_USERDB];
+	struct m_userdb_s* udb;
 
-  if(udb)
-  {
-    timer_cancel(&udb->timer);
-
-    m_userdb_done(udb);
-  }
+	dlink_foreach(&m_userdb_list, udb) {
+     if(udb->lclient == lcptr) {
+       m_userdb_done(udb->sauth, udb);
+       return;
+		 }
+	}
 }
 
 /* -------------------------------------------------------------------------- *
@@ -191,7 +190,7 @@ m_userdb_register(struct lclient *lcptr) {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
-m_userdb_done(struct m_userdb_s *arg) {
+m_userdb_done(struct sauth* saptr, struct m_userdb_s *arg) {
   struct node *nptr;
 
   //if(arg->timer) { timer_cancel(&arg->timer);  }

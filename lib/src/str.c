@@ -944,7 +944,7 @@ size_t str_tokenize_d(char *s, char **v, size_t maxtok, const char *delim)
   for(EVER)
   {
     /* Skip and zero whitespace */
-    while(str_chr(delim, *s))
+    while(strchr(delim, *s))
       *s++ = '\0';
     
     /* We finished */
@@ -969,7 +969,7 @@ size_t str_tokenize_d(char *s, char **v, size_t maxtok, const char *delim)
   {
     while(*s)
     {
-      if(str_chr(delim, *s))
+      if(strchr(delim, *s))
       {
         *s = '\0';
         break;
@@ -980,7 +980,7 @@ size_t str_tokenize_d(char *s, char **v, size_t maxtok, const char *delim)
     
     do
       s--;
-    while(str_chr(delim, *s));
+    while(strchr(delim, *s));
     
     *++s = '\0';
   }
