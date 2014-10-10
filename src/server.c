@@ -807,10 +807,10 @@ int server_ping(struct lclient *lcptr)
 
 /*    io_shutup(fds[0]);
     io_shutup(fds[1]);
-    io_close(fds[0]);
+    io_destroy(fds[0]);
 
     if(fds[0] != fds[1])
-      io_close(fds[1]);*/
+      io_destroy(fds[1]);*/
 
     return 0;
   }

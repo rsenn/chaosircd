@@ -293,7 +293,7 @@ void conf_shutdown(void)
 {
 /*  conf_free(&conf_current);
   conf_free(&conf_new);*/
-  io_close(conf_fd);
+  io_destroy(conf_fd);
 
   log_source_unregister(conf_log);
 }
@@ -354,7 +354,7 @@ void conf_read_callback(int fd, void *ptr)
     conf_free(&conf_current);
     conf_done();
 
-    io_close(fd);
+    io_destroy(fd);
   }
 }
 

@@ -186,7 +186,7 @@ static int lc_mflood_parse(struct lclient *lcptr, char *s)
         fd = lcptr->fds[0];
         lclient_exit(lcptr, "excess flood: %umsgs in %llumsecs",
                      lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines, delta);
-        io_close(fd);
+        io_destroy(fd);
         return 1;
       }
     }
@@ -257,7 +257,7 @@ static int lc_mflood_ttimer(struct lc_mflood *lcmfptr)
       fd = lcptr->fds[0];
       lclient_exit(lcptr, "excess flood: %umsgs in %llumsecs",
                    lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines, delta);
-      io_close(fd);
+      io_destroy(fd);
       return 0;
     }
   }

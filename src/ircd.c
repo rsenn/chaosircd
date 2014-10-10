@@ -221,7 +221,7 @@ static int ircd_writepid(struct config *config, pid_t pid)
 
   io_queue_control(fd, OFF, OFF, OFF);
   io_puts(fd, "%u", pid);
-  io_close(fd);
+  io_destroy(fd);
 
   return 0;
 }
