@@ -961,7 +961,7 @@ size_t str_tokenize_d(char *s, char **v, size_t maxtok, const char *delim)
       break;
     
     /* Scan for end or whitespace */
-    while(*s && str_chr(delim, *s) == NULL)
+    while(*s && strchr(delim, *s) == NULL)
       s++;    
   }
   

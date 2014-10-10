@@ -73,6 +73,7 @@ CONFIG_H_TOP = include/libchaos/config.h
 
 @WIN32_TRUE@@SHARED_TRUE@bin_EXEC = libchaos.dll
 
+CFLAGS     += $(LIBOWFAT_CFLAGS)
 LIBS     += $(LIBOWFAT_LIBS)
 LIBS     += $(DLFCN_LIBS)
 LIBS     += $(SSL_LIBS)

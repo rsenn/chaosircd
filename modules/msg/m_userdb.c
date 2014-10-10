@@ -194,9 +194,7 @@ static void
 m_userdb_done(struct m_userdb_s *arg) {
   struct node *nptr;
 
-  if(arg->timer) {
-    timer_cancel(&arg->timer);
-  }
+  //if(arg->timer) { timer_cancel(&arg->timer);  }
 
   if(arg->sauth) {
     sauth_delete(arg->sauth);

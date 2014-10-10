@@ -405,6 +405,8 @@ sauth_launch(void)
   if(sauth_child == NULL)
   {
     sauth_child = child_find_name("-sauth");
+    if(sauth_child == NULL)
+      sauth_child = child_find_name("servauth");
 
     if(sauth_child == NULL)
     {
@@ -419,29 +421,30 @@ sauth_launch(void)
     {
       child_launch(sauth_child);
 
-      if(sauth_child->channels[0][CHILD_PARENT][CHILD_READ] > -1)
-      {
-        sauth_fds[CHILD_READ] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
+			if(sauth_child->channels[0][CHILD_PARENT][CHILD_READ] == -1)
+				return 0;
 
-#ifdef HAVE_SOCKETPAIR
-        sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
-        io_queue_control(sauth_fds[CHILD_READ], ON, ON, ON);
-#else
-        sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_WRITE];
-        io_queue_control(sauth_fds[CHILD_READ], ON, OFF, ON);
-        io_queue_control(sauth_fds[CHILD_WRITE], OFF, ON, ON);
-#endif /* HAVE_SOCKETPAIR */
 
-        io_register(sauth_fds[CHILD_READ], IO_CB_READ, sauth_read, NULL);
-      }
-
-      sauth_rtimer = NULL;
-
-      return 1;
+      goto running;
     }
 
     return 0;
   }
+running:
+		sauth_fds[CHILD_READ] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
+
+#ifdef HAVE_SOCKETPAIR
+		sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_READ];
+		io_queue_control(sauth_fds[CHILD_READ], ON, ON, ON);
+#else
+		sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_WRITE];
+		io_queue_control(sauth_fds[CHILD_READ], ON, OFF, ON);
+		io_queue_control(sauth_fds[CHILD_WRITE], OFF, ON, ON);
+#endif /* HAVE_SOCKETPAIR */
+
+		io_register(sauth_fds[CHILD_READ], IO_CB_READ, sauth_read, NULL);
+
+  log(sauth_log, L_verbose, "Servauth child started (%u) (W=%u,R=%u)", sauth_child->pid, sauth_fds[CHILD_WRITE], sauth_fds[CHILD_READ]);
 
   sauth_rtimer = NULL;
 
@@ -492,6 +495,8 @@ sauth_init(void)
   sauth_rtimer = timer_start(sauth_launch, SAUTH_RELAUNCH);
 
   timer_note(sauth_rtimer, "servauth relaunch timer");
+
+	debug(sauth_log, "sauth_init()");
 }
 
 /* ------------------------------------------------------------------------ *
@@ -775,6 +780,12 @@ sauth_dump(struct sauth *saptr)
   if(saptr == NULL)
   {
     dump(sauth_log, "[================ sauth summary ================]");
+
+    dump(sauth_log, "   sauth_fds: [%d,%d]", sauth_fds[0], sauth_fds[1]);
+    dump(sauth_log, "sauth_serial: %u", sauth_serial);
+    dump(sauth_log, "   sauth_log: %d", sauth_log);
+    dump(sauth_log, " sauth_timer: %p", sauth_timer);
+    dump(sauth_log, " sauth_child: %p", sauth_child);
 
     dump(sauth_log, "------------------ dns reverse ------------------");
 
