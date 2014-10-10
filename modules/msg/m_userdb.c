@@ -195,6 +195,14 @@ m_userdb_done(struct sauth* saptr, struct m_userdb_s *arg) {
 
   //if(arg->timer) { timer_cancel(&arg->timer);  }
 
+	log(sauth_log, L_status, "userdb query (#%u) done: %s",
+			arg->sauth->id, arg->sauth->userargs);
+
+	lclient_send(arg->lclient, ":%S NOTICE %s :*** USERDB reply: %s %s",
+			server_me, arg->lclient->name, arg->sauth->usercmd, arg->sauth->userargs);
+
+  //arg->sauth->reply
+
   if(arg->sauth) {
     sauth_delete(arg->sauth);
     arg->sauth = NULL;
@@ -252,6 +260,17 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
     return;
   }
 
+	if(client_is_user(cptr)) {
+		if(!client_is_local(cptr))
+			return;
+
+	 if(!client_is_oper(lcptr)) {
+				numeric_lsend(lcptr, ERR_NOPRIVILEGES, argv[1]);
+       return;
+	 }
+	}
+
+
   stralloc args;
   stralloc_init(&args);
 
@@ -263,7 +282,6 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
 
   stralloc_catb(&args, "\0", 1);
 
-  struct m_userdb_s* s = m_userdb_query(lcptr, argv[2], args.s);
-
-   
+  struct m_userdb_s* s = 
+		m_userdb_query(lcptr, argv[2], args.s);
 }

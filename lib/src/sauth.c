@@ -176,7 +176,7 @@ static void sauth_callback(struct sauth *sauth, int type) {
 			break;
 		}
 		case SAUTH_TYPE_USERDB: {
-			log(sauth_log, L_verbose, "USERDB query (#%u) %s %-20s", sauth->id, sauth->usercmd, sauth->userargs);
+			//log(sauth_log, L_verbose, "USERDB query (#%u) %s %-20s", sauth->id, sauth->usercmd, sauth->userargs);
 			break;
 		}
 	}
@@ -261,7 +261,28 @@ static int sauth_parse(char **argv) {
 		sauth = sauth_find(serial);
 
 		if(sauth) {
-//      sauth->reply = sauth_userdb_reply(argv[2]);
+			char* p = sauth_readbuf;
+
+			int i;
+			for(i = 0; i < 3; ++i) {
+				while(p && !isspace(*p)) ++p;
+				while(p && isspace(*p)) ++p;
+			}
+
+			char* e = &sauth_readbuf[str_len(sauth_readbuf)];
+
+			while(e > p) {
+        --e;
+				if(isspace(*e))
+					*e = '\0';
+				else
+					break;
+			}
+
+      sauth->reply = p - sauth_readbuf;
+
+			free(sauth->userargs);
+			sauth->userargs = str_dup(p);
 
 			sauth_callback(sauth, SAUTH_DONE);
 		}
@@ -307,13 +328,15 @@ static void sauth_read(int fd, void *ptr) {
 	while(io_list[fd].recvq.lines) {
 		if((len = io_gets(fd, sauth_readbuf, BUFSIZE)) == 0) break;
 
-		str_tokenize(sauth_readbuf, argv, 5);
+	  char* s = str_dup(sauth_readbuf);	
+		str_tokenize(s, argv, 5);
 
 		if(sauth_parse(argv)) {
 			log(sauth_log, L_warning, "Invalid reply from sauth!");
 
 			io_shutup(fd);
 		}
+		free(s);
 	}
 
 	if(io_list[fd].status.eof || io_list[fd].status.err) {

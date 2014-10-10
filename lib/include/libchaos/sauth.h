@@ -46,7 +46,7 @@
 #define SAUTH_TYPE_USERDB 0x04
 
 #define SAUTH_TIMEOUT    20000
-#define SAUTH_RELAUNCH   15000        /* 15 secs relaunch interval */
+#define SAUTH_RELAUNCH    3000        /* 15 secs relaunch interval */
 
 #define SAUTH_PROXY_TIMEOUT  1
 #define SAUTH_PROXY_FILTERED 2
