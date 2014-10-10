@@ -111,7 +111,7 @@ void mfile_read(int fd, struct mfile *mfptr)
     log(mfile_log, L_status, "Read %u lines from %s.",
         mfptr->lines.size, mfptr->path);
 
-    io_close(fd);
+    io_destroy(fd);
     mfptr->fd = -1;
   }
 

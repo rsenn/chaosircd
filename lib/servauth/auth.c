@@ -186,7 +186,7 @@ int auth_lookup(struct auth_client *auth, net_addr_t addr,
     auth->remote_port = remote_port;
     auth->deadline = timer_systime + t;
 
-    io_nonblock(auth->sock - 1);
+    io_nonblocking(auth->sock - 1);
 
     if(net_connect(auth->sock - 1, addr, 113, auth_event_cn, auth_event_cn, auth) &&
        syscall_errno != EINPROGRESS)

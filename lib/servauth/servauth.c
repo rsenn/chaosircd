@@ -224,8 +224,8 @@ int main(int argc, char *argv[])
       argv[i][j] = '\0';
 
   /* set file descriptor to nonblocking mode */
-/*  io_nonblock(recvfd);
-  io_nonblock(sendfd);*/
+/*  io_nonblocking(recvfd);
+  io_nonblocking(sendfd);*/
 
   /* initialize dns client */
   dns_init();

@@ -126,7 +126,7 @@ void mem_shutdown(void)
 #ifdef HAVE_MMAP
 # ifndef MAP_ANON
 
-  io_close(mem_zero);
+  io_destroy(mem_zero);
 
 # endif /* MAP_ANON */
 #endif /* HAVE_MMAP */

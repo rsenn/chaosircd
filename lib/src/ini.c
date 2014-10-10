@@ -233,7 +233,7 @@ static void ini_read_cb(int fd, void *ptr)
   io_unregister(fd, IO_CB_READ);
 
   ini_load(ini);
-  io_close(fd);
+  io_destroy(fd);
 
 //  if(io_list[fd].status.closed || io_list[fd].status.err)
   {
@@ -243,7 +243,7 @@ static void ini_read_cb(int fd, void *ptr)
   /*  else
       ini_load(ini);*/
 
-//    io_close(fd);
+//    io_destroy(fd);
   }
 }
 
@@ -970,7 +970,7 @@ int ini_read_color(struct ini_section *section, const char *key, struct color *c
 void ini_close(struct ini *ini)
 {
   if(ini->fd >= 0)
-    io_close(ini->fd);
+    io_destroy(ini->fd);
 
   ini->fd = -1;
 }

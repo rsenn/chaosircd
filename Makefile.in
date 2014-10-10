@@ -21,8 +21,8 @@ dep: makefiles dep-recursive
 # Subdirectories
 ROOT = 1
 RECURSIVE = 1
-@DLM_TRUE@SUBDIRS = libowfat lib include src modules tools conf doc contrib test
-@DLM_FALSE@SUBDIRS = libowfat lib include modules src tools conf doc contrib test
+@DLM_TRUE@SUBDIRS = lib include src modules tools conf doc contrib test
+@DLM_FALSE@SUBDIRS = lib include modules src tools conf doc contrib test
 
 RECURSIVE_TARGETS = all-recursive \
                     install-recursive \

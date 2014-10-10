@@ -1684,7 +1684,7 @@ int gif_save(struct gif *gif)
 
   io_write(gif->fd, gif->mem, gif->size);
 
-  io_close(gif->fd);
+  io_destroy(gif->fd);
 
   gif->fd = -1;
 

@@ -791,7 +791,7 @@ static void connect_write(int fd, struct connect *cnptr)
       if(ssl_new(fd, cnptr->ctxt))
       {
         cnptr->status = CONNECT_ERROR;
-        io_close(fd);
+        io_destroy(fd);
         connect_retry(cnptr);
         return;
       }
@@ -802,7 +802,7 @@ static void connect_write(int fd, struct connect *cnptr)
             cnptr->name, ssl_strerror(fd));
 
         ssl_close(fd);
-        io_close(fd);
+        io_destroy(fd);
         connect_retry(cnptr);
         return;
       }
