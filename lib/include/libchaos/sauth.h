@@ -166,6 +166,10 @@ CHAOS_API(int) sauth_proxy_reply(const char *reply);
  * ------------------------------------------------------------------------ */
 CHAOS_API(int) sauth_proxy_type(const char *type);
 
+
+
+CHAOS_API(struct sauth*) sauth_userdb(const char *cmd, const char *args, void *callback, ...);
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void) sauth_delete(struct sauth *sauth);

@@ -538,7 +538,8 @@ if test "$ac_cv_libowfat_stralloc_h_found" = yes; then
 		LIBOWFAT_LIBS="-L${LIBOWFAT_LIBDIR} $LIBOWFAT_LIBS"
 	fi
 else
-  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Need libowfat!])
+  dnl AC_MSG_RESULT([no])
 fi
 
 AM_CONDITIONAL([LIBOWFAT], [test "$ac_cv_libowfat_stralloc_h_found" = yes])

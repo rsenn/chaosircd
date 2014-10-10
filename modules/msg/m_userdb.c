@@ -42,7 +42,6 @@
 #include "ircd/server.h"
 #include "ircd/client.h"
 #include "ircd/numeric.h"
-#include "ircd/userdb.h"
 
 #include "stralloc.h"
 

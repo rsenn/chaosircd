@@ -31,7 +31,6 @@ MODULES              = chanmode \
                        server \
                        service \
                        user \
-                       userdb \
                        usermode
                        
 include $(top_builddir)/config.mk

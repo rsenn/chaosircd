@@ -196,7 +196,7 @@ build_values(struct db* db, stralloc* sa, char** v, size_t n, char sep, char q, 
 		if(!v[i]) v[i] = "";
 		size_t len = str_len(v[i]);
 		if(sa->len) stralloc_catb(sa, &sep, 1);
-		int quote = (q != '\0') && (((sep == ',') || (!len || str_chr(v[i], sep) != NULL)) || (q == '`'));
+		int quote = (q != '\0') && (((sep == ',') || (!len || strchr(v[i], sep) != NULL)) || (q == '`'));
 		if(quote) stralloc_catb(sa, &q, 1);
 
 		char *str;
@@ -298,7 +298,7 @@ userdb_fields(struct userdb_client *userdb, size_t* nfields, const char* excepti
 static char*
 get_varname(char* a, size_t *n) {
 	char* p;
-	if((p = str_chr(a, '='))) {
+	if((p = strchr(a, '='))) {
 		*n = p - a;
 		return a;
 	}
@@ -310,7 +310,7 @@ get_varname(char* a, size_t *n) {
 static char*
 get_varvalue(char* a) {
 	char *p, *d;
-	if((p = str_chr(a, '=')))
+	if((p = strchr(a, '=')))
 		++p;
 	else
 		p = a;
@@ -467,7 +467,7 @@ userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_t nu
 	size_t i;
 	for(i = 0; i < num_values; ++i) {
 		char *s = (char *)v[i];
-		char *eq = str_chr(s, '=');
+		char *eq = strchr(s, '=');
 		size_t n = str_len(s);
 		if(eq) {
 			n = eq - s;
