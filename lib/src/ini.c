@@ -499,7 +499,7 @@ int ini_load(struct ini *ini)
     }
 
     /* Split up into key & value */
-    p = str_chr(buf, '=');
+    p = strchr(buf, '=');
 
     if(p == NULL) {
       log(ini_log, L_warning, "%s:%i: missing '='", ini->name, line);

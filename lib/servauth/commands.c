@@ -320,7 +320,7 @@ static int cmd_proxy(control_t *cptr, int ac, char **av)
 
   strlcpy(remote, av[2], sizeof(remote));
 
-  if((ptr = str_chr(remote, ':')) == NULL)
+  if((ptr = strchr(remote, ':')) == NULL)
     return -1;
 
   *ptr++ = '\0';

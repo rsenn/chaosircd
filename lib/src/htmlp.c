@@ -148,14 +148,14 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
 
   for(;;)
   {
-    if((p1 = str_chr(p1, '<')) == NULL)
+    if((p1 = strchr(p1, '<')) == NULL)
       break;
 
     *p1++ = '\0';
 
     if(*p1 == '!')
     {
-      if((p1 = str_chr(p1, '>')) == NULL)
+      if((p1 = strchr(p1, '>')) == NULL)
         break;
 
       continue;
@@ -171,13 +171,13 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
       closing = 0;
     }
 
-    p2 = str_chr(p1, ' ');
+    p2 = strchr(p1, ' ');
 
     p4 = p1;
 
     do
     {
-      p3 = str_chr(p4, '>');
+      p3 = strchr(p4, '>');
 
       /* incomplete tag -> parse error */
       if(p3 == NULL)
@@ -231,7 +231,7 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
           {
             *value++ = '\0';
 
-            p4 = str_chr(value, '"');
+            p4 = strchr(value, '"');
 
             if(p4 == NULL)
               return -1;
@@ -240,7 +240,7 @@ int htmlp_parse(struct htmlp *hpptr, const char *data, size_t n)
           }
           else
           {
-            p4 = str_chr(value, ' ');
+            p4 = strchr(value, ' ');
 
             if(p4 == NULL || p4 > p3)
               p4 = p3;
@@ -596,7 +596,7 @@ char *htmlp_decode(const char *s)
 
         text[di++] = str_toul(&s[++i], &p, 10);
 
-        p = str_chr(&s[i], ';');
+        p = strchr(&s[i], ';');
         p -= (size_t)&s[i];
 
         i += (size_t)p;

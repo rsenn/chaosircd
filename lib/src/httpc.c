@@ -658,7 +658,7 @@ void httpc_recv_header(struct httpc *hcptr, char *s)
 
       return;
     }
-    else if((p = str_chr(hdv[0], ':')))
+    else if((p = strchr(hdv[0], ':')))
     {
       *p = '\0';
 
@@ -921,7 +921,7 @@ void httpc_dump(struct httpc *hcptr)
 
       do
       {
-        next = str_chr(p, '\n');
+        next = strchr(p, '\n');
 
         if(next) *next = '\0';
 

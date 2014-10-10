@@ -91,9 +91,9 @@ void mfile_read(int fd, struct mfile *mfptr)
 
   while(io_gets(fd, buf, MFILE_LINELEN - 1))
   {
-    if((eol = str_chr(buf, '\r')))
+    if((eol = strchr(buf, '\r')))
       *eol = '\0';
-    if((eol = str_chr(buf, '\n')))
+    if((eol = strchr(buf, '\n')))
       *eol = '\0';
     if(eol == NULL)
       eol = buf + str_len(buf);

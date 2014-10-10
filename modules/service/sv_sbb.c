@@ -959,7 +959,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
     *p++ = '\0';
     *p++ = '\0';
 
-    if((timestr = str_chr(p, ':')))
+    if((timestr = strchr(p, ':')))
     {
       while(*timestr != ' ' && timestr > p)
         timestr--;
@@ -975,7 +975,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
         if((q_time = timer_parse_time(timestr)) == (uint64_t)-1LL)
           q_time = timer_mtime - timer_today;
 
-        if((datestr = str_chr(timestr, ' ')))
+        if((datestr = strchr(timestr, ' ')))
         {
           *datestr++ = '\0';
 

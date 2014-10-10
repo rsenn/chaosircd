@@ -112,7 +112,7 @@ static struct module *module_new(const char *path)
   strlcpy(name, (p ? p + 1 : path), sizeof(name));
 
   /* cut the .so */
-  p = str_chr(name, '.');
+  p = strchr(name, '.');
 
   if(p)
     *p = '\0';
@@ -261,7 +261,7 @@ const char *module_expand(const char *name)
 
   strlcpy(ret, name, sizeof(ret));
 
-  if(str_chr(ret, '/') == NULL && (p = str_chr(ret, '_'))) {
+  if(strchr(ret, '/') == NULL && (p = strchr(ret, '_'))) {
 
     for(i = 0; module_table[i][0]; i++) {
 
@@ -270,7 +270,7 @@ const char *module_expand(const char *name)
 
         strlcpy(lala, p, sizeof(lala));
 
-        if((p = str_chr(lala, '.')))
+        if((p = strchr(lala, '.')))
           *p = '\0';
 
         strlcpy(ret, module_path, sizeof(lala));

@@ -655,14 +655,14 @@ void lclient_process(int fd, struct lclient *lcptr)
 
   lclient_update_recvb(lcptr, n);
 #ifdef DEBUG
-  p = str_chr(lclient_recvbuf, '\r');
+  p = strchr(lclient_recvbuf, '\r');
   if(p)
   {
     *p = '\0';
   }
   else
   {
-    p = str_chr(lclient_recvbuf, '\n');
+    p = strchr(lclient_recvbuf, '\n');
     if(p) *p = '\0';
   }
   debug(ircd_log_in, "From %s: %s", lcptr->name, lclient_recvbuf);

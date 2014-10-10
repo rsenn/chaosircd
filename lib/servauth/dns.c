@@ -879,7 +879,7 @@ static void dns_read_line(int fd, void *arg)
       if(!str_isdigit(buf[i]))
         return;
 
-      p = str_chr(&buf[i], '\n');
+      p = strchr(&buf[i], '\n');
 
       if(p)
         *p = '\0';

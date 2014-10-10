@@ -259,7 +259,7 @@ static void m_gline_mask(const char *host, net_addr_t *addr,
   /* Parse CIDR netmask */
   strlcpy(netmask, host, sizeof(netmask));
 
-  if((s = str_chr(netmask, '/')))
+  if((s = strchr(netmask, '/')))
   {
     *s++ = '\0';
     mbc = str_toul(s, NULL, 10);
@@ -496,7 +496,7 @@ static int m_gline_loaddb(void)
     strlcpy(mask, isptr->name, sizeof(mask));
 
     /* Invalid section name, skip it */
-    if((host = str_chr(mask, '@')) == NULL)
+    if((host = strchr(mask, '@')) == NULL)
       continue;
 
     /* Null-terminate user mask */
@@ -573,7 +573,7 @@ static int m_gline_split(char  user[IRCD_USERLEN],
   host[1] = '\0';
 
   /* Split up the mask */
-  if((p = str_chr(mask, '@')))
+  if((p = strchr(mask, '@')))
   {
     *p++ = '\0';
 
