@@ -525,7 +525,18 @@ AC_MSG_CHECKING([for libowfat])
 
 if test "$ac_cv_libowfat_stralloc_h_found" = yes; then
   AC_MSG_RESULT([yes])
-  LIBOWFAT_LIBS="-L${ac_cv_with_libowfat}/lib -lowfat"
+
+	for DIR in "${ac_cv_with_libowfat}/lib/${host:+dummy}/" "${ac_cv_with_libowfat}/lib64" "${ac_cv_with_libowfat}/lib"; do
+		if test -d "$DIR" ; then
+			LIBOWFAT_LIBDIR="$DIR"
+		  break
+		fi
+	done
+
+  LIBOWFAT_LIBS="-lowfat"
+	if test -n "$LIBOWFAT_LIBDIR"; then
+		LIBOWFAT_LIBS="-L${LIBOWFAT_LIBDIR} $LIBOWFAT_LIBS"
+	fi
 else
   AC_MSG_RESULT([no])
 fi

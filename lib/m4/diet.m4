@@ -63,7 +63,10 @@ AC_ARG_WITH([dietlibc],
      AC_MSG_RESULT([yes])
    else
 dnl     DIET=""
-     
+   
+	    
+		 test -e "$DIETDIR/lib64" && 
+     LIBDIR="$DIETDIR/lib64" ||
      LIBDIR="$DIETDIR/lib"
      
      for x in $DIETLIBS

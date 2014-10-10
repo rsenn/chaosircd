@@ -233,6 +233,7 @@ AC_CHECK_WERROR
 # ---------------------------------------------------------------------------
 
 eval "case $libdir in
+  /lib64 | /usr/lib64 | /usr/local/lib64) ;;
   /lib | /usr/lib | /usr/local/lib) ;;
   *)
     LDFLAGS=\"\${LDFLAGS:+\$LDFLAGS }-Wl,-rpath=\\\${libdir}\"
