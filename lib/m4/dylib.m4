@@ -83,6 +83,14 @@ AC_DEFUN([AC_CONFIG_DYLIB],[
      	PIE_ENABLE=yes
 		DLM_ENABLE=yes
   fi
+
+	if test "$DLM_ENABLE" = yes; then
+		case "$host" in
+		  *darwin*|*apple*)
+		PIE_ENABLE=yes
+	;;
+	esac
+  fi
  
   
 dnl   if test "$DLM_ENABLE" = yes -a "$PIE_ENABLE" != yes; then

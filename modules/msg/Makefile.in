@@ -102,6 +102,8 @@ shobjects: $(SHOBJECTS)
 
 include $(top_builddir)/config.mk
 
+@PIE_TRUE@LDFLAGS += $(PIE_LDFLAGS)
+
 #INSTALL = @INSTALL@
 
 CLEANFILES           = *~ core core.* \
