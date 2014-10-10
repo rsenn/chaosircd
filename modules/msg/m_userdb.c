@@ -224,7 +224,8 @@ m_userdb_query(struct lclient *lcptr, const char* cmd, const char *args) {
 
   struct m_userdb_s* arg = m_userdb_new(lcptr);
 
-  arg->sauth = sauth_userdb(cmd, args);
+  arg->sauth = sauth_userdb(cmd, args, m_userdb_done, arg);
+
   /* Report start of the dns lookup */
   if(arg->sauth)
   {
