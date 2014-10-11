@@ -574,7 +574,7 @@ void io_handle_fd(int fd)
                                     io_list[fd].args[0], io_list[fd].args[1],
                                     io_list[fd].args[1], io_list[fd].args[2]);
       io_list[fd].status.closed = 0;
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
   }
@@ -654,7 +654,7 @@ void io_handle_fd(int fd)
 
   if(io_list[fd].status.closed || io_list[fd].status.err)
   {
-    io_close(fd);
+    io_destroy(fd);
     return;
   }
 }
@@ -728,7 +728,7 @@ void io_shutdown(void)
   {
     queue_destroy(&io_list[i].sendq);
     queue_destroy(&io_list[i].recvq);
-    io_close(i);
+    io_destroy(i);
   }
 
   log_source_unregister(io_log);
@@ -737,7 +737,7 @@ void io_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Put a file descriptor into non-blocking mode.                            *
  * ------------------------------------------------------------------------ */
-int io_nonblock(int fd)
+int io_nonblocking(int fd)
 {
 #ifdef WIN32
   if(io_list[fd].type == FD_SOCKET)
@@ -827,7 +827,7 @@ int io_new(int fd, int type)
   io_add_fd(fd);
 
   if(!io_list[fd].flags)
-    io_nonblock(fd);
+    io_nonblocking(fd);
 
   return fd;
 }
@@ -890,7 +890,7 @@ int io_open(const char *path, int mode, ...)
 /* ------------------------------------------------------------------------ *
  * Close an fd.                                                             *
  * ------------------------------------------------------------------------ */
-void io_close(int fd)
+void io_destroy(int fd)
 {
   if(io_list[fd].status.dead)
     return;
@@ -1335,7 +1335,7 @@ int io_poll(int64_t *remain, int64_t *timeout)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void io_wait(void)
+void io_wait_blocking(void)
 {
   io_multiplex(NULL, NULL);
   io_handle();
@@ -1387,7 +1387,7 @@ void io_move(int from, int to)
 
   memcpy(&io_list[to], &io_list[from], sizeof(struct io));
 
-  io_close(from);
+  io_destroy(from);
 }
 
 /* ------------------------------------------------------------------------ *

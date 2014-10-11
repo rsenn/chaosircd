@@ -102,6 +102,10 @@ shobjects: $(SHOBJECTS)
 
 include $(top_builddir)/config.mk
 
+
+CFLAGS += $(LIBOWFAT_CFLAGS)
+@PIE_TRUE@LDFLAGS += $(PIE_LDFLAGS)
+
 #INSTALL = @INSTALL@
 
 CLEANFILES           = *~ core core.* \
@@ -116,6 +120,8 @@ DEFS += -DBUILD_MODULE
 @DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
 @DLM_FALSE@DEFS += -DSTATIC_IRCD
 
+CFLAGS += $(LIBOWFAT_CFLAGS)
+#LIBS += $(LIBOWFAT_LIBS)
 
 @WIN32_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/src -lircd
 @DLM_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos

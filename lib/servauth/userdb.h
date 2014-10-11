@@ -40,13 +40,13 @@ typedef void (userdb_callback_t)(struct userdb_client *);
 
 struct userdb_client
 {
-  struct db                *handle;
-  struct db_result         *result;
+  struct db         *handle;
+  struct db_result  *result;
   uint64_t           timeout;
   void              *userarg;
   struct timer      *timer;
   char               reply[256];
-  userdb_callback_t   *callback;
+  userdb_callback_t *callback;
 };
 
 #define userdb_is_idle(userdb) (!((struct userdb_client *)(userdb))->handle)

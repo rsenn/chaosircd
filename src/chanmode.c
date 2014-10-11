@@ -923,8 +923,8 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
 
   if(cmcptr->what == CHANMODE_ADD)
   {
-    sep1 = str_chr(cmcptr->arg, '!');
-    sep2 = str_chr(cmcptr->arg, '@');
+    sep1 = strchr(cmcptr->arg, '!');
+    sep2 = strchr(cmcptr->arg, '@');
 
     nick[0] = '*';
     user[0] = '*';
@@ -951,7 +951,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       if(cmcptr->arg[0])
         strlcpy(user, cmcptr->arg, sizeof(user));
 
-      if((sep1 = str_chr(cmcptr->arg, '@')))
+      if((sep1 = strchr(cmcptr->arg, '@')))
         *sep1 = '\0';
 
       if(sep2[0])
@@ -964,7 +964,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       if(cmcptr->arg[0])
         strlcpy(nick, cmcptr->arg, sizeof(nick));
 
-      if((sep2 = str_chr(cmcptr->arg, '!')))
+      if((sep2 = strchr(cmcptr->arg, '!')))
         *sep2 = '\0';
 
       if(sep1[0])
@@ -981,16 +981,16 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
 
       *sep2++ = '\0';
 
-      if((tmp = str_chr(sep1, '!')))
+      if((tmp = strchr(sep1, '!')))
         *tmp = '\0';
 
       if(sep1[0])
         strlcpy(user, sep1, sizeof(user));
 
-      if((tmp = str_chr(sep2, '@')))
+      if((tmp = strchr(sep2, '@')))
         *tmp = '\0';
 
-      if((tmp = str_chr(sep2, '!')))
+      if((tmp = strchr(sep2, '!')))
         *tmp = '\0';
 
       if(sep2[0])

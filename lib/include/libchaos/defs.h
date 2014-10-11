@@ -84,9 +84,9 @@ typedef int ssize_t;
 
 #ifndef CHAOS_INLINE
 #ifdef __clang__
-#define CHAOS_INLINE static inline
+#define CHAOS_INLINE(x) //static inline x
 #else
-#define CHAOS_INLINE extern inline
+#define CHAOS_INLINE(x) extern inline x
 #endif
 #endif
 

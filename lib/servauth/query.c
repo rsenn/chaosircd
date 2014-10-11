@@ -196,7 +196,7 @@ int query_set_proxy(struct servauth_query *q, const char *id,
   /* parse remote address:port */
   strlcpy(addrbuf, r, sizeof(addrbuf));
 
-  if((ptr = str_chr(addrbuf, ':')))
+  if((ptr = strchr(addrbuf, ':')))
     *ptr++ = '\0';
 
   if(net_aton(addrbuf, &q->remote_addr) <= 0)
@@ -207,7 +207,7 @@ int query_set_proxy(struct servauth_query *q, const char *id,
   /* parse local address:port */
   strlcpy(addrbuf, l, sizeof(addrbuf));
 
-  if((ptr = str_chr(addrbuf, ':')))
+  if((ptr = strchr(addrbuf, ':')))
     *ptr++ = '\0';
 
   if(net_aton(addrbuf, &q->local_addr) <= 0)

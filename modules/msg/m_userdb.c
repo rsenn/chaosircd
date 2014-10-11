@@ -30,6 +30,7 @@
 #include "libchaos/str.h"
 #include "libchaos/hook.h"
 #include "libchaos/timer.h"
+#include "libchaos/sauth.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
@@ -41,7 +42,8 @@
 #include "ircd/server.h"
 #include "ircd/client.h"
 #include "ircd/numeric.h"
-#include "ircd/userdb.h"
+
+#include "stralloc.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
@@ -56,21 +58,18 @@ struct m_userdb_s {
   struct node     node;
   struct lclient *lclient;
   struct timer   *timer;
-  struct timer   *timer_auth;
-  struct userdb   *h;
+  struct sauth   *sauth;
   int             done;
 };
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int m_userdb_register(struct lclient *lcptr);
-static void m_userdb_handshake(struct lclient *lcptr);
 static void m_userdb_release(struct lclient *lcptr);
 static void m_userdb(struct lclient* lcptr, struct client* cptr,
                      int             argc,  char         **argv);
 
-static void m_userdb_done(struct m_userdb_s *arg);
+static void m_userdb_done(struct sauth* saptr, struct m_userdb_s *arg);
 /* -------------------------------------------------------------------------- *
  * Local variables                                                            *
  * -------------------------------------------------------------------------- */
@@ -93,7 +92,7 @@ static char *m_userdb_help[] = {
 
 static struct msg m_userdb_msg = {
   "USERDB", 1, 0, MFLG_CLIENT,
-  { NULL, m_userdb, m_userdb, m_userdb }, 
+  { NULL, m_userdb, m_userdb, m_userdb },
   m_userdb_help
 };
 
@@ -110,7 +109,7 @@ m_userdb_load(void) {
 
   mem_static_create(&m_userdb_heap, sizeof(struct m_userdb_s),
                     SAUTH_BLOCK_SIZE / 2);
-  mem_static_note(&m_userdb_heap, "udb client heap");
+  mem_static_note(&m_userdb_heap, "m_userdb client heap");
 
   dlink_list_zero(&m_userdb_list);
 
@@ -129,7 +128,7 @@ m_userdb_unload(void) {
 
   /* Remove all pending udb stuff */
   dlink_foreach_safe_data(&m_userdb_list, node, next, arg)
-    m_userdb_done(arg);
+    m_userdb_done(arg->sauth, arg);
 
  // hook_unregister(lclient_register, HOOK_DEFAULT, m_userdb_register);
   hook_unregister(lclient_release, HOOK_DEFAULT, m_userdb_release);
@@ -140,16 +139,18 @@ m_userdb_unload(void) {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void
-m_userdb_handshake(struct lclient *lcptr) {
+static struct m_userdb_s*
+m_userdb_new(struct lclient *lcptr) {
   struct m_userdb_s *arg;
 
-  /* Keep track of the lclient if the module gets unloaded */
-  arg = mem_static_alloc(&m_userdb_heap);
+	  /* Keep track of the lclient if the module gets unloaded */
+	  arg = mem_static_alloc(&m_userdb_heap);
 
-  arg->lclient = lclient_pop(lcptr);
+	  arg->lclient = lclient_pop(lcptr);
 
   dlink_add_tail(&m_userdb_list, &arg->node, arg);
+
+  return arg;
 }
 
 
@@ -157,21 +158,20 @@ m_userdb_handshake(struct lclient *lcptr) {
  * -------------------------------------------------------------------------- */
 static void
 m_userdb_release(struct lclient *lcptr) {
-  struct m_userdb_s *udb;
 
-  udb = lcptr->plugdata[LCLIENT_PLUGDATA_USERDB];
+	struct m_userdb_s* udb;
 
-  if(udb)
-  {
-    timer_cancel(&udb->timer);
-
-    m_userdb_done(udb);
-  }
+	dlink_foreach(&m_userdb_list, udb) {
+     if(udb->lclient == lcptr) {
+       m_userdb_done(udb->sauth, udb);
+       return;
+		 }
+	}
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int
+/*static int
 m_userdb_register(struct lclient *lcptr) {
   struct m_userdb_s *udb;
 
@@ -185,20 +185,27 @@ m_userdb_register(struct lclient *lcptr) {
 
   return 0;
 }
+*/
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
-m_userdb_done(struct m_userdb_s *arg) {
+m_userdb_done(struct sauth* saptr, struct m_userdb_s *arg) {
   struct node *nptr;
 
-  if(arg->timer) {
-    timer_cancel(&arg->timer);
-  }
+  //if(arg->timer) { timer_cancel(&arg->timer);  }
 
-  if(arg->h) {
-    userdb_delete(arg->h);
-    arg->h = NULL;
+	log(sauth_log, L_status, "userdb query (#%u) done: %s",
+			arg->sauth->id, arg->sauth->userargs);
+
+	lclient_send(arg->lclient, ":%S NOTICE %s :*** USERDB reply: %s %s",
+			server_me, arg->lclient->name, arg->sauth->usercmd, arg->sauth->userargs);
+
+  //arg->sauth->reply
+
+  if(arg->sauth) {
+    sauth_delete(arg->sauth);
+    arg->sauth = NULL;
   }
 
   dlink_delete(&m_userdb_list, &arg->node);
@@ -209,35 +216,35 @@ m_userdb_done(struct m_userdb_s *arg) {
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void
-m_userdb_verify_query(struct m_userdb_s *arg) {
-  /* Start reverse lookup */
-//  arg->sauth_userdb = userdb_verify(m_userdb_verify, arg);
-//
-//  /* Report start of the dns lookup */
-//  if(arg->sauth_userdb)
-//  {
-//    lclient_send(arg->lclient,
-//                 ":%s NOTICE %s :(dns) looking up %u.%u.%u.%u.in-addr.arpa.",
-//                 lclient_me->name, arg->lclient->name,
-//                 (uint32_t)ip[3], (uint32_t)ip[2],
-//                 (uint32_t)ip[1], (uint32_t)ip[0]);
-//  }
-//  else
-//  {
-//    /* Huh, dns failed, maybe servauth done, let's try the auth query */
-//    lclient_send(arg->lclient, ":%s NOTICE %s :(dns) servauth down.",
-//                 lclient_me->name, arg->lclient->name);
-//    m_userdb_lookup_auth(arg);
-//  }
+m_userdb_callback(struct sauth* saptr) {
 
 }
 
 /* -------------------------------------------------------------------------- *
  * Start an AUTH lookup for a local client                                    *
  * -------------------------------------------------------------------------- */
-static int
-m_userdb_lookup_auth(struct m_userdb_s *arg) {
-  return 0;
+static struct m_userdb_s*
+m_userdb_query(struct lclient *lcptr, const char* cmd, const char *args) {
+
+  struct m_userdb_s* arg = m_userdb_new(lcptr);
+
+  arg->sauth = sauth_userdb(cmd, args, m_userdb_done, arg);
+
+  /* Report start of the dns lookup */
+  if(arg->sauth)
+  {
+    lclient_send(arg->lclient,
+                 ":%s NOTICE %s :(userdb) query: %s", 
+                 lclient_me->name, arg->lclient->name, cmd);
+  }
+  else
+  {
+    /* Huh, dns failed, maybe servauth done, let's try the auth query */
+    lclient_send(arg->lclient, ":%s NOTICE %s :(userdb) servauth down.",
+                 lclient_me->name, arg->lclient->name);
+    //m_userdb_lookup_auth(arg);
+  }
+  return arg;
 }
 
 /* -------------------------------------------------------------------------- *
@@ -249,5 +256,32 @@ m_userdb(struct lclient* lcptr, struct client* cptr, int argc, char** argv) {
   } else if(!str_icmp(argv[2],"register"))  {
   } else if(!str_icmp(argv[2],"mutate"))  {
   } else if(!str_icmp(argv[2],"search"))  {
+  } else {
+    return;
   }
+
+	if(client_is_user(cptr)) {
+		if(!client_is_local(cptr))
+			return;
+
+	 if(!lclient_is_oper(lcptr)) {
+				numeric_lsend(lcptr, ERR_NOPRIVILEGES, argv[1]);
+       return;
+	 }
+	}
+
+
+  stralloc args;
+  stralloc_init(&args);
+
+  size_t i;
+  for(i = 3; i < argc; ++i) {
+		if(args.len) stralloc_catb(&args, " ", 1);
+    stralloc_catb(&args, argv[i], strlen(argv[i]));
+  }
+
+  stralloc_catb(&args, "\0", 1);
+
+  struct m_userdb_s* s = 
+		m_userdb_query(lcptr, argv[2], args.s);
 }

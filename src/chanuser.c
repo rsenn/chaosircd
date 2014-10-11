@@ -776,7 +776,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
         rplbuf[rpllen + rplidx++] = ' ';
 
       str_copy(&rplbuf[rpllen + rplidx], acuptr->prefix);
-      str_cat(&rplbuf[rpllen + rplidx], acuptr->channel->name);
+      strcat(&rplbuf[rpllen + rplidx], acuptr->channel->name);
 
       rplidx += len;
 

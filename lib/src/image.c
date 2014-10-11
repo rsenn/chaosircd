@@ -1009,7 +1009,7 @@ int image_save_gif(struct image *iptr, const char *name)
 
   if((gif = gif_open_fd(fd, GIF_WRITE)) == NULL)
   {
-    io_close(fd);
+    io_destroy(fd);
     return -1;
   }
 
@@ -1052,7 +1052,7 @@ struct image *image_load_gif(const char *name)
 
   if((gif = gif_open_fd(fd, GIF_READ)) == NULL)
   {
-    io_close(fd);
+    io_destroy(fd);
     return NULL;
   }
 

@@ -65,6 +65,7 @@ install: install-exec
 @LIBOWFAT_TRUE@LIBS += $(LIBOWFAT_LIBS)
 LIBS     += $(DLFCN_LIBS)
 LIBS     += -lowfat
+LIBS     += $(EFENCE_LIBS)
 CPPFLAGS += -DHAVE_CONFIG_H
 @A_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 

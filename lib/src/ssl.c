@@ -902,20 +902,20 @@ void ssl_cipher(int fd, char *ciphbuf, size_t n)
   {
     char *p;
     strlcpy(ciphername, &SSL_CIPHER_get_name(cipher)[8], sizeof(ciphername));
-    if((p = str_chr(ciphername, '-')))
+    if((p = strchr(ciphername, '-')))
       *p = '\0';
   }
   else if(!str_ncmp(ciphername, "EXP", 3))
   {
     char *p;
     strlcpy(ciphername, &SSL_CIPHER_get_name(cipher)[4], sizeof(ciphername));
-    if((p = str_chr(ciphername, '-')))
+    if((p = strchr(ciphername, '-')))
       *p = '\0';
   }
   else
   {
     char *p;
-    if((p = str_chr(ciphername, '-')))
+    if((p = strchr(ciphername, '-')))
       *p = '\0';
   }
 

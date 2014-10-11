@@ -51,7 +51,7 @@
 #define CHILD_PARENT 0
 #define CHILD_CHILD  1
 
-#define CHILD_INTERVAL   20000L
+#define CHILD_INTERVAL   5000L
 
 /* ------------------------------------------------------------------------ *
  * Types                                                                      *

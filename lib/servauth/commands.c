@@ -137,8 +137,9 @@ static int cmd_auth(control_t *cptr, int ac, char **av)
 /* -------------------------------------------------------------------------- *
  * cmd_userdb() -
  *                                                                            *
- * av[0] = "userdb"                                                             *
- * av[1] = "verify"|"register"|"mutate"
+ * av[0] = "userdb"                                                           *
+ * av[1] = id
+ * av[2] = "verify"|"register"|"mutate"
  * -------------------------------------------------------------------------- */
 static int cmd_userdb(control_t *cptr, int ac, char **av)
 {
@@ -149,28 +150,37 @@ static int cmd_userdb(control_t *cptr, int ac, char **av)
 
     if(   userdb_connect(udb, "127.0.0.1", "root", "") )
       log(servauth_log, L_status, "userdb connection succeeded");
+  }
+  const char *cmd, *id;
 
-
+  if(str_isdigit(av[1][0])) {
+	  id = av[1];
+	  cmd = av[2];
+	  ++av;
+	  --ac;
+  } else {
+	  id = "";
+	  cmd = av[1];
   }
 
-  if(!strcmp(av[1], "verify")) {
+  if(!strcmp(cmd, "verify")) {
     char *s;
     int v = userdb_verify(udb, (const char*)av[2], av[3] ? av[3] : "", &s);
-    control_send(&servauth_control, "userdb verify %s %d %s", av[2], !!v, s ? s : "");
+    control_send(&servauth_control, "userdb %s verify %s %d %s", id, av[2], !!v, s ? s : "");
     free(s);
 
-  } else if(!strcmp(av[1], "register")) {
+  } else if(!strcmp(cmd, "register")) {
     int v = userdb_register(udb, ( char*)av[2], &av[3], ac - 3);
-    control_send(&servauth_control, "userdb register %s %d", av[2], !v);
-  } else if(!strcmp(av[1], "mutate")) {
+    control_send(&servauth_control, "userdb %s register %s %d", id, av[2], !v);
+  } else if(!strcmp(cmd, "mutate")) {
     int v = userdb_mutate(udb, ( char*)&av[2], &av[3], ac - 3);
-    control_send(&servauth_control, "userdb mutate %s %d", av[2], !v);
-  } else if(!strcmp(av[1], "search")) {
+    control_send(&servauth_control, "userdb %s mutate %s %d", id, av[2], !v);
+  } else if(!strcmp(cmd, "search")) {
     char *s;
     //int v = userdb_search(udb, av[2], &av[3], ac - 3);
     //control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
     int v = userdb_search(udb, &av[2], ac - 2, &s);
-    control_send(&servauth_control, "userdb search %s %d %s", av[2], v, s ? s : "");
+    control_send(&servauth_control, "userdb %s search %s %d %s", id, av[2], v, s ? s : "");
     if(s) free(s);
   }
 
@@ -310,7 +320,7 @@ static int cmd_proxy(control_t *cptr, int ac, char **av)
 
   strlcpy(remote, av[2], sizeof(remote));
 
-  if((ptr = str_chr(remote, ':')) == NULL)
+  if((ptr = strchr(remote, ':')) == NULL)
     return -1;
 
   *ptr++ = '\0';

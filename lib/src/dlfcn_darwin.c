@@ -38,7 +38,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <limits.h>
 #include <mach-o/dyld.h>
 
-#include "dlfcn_darwin.h"
+#include "dlfcn.h""
 
 #define ERR_STR_LEN 256
 static const char *error(int setget, const char *str, ...);

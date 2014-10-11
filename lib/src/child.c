@@ -52,6 +52,8 @@
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
+#include <sys/socket.h>
+
 /* ------------------------------------------------------------------------ *
  * Local variables                                                          *
  * ------------------------------------------------------------------------ */
@@ -409,7 +411,7 @@ static int child_prepare(struct child *child)
   for(i = 0; i < child->chans; i++)
   {
 #ifdef HAVE_SOCKETPAIR
-    if(syscall_socketpair(PF_UNIX, SOCK_STREAM, IPPROTO_IP, sp) == -1)
+    if(syscall_socketpair(PF_UNIX, SOCK_STREAM, 0, sp) == -1)
       return -1;
 
     child->channels[i][CHILD_PARENT][CHILD_READ] =

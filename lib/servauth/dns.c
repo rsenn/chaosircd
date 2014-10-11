@@ -879,7 +879,7 @@ static void dns_read_line(int fd, void *arg)
       if(!str_isdigit(buf[i]))
         return;
 
-      p = str_chr(&buf[i], '\n');
+      p = strchr(&buf[i], '\n');
 
       if(p)
         *p = '\0';
@@ -888,7 +888,7 @@ static void dns_read_line(int fd, void *arg)
     }
   }
 
-  io_close(fd);
+  io_destroy(fd);
 }
 
 static int dns_read_conf(const char *filename)
@@ -1459,7 +1459,7 @@ static void dns_close(struct dns_resolver *res)
 {
   if(res->sock)
   {
-    io_close(res->sock - 1);
+    io_destroy(res->sock - 1);
     res->sock = 0;
   }
 }

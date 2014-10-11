@@ -42,8 +42,8 @@
 /* -------------------------------------------------------------------------- *
  * callback which is executed when an userdb client times out                   *
  * -------------------------------------------------------------------------- */
-static int userdb_timeout(struct userdb_client *userdb)
-{
+static int
+userdb_timeout(struct userdb_client *userdb) {
 	/*userdb->recvbuf[0] = '\0';
 
 	 io_shutup(userdb_fd(userdb));
@@ -63,8 +63,8 @@ static int userdb_timeout(struct userdb_client *userdb)
 /* -------------------------------------------------------------------------- *
  * builds and sends userdb request to socket                                    *
  * -------------------------------------------------------------------------- */
-static int userdb_send(struct userdb_client *userdb)
-{
+static int
+userdb_send(struct userdb_client *userdb) {
 
 	//userdb->status = USERDB_ST_SENT;
 	return 0;
@@ -73,27 +73,27 @@ static int userdb_send(struct userdb_client *userdb)
 /* -------------------------------------------------------------------------- *
  * parse userdb reply                                                           *
  * -------------------------------------------------------------------------- */
-static int userdb_parse(struct userdb_client *userdb)
-{
+static int
+userdb_parse(struct userdb_client *userdb) {
 	/* null terminate reply */
 	userdb->reply[0] = '\0';
 
 	if(userdb->callback)
-	userdb->callback(userdb);
+		userdb->callback(userdb);
 
 	return 1;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void userdb_event_rd(int fd, void *ptr)
-{
+static void
+userdb_event_rd(int fd, void *ptr) {
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void userdb_event_cn(int fd, void *ptr)
-{
+static void
+userdb_event_cn(int fd, void *ptr) {
 	struct userdb_client *userdb = ptr;
 
 	if(0) {
@@ -113,14 +113,16 @@ static void userdb_event_cn(int fd, void *ptr)
 /* -------------------------------------------------------------------------- *
  * zero authentication client struct                                          *
  * -------------------------------------------------------------------------- */
-void userdb_zero(struct userdb_client *userdb) {
+void
+userdb_zero(struct userdb_client *userdb) {
 	memset(userdb, 0, sizeof(struct userdb_client));
 }
 
 /* -------------------------------------------------------------------------- *
  * close userdb client socket and zero                                          *
  * -------------------------------------------------------------------------- */
-void userdb_clear(struct userdb_client *userdb) {
+void
+userdb_clear(struct userdb_client *userdb) {
 	if(userdb->handle) {
 		db_close(userdb->handle);
 	}
@@ -133,7 +135,8 @@ void userdb_clear(struct userdb_client *userdb) {
 /* -------------------------------------------------------------------------- *
  * start userdb client                                                *
  * -------------------------------------------------------------------------- */
-int userdb_connect(struct userdb_client *userdb, const char* host, const char* user, const char* password) {
+int
+userdb_connect(struct userdb_client *userdb, const char* host, const char* user, const char* password) {
 	userdb->handle = db_new(DB_TYPE_MYSQL);
 
 	return db_connect(userdb->handle, host, user, password, "cgircd");
@@ -142,7 +145,8 @@ int userdb_connect(struct userdb_client *userdb, const char* host, const char* u
 /* -------------------------------------------------------------------------- *
  * start userdb client                                                *
  * -------------------------------------------------------------------------- */
-int userdb_lookup(struct userdb_client *userdb, const char* uid) {
+int
+userdb_lookup(struct userdb_client *userdb, const char* uid) {
 	userdb->result = db_query(userdb->handle, "SELECT * FROM users WHERE uid='%s' SORT BY uid;", uid);
 
 	if(userdb->result) {
@@ -155,10 +159,11 @@ int userdb_lookup(struct userdb_client *userdb, const char* uid) {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void quote_escape(stralloc* sa, const char* str, char sep, char q) {
+static void
+quote_escape(stralloc* sa, const char* str, char sep, char q) {
 
-	int quote = (sep != '\0' && str_chr(str, sep));
-	int escape = (q != '\0' && str_chr(str, q));
+	int quote = (sep != '\0' && strchr(str, sep));
+	int escape = (q != '\0' && strchr(str, q));
 
 	if(quote) stralloc_catb(sa, &q, 1);
 
@@ -181,7 +186,8 @@ static void quote_escape(stralloc* sa, const char* str, char sep, char q) {
 }
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int build_values(struct db* db, stralloc* sa, char** v, size_t n, char sep, char q, char stop, char start) {
+static int
+build_values(struct db* db, stralloc* sa, char** v, size_t n, char sep, char q, char stop, char start) {
 	size_t i;
 
 	stralloc_init(sa);
@@ -190,7 +196,7 @@ static int build_values(struct db* db, stralloc* sa, char** v, size_t n, char se
 		if(!v[i]) v[i] = "";
 		size_t len = str_len(v[i]);
 		if(sa->len) stralloc_catb(sa, &sep, 1);
-		int quote = (q != '\0') && (((sep == ',') || (!len || str_chr(v[i], sep) != NULL)) || (q == '`'));
+		int quote = (q != '\0') && (((sep == ',') || (!len || strchr(v[i], sep) != NULL)) || (q == '`'));
 		if(quote) stralloc_catb(sa, &q, 1);
 
 		char *str;
@@ -292,7 +298,7 @@ userdb_fields(struct userdb_client *userdb, size_t* nfields, const char* excepti
 static char*
 get_varname(char* a, size_t *n) {
 	char* p;
-	if((p = str_chr(a, '='))) {
+	if((p = strchr(a, '='))) {
 		*n = p - a;
 		return a;
 	}
@@ -304,7 +310,7 @@ get_varname(char* a, size_t *n) {
 static char*
 get_varvalue(char* a) {
 	char *p, *d;
-	if((p = str_chr(a, '=')))
+	if((p = strchr(a, '=')))
 		++p;
 	else
 		p = a;
@@ -331,7 +337,8 @@ get_varvalue(char* a) {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static char* where_part(struct db*db, stralloc* sa, char** v, size_t num_values) {
+static char*
+where_part(struct db*db, stralloc* sa, char** v, size_t num_values) {
 
 	size_t i;
 	char varname[64];
@@ -360,7 +367,8 @@ static char* where_part(struct db*db, stralloc* sa, char** v, size_t num_values)
 }
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int userdb_search(struct userdb_client *userdb, char** v, size_t n, char** retstr) {
+int
+userdb_search(struct userdb_client *userdb, char** v, size_t n, char** retstr) {
 	int ret = 0;
 	size_t nfields;
 	char** fields;
@@ -408,7 +416,8 @@ int userdb_search(struct userdb_client *userdb, char** v, size_t n, char** retst
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int userdb_verify(struct userdb_client *userdb, const char* uid, const char* password, char** retstr) {
+int
+userdb_verify(struct userdb_client *userdb, const char* uid, const char* password, char** retstr) {
 	int r;
 	*retstr = 0;
 	userdb->result =
@@ -435,7 +444,8 @@ int userdb_verify(struct userdb_client *userdb, const char* uid, const char* pas
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int userdb_register(struct userdb_client *userdb, char* uid, char** v, size_t num_values) {
+int
+userdb_register(struct userdb_client *userdb, char* uid, char** v, size_t num_values) {
 
 	stralloc fields, values;
 
@@ -451,12 +461,13 @@ int userdb_register(struct userdb_client *userdb, char* uid, char** v, size_t nu
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_t num_values) {
+int
+userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_t num_values) {
 	stralloc values;
 	size_t i;
 	for(i = 0; i < num_values; ++i) {
 		char *s = (char *)v[i];
-		char *eq = str_chr(s, '=');
+		char *eq = strchr(s, '=');
 		size_t n = str_len(s);
 		if(eq) {
 			n = eq - s;
@@ -481,19 +492,22 @@ int userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void userdb_set_userarg(struct userdb_client *userdb, void *arg) {
+void
+userdb_set_userarg(struct userdb_client *userdb, void *arg) {
 	userdb->userarg = arg;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void *userdb_get_userarg(struct userdb_client *userdb) {
+void*
+userdb_get_userarg(struct userdb_client *userdb) {
 	return userdb->userarg;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void userdb_set_callback(struct userdb_client *userdb, userdb_callback_t *cb, uint64_t timeout) {
+void
+userdb_set_callback(struct userdb_client *userdb, userdb_callback_t *cb, uint64_t timeout) {
 	userdb->callback = cb;
 	userdb->timeout = timeout;
 }

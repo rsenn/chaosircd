@@ -221,7 +221,7 @@ static int ircd_writepid(struct config *config, pid_t pid)
 
   io_queue_control(fd, OFF, OFF, OFF);
   io_puts(fd, "%u", pid);
-  io_close(fd);
+  io_destroy(fd);
 
   return 0;
 }
@@ -371,7 +371,6 @@ void ircd_init(int argc, char **argv, char **envp)
   ini_init();
   hook_init();
   child_init();
-  sauth_init();
   mfile_init();
   ssl_init();
   httpc_init();
@@ -417,6 +416,8 @@ void ircd_init(int argc, char **argv, char **envp)
 #else
   ircd_drain = log_drain_setfd(1, LOG_ALL & log_source_filter, L_status, 0);
 #endif /* DEBUG */
+
+  sauth_init();
 
   hook_register(conf_done, HOOK_DEFAULT, ircd_coldstart);
   hook_register(listen_add, HOOK_DEFAULT, ircd_listen);

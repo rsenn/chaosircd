@@ -43,9 +43,10 @@
 #define SAUTH_TYPE_DNSR   0x01
 #define SAUTH_TYPE_AUTH   0x02
 #define SAUTH_TYPE_PROXY  0x03
+#define SAUTH_TYPE_USERDB 0x04
 
 #define SAUTH_TIMEOUT    20000
-#define SAUTH_RELAUNCH   15000        /* 15 secs relaunch interval */
+#define SAUTH_RELAUNCH    3000        /* 15 secs relaunch interval */
 
 #define SAUTH_PROXY_TIMEOUT  1
 #define SAUTH_PROXY_FILTERED 2
@@ -88,6 +89,8 @@ typedef struct sauth {
   void             *args[4];
   int               reply;
   int               ptype;
+  char*             usercmd;
+  char*             userargs;
   sauth_callback_t *callback;
 } sauth_t;
 
@@ -138,7 +141,8 @@ CHAOS_API(int) sauth_launch(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sauth *) sauth_auth(net_addr_t address,
+CHAOS_API(struct sauth *)
+sauth_auth(net_addr_t address,
 		net_port_t local,
 		net_port_t remote,
 		void *callback,
@@ -161,6 +165,8 @@ CHAOS_API(int) sauth_proxy_reply(const char *reply);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int) sauth_proxy_type(const char *type);
+
+CHAOS_API(struct sauth*) sauth_userdb(const char *cmd, const char *args, void *callback, ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */

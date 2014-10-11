@@ -411,7 +411,7 @@ int net_socket(net_address_t at, net_socket_t st)
     return -1;
 
   /* Set O_NONBLOCK flag */
-  io_nonblock(fd);
+  io_nonblocking(fd);
 
   /* Some info */
 /*  debug(net_log, "new socket: fd = %i, family: %s, proto = %s",
@@ -440,7 +440,7 @@ int net_bind(int fd, net_addr_t addr, uint16_t port)
 
   if(syscall_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)))
   {
-    io_close(fd);
+    io_destroy(fd);
     return -1;
   }
 
@@ -466,7 +466,7 @@ int net_vlisten(int fd, int backlog, void *callback, va_list args)
 
   if(syscall_listen(fd, backlog))
   {
-    io_close(fd);
+    io_destroy(fd);
     return -1;
   }
 
@@ -511,7 +511,7 @@ int net_vconnect(int   fd,    net_addr_t addr,  uint16_t port,
   {
     if((syscall_errno != EINPROGRESS))
     {
-      io_close(fd);
+      io_destroy(fd);
       return -1;
     }
   }

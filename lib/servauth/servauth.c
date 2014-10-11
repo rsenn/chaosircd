@@ -102,7 +102,9 @@ void servauth_init(void)
  * -------------------------------------------------------------------------- */
 void servauth_shutdown(void)
 {
-  log(servauth_log, L_status, "Shutting down libircd...");
+  log(servauth_log, L_status, "Shutting down servauth...");
+
+  syscall_exit(0);
 
   connect_shutdown();
   io_shutdown();
@@ -113,8 +115,6 @@ void servauth_shutdown(void)
   timer_shutdown();
 
   log_source_unregister(servauth_log);
-
-  syscall_exit(0);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -224,8 +224,8 @@ int main(int argc, char *argv[])
       argv[i][j] = '\0';
 
   /* set file descriptor to nonblocking mode */
-/*  io_nonblock(recvfd);
-  io_nonblock(sendfd);*/
+/*  io_nonblocking(recvfd);
+  io_nonblocking(sendfd);*/
 
   /* initialize dns client */
   dns_init();

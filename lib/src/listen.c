@@ -95,7 +95,7 @@ static void listen_accept(int fd, void *ptr)
       {
         /* Perhaps we don't support SSL or we are out of memory */
         listen->status = LISTEN_ERROR;
-        io_close(newfd);
+        io_destroy(newfd);
         return;
       }
 
@@ -105,7 +105,7 @@ static void listen_accept(int fd, void *ptr)
             listen->name, ssl_strerror(newfd));
 
         ssl_close(newfd);
-        io_close(newfd);
+        io_destroy(newfd);
       }
     }
   }
@@ -255,7 +255,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
 
   if(net_bind(fd, addr, port))
   {
-    io_close(fd);
+    io_destroy(fd);
     hooks_call(listen_add, HOOK_DEFAULT, address, port,
                syscall_strerror(syscall_errno));
     return NULL;
@@ -265,7 +265,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
 
   if(net_listen(fd, backlog, listen_accept, listen))
   {
-    io_close(fd);
+    io_destroy(fd);
     mem_static_free(&listen_heap, listen);
     return NULL;
   }
@@ -359,7 +359,7 @@ void listen_delete(struct listen *listen)
   net_push(&listen->proto);
 
   if(listen->fd > -1)
-    io_close(listen->fd);
+    io_destroy(listen->fd);
 
   if(listen->args)
     free(listen->args);

@@ -160,6 +160,7 @@ AC_CHECK_LIB([m], [cos])
 AC_CANONICAL_HOST
 
 AC_CONFIG_HOST
+AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
 
 dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
@@ -168,6 +169,8 @@ AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.
 dnl AC_FUNC_MMAP
 
 AC_CHECK_SSL
+AC_CHECK_LIBOWFAT
+AC_CHECK_EFENCE
 dnl AC_CHECK_FT2
 dnl AC_CHECK_PSQL
 dnl AC_CHECK_MYSQL
@@ -230,6 +233,7 @@ AC_CHECK_WERROR
 # ---------------------------------------------------------------------------
 
 eval "case $libdir in
+  /lib64 | /usr/lib64 | /usr/local/lib64) ;;
   /lib | /usr/lib | /usr/local/lib) ;;
   *)
     LDFLAGS=\"\${LDFLAGS:+\$LDFLAGS }-Wl,-rpath=\\\${libdir}\"
@@ -272,6 +276,7 @@ modules/msg/Makefile
 modules/service/Makefile
 modules/stats/Makefile
 modules/usermode/Makefile
+libowfat/Makefile
 src/Makefile
 test/Makefile
 tools/Makefile

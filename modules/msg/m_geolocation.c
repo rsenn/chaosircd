@@ -68,7 +68,7 @@ static int valid_base32(const char *s)
 {
   while(*s)
   {
-    if(!str_chr(base32, *s))
+    if(!strchr(base32, *s))
       return 0;
 
     s++;

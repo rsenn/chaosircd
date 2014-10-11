@@ -283,14 +283,14 @@ void lclient_release(struct lclient *lcptr)
   {
     io_unregister(lcptr->fds[1], IO_CB_READ);
     io_unregister(lcptr->fds[1], IO_CB_WRITE);
-    io_close(lcptr->fds[1]);
+    io_destroy(lcptr->fds[1]);
   }
 
   if(io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
   {
     io_unregister(lcptr->fds[0], IO_CB_READ);
     io_unregister(lcptr->fds[0], IO_CB_WRITE);
-    io_close(lcptr->fds[0]);
+    io_destroy(lcptr->fds[0]);
   }
 
   lcptr->fds[0] = -1;
@@ -435,7 +435,7 @@ void lclient_accept(int fd, struct listen *listen)
     {
       log(lclient_log, L_warning,
           "Invalid class in listener %s: %s", listen->name, lconf->class);
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -444,7 +444,7 @@ void lclient_accept(int fd, struct listen *listen)
     {
       log(lclient_log, L_warning, "Too many connects in class '%s'.",
           clptr->name);
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -452,7 +452,7 @@ void lclient_accept(int fd, struct listen *listen)
     {
       log(lclient_log, L_warning, "Too many connects from %s.",
           net_ntoa(listen->addr_remote));
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -463,7 +463,7 @@ void lclient_accept(int fd, struct listen *listen)
           "Could not allocate new lclient struct for listen %s",
           listen->name);
 
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -655,14 +655,14 @@ void lclient_process(int fd, struct lclient *lcptr)
 
   lclient_update_recvb(lcptr, n);
 #ifdef DEBUG
-  p = str_chr(lclient_recvbuf, '\r');
+  p = strchr(lclient_recvbuf, '\r');
   if(p)
   {
     *p = '\0';
   }
   else
   {
-    p = str_chr(lclient_recvbuf, '\n');
+    p = strchr(lclient_recvbuf, '\n');
     if(p) *p = '\0';
   }
   debug(ircd_log_in, "From %s: %s", lcptr->name, lclient_recvbuf);
@@ -1007,10 +1007,10 @@ void lclient_vexit(struct lclient *lcptr, char *format, va_list args)
   }
 
   if(io_valid(lcptr->fds[1]))
-    io_close(lcptr->fds[1]);
+    io_destroy(lcptr->fds[1]);
 
   if(io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
-    io_close(lcptr->fds[0]);
+    io_destroy(lcptr->fds[0]);
 
   lcptr->fds[0] = -1;
   lcptr->fds[1] = -1;
@@ -1299,7 +1299,7 @@ int lclient_ping(struct lclient *lcptr)
     saved = lcptr->fds[0];
     client_exit(NULL, lcptr->client, "ping timeout: %u seconds",
                 (uint32_t)((lcptr->class->ping_freq + 500LL) / 1000LL));
-    io_close(saved);
+    io_destroy(saved);
   }
 
   return 0;

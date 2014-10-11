@@ -500,23 +500,92 @@ AC_SUBST(SSL_CFLAGS)
 
 # check for libowfat
 # ------------------------------------------------------------------
-AC_DEFUN([AC_CHECK_LIBOWFAT], [dnl AC_MSG_CHECKING([for libowfatipv6 support])
+AC_DEFUN([AC_CHECK_LIBOWFAT], [
+ AC_MSG_CHECKING([for libowfat prefix])
 
 
+ac_cv_with_libowfat=/usr
+AC_ARG_WITH(libowfat,
+[  --with-libowfat[[=DIR]]   libowfat [[auto]]],
+[
+  case "$withval" in
+    yes|no ) ;;
+    *) ac_cv_with_libowfat="$withval" ;;
+  esac
+])
+AC_MSG_RESULT($ac_cv_with_libowfat)
+
+
+old_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I${ac_cv_with_libowfat}/include"
 AC_CHECK_HEADER([stralloc.h], [ac_cv_libowfat_stralloc_h_found=yes])
-AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I/usr/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes])
+AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I${ac_cv_with_libowfat}/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes])
+CPPFLAGS="$old_CPPFLAGS"
 AC_MSG_CHECKING([for libowfat])
 
 if test "$ac_cv_libowfat_stralloc_h_found" = yes; then
   AC_MSG_RESULT([yes])
+
+	for DIR in "${ac_cv_with_libowfat}/lib/${host:+dummy}/" "${ac_cv_with_libowfat}/lib64" "${ac_cv_with_libowfat}/lib"; do
+		if test -d "$DIR" ; then
+			LIBOWFAT_LIBDIR="$DIR"
+		  break
+		fi
+	done
+
   LIBOWFAT_LIBS="-lowfat"
+	if test -n "$LIBOWFAT_LIBDIR"; then
+		LIBOWFAT_LIBS="-L${LIBOWFAT_LIBDIR} $LIBOWFAT_LIBS"
+	fi
 else
-  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Need libowfat!])
+  dnl AC_MSG_RESULT([no])
 fi
 
 AM_CONDITIONAL([LIBOWFAT], [test "$ac_cv_libowfat_stralloc_h_found" = yes])
 AC_SUBST([LIBOWFAT_CFLAGS])
 AC_SUBST([LIBOWFAT_LIBS])
+])
+
+# check for libdl
+# ------------------------------------------------------------------
+AC_DEFUN([AC_CHECK_DLFCN], [
+AC_CHECK_HEADER([dlfcn.h], [ac_cv_have_dlfcn_h=yes
+AC_DEFINE_UNQUOTED([HAVE_DLFCN_H], [1], [Define this if you have <dlfcn.h>])
+])
+AC_CHECK_LIB([dl],[dlopen], [ac_cv_have_libdl_dlopen=yes])
+
+if test "$ac_cv_have_dlfcn_h" = yes -a "$ac_cv_have_libdl_dlopen" = yes; then
+  HAVE_DLFCN_DLOPEN=yes
+fi
+
+AM_CONDITIONAL([DLFCN], [test "$HAVE_DLFCN_DLOPEN" = yes])
+
+])
+
+# check for electric-fence
+# ------------------------------------------------------------------
+AC_DEFUN([AC_CHECK_EFENCE], [
+AC_MSG_CHECKING(whether to compile with Electric Fence support)
+ac_cv_efence="auto"
+AC_ARG_WITH(efence,
+[  --with-efence[[=yes|no|auto]]   Electric Fence support [[auto]]],
+[
+  case "$enableval" in
+    y*) ac_cv_efence="yes" ;;
+    n*) ac_cv_efence="no" ;;
+    *) ac_cv_efence="auto" ;;
+  esac
+])
+AC_MSG_RESULT($ac_cv_efence)
+
+if test "$ac_cv_efence" = yes; then
+  EFENCE_LIBS="-lefence"
+fi
+
+AM_CONDITIONAL([EFENCE], [test "$ac_cv_efence" = yes])
+AC_SUBST([EFENCE_CFLAGS])
+AC_SUBST([EFENCE_LIBS])
 ])
 
 # check for termios

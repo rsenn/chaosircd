@@ -294,7 +294,7 @@ void oper_down(struct oper *optr, struct client *cptr)
     dlink_find_delete(&optr->online, cptr);
 
     if(cptr->lclient)
-      lclient_set_type(cptr->lclient, LCLIENT_OPER);
+      lclient_set_type(cptr->lclient, LCLIENT_USER);
 
     if(cptr->source)
       numeric_send(cptr, RPL_NOTOPERANYMORE);
