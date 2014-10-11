@@ -40,6 +40,8 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#include <ctype.h>
+
 #ifdef HAVE_CYGWIN_IN_H
 #include <cygwin/in.h>
 #endif /* HAVE_CYGWIN_IN_H */

@@ -306,7 +306,7 @@ static void include(void)
 static int ieof(void)
 {
   if(include_sp)
-    io_close(conf_fd);
+    io_destroy(conf_fd);
   
   if(--include_sp < 0)
   {

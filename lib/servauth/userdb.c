@@ -353,7 +353,7 @@ where_part(struct db*db, stralloc* sa, char** v, size_t num_values) {
 		if(s)
 			strlcpy(varname, s, n + 1);
 		else
-			str_copy(varname, "uid");
+			strcpy(varname, "uid");
 
 		stralloc_catb(sa, varname, str_len(varname));
 		stralloc_catb(sa, "='", 2);
