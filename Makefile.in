@@ -43,7 +43,7 @@ MAINTAINERCLEANFILES = aclocal.m4 configure *.bz2 *.gz autom4te.cache
 # Files that go into distribution tarball
 FILES =  autogen.sh \
          Makefile.in \
-         configure.in \
+         configure.ac \
          config.guess \
          config.sub \
          build.mk.in \

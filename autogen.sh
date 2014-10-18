@@ -57,10 +57,10 @@ autogen() {
 		esac
 	done
 
-	touch $ag_srcdir/configure.in $ag_libdir/m4/*
-	ag_package="$(grep AC_INIT $ag_srcdir/configure.in | sed -e 's,^AC_INIT(\[,,;;s,\].*$,,')"
+	touch $ag_srcdir/configure.ac $ag_libdir/m4/*
+	ag_package="$(grep AC_INIT $ag_srcdir/configure.ac | sed -e 's,^AC_INIT(\[,,;;s,\].*$,,')"
 	ag_configure="$ag_srcdir/configure"
-	ag_configure_in="$ag_configure.in"
+	ag_configure_ac="$ag_configure.ac"
 
 	# Programs
 	ag_aclocal="aclocal"
@@ -70,7 +70,7 @@ autogen() {
 	type glibtoolize >/dev/null 2>/dev/null && ag_libtoolize=glibtoolize ||
 	ag_libtoolize="libtoolize"
 
-	ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
+	ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.ac)"
 
 	# execute the stuff
 	(

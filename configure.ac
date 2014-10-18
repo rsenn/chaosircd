@@ -1,4 +1,4 @@
-# $Id: configure.in,v 1.16 2006/09/28 09:47:03 roman Exp $
+# $Id: configure.ac,v 1.16 2006/09/28 09:47:03 roman Exp $
 # ===========================================================================
 #
 # GNU autoconf template for cgircd

@@ -1,4 +1,4 @@
-# $Id: configure.in,v 1.8 2006/09/28 07:52:11 roman Exp $
+# $Id: configure.ac,v 1.8 2006/09/28 07:52:11 roman Exp $
 # ===========================================================================
 #
 # GNU autoconf template for tichu-server
