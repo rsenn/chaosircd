@@ -155,7 +155,7 @@ if test "$with_sqlite" != no; then
     AC_MSG_RESULT($SQLITE_LIB_DIR)
     SQLITE=true
     SQLITE_LIBS="-L${SQLITE_LIB_DIR} -Wl,-rpath,${SQLITE_LIB_DIR} -lsqlite3"
-    SQLITE_CFLAGS="-I${SQLITE_INC_DIR}"
+    SQLITE_CFLAGS="${SQLITE_INC_DIR:+-I$SQLITE_INC_DIR}"
     AC_CHECK_LIB(z, compress)
     DBSUPPORT="$DBSUPPORT SQLite"
     AC_DEFINE_UNQUOTED(HAVE_SQLITE, "1", [Define this if you have SQLite])
