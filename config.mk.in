@@ -251,5 +251,5 @@ MAINTAINERCLEANFILES =
 # ---------------------------------------------------------------------------
 FILES                = Makefile.in $(SOURCES) $(HEADERS) $(DATA)
 DISTFILES            = $(FILES)
-DEVFILES             = CVS $(FILES)
+DEVFILES             = $(FILES)
 

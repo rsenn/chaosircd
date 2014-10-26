@@ -103,7 +103,7 @@ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 
 FILES                = Makefile.in $(MODULES:%=%.c) $(HEADERS) ircd.l ircd.y
 DISTFILES            = $(FILES) y.tab.c y.tab.h lex.yy.c main.c
-DEVFILES             = CVS $(FILES)
+DEVFILES             = $(FILES)
 
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 @WIN32_TRUE@@DLM_TRUE@main.o: CPPFLAGS += -DBUILD_MAIN=1

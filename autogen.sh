@@ -22,7 +22,7 @@ export WANT_AUTOCONF_2_5=1
 export WANT_AUTOMAKE_1_6=1
 
 autogen() {
-	# Against CVS timestamp mess
+	# Against timestamp mess
 	ag_pwd="$(pwd)"
 	ag_package="$(basename $ag_pwd)"
 	ag_name="${ag_package%%-*}"

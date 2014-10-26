@@ -276,7 +276,6 @@ modules/msg/Makefile
 modules/service/Makefile
 modules/stats/Makefile
 modules/usermode/Makefile
-libowfat/Makefile
 src/Makefile
 test/Makefile
 tools/Makefile

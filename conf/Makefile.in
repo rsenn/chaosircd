@@ -36,7 +36,7 @@ CLEANFILES = *~ children.conf classes.conf inis.conf ircd.conf logs.conf modules
 DISTCLEANFILES = Makefile $(CLEANFILES) 
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES = Makefile.in children.conf.in classes.conf.in inis.conf.in ircd.conf.in logs.conf.in modules.conf.in opers.conf.in ssl.conf.in ircd.motd proxy.ini
-DEVFILES = CVS $(DISTFILES)
+DEVFILES = $(DISTFILES)
 
 children.conf: children.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)

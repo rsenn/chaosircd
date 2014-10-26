@@ -65,7 +65,7 @@ CLEANFILES           = *~ core core.* \
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 @DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
 

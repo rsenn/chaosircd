@@ -57,7 +57,7 @@ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 
 FILES                = Makefile.in $(SOURCES) shellcode.asm shellcode.h syscalls.inc dumpcode.c
 DISTFILES            = $(FILES)
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 noinst_EXEC = dumpcode sploit
 

@@ -17,7 +17,7 @@ CLEANFILES = *~ mkca mkcrt mkkeys mkreq sign
 DISTCLEANFILES = Makefile $(CLEANFILES) $(DATA) 
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES = Makefile.in mkca.in mkcrt.in mkkeys.in mkreq.in sign.in openssl.cnf.in ircd-config.in
-DEVFILES = CVS $(DISTFILES)
+DEVFILES = $(DISTFILES)
 #INSTALL = @INSTALL@
 #INSTALL_EXEC = $(INSTALL) -m 700
 
