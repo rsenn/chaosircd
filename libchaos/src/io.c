@@ -55,9 +55,9 @@
 #include <openssl/ssl.h>
 #endif /* HAVE_SSL */
 
-#ifdef HAVE_IO_H
+#ifdef WIN32
 #include <io.h>
-#endif /* HAVE_IO_H */
+#endif 
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>

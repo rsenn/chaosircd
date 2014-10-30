@@ -117,7 +117,7 @@ AC_PROG_LN
 AC_PROG_DLLWRAP
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_CYGPATH
+AC_CHECK_PROG([CYGPATH], [cygpath])
 AC_CHECK_PROG([NASM], [nasm], [$as_dir/$ac_word$ac_exec_ext], [], [$PATH])
 
 # check some system dependencies

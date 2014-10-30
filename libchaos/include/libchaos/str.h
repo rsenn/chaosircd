@@ -479,13 +479,13 @@ CHAOS_INLINE_FN(char *str_dup(const char *s))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-#define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-CHAOS_INLINE_FN(uint32_t str_hash(const char *s))
+#define ROR(v, n) ((v >> (n & ((sizeof(hash_t)*4)-1))) | (v << ((sizeof(hash_t)*4) - (n & ((sizeof(hash_t)*4)-1)))))
+#define ROL(v, n) ((v >> (n & ((sizeof(hash_t)*4)-1))) | (v << ((sizeof(hash_t)*4) - (n & ((sizeof(hash_t)*4)-1)))))
+CHAOS_INLINE_FN(hash_t str_hash(const char *s))
 {
-  uint32_t ret = 0xcafebabe;
-  uint32_t temp;
-  uint32_t i;
+  hash_t ret = 0xcafebabe;
+  hash_t temp;
+  hash_t i;
   
   if(s == NULL)
     return ret;
@@ -506,13 +506,13 @@ CHAOS_INLINE_FN(uint32_t str_hash(const char *s))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#define ROR(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-#define ROL(v, n) ((v >> (n & 0x1f)) | (v << (32 - (n & 0x1f))))
-CHAOS_INLINE_FN(uint32_t str_ihash(const char *s))
+#define ROR(v, n) ((v >> (n & ((sizeof(hash_t)*4)-1))) | (v << ((sizeof(hash_t)*4) - (n & ((sizeof(hash_t)*4)-1)))))
+#define ROL(v, n) ((v >> (n & ((sizeof(hash_t)*4)-1))) | (v << ((sizeof(hash_t)*4) - (n & ((sizeof(hash_t)*4)-1)))))
+CHAOS_INLINE_FN(hash_t str_ihash(const char *s))
 {
-  uint32_t ret = 0xcafebabe;
-  uint32_t temp;
-  uint32_t i;
+  hash_t ret = 0xcafebabe;
+  hash_t temp;
+  hash_t i;
   
   if(s == NULL)
     return ret;
