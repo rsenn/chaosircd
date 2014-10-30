@@ -34,6 +34,9 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
     add_library("${MODULE_NAME}" MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
     
+		string(REGEX REPLACE _.* "" MODULE_TYPE "${MODULE_NAME}")
+		message(STATUS "Module type: ${MODULE_TYPE}")
+    
     target_compile_definitions("${MODULE_NAME}" PUBLIC "-DBUILD_MODULES=1")
 
     add_dependencies("${MODULE_NAME}" ircd)
@@ -43,7 +46,7 @@ if(WIN32)
 endif()
 
     install(TARGETS "${MODULE_NAME}"
-            RUNTIME DESTINATION libexec/chaosircd
-            LIBRARY DESTINATION lib/chaosircd
-            ARCHIVE DESTINATION lib/chaosircd)
+						RUNTIME DESTINATION "libexec/chaosircd/${MODULE_TYPE}"
+						LIBRARY DESTINATION "lib/chaosircd/${MODULE_TYPE}"
+						ARCHIVE DESTINATION "lib/chaosircd/${MODULE_TYPE}")
 endforeach()
