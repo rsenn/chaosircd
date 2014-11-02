@@ -44,7 +44,8 @@ oper {
   # usermode         - usermode engine
   # all              - log ALL of them
  
-  sources  = "all";             # log source
+  # log source
+  sources  = "child connect dlink i/o listen log mem mfile module net queue ssl timer chanmode chanuser channel class client conf ircd in out lclient msg oper server user usermode";          
   
   level    = "status";          # Log level
 };
