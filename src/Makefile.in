@@ -117,7 +117,7 @@ CFLAGS += $(LIBOWFAT_CFLAGS)
 LIBS += $(LIBOWFAT_LIBS)
 @DLM_TRUE@LIBS += -Wl,--no-whole-archive
 
-@DLM_TRUE@LIBS += -ldl
+@DLM_TRUE@LIBS += $(DLFCN_LIBS)
 LIBS += $(EFENCE_LIBS)
 
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
