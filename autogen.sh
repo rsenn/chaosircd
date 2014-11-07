@@ -24,7 +24,7 @@ export WANT_AUTOMAKE_1_6=1
 autogen() {
 	# Against CVS timestamp mess
 	ag_pwd="$(pwd)"
-	ag_package="$(basename $ag_pwd)"
+	ag_package="$(basename "$ag_pwd")"
 	ag_name="${ag_package%%-*}"
 	ag_srcdir=$ag_pwd
 	#ag_libdir="$ag_topsrcdir/lib"
@@ -57,8 +57,8 @@ autogen() {
 		esac
 	done
 
-	touch $ag_srcdir/configure.in $ag_libdir/m4/*
-	ag_package="$(grep AC_INIT $ag_srcdir/configure.in | sed -e 's,^AC_INIT(\[,,;;s,\].*$,,')"
+	touch "$ag_srcdir"/configure.in "$ag_libdir"/m4/*
+	ag_package="$(grep AC_INIT "$ag_srcdir"/configure.in | sed -e 's,^AC_INIT(\[,,;;s,\].*$,,')"
 	ag_configure="$ag_srcdir/configure"
 	ag_configure_in="$ag_configure.in"
 
@@ -70,24 +70,24 @@ autogen() {
 	type glibtoolize >/dev/null 2>/dev/null && ag_libtoolize=glibtoolize ||
 	ag_libtoolize="libtoolize"
 
-	ag_headers="$(grep AC_CONFIG_HEADERS $ag_srcdir/configure.in)"
+	ag_headers="$(grep AC_CONFIG_HEADERS "$ag_srcdir"/configure.in)"
 
 	# execute the stuff
 	(
 	cd "$ag_srcdir"
 	# $ag_aclocal --acdir=m4
-	#  cat $ag_libdir/m4/*.m4 > $ag_srcdir/aclocal.m4
+	#  cat $ag_libdir/m4/*.m4 > "$ag_srcdir"/aclocal.m4
 	 rm -f aclocal.m4
 		 set -x
-	 $ag_aclocal $(ls -d $ag_libdir/m4 2>/dev/null | sed 's,^,-I,')
+	 $ag_aclocal $(ls -d "$ag_libdir"/m4 2>/dev/null | sed 's,^,-I,')
 
 	 if test "$ag_headers"; then
 		 $ag_autoheader
 	 else
 		 set -x
 	 fi
-	 $ag_autoconf -B $ag_libdir/m4 &&
-	 sed -i 's/###ESCAPE###/\[/' $ag_configure
+	 $ag_autoconf -B "$ag_libdir"/m4 &&
+	 sed -i 's/###ESCAPE###/\[/' "$ag_configure"
 		
 	 # ok, we don't really use libtool nor automake, but
 	 # we need config.guess and config.sub for host system
@@ -96,7 +96,7 @@ autogen() {
 	 # complain about missing AC_PROG_LIBTOOL
 	 $ag_libtoolize --copy --force --automake &&
 	 for guess in config.guess ../config.guess; do
-		 if test -f $ag_srcdir/$guess; then
+		 if test -f "$ag_srcdir"/$guess; then
 			 # so this one is for proper target detection on cygwin 
 			 # systems where mingw32 is wished explicitly by specifing
 			 # the compiler
@@ -124,11 +124,11 @@ autogen() {
 					#endif\\
 	EOF\\
 					eval \`\$CC_FOR_BUILD -E \$dummy.c 2>/dev/null | grep ^MACHINE=\`
-	s/-cygwin\$/-\$MACHINE/" $ag_srcdir/$guess
+	s/-cygwin\$/-\$MACHINE/" "$ag_srcdir"/$guess
 		 fi
 	 done
 	 
-	 rm -f $ag_srcdir/ltmain.sh $ag_srcdir/mkinstalldirs)
+	 rm -f "$ag_srcdir"/ltmain.sh "$ag_srcdir"/mkinstalldirs)
 
 }
 
