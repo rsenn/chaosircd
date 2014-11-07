@@ -356,7 +356,7 @@ static struct m_gline_entry *m_gline_add(const char *user, const char *host,
     struct ini_section *isptr;
     char                mask[IRCD_PREFIXLEN];
     
-    str_snprintf(mask, sizeof(mask), "%s@%s", user, host);
+    snprintf(mask, sizeof(mask), "%s@%s", user, host);
     
     /* Maybe that g-line already exists, then just modify the section */
     if((isptr = ini_section_find(m_gline_ini, mask)) == NULL)
@@ -382,7 +382,7 @@ static void m_gline_delete(struct m_gline_entry *mgeptr)
   char mask[IRCD_PREFIXLEN];
     
   /* Assemble the mask */
-  str_snprintf(mask, sizeof(mask), "%s@%s", mgeptr->user, mgeptr->host);
+  snprintf(mask, sizeof(mask), "%s@%s", mgeptr->user, mgeptr->host);
 
   /* Kill the entry */
   dlink_delete(&m_gline_list, &mgeptr->node);
@@ -771,7 +771,7 @@ static void mo_gline(struct lclient *lcptr, struct client *cptr,
   
   /* Create info string */
   if(client_is_user(cptr))
-    str_snprintf(mask, sizeof(mask), "%s!%s@%s", cptr->name, cptr->user->name, cptr->host);
+    snprintf(mask, sizeof(mask), "%s!%s@%s", cptr->name, cptr->user->name, cptr->host);
   else
     strlcpy(mask, cptr->name, sizeof(mask));
   

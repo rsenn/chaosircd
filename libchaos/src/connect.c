@@ -273,7 +273,7 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
   cnptr->addr_local = INADDR_ANY;
   cnptr->port_local = 0;
   
-  str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);  
+  snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);  
   
   /* Add to connect list */
   dlink_add_tail(&connect_list, &cnptr->node, connect);
@@ -365,7 +365,7 @@ int connect_update(struct connect *cnptr,    const char      *address,
   
   /* Update the name if none has been set */
   if(cnptr->name[0] == '\0')
-     str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);    
+     snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);    
   
   log(connect_log, L_status, "Updated connect block: %s", cnptr->name);
   

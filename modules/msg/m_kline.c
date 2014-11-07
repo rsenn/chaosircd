@@ -351,7 +351,7 @@ static struct m_kline_entry *m_kline_add(const char *user, const char *host,
     struct ini_section *isptr;
     char                mask[IRCD_PREFIXLEN];
   
-    str_snprintf(mask, sizeof(mask), "%s@%s", user, host);
+    snprintf(mask, sizeof(mask), "%s@%s", user, host);
   
     /* Maybe that k-line already exists, then just modify the section */
     if((isptr = ini_section_find(m_kline_ini, mask)) == NULL)
@@ -377,7 +377,7 @@ static void m_kline_delete(struct m_kline_entry *mkeptr)
   char mask[IRCD_PREFIXLEN];
     
   /* Assemble the mask */
-  str_snprintf(mask, sizeof(mask), "%s@%s", mkeptr->user, mkeptr->host);
+  snprintf(mask, sizeof(mask), "%s@%s", mkeptr->user, mkeptr->host);
 
 #ifdef HAVE_SOCKET_FILTER
   if(mkeptr->addr != NET_ADDR_ANY &&
@@ -812,7 +812,7 @@ static void mo_kline(struct lclient *lcptr, struct client *cptr,
   
   /* Create info string */
   if(client_is_user(cptr))
-    str_snprintf(mask, sizeof(mask), "%s!%s@%s", cptr->name, cptr->user->name, cptr->host);
+    snprintf(mask, sizeof(mask), "%s!%s@%s", cptr->name, cptr->user->name, cptr->host);
   else
     strlcpy(mask, cptr->name, sizeof(mask));
   

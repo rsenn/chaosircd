@@ -148,7 +148,7 @@ static void m_info(struct lclient *lcptr, struct client *cptr,
     numeric_send(cptr, RPL_INFO, m_info_text[i]);
   
   numeric_send(cptr, RPL_INFO, "");
-  str_snprintf(uptime, sizeof(uptime), "Server up since %s.", ircd_uptime());
+  snprintf(uptime, sizeof(uptime), "Server up since %s.", ircd_uptime());
   numeric_send(cptr, RPL_INFO, uptime);
   
   numeric_send(cptr, RPL_ENDOFINFO);  

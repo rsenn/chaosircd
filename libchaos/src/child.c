@@ -382,11 +382,11 @@ static int child_format(struct child *child)
       
       if(argv[i][1] == 'r')
       {
-        str_snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_READ]);
+        snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_READ]);
       }
       else if(argv[i][1] == 'w')
       {
-        str_snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_WRITE]);
+        snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_WRITE]);
       }
     }
     else

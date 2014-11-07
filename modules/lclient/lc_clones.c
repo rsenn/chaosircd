@@ -129,7 +129,7 @@ static int lc_clones_check_local (struct lclient *lcptr)
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
       
-      str_snprintf(mask, sizeof(mask), "*@%s/24", net_ntoa(addr));
+      snprintf(mask, sizeof(mask), "*@%s/24", net_ntoa(addr));
       
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
@@ -148,7 +148,7 @@ static int lc_clones_check_local (struct lclient *lcptr)
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
       
-      str_snprintf(mask, sizeof(mask), "*@%s", net_ntoa(addr));
+      snprintf(mask, sizeof(mask), "*@%s", net_ntoa(addr));
       
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
@@ -183,7 +183,7 @@ static int lc_clones_check_remote(struct client *cptr)
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
       
-      str_snprintf(mask, sizeof(mask), "*@%s/24", net_ntoa(addr));
+      snprintf(mask, sizeof(mask), "*@%s/24", net_ntoa(addr));
       
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
@@ -202,7 +202,7 @@ static int lc_clones_check_remote(struct client *cptr)
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
       
-      str_snprintf(mask, sizeof(mask), "*@%s", net_ntoa(addr));
+      snprintf(mask, sizeof(mask), "*@%s", net_ntoa(addr));
       
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }

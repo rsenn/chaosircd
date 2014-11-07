@@ -164,6 +164,6 @@ static void cm_limit_build(char     *dst, struct channel *chptr,
     if(*di != 0)
       dst[(*di)++] = ' ';
     
-    *di += str_snprintf(&dst[*di], IRCD_KEYLEN * 8 + 1, "%i", chptr->limit);
+    *di += snprintf(&dst[*di], IRCD_KEYLEN * 8 + 1, "%i", chptr->limit);
   }
 }

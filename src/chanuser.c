@@ -247,7 +247,7 @@ void chanuser_show(struct client   *cptr,  struct channel *chptr,
   
   if(nptr)
   {
-    len = str_snprintf(buf, sizeof(buf), numeric_format(RPL_NAMREPLY),
+    len = snprintf(buf, sizeof(buf), numeric_format(RPL_NAMREPLY),
                    client_me->name, cptr->name,
                    (chptr->modes & CHFLG(s) ? "@" : "="), chptr->name);    
     do
@@ -431,10 +431,10 @@ void chanuser_introduce(struct lclient *lcptr, struct client *cptr,
   debug(chanuser_log, "introducing new members to %s", chptr->name);
 
   if(cptr == NULL || cptr == client_me)
-    len = str_snprintf(buf, sizeof(buf), "NJOIN %s %lu :",
+    len = snprintf(buf, sizeof(buf), "NJOIN %s %lu :",
                    chptr->name, (unsigned long)(chptr->ts));
   else
-    len = str_snprintf(buf, sizeof(buf), ":%s NJOIN %s %lu :",
+    len = snprintf(buf, sizeof(buf), ":%s NJOIN %s %lu :",
                    cptr->name, chptr->name, (unsigned long)(chptr->ts));
 
   for(node = nptr; node;)
@@ -467,7 +467,7 @@ size_t chanuser_burst(struct lclient *lcptr, struct channel *chptr)
   size_t           ret = 0;
   char             buf[IRCD_LINELEN - 1];
   
-  len = str_snprintf(buf, sizeof(buf), "NJOIN %s %lu :",
+  len = snprintf(buf, sizeof(buf), "NJOIN %s %lu :",
                  chptr->name, (unsigned long)(chptr->ts));
   
   for(nptr = chptr->chanusers.head; nptr;)
@@ -751,7 +751,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
 
   channel_serial++;
     
-  rpllen = str_snprintf(rplbuf, IRCD_LINELEN, ":%s %03u %s %s :",
+  rpllen = snprintf(rplbuf, IRCD_LINELEN, ":%s %03u %s %s :",
                     client_me->name, RPL_WHOISCHANNELS,
                     client_is_local(cptr) ? cptr->name : cptr->user->uid,
                     auptr->client->name);

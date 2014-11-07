@@ -7,7 +7,6 @@ modules {
   load "m_die";             # Oper command for shutting down servers
   load "m_dump";            # Oper command to dump state information
   load "m_error";           # Protocol error message
-  load "m_geolocation";     # GEOLOCATION command
   load "m_gline";           # Oper command for network bans
   load "m_help";            # Some user-friendly command
   load "m_info";            # Showing info about a server
@@ -34,6 +33,7 @@ modules {
   load "m_ntopic";          # Synchronizes topic on burst
   load "m_nuser";           # Introduces clients
   load "m_nick";            # Changes nickname
+  load "m_opart";           # Owner part
   load "m_oper";            # Operator authentication
   load "m_omode";           # Oper mode
   load "m_part";            # Makes the client leave a channel
@@ -56,10 +56,10 @@ modules {
   load "m_version";         # Shows version of a server
   load "m_who";             # Shows channel members
   load "m_whois";           # Shows client info
-  #load "lc_clones";         # Network clone detector
-  #load "lc_cookie";         # Client PING cookie
-  #load "lc_mflood";         # Client message flood trigger
-  #load "lc_sauth";          # Client AUTH/DNS resolver
+  load "lc_clones";         # Network clone detector
+  load "lc_cookie";         # Client PING cookie
+  load "lc_mflood";         # Client message flood trigger
+#  load "lc_sauth";          # Client AUTH/DNS resolver
   load "um_client";         # Usermode +c
   load "um_invisible";      # Usermode +i
   load "um_operator";       # Usermode +o

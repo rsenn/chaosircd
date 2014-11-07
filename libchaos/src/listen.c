@@ -306,7 +306,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
     }
   }
   
-  str_snprintf(listen->name, sizeof(listen->name), "%s:%u", address, port);
+  snprintf(listen->name, sizeof(listen->name), "%s:%u", address, port);
   
   listen->nhash = str_ihash(listen->name);
 

@@ -114,7 +114,7 @@ static struct timer *m_proxy_timer;
 static char *mo_proxy_help[] = {
   "PROXY [server] <list|add|delete> [port] [type]",
   "",
-  "Manages ports for the proxy scanner tests.",
+  "Manages ports the proxy scanner tests.",
   "",
   "list        Lists all scanned ports.",
   "add         Adds a port/service pair.",
@@ -467,9 +467,9 @@ void lc_sauth_deny(struct lc_sauth *arg, uint16_t port, int type)
   char        msg[128];
   char *argv[] = { client_me->name, "GLINE", mask, msg, NULL };
   
-  str_snprintf(mask, sizeof(mask), "*@%s", net_ntoa(arg->lclient->addr_remote));
+  snprintf(mask, sizeof(mask), "*@%s", net_ntoa(arg->lclient->addr_remote));
   
-  str_snprintf(msg, sizeof(msg), "open %s proxy on port %u",
+  snprintf(msg, sizeof(msg), "open %s proxy on port %u",
            sauth_types[type], (uint32_t)port);
   
   lclient_set_type(arg->lclient, LCLIENT_USER);
@@ -526,7 +526,7 @@ static struct node *m_proxy_find(uint16_t port, int service)
   {
     size_t val = (size_t)node->data & 0xfffffffflu;
 
-    if((val >> 16) == port && (val & 0xffff) == service)
+    if((val > 16) == port && (val & 0xffff) == service)
       return node;
   }
   
@@ -578,7 +578,7 @@ static int m_proxy_save(void)
     port = val >> 16;
     type = val & 0xffff;
     
-    str_snprintf(namebuf, sizeof(namebuf), "%u", (uint32_t)port);
+    snprintf(namebuf, sizeof(namebuf), "%u", (uint32_t)port);
     
     isptr = ini_section_new(m_proxy_ini, namebuf);
     

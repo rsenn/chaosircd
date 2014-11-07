@@ -231,7 +231,7 @@ static void sv_sbb_parse_error(struct sv_sbb_request *query)
       unknown = "destination";
   }
    
-  str_snprintf(query->error, sizeof(query->error), 
+  snprintf(query->error, sizeof(query->error), 
            "You specified an inaccurate %s, please use one of those:",
            unknown);
   

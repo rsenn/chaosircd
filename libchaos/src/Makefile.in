@@ -70,6 +70,8 @@ CONFIG_H_TOP = include/libchaos/config.h
 
 @WIN32_TRUE@@SHARED_TRUE@bin_EXEC = chaos.dll
 
+LIBS     += $(DLFCN_LIBS)
+
 LIBS     += $(SSL_LIBS)
 INCLUDES += $(SSL_CFLAGS)
 
