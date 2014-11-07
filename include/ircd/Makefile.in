@@ -47,6 +47,6 @@ DISTCLEANFILES       = Makefile $(CLEANFILES)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES) 
 DISTFILES            = Makefile.in config.h.in $(HEADERS)
 
-DEVFILES             = CVS Makefile.in $(SOURCES) $(HEADERS)
+DEVFILES             = Makefile.in $(SOURCES) $(HEADERS)
 
 include $(top_builddir)/build.mk

@@ -34,6 +34,6 @@ MAINTAINERCLEANFILES =
 # ---------------------------------------------------------------------------
 FILES                = Makefile.in $(MACROS)
 DISTFILES            = $(FILES)
-DEVFILES             = CVS $(FILES)
+DEVFILES             = $(FILES)
 
 include $(top_builddir)/build.mk

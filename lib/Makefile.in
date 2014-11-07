@@ -70,7 +70,7 @@ FILES                += Makefile.in config.mk.in build.mk.in configure.ac \
                         config.h.in
 
 DISTFILES            += $(FILES) configure aclocal.m4
-DEVFILES             += $(FILES) autogen.sh 
+DEVFILES             += $(FILES) 
 
 # files to be cleaned
 # ---------------------------------------------------------------------------

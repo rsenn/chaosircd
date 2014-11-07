@@ -47,7 +47,7 @@ CLEANFILES           = *~ core core.* \
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 DEFS += -DBUILD_MODULE
 

@@ -59,7 +59,7 @@ DISTFILES = $(FILES) configure
 #	@(./config.status config.mak) >/dev/null
 
 # Files that go into development tarball
-DEVFILES = CVS $(FILES)
+DEVFILES = $(FILES)
 
 # Local targets
 all-local: Makefile config.mk $(srcdir)/configure 

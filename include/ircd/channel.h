@@ -92,7 +92,8 @@ struct invite {
 #define channel_is_member(chptr, cptr)  (chanuser_find(chptr, cptr) != NULL)
 
 #define channel_is_valid(name)           ((name) && \
-                                        (*(name) == '#'))
+                                        (*(name) == '#' || *(name) == '+' || \
+                                         *(name) == '&' || *(name) == '!'))
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */

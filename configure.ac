@@ -162,6 +162,7 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
+AX_CHECK_LINK_FLAG([-Wl,--export-dynamic], [LDFLAGS="$LDFLAGS -Wl,--export-dynamic"], [])
 
 dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
 AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.h])
@@ -276,7 +277,6 @@ modules/msg/Makefile
 modules/service/Makefile
 modules/stats/Makefile
 modules/usermode/Makefile
-libowfat/Makefile
 src/Makefile
 test/Makefile
 tools/Makefile
