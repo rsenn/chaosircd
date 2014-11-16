@@ -504,7 +504,7 @@ AC_DEFUN([AC_CHECK_LIBOWFAT], [
  AC_MSG_CHECKING([for libowfat prefix])
 
 
-ac_cv_with_libowfat="/usr/local /usr /opt/diet"
+ac_cv_with_libowfat="/usr /usr/local /opt/diet"
 AC_ARG_WITH(libowfat,
 [  --with-libowfat[[=DIR]]   libowfat [[auto]]],
 [
