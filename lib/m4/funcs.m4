@@ -7,6 +7,29 @@
 #
 # Copyleft GPL (c) 2005 by Roman Senn <smoli@paranoya.ch>
 
+AC_DEFUN([AC_GCC_SEARCH_PATHS],[
+ac_gcc_search_paths=` 
+ $CC -v -x c -E - <<<"" 2>&1 | sed -n "/#include.*search starts here/ {  
+	 :lp
+	 N
+	 /End of search list/! { b lp; }
+	 s/.*starts here:\n//
+	 s/End of search.*//
+	 s,^ ,,
+	 s,\n ,\n,g
+	 s,/include[^\n]*,,
+	 p 
+}"`
+])
+
+AC_DEFUN([AC_GCC_SEARCH_PREFIXES], [
+AC_GCC_SEARCH_PATHS
+
+set -- $ac_gcc_search_paths
+ac_gcc_search_prefixes=${*%/include*}
+
+echo "ac_gcc_search_prefixes: $ac_gcc_search_prefixes" 1>&2
+])
 # check for PostgreSQL
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_PSQL],
@@ -88,7 +111,10 @@ AC_SUBST(PSQL_CFLAGS)])
 # check for SQLite
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_SQLITE],
-[default_directory="/usr /usr/local" 
+[
+
+AC_GCC_SEARCH_PREFIXES
+default_directory="$ac_cv_gcc_search_prefixes /usr /usr/local" 
 
 with_sqlite=yes
 AC_ARG_WITH(sqlite,
@@ -169,7 +195,8 @@ AC_SUBST([SQLITE_CFLAGS])
 # check for MySQL
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_MYSQL],
-[default_directory="/usr /usr/local /usr/mysql /opt/mysql"
+[AC_GCC_SEARCH_PREFIXES
+default_directory="$ac_cv_gcc_search_prefixes /usr /usr/local /usr/mysql /opt/mysql"
 
 with_mysql=yes
 AC_ARG_WITH(mysql,
@@ -498,13 +525,15 @@ AC_SUBST(SSL_LIBS)
 AC_SUBST(SSL_CFLAGS)
 ])                        
 
+
 # check for libowfat
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_LIBOWFAT], [
  AC_MSG_CHECKING([for libowfat prefix])
 
+AC_GCC_SEARCH_PREFIXES
 
-ac_cv_with_libowfat="/usr /usr/local /opt/diet"
+ac_cv_with_libowfat="$ac_gcc_search_prefixes /usr /usr/local /opt/diet"
 AC_ARG_WITH(libowfat,
 [  --with-libowfat[[=DIR]]   libowfat [[auto]]],
 [

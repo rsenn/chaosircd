@@ -145,7 +145,7 @@ FFLAGS=""
 # check for libs and programs needed to build tichu-server
 # ---------------------------------------------------------------------------
 AC_DIETLIBC([/opt/diet /usr/diet])
-AC_PROG_CC([cc gcc])
+dnl AC_PROG_CC([cc gcc])
 AC_PROG_AR
 AC_PROG_RANLIB
 AC_PROG_INSTALL
