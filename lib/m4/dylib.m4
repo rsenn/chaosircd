@@ -161,7 +161,7 @@ dnl   fi
       fi
       ;;
 
-    *mingw32*|*cygwin*|*msys*)
+    *mingw32*|*cygwin*)
         PIC_OBJEXT='pio'
         PIC_DEPEXT='d'
         PIE_LIBEXT='dll'
@@ -175,7 +175,6 @@ dnl   fi
       fi
        case $host in
          *cygwin*) PIE_PREPEND=cyg ;;
-         *msys*) PIE_PREPEND=msys- ;;
          *) PIE_PREPEND=lib ;;
         esac
       
