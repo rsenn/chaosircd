@@ -2,9 +2,9 @@
 
 # Global settings
 global {
-  name   = "crowdguard.org";    # Server name (doesn't need 
+  name   = "irc.yokto.net";    # Server name (doesn't need 
                                 # to match real hostname).
-  info   = "CrowdGuard Server";      # Information about the server
+  info   = "kon.ath.cx tribal server";      # Information about the server
                                 # shown in /links, /whois and others
   detach = yes;                 # Detach from terminal after 
                                 # configfile coldstart
@@ -30,7 +30,7 @@ mfiles {
 # Listen for incoming SSL connections on port 9200
 @SSL_TRUE@listen {
 @SSL_TRUE@  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-@SSL_TRUE@  port     = 9200;                         # Port to listen to
+@SSL_TRUE@  port     = 6697;                         # Port to listen to
 @SSL_TRUE@  protocol = "irc";                       # Protocol handler for this port
 @SSL_TRUE@  class    = "clients";                   # Class for client connects
 @SSL_TRUE@  ssl      = yes;                         # Use OpenSSL encryption?
@@ -45,7 +45,7 @@ mfiles {
 # Listen for incoming connections on port 9990
 listen {
   address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-  port     = 9990;                        # Port to listen to
+  port     = 6667;                        # Port to listen to
   protocol = "irc";                       # Protocol handler for this port
   class    = "clients";                   # Class for client connects
   ssl      = no;                          # Use OpenSSL encryption?
@@ -55,12 +55,12 @@ listen {
                                           # accept() is called.
 };
 
-# Listen for incoming connections on 127.0.0.1:9989
+# Listen for incoming connections on 127.0.0.1:6668
 listen {
-  address  = "127.0.0.1";                   # Address to listen to (0.0.0.0 = any)
-  port     = 9989;                        # Port to listen to
+  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
+  port     = 6668;                        # Port to listen to
   protocol = "irc";                       # Protocol handler for this port
-  class    = "local";                   # Class for client connects
+  class    = "clients";                   # Class for client connects
   ssl      = no;                          # Use OpenSSL encryption?
   backlog  = 5;                           # Backlog argument for listen(),
                                           # this defines how many incoming
