@@ -1,0 +1,16 @@
+
+#if(LIBOWFAT_LIBRARY)
+  set(USE_LIBOWFAT true CACHE BOOL "Use libowfat")
+  #endif()
+  #if(LIBOWFAT_FOUND)
+  # set(USE_LIBOWFAT true CACHE BOOL "Use libowfat")
+  #endif()
+if(USE_LIBOWFAT)
+  set(LIBOWFAT_INCLUDE_DIRS /usr/local/include /usr/include /opt/diet/include)
+  set(LIBOWFAT_LIBS "${LIBOWFAT_LIBRARIES}")
+  foreach(I ${LIBOWFAT_INCLUDE_DIRS})
+    include_directories(${I}/libowfat)
+  endforeach()
+  add_definitions(-DHAVE_LIBOWFAT=1)
+endif()
+

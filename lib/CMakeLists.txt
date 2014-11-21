@@ -32,6 +32,7 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigMathLib.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseOpenSSL.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseMySQL.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
+include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseLibOWFAT.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/FindPostgreSQL.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
@@ -45,6 +46,7 @@ check_library_exists(owfat stralloc_init "${CMAKE_INSTALL_PREFIX}/lib" HAVE_LOWF
 if(HAVE_LOWFAT)
   set(LOWFAT_LIBRARY owfat)
 endif()
+
 
 add_definitions(-DHAVE_CONFIG_H=1)
 
