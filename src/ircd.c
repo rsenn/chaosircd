@@ -119,7 +119,7 @@ char         ircd_path[PATHLEN];
  * -------------------------------------------------------------------------- */
 void ircd_stack_install(void) {
 
-#ifdef HAVE_MPROTECT
+#if 0 //def HAVE_MPROTECT
   void   *old_esp;
   void   *old_ebp;
   size_t  old_size;
