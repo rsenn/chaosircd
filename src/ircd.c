@@ -678,8 +678,8 @@ struct node *ircd_support_assemble(char *buf, struct node *nptr, size_t n)
   {
     suptr = nptr->data;
 
-    len = str_len(suptr->name) + 1 +
-      (suptr->value[0] ? str_len(suptr->value) + 1 : 0);
+    len = strlen(suptr->name) + 1 +
+      (suptr->value[0] ? strlen(suptr->value) + 1 : 0);
 
     if(len + 2 > n - i)
       break;

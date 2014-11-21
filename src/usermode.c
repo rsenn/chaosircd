@@ -584,7 +584,7 @@ usermode_change_send(struct lclient *lcptr,
     {
       *pa++ = ' ';
 
-      arglen = str_len(umcptr->arg);
+      arglen = strlen(umcptr->arg);
       memcpy(pa, umcptr->arg, arglen);
       pa += arglen;
     }

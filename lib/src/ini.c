@@ -74,7 +74,7 @@ static inline void ini_strip(char *s)
   uint32_t i;
   uint32_t len;
 
-  len = str_len(s);
+  len = strlen(s);
 
   for(i = 0; str_isspace(s[i]); i++);
 
@@ -451,7 +451,7 @@ int ini_load(struct ini *ini)
     /* Remove leading & trailing whitespace */
     ini_strip(buf);
 
-    len = str_len(buf);
+    len = strlen(buf);
 
     if(buf[0] == ';' || len == 0)
     {

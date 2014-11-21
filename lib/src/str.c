@@ -293,7 +293,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 's') 
       {
         register const char *p1  = va_arg(args, const char *);
-        register size_t      len = (p1 ? str_len(p1) : 6);
+        register size_t      len = (p1 ? strlen(p1) : 6);
         
         /* if left aligned, do padding now */
         if(!left && len < padding) 
@@ -1054,7 +1054,7 @@ char *str_dup(const char *s)
 {
   char *r;
 
-  r = malloc(str_len(s) + 1);
+  r = malloc(strlen(s) + 1);
 
   if(r != NULL)
     strcpy(r, s);

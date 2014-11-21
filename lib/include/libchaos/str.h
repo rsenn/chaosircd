@@ -71,9 +71,9 @@ CHAOS_API(void) str_unregister (char           c);
  * Get string length.                                                         *
  * ------------------------------------------------------------------------ */
 #if 1 //def USE_IA32_LINUX_INLINE
-CHAOS_API(size_t) str_len(const char *s);
+CHAOS_API(size_t) strlen(const char *s);
 
-/*CHAOS_INLINE  size_t str_len(const char *s)
+/*CHAOS_INLINE  size_t strlen(const char *s)
 {
   size_t len = 0;
 
@@ -474,7 +474,7 @@ CHAOS_INLINE( char *str_dup(const char *s)
 {
   char *r;
 
-  r = malloc(str_len(s) + 1);
+  r = malloc(strlen(s) + 1);
 
   if(r != NULL)
     strcpy(r, s);

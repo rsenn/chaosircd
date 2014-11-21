@@ -127,8 +127,8 @@ static void ms_ntopic(struct lclient *lcptr, struct client *cptr,
       size_t nlen;
       size_t olen;
 
-      nlen = topic[0] ? str_len(topic) : 0;
-      olen = str_len(chptr->topic);
+      nlen = topic[0] ? strlen(topic) : 0;
+      olen = strlen(chptr->topic);
 
       if(nlen < olen)
       {

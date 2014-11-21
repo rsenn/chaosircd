@@ -300,7 +300,7 @@ int str_vsnprintf(char *str, size_t n, const char *format, va_list args)
       if(c == 's')
       {
         register const char *p1  = va_arg(args, const char *);
-        register size_t      len = (p1 ? str_len(p1) : 6);
+        register size_t      len = (p1 ? strlen(p1) : 6);
 
         /* if left aligned, do padding now */
         if(!left && len < padding)
@@ -602,7 +602,7 @@ int str_vsprintf(char *str, const char *format, va_list args)
  * Get string length.                                                       *
  * ------------------------------------------------------------------------ */
 #if 1 //def __i386__
-size_t str_len(const char *s)
+size_t strlen(const char *s)
 {
   size_t len = 0;
 
@@ -1141,7 +1141,7 @@ char *str_dup(const char *s)
 {
   char *r;
 
-  r = malloc(str_len(s) + 1);
+  r = malloc(strlen(s) + 1);
 
   if(r != NULL)
     str_copy(r, s);

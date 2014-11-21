@@ -61,7 +61,7 @@ static int lc_crowdguard_hook(struct lclient *lcptr)
 
   strlcpy(info, lcptr->info, sizeof(info));
 
-  for(i = 0; i < str_len(info); i++)
+  for(i = 0; i < strlen(info); i++)
   {
     unsigned char c = info[i];
     if(c == 0xa0 || c <= 0x20)

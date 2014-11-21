@@ -1339,7 +1339,7 @@ int gif_extension_put(struct gif *gif, uint8_t  extcode,
  * ------------------------------------------------------------------------ */
 int gif_comment_put(struct gif *gif, char *comment)
 {
-  return gif_extension_put(gif, GIF_EXT_COMMENT, comment, str_len(comment));
+  return gif_extension_put(gif, GIF_EXT_COMMENT, comment, strlen(comment));
 }
 
 /* ------------------------------------------------------------------------ *

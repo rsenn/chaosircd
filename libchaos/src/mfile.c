@@ -96,7 +96,7 @@ void mfile_read(int fd, struct mfile *mfptr)
     if((eol = str_chr(buf, '\n')))
       *eol = '\0';
     if(eol == NULL)
-      eol = buf + str_len(buf);
+      eol = buf + strlen(buf);
 
     line = mem_dynamic_alloc(&mfile_dheap, eol - buf + 1);
     nptr = dlink_node_new();

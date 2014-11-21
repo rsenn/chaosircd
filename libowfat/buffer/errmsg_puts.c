@@ -5,7 +5,7 @@
 #ifdef __MINGW32__
 
 void errmsg_puts(int fd,const char* s) {
-  return write(fd,s,str_len(s));
+  return write(fd,s,strlen(s));
 }
 
 void errmsg_flush(int fd) {
@@ -21,7 +21,7 @@ static int l;
 
 void errmsg_puts(int fd,const char* s) {
   x[l].iov_base=(char*)s;
-  x[l].iov_len=str_len(s);
+  x[l].iov_len=strlen(s);
   if (++l==COUNT) errmsg_flush(fd);
 }
 

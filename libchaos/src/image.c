@@ -946,7 +946,7 @@ void image_putstr(struct image *iptr, struct font *ifptr, uint16_t x,
                   uint16_t      y,    uint32_t     c,     int align,
                   char         *s)
 {
-  size_t len = str_len(s);
+  size_t len = strlen(s);
   size_t width = len * ifptr->w;
 
   switch(align)

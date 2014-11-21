@@ -108,7 +108,7 @@ static void m_join(struct lclient *lcptr, struct client *cptr,
   for(i = 0; i < n; i++)
   {
     /* Check for valid channel name */
-    if(!chars_valid_chan(chanv[i]) || str_len(chanv[i]) > IRCD_CHANNELLEN)
+    if(!chars_valid_chan(chanv[i]) || strlen(chanv[i]) > IRCD_CHANNELLEN)
     {
       numeric_send(cptr, ERR_BADCHANNAME, chanv[i]);
       return;

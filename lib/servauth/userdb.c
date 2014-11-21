@@ -169,7 +169,7 @@ quote_escape(stralloc* sa, const char* str, char sep, char q) {
 
 	if(str) {
 
-		int n = str_len(str);
+		int n = strlen(str);
 		if(escape) {
 
 			while(n >= 0) {
@@ -194,7 +194,7 @@ build_values(struct db* db, stralloc* sa, char** v, size_t n, char sep, char q, 
 
 	for(i = 0; i < n; ++i) {
 		if(!v[i]) v[i] = "";
-		size_t len = str_len(v[i]);
+		size_t len = strlen(v[i]);
 		if(sa->len) stralloc_catb(sa, &sep, 1);
 		int quote = (q != '\0') && (((sep == ',') || (!len || strchr(v[i], sep) != NULL)) || (q == '`'));
 		if(quote) stralloc_catb(sa, &q, 1);
@@ -205,7 +205,7 @@ build_values(struct db* db, stralloc* sa, char** v, size_t n, char sep, char q, 
 		if(sql) {
 			str = malloc(len * 2 + 1);
 			db_escape_string(db, str, v[i], len);
-			len = str_len(str);
+			len = strlen(str);
 		} else
 			str = strdup(v[i]);
 
@@ -268,7 +268,7 @@ userdb_fields(struct userdb_client *userdb, size_t* nfields, const char* excepti
 		const char* f = row[0] ? row[0] : "";
 		if(exception && !str_cmp(f, exception)) continue;
 
-    size_t l = str_len(f);
+    size_t l = strlen(f);
     if(l > 9 && !str_cmp(f+l-9, "_location")) {
       char* tmp = malloc(l + 8 + 1);
       if(tmp) {
@@ -334,7 +334,7 @@ get_varvalue(char* a) {
 		char *e;
 		d += dequote;
 		char *s = p = d;
-		e = p + str_len(p) - dequote;
+		e = p + strlen(p) - dequote;
 		while(*s && s < e) {
 			if(*s == '\\' && s[1] == '\'') {
 				++s;
@@ -366,11 +366,11 @@ where_part(struct db*db, stralloc* sa, char** v, size_t num_values) {
 		else
 			strcpy(varname, "uid");
 
-		stralloc_catb(sa, varname, str_len(varname));
+		stralloc_catb(sa, varname, strlen(varname));
 		stralloc_catb(sa, "='", 2);
 		s = db_escape_string_dup(db, get_varvalue(v[i]));
 		//quote_escape(sa, get_varvalue(v[i]), ',', '\'');
-		stralloc_catb(sa, s, str_len(s));
+		stralloc_catb(sa, s, strlen(s));
 		stralloc_catb(sa, "'", 1);
 	}
 	stralloc_catb(sa, "\0", 1);
@@ -409,7 +409,7 @@ userdb_search(struct userdb_client *userdb, char** v, size_t n, char** retstr) {
 			stralloc_init(&sa);
 			for(i = 0; i < nfields; ++i) {
 				if(sa.len) stralloc_catb(&sa, " ", 1);
-				stralloc_catb(&sa, fields[i], str_len(fields[i]));
+				stralloc_catb(&sa, fields[i], strlen(fields[i]));
 				stralloc_catb(&sa, "=", 1);
 
 				if(row[i]) quote_escape(&sa, row[i], ' ', '\'');
@@ -480,7 +480,7 @@ userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_t nu
 	for(i = 0; i < num_values; ++i) {
 		char *s = (char *)v[i];
 		char *eq = strchr(s, '=');
-		size_t n = str_len(s);
+		size_t n = strlen(s);
 		if(eq) {
 			n = eq - s;
 		}
@@ -489,7 +489,7 @@ userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_t nu
 		stralloc_catb(&values, "='", 2);
 		s += n;
 		if(*s) ++s;
-		stralloc_catb(&values, s, str_len(s));
+		stralloc_catb(&values, s, strlen(s));
 		stralloc_catb(&values, "'", 1);
 	}
 	stralloc_catb(&values, "\0", 1);

@@ -271,7 +271,7 @@ static int sauth_parse(char **argv) {
 				while(p && isspace(*p)) ++p;
 			}
 
-			char* e = &sauth_readbuf[str_len(sauth_readbuf)];
+			char* e = &sauth_readbuf[strlen(sauth_readbuf)];
 
 			while(e > p) {
         --e;

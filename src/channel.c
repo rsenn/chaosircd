@@ -679,7 +679,7 @@ void channel_backlog(struct channel *chptr, struct client *cptr,
 
   if(text && text[0])
   {
-    e->text = mem_dynamic_alloc(&channel_msglog_heap, str_len(text)+1);
+    e->text = mem_dynamic_alloc(&channel_msglog_heap, strlen(text)+1);
     strcpy(e->text, text);
   }
   else

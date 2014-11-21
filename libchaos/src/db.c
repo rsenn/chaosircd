@@ -51,7 +51,7 @@ db_trim(char *s)
   uint32_t i;
   uint32_t len;
 
-  len = str_len(s);
+  len = strlen(s);
 
   for(i = len; i > 0; i--)
   {
@@ -75,13 +75,13 @@ static void db_format_str(char   **pptr, size_t  *bptr,
   char *escaped;
   int i;
 
-  len = str_len(arg) + 1024;
+  len = strlen(arg) + 1024;
 
   if(arg)
   {
-    escaped = mem_dynamic_alloc(&db_dheap, str_len(arg) + 1024);
+    escaped = mem_dynamic_alloc(&db_dheap, strlen(arg) + 1024);
 
-    len = db_escape_string(db_current, escaped, arg, str_len(arg));
+    len = db_escape_string(db_current, escaped, arg, strlen(arg));
   }
   else
   {

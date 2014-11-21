@@ -52,7 +52,7 @@ static inline char *db_trim(char *s)
   uint32_t i;
   uint32_t len;
 
-  len = str_len(s);
+  len = strlen(s);
 
   for(i = len; i > 0; i--)
   {
@@ -76,13 +76,13 @@ db_format_str(char   **pptr, size_t  *bptr,
   size_t i, len;
   char *escaped;
 
-  len = str_len(arg) + 1024;
+  len = strlen(arg) + 1024;
 
   if(arg)
   {
-    escaped = mem_dynamic_alloc(&db_dheap, str_len(arg) + 1024);
+    escaped = mem_dynamic_alloc(&db_dheap, strlen(arg) + 1024);
 
-    len = db_escape_string(db_current, escaped, arg, str_len(arg));
+    len = db_escape_string(db_current, escaped, arg, strlen(arg));
   }
   else
   {
@@ -350,9 +350,9 @@ void db_close(struct db *db)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 char* db_escape_string_dup(struct db *db, const char *from) {
-  char* ret = malloc(str_len(from)*2+1);
+  char* ret = malloc(strlen(from)*2+1);
   if(ret)
-    db_escape_string(db, ret, from, str_len(from));
+    db_escape_string(db, ret, from, strlen(from));
   return ret;
 }
 /* ------------------------------------------------------------------------ *

@@ -107,7 +107,7 @@ int main(int argc,char* argv[]) {
 #endif
 #if 0
   char buf[100]="/usr/bin/sh";
-  int len=str_len(buf);
+  int len=strlen(buf);
   assert(byte_rchr(buf,len,'/')==8);
   assert(byte_rchr(buf,len,'@')==len);
   assert(byte_rchr(buf,len,'h')==len-1);
@@ -231,7 +231,7 @@ int main(int argc,char* argv[]) {
 #if 0
   char buf[]="00000000000000000000000000000001";
   char ip[16];
-  if (scan_ip6_flat(buf,ip) != str_len(buf))
+  if (scan_ip6_flat(buf,ip) != strlen(buf))
     buffer_putsflush(buffer_2,"parse error!\n");
 #endif
 #if 0
@@ -307,7 +307,7 @@ int main(int argc,char* argv[]) {
   buf[fmt_8long(buf,0)]=0;
   puts(buf);
   rdtscl(a);
-  c=str_len(buf);
+  c=strlen(buf);
   rdtscl(b);
   /*byte_zero_djb(buf,j); */
 //  printf("\n%lu %d\n",b-a,c);

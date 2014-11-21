@@ -739,7 +739,7 @@ struct node *chanmode_assemble(char        *modebuf, char  *parabuf,
 
     if(cmcptr->mode->type != CHANMODE_TYPE_SINGLE && arg)
     {
-      len = str_len(arg);
+      len = strlen(arg);
 
       if(pi + len + 2 > n)
         break;
@@ -1441,7 +1441,7 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     if(lasthash && cmcptr->info && lasthash == cmcptr->ihash)
     {
       if(flen + ilen + tlen + mlen + 2 +
-         1 + 2 + 12 + str_len(cmcptr->arg) + 2 + 1 > len ||
+         1 + 2 + 12 + strlen(cmcptr->arg) + 2 + 1 > len ||
          flen == CHANMODE_PER_LINE)
         break;
 
@@ -1451,8 +1451,8 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     else
     {
       if(flen + ilen + tlen + mlen + 2 +
-         (cmcptr->info ? str_len(cmcptr->info) : 1)
-         + 2 + 12 + str_len(cmcptr->arg) + 2 + 1 > len ||
+         (cmcptr->info ? strlen(cmcptr->info) : 1)
+         + 2 + 12 + strlen(cmcptr->arg) + 2 + 1 > len ||
          flen == CHANMODE_PER_LINE)
         break;
 

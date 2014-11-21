@@ -111,7 +111,7 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
     log(server_log, L_warning, "Dropping NMODE for %s with too recent TS",
         chptr->name);
 
-    cptr->server->in.chanmodes += str_len(argv[4]);
+    cptr->server->in.chanmodes += strlen(argv[4]);
 
     return;
   }
@@ -124,7 +124,7 @@ static void ms_nmode(struct lclient *lcptr, struct client *cptr,
     chptr->ts = ts;
   }
 
-  len = str_len(argv[4]);
+  len = strlen(argv[4]);
 
   if(str_tokenize_s(argv[5], infos, CHANMODE_PER_LINE, ';') != len ||
      str_tokenize_s(argv[6], timestamps, CHANMODE_PER_LINE, ';') != len ||

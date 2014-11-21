@@ -1034,7 +1034,7 @@ int client_nick_rotate(const char *name, char *buf)
   uint32_t       len;
   struct client *acptr = NULL;
 
-  len = str_len(name);
+  len = strlen(name);
 
   if(len < 2)
     return -1;

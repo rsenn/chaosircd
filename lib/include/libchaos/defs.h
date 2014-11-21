@@ -47,6 +47,9 @@
 #include <time.h>
 #include <sys/time.h>
  */
+#ifndef SIZEOF_UINTPTR_T
+#define SIZEOF_UINTPTR_T 4
+#endif
 
 #define HASH_BIT_SIZE (SIZEOF_UINTPTR_T*8)
 

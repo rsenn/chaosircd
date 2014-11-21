@@ -100,7 +100,7 @@ again:
 
     /* We haven't found a '=', set end of name */
     if(!max)
-      max = &arg[str_len(arg)];
+      max = &arg[strlen(arg)];
 
     /* Walk through the option list */
     for(o = longopts; o->name; o++)

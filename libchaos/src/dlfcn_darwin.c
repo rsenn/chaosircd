@@ -66,7 +66,7 @@ static const char *error(int setget, const char *str, ...)
 		if (setget == 0) {
 			NSLinkEditError(&ler, &lerno, &file, &dylderrstr);
 			fprintf(stderr,"dyld: %s\n",dylderrstr);
-			if (dylderrstr && str_len(dylderrstr))
+			if (dylderrstr && strlen(dylderrstr))
 				strncpy(errstr,dylderrstr,ERR_STR_LEN);
 		}
 		err_filled = 1;
@@ -167,7 +167,7 @@ int dlclose(void *handle)
 
 void *dlsym(void *handle, const char *symbol)
 {
-	int sym_len = str_len(symbol);
+	int sym_len = strlen(symbol);
 	void *value = NULL;
 	char *malloc_sym = NULL;
 	NSSymbol *nssym = 0;

@@ -590,7 +590,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
       if(!str_icmp(htptr->name, "tr") && htptr->closing)
         break;
 
-      if(htptr->text[0] && str_len(htptr->text) > 1)
+      if(htptr->text[0] && strlen(htptr->text) > 1)
         product = htptr->text;
     }
 

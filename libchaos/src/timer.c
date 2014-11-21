@@ -218,7 +218,7 @@ size_t timer_strftime(char *s, size_t max, const char *format,
       /* Day Sunday - Monday */
       case 'A':
       {
-        size_t len = str_len(timer_weekdays[tm->tm_wday]);
+        size_t len = strlen(timer_weekdays[tm->tm_wday]);
 
         if(i + len < max)
           i += strlcpy(&s[i], timer_weekdays[tm->tm_wday], len + 1);
@@ -241,7 +241,7 @@ size_t timer_strftime(char *s, size_t max, const char *format,
       /* Month January - December */
       case 'B':
       {
-        size_t len = str_len(timer_months[tm->tm_mon]);
+        size_t len = strlen(timer_months[tm->tm_mon]);
 
         if(i + len < max)
           i += strlcpy(&s[i], timer_months[tm->tm_mon], len + 1);

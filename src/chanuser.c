@@ -371,8 +371,8 @@ struct node *chanuser_assemble(char  *buf, struct node *nptr,
   {
     cuptr = nptr->data;
     name = (uid ? cuptr->client->user->uid : cuptr->client->name);
-    nlen = str_len(name);
-    plen = (of ? 1 : str_len(cuptr->prefix));
+    nlen = strlen(name);
+    plen = (of ? 1 : strlen(cuptr->prefix));
     len = nlen + (cuptr->flags ? plen : 0);
 
     if(i + 2 + len > n)
@@ -479,7 +479,7 @@ size_t chanuser_burst(struct lclient *lcptr, struct channel *chptr)
 
     lclient_send(lcptr, "%s", buf);
 
-    ret += str_len(cuptr->prefix);
+    ret += strlen(cuptr->prefix);
   }
 
   return ret;
@@ -764,7 +764,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
 
     if(acuptr)
     {
-      len = str_len(acuptr->channel->name) + str_len(acuptr->prefix);
+      len = strlen(acuptr->channel->name) + strlen(acuptr->prefix);
 
       if(len + rpllen + rplidx + 1 > IRCD_LINELEN - 2)
       {
@@ -793,7 +793,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
     if(hooks_call(chanuser_whois, HOOK_DEFAULT, cptr, auptr->client, acuptr))
       continue;
 
-    len = str_len(acuptr->channel->name) + str_len(acuptr->prefix);
+    len = strlen(acuptr->channel->name) + strlen(acuptr->prefix);
 
     if(len + rpllen + rplidx + 1 > IRCD_LINELEN - 2)
     {

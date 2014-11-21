@@ -11,13 +11,13 @@
 #ifdef __dietlibc__
 #include <write12.h>
 #else
-static inline __write1(const char* s) { write(1,s,str_len(s)); }
-static inline __write2(const char* s) { write(2,s,str_len(s)); }
+static inline __write1(const char* s) { write(1,s,strlen(s)); }
+static inline __write2(const char* s) { write(2,s,strlen(s)); }
 #endif
 #include <stdlib.h>
 
 void panic(const char* s) {
-  int i=str_len(s);
+  int i=strlen(s);
   __write2(s);
   if (s[i-1]!='\n') {
     __write2(": ");

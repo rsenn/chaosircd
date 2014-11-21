@@ -333,7 +333,7 @@ void graph_calc(struct graph *graph)
     timer_strftime(m, sizeof(m), graph->format, &tm);
 //    str_snprintf(m, sizeof(m), "%u", tm.tm_sec);
 //
-    graph->measure[i] = mem_dynamic_alloc(&graph_data_heap, str_len(m) + 1);
+    graph->measure[i] = mem_dynamic_alloc(&graph_data_heap, strlen(m) + 1);
 
     if(str_isdigit(m[0]))
       graph->mval[i] = (uint32_t)str_toul(m, NULL, 10);
@@ -360,7 +360,7 @@ void graph_calc(struct graph *graph)
 
     log(graph_log, L_status, "umeasure: %s", m);
 
-    graph->umeasure[i] = mem_dynamic_alloc(&graph_data_heap, str_len(m) + 1);
+    graph->umeasure[i] = mem_dynamic_alloc(&graph_data_heap, strlen(m) + 1);
 
     strcpy(graph->umeasure[i], m);
 

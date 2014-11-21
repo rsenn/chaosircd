@@ -112,7 +112,7 @@ static void m_userhost(struct lclient *lcptr, struct client *cptr,
     if(acptr == NULL)
       continue;
 
-    if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
+    if(len + 1 + strlen(acptr->name) > IRCD_LINELEN - 2)
       break;
 
     if(!first)

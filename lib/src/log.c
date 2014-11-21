@@ -592,7 +592,7 @@ void log_voutput(uint64_t src, int level, const char *format, va_list ap)
     {
       if(level == L_startup)
       {
-        syscall_write(1, logmsg, str_len(logmsg));
+        syscall_write(1, logmsg, strlen(logmsg));
         syscall_write(1, "\n", 1);
       }
     }
@@ -698,7 +698,7 @@ void log_debug(const char *file,  int line,
     {
       if(level == L_startup)
       {
-        syscall_write(1, logmsg, str_len(logmsg));
+        syscall_write(1, logmsg, strlen(logmsg));
         syscall_write(1, "\n", 1);
       }
     }

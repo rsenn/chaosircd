@@ -606,7 +606,7 @@ char *htmlp_decode(const char *s)
 
       for(ti = 0; htmlp_table[ti].key; ti++)
       {
-        len = str_len(htmlp_table[ti].key);
+        len = strlen(htmlp_table[ti].key);
 
         if(!str_nicmp(htmlp_table[ti].key, &s[i], len))
         {

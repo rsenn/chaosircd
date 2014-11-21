@@ -50,7 +50,7 @@ int stralloc_copyb(stralloc* sa,const char* buf,size_t len);
 
 /* stralloc_copys copies a \0-terminated string from buf into sa,
  * without the \0. It is the same as
- * stralloc_copyb(&sa,buf,str_len(buf)). */
+ * stralloc_copyb(&sa,buf,strlen(buf)). */
 int stralloc_copys(stralloc* sa,const char* buf);
 
 /* stralloc_copy copies the string stored in sa2 into sa. It is the same

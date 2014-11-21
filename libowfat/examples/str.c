@@ -58,14 +58,14 @@ main()
 
 	/* Determinating the length of a string is also easy with the libowfat:
 	 *
-	 * unsigned int str_len(const char *s);
+	 * unsigned int strlen(const char *s);
 	 * 
 	 * returns the index of \0 in the string and that's also the length.
 	 */
 
-	len = str_len(string1);
+	len = strlen(string1);
 
-	buffer_puts(buffer_1, "str_len(buffer_1): ");
+	buffer_puts(buffer_1, "strlen(buffer_1): ");
 	buffer_putulong(buffer_1, len);
 	buffer_putnlflush(buffer_1);
 

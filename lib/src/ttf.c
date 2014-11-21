@@ -976,7 +976,7 @@ struct image *ttf_text_solid(struct ttf *ttf, const char *text, struct color *c)
   uint16_t     *unicode_text;
   int           unicode_len;
 
-  unicode_len = str_len(text);
+  unicode_len = strlen(text);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   if(unicode_text == NULL)
   {
@@ -1001,7 +1001,7 @@ struct image *ttf_utf8_solid(struct ttf *ttf, const char *utf8, struct color *c)
   uint16_t     *unicode_text;
   int           unicode_len;
 
-  unicode_len = str_len(utf8);
+  unicode_len = strlen(utf8);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
 
   if(unicode_text == NULL)
@@ -1234,7 +1234,7 @@ struct image *ttf_text_shaded(struct ttf *ttf, const char *text, struct color *b
   uint16_t     *unicode_text;
   int           unicode_len;
 
-  unicode_len = str_len(text);
+  unicode_len = strlen(text);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   if(unicode_text == NULL)
   {
@@ -1259,7 +1259,7 @@ struct image *ttf_utf8_shaded(struct ttf *ttf, const char *utf8, struct color *b
   uint16_t     *unicode_text;
   int           unicode_len;
 
-  unicode_len = str_len(utf8);
+  unicode_len = strlen(utf8);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
 
   if(unicode_text == NULL)
@@ -1468,7 +1468,7 @@ struct image *ttf_text_blended(struct ttf *ttf, const char *text, struct color *
   uint16_t     *unicode_text;
   int           unicode_len;
 
-  unicode_len = str_len(text);
+  unicode_len = strlen(text);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
   if(unicode_text == NULL)
   {
@@ -1493,7 +1493,7 @@ struct image *ttf_utf8_blended(struct ttf *ttf, const char *utf8, struct color *
   uint16_t     *unicode_text;
   int           unicode_len;
 
-  unicode_len = str_len(utf8);
+  unicode_len = strlen(utf8);
   unicode_text = (uint16_t *)alloca((1 + unicode_len + 1) * sizeof(uint16_t));
 
   if(unicode_text == NULL)
