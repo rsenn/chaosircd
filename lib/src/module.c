@@ -35,7 +35,7 @@
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
 
-#include "config.h"
+#include "../config.h"
 
 #ifndef USE_DSO
 #define USE_DSO

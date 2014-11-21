@@ -24,7 +24,7 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "ircd/config.h"
+#include "../config.h"
 #include "libchaos/connect.h"
 #include "libchaos/syscall.h"
 #include "libchaos/filter.h"
@@ -53,7 +53,6 @@
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "ircd/config.h"
 #include "ircd/ircd.h"
 #include "ircd/chanmode.h"
 #include "ircd/usermode.h"

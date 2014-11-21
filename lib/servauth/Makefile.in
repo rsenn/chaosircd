@@ -73,9 +73,9 @@ INCLUDES += \
             -I$(top_srcdir) \
             -I$(top_srcdir)/include \
             -I$(builddir) \
-            -I$(top_builddir)/include/libchaos \
+            -I$(top_builddir)/include \
             -I. \
-            -I../include/libchaos
+            -I../include
 
 #$(PROGRAM): CFLAGS += -I$(srcdir)/../include
 $(PROGRAM): $(OBJECTS)

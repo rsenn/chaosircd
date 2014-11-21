@@ -162,7 +162,17 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
+
+
+echo "Host is: $host" 1>&2
+case "$host" in
+  *mingw* | *msys* | *cygwin* | *msvc* | *win32* | *win64*)
+;;
+  *)
 AX_CHECK_LINK_FLAG([-Wl,--export-dynamic], [LDFLAGS="$LDFLAGS -Wl,--export-dynamic"], [])
+
+ ;;
+ esac
 
 dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
 AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.h])

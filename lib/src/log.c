@@ -56,7 +56,7 @@
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int          log_log;
+int         log_log;
 struct sheap log_heap;
 struct list  log_list;
 int          log_dirty;

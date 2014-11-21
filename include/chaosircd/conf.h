@@ -34,7 +34,7 @@
 /* -------------------------------------------------------------------------- *
  * command line option structure                                              *
  * -------------------------------------------------------------------------- */
-struct option {
+struct conf_option {
   const char *name;
   int         has_arg;
   int        *flag;

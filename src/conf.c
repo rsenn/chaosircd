@@ -67,7 +67,7 @@ static int    conf_optopt;
 static char  *conf_optarg = NULL;
 
 static int conf_getopt(int argc, char **argv, const char *optstring,
-                       struct option *longopts)
+                       struct conf_option *longopts)
 {
   static int lastidx = 0, lastofs = 0;
   char *tmp;
@@ -96,7 +96,7 @@ again:
   {
     char *arg = &argv[conf_optind][2];      /* Option name */
     char *max = strchr(arg, '=');      /* Points to end of name */
-    const struct option *o;            /* Points to switch in option struct */
+    const struct conf_option *o;            /* Points to switch in option struct */
 
     /* We haven't found a '=', set end of name */
     if(!max)
@@ -245,7 +245,7 @@ static void usage(char **argv)
 /* -------------------------------------------------------------------------- *
  * Getopt and configfile coldstart.                                           *
  * -------------------------------------------------------------------------- */
-static struct option longoptions[] = {
+static struct conf_option longoptions[] = {
   { "help",   0, NULL, 'h', },
   { "nofork", 1, NULL, 'd', },
   { "config", 1, NULL, 'f', },

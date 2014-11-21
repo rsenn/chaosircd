@@ -13,6 +13,8 @@ A_LIBRARY          = libircd.a
 @WIN32_TRUE@PIE_LIBRARY          = ircd.dll
 
 
+VPATH = $(srcdir):$(builddir)
+#vpath $(srcdir) $(builddir)
 
 bin_EXEC = chaosircd$(EXEEXT)
 @SHARED_TRUE@@WIN32_TRUE@bin_EXEC += $(PIE_LIBRARY)
@@ -66,7 +68,7 @@ PARSEROBJ            = y.tab.o
 SOURCES              = $(MODULES:%=%.c) $(LEXERSRC) $(PARSERSRC)
 @WIN32_FALSE@OBJECTS              = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @DLM_TRUE@@WIN32_TRUE@OBJECTS              = main.o
-@DLM_TRUE@@WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
+PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @DLM_FALSE@@WIN32_TRUE@OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @WIN32_TRUE@LIBNAME              = ircd
 PIE_DEF              = ircd.def
@@ -91,6 +93,8 @@ DEPS                 = $(MODULES:%=%.d)
 
 #@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/lib/src -lchaos
 @SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
+#@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
+@SHARED_TRUE@LIBS += $(top_builddir)/lib/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
 @DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/src/ircd.@PIE_LIBEXT@
 
 @DLM_FALSE@LDPRE += -Wl,--whole-archive
@@ -121,17 +125,19 @@ LIBS += $(LIBOWFAT_LIBS)
 LIBS += $(EFENCE_LIBS)
 
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a
-@WIN32_TRUE@LIBS += -lws2_32 -ldnsapi
+@WIN32_TRUE@LIBS += -lws2_32 -lwsock32#-ldnsapi
 
 @WIN32_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@DLM_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): ircd.dll
-@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
 @WIN32_TRUE@@SHARED_TRUE@chaosircd: ircd.dll
-@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
 @WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
+@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
+@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 
+@WIN32_TRUE@$(top_builddir)/src/$(PIE_LIBRARY): $(PIC_OBJECTS) 
+@WIN32_TRUE@	$(CC) -o $@ $^ $(LIBS)
 .y.c:
 
 .l.c:
@@ -140,12 +146,12 @@ ircd.c:
 
 $(LEXERSRC): $(srcdir)/ircd.l $(PARSERINC)
 	@$(ECHO_LEX)
-	@$(LEX) -o$@ ircd.l
+	@$(LEX) -o$@ $(srcdir)/ircd.l
 $(LEXEROBJ): $(LEXERSRC) $(PARSERINC)
 $(PARSEROBJ): $(PARSERSRC) $(PARSERINC)
 $(PARSERINC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
-	$(YACC) -d -o $(PARSERSRC) ircd.y
+	$(YACC) -d -o $(PARSERSRC) $(srcdir)/ircd.y
 #.y.c:
 #	@$(ECHO_YACC)
 #	@$(YACC) -d -o $(PARSERSRC) $(PARSER)
@@ -153,9 +159,12 @@ $(PARSERSRC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
 	$(YACC) -d -o $(srcdir)/y.tab.c $(PARSER)
 
+$(PROGRAM): CFLAGS += $(DEFS)
 $(PROGRAM): $(OBJECTS) $(LDADD)
 	@$(ECHO_LD)
 	$(LINK) $(LDFLAGS) -o $@ $(OBJECTS) $(LDPRE) $(LDADD) $(LDPOST) $(LIBS)
+
+@WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): CFLAGS += $(DEFS)
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): main.o $(LDADD)
 @WIN32_TRUE@@SHARED_FALSE@	@$(ECHO_LD)
 @WIN32_TRUE@@SHARED_FALSE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
