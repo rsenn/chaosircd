@@ -3,23 +3,25 @@
 AC_DEFUN([AC_CHECK_SQLITE],
 [default_directory="/usr /usr/local" 
 
-with_sqlite=yes
 AC_ARG_WITH(sqlite,
     [  --with-sqlite=DIR        support for SQLite],
     [ with_sqlite="$withval" ],
     [ with_sqlite=no ])
 
-if test "$with_sqlite" != no; then
+: ${with_sqlite=yes}
+
   if test "$with_sqlite" = yes; then
-    sqlite_directory="$default_directory";
+    sqlite_directory="$default_directory"
     sqlite_fail=yes
-  elif test -d $withval; then
-    sqlite_directory="$withval"
+  elif test -d "$with_sqlite"; then
+    sqlite_directory="$with_sqlite"
     sqlite_fail=no
   elif test "$with_sqlite" = ""; then
     sqlite_directory="$default_directory";
     sqlite_fail=no
   fi
+
+  if test "$with_sqlite" != "" -a test "$with_sqlite" != no; then
 
   AC_MSG_CHECKING(for SQLite headers)
 
@@ -73,7 +75,7 @@ if test "$with_sqlite" != no; then
     DBSUPPORT="$DBSUPPORT SQLite"
     AC_DEFINE_UNQUOTED(HAVE_SQLITE, "1", [Define this if you have SQLite])
   fi
-fi
+ fi
 AM_CONDITIONAL([SQLITE],[test "$SQLITE" = true])
 AC_SUBST([SQLITE_LIBS])
 AC_SUBST([SQLITE_CFLAGS])

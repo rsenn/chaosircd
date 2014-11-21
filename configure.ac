@@ -167,6 +167,7 @@ AC_CONFIG_DYLIB
 echo "Host is: $host" 1>&2
 case "$host" in
   *mingw* | *msys* | *cygwin* | *msvc* | *win32* | *win64*)
+AX_CHECK_LINK_FLAG([-Wl,--export-all-symbols], [LDFLAGS="$LDFLAGS -Wl,--export-all-symbols"], [])
 ;;
   *)
 AX_CHECK_LINK_FLAG([-Wl,--export-dynamic], [LDFLAGS="$LDFLAGS -Wl,--export-dynamic"], [])

@@ -45,6 +45,10 @@
 #include "dlfcn_darwin.h"
 #endif /* DARWIN */
 
+#ifdef WIN32
+#include <windows.h>
+#endif /* WIN32 */
+
 #ifndef USE_DSO
 #include <../modules/module_import.h>
 #endif

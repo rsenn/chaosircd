@@ -131,12 +131,15 @@ AC_TRY_COMPILE([#include <winsock2.h>],
   LIBS="$ac_cv_libs"])
 
 # runtime linker
+#echo "Host is: $host" 1>&2
+
 case "$host" in
   *darwin*)
     PIE_LOADER="dlfcn_darwin"
     ;;
-  *mingw32*)
+  *mingw*)
     PIE_LOADER="dlfcn_win32"
+    LIBS="$LIBS -ldnsapi"
     ;;
   *freebsd*)
     AC_DEFINE_UNQUOTED([HAVE_SOCKET_FILTER], [1], [Define this if your OS has a socket-based filtering mechanism])
@@ -175,6 +178,12 @@ AC_SUBST([LDFLAGS])
 AC_SUBST([DEFS])
 
 AC_CHECK_LIB([m], [cos])
+
+dnl AC_CHECK_LIB([dnsapi], [DnsQueryConfig@24], [LIBS="$LIBS -ldnsapi"])
+dnl old_CPPFLAGS="$CPPFLAGS"
+dnl CPPFLAGS="$CPPFLAGS -include windns.h"
+dnl AC_CHECK_LIB([dnsapi], [DnsQueryConfig], [LIBS="$LIBS -ldnsapi"])
+dnl CPPFLAGS="$old_CPPFLAGS"
 
 AC_SUBST([DLFCN_LDADD])
 

@@ -3,23 +3,30 @@
 AC_DEFUN([AC_CHECK_MYSQL],
 [default_directory="/usr /usr/local /usr/mysql /opt/mysql"
 
-with_mysql=yes
+dnl #: ${with_mysql=yes}
 AC_ARG_WITH(mysql,
     [  --with-mysql=DIR        support for MySQL],
     [ with_mysql="$withval" ],
     [ with_mysql=no ])
 
-if test "$with_mysql" != no; then
-  if test "$with_mysql" = yes; then
-    mysql_directory="$default_directory";
-    mysql_fail=yes
-  elif test -d $withval; then
-    mysql_directory="$withval"
-    mysql_fail=no
-  elif test "$with_mysql" = ""; then
-    mysql_directory="$default_directory";
-    mysql_fail=no
-  fi
+: ${with_mysql=yes}
+if test "$with_mysql" = yes; then
+  mysql_directory="$default_directory";
+  mysql_fail=yes
+elif test -d $withval; then
+  mysql_directory="$withval"
+  mysql_fail=no
+elif test "$with_mysql" = "" -o "$with_mysql" = "no"; then
+  mysql_directory="$default_directory";
+  mysql_fail=no
+fi
+
+dnl echo "with_mysql=$with_mysql" 1>&2
+
+if test "$with_mysql" = no; then
+  MYSQL_CFLAGS=
+  MYSQL_LIBS=
+else
 
   AC_MSG_CHECKING(for MySQL headers)
 
@@ -78,7 +85,9 @@ if test "$with_mysql" != no; then
     DBSUPPORT="$DBSUPPORT MySQL"
     AC_DEFINE_UNQUOTED(HAVE_MYSQL, "1", [Define this if you have MySQL])
   fi
+
 fi
+
 AM_CONDITIONAL([MYSQL],[test "$MYSQL" = true])
 AC_SUBST([MYSQL_LIBS])
 AC_SUBST([MYSQL_CFLAGS])

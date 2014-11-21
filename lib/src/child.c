@@ -52,7 +52,9 @@
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Local variables                                                          *

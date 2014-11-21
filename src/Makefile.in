@@ -129,6 +129,7 @@ LIBS += $(EFENCE_LIBS)
 
 @WIN32_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@DLM_FALSE@OBJECTS += main.o
+@WIN32_TRUE@@SHARED_TRUE@LDFLAGS += -shared
 @WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): ircd.dll
 @WIN32_TRUE@@SHARED_TRUE@chaosircd: ircd.dll
 @WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
@@ -137,7 +138,7 @@ LIBS += $(EFENCE_LIBS)
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 
 @WIN32_TRUE@$(top_builddir)/src/$(PIE_LIBRARY): $(PIC_OBJECTS) 
-@WIN32_TRUE@	$(CC) -o $@ $^ $(LIBS)
+@WIN32_TRUE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
 .y.c:
 
 .l.c:
