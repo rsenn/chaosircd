@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,19 +22,19 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/log.h>
-#include <libchaos/timer.h>
-#include <libchaos/str.h>
+#include "libchaos/log.h"
+#include "libchaos/timer.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,27 +24,27 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/dlink.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/chars.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/chanuser.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/chars.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -92,7 +92,7 @@ struct chanuser *chanuser_new(struct channel *chptr, struct client *cptr)
 
   cuptr->channel = channel_pop(chptr);
   cuptr->client = client_pop(cptr);
-  cuptr->flags = 0ull;
+  cuptr->flags = 0LLU;
   cuptr->serial = chanuser_serial;
   cuptr->local = 0;
 
@@ -304,8 +304,8 @@ uint32_t chanuser_parse(struct lclient *lcptr,  struct list *lptr,
     if(prefix && pfx)
       flags = chanmode_prefix_parse(pfx);
     else
-      flags = 0ULL;
-    
+      flags = 0LLU;
+
     if(pfx)
       modes += usr - pfx;
 
@@ -726,7 +726,7 @@ void chanuser_drop(struct client *cptr, struct channel *chptr)
     chanmode_changes_make(&modelist, CHANMODE_DEL, cuptr);
 
     cuptr->prefix[0] = '\0';
-    cuptr->flags = 0ull;
+    cuptr->flags = 0LLU;
   }
 
 #ifdef DEBUG
@@ -750,6 +750,7 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
   size_t           len;
 
   channel_serial++;
+
   rpllen = str_snprintf(rplbuf, IRCD_LINELEN, ":%s %03u %s %s :",
                     client_me->name, RPL_WHOISCHANNELS,
                     client_is_local(cptr) ? cptr->name : cptr->user->uid,
@@ -774,8 +775,8 @@ void chanuser_whois(struct client *cptr, struct user *auptr)
       if(rplidx != 0)
         rplbuf[rpllen + rplidx++] = ' ';
 
-      str_copy(&rplbuf[rpllen + rplidx], acuptr->prefix);
-      str_cat(&rplbuf[rpllen + rplidx], acuptr->channel->name);
+      strcpy(&rplbuf[rpllen + rplidx], acuptr->prefix);
+      strcat(&rplbuf[rpllen + rplidx], acuptr->channel->name);
 
       rplidx += len;
 

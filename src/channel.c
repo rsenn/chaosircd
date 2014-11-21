@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,30 +24,30 @@
 /* -------------------------------------------------------------------------- *
  * Library headers.                                                           *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/dlink.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers.                                                              *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/server.h>
-#include <chaosircd/service.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/chanuser.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/service.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables.                                                          *
@@ -150,8 +150,8 @@ struct channel *channel_new(const char *name)
   chptr->refcount = 1;
   chptr->id = channel_id++;
   chptr->serial = channel_serial;
-  chptr->modes = 0ULL;
-  
+  chptr->modes = 0LLU;
+
   dlink_list_zero(&chptr->invites);
 
   dlink_add_tail(&channel_list, &chptr->node, chptr);
@@ -680,7 +680,7 @@ void channel_backlog(struct channel *chptr, struct client *cptr,
   if(text && text[0])
   {
     e->text = mem_dynamic_alloc(&channel_msglog_heap, str_len(text)+1);
-    str_copy(e->text, text);
+    strcpy(e->text, text);
   }
   else
     e->text = NULL;

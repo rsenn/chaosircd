@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -40,21 +40,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/defs.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/str.h>
+#include "libchaos/io.h"
+#include "libchaos/defs.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/server.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/server.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -123,16 +123,16 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
   if(argc == 3)
   {
     log(server_log, L_status, "Time synchronisation request from %s.", lcptr->name);
-
-    lclient_send(lcptr, "NCLOCK %llu %lli", clk, clk - timer_mtime - timer_offset);
-
-    log(server_log, L_status, "Replying time delta %lli.", clk - timer_mtime - timer_offset);
+    
+    lclient_send(lcptr, "NCLOCK %llu %lld", clk, clk - timer_mtime - timer_offset);
+    
+    log(server_log, L_status, "Replying time delta %lld.", clk - timer_mtime - timer_offset);
   }
   else if(argc == 4)
   {
     lcptr->lag = timer_mtime + timer_offset - clk;
-
-    lclient_send(lcptr, "NCLOCK %llu %lli :%llu",
+    
+    lclient_send(lcptr, "NCLOCK %llu %lld :%llu",
                  timer_mtime + timer_offset, lcptr->lag >> 1, timer_mtime + timer_offset + (lcptr->lag >> 1));
   }
   else if(argc == 5)
@@ -151,12 +151,12 @@ static void ms_nclock(struct lclient *lcptr, struct client *cptr,
     timer_offset += delta;
 /*    timer_mtime += timer_offset;*/
 
-    log(server_log, L_status, "Timer delta: %lli New offset: %lli",
+    log(server_log, L_status, "Timer delta: %lld New offset: %lld",
         delta, timer_offset);
 
     if(delta > 500LL || delta < -500LL)
     {
-      lclient_send(lcptr, "NCLOCK %llu %lli", clk, delta);
+      lclient_send(lcptr, "NCLOCK %llu %lld", clk, delta);
     }
     else
     {
@@ -182,7 +182,7 @@ static int ms_nclock_hook(struct lclient *lcptr, struct class  *clptr)
     if(lcptr->listen == NULL)
     {
       lcptr->class = clptr;
-
+      
       lclient_send(lcptr, "NCLOCK :%llu", timer_mtime + timer_offset);
     }
 

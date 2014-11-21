@@ -1,0 +1,121 @@
+# $Id: Makefile.in,v 1.4 2006/09/28 06:44:36 roman Exp $
+# ===========================================================================
+#
+# Makefile for libchaos/src subdirectory
+#
+# relative directories
+# ---------------------------------------------------------------------------
+srcdir       = @srcdir@
+top_srcdir   = @top_srcdir@
+top_builddir = @top_builddir@
+thisdir      = src/
+
+VPATH        = $(srcdir)
+
+# include global make configuration
+# ---------------------------------------------------------------------------
+include $(top_builddir)/config.mk
+
+# configuration for this directory
+# ---------------------------------------------------------------------------
+LIBNAME     = $(PACKAGE)
+@A_TRUE@A_LIBRARY   = $(LIBNAME).$(A_EXEEXT)
+#PIE_LIBRARY = $(PIE_NAME)$(PIE_VERSION_PREFIX).$(PIE_LIBEXT)$(PIE_VERSION_SUFFIX)
+@PIE_TRUE@PIE_LIBRARY = @PIE_PREPEND@chaos.@PIE_LIBEXT@
+MODULES     = cfg \
+              child \
+              connect \
+              db \
+              divdi3 \
+              dlink \
+              filter \
+              gif \
+              graph \
+              hook \
+              htmlp \
+              httpc \
+              image \
+              ini \
+              io \
+              listen \
+              log \
+              mem \
+              mfile \
+              module \
+              net \
+              queue \
+              sauth \
+              ssl \
+              str \
+              syscall \
+              timer \
+              ttf
+
+PIE_LOADER  = @PIE_LOADER@
+
+@DLFCN_FALSE@MODULES += $(PIE_LOADER)
+
+SOURCES     = $(MODULES:%=%.c)
+OBJECTS     = $(MODULES:%=%.@OBJEXT@)
+PIC_OBJECTS = $(MODULES:%=%.@PIC_OBJEXT@)
+DEPS        = $(MODULES:%=%.d)
+
+@DLFCN_FALSE@SYS_SOURCES += dlfcn_win32.c
+@DLFCN_FALSE@SYS_SOURCES += dlfcn_darwin.c 
+
+CONFIG_H_IN  = $(top_srcdir)/include/libchaos/config.h.in
+CONFIG_H     = $(top_builddir)/include/libchaos/config.h
+CONFIG_H_TOP = include/libchaos/config.h
+
+#PIE_DEF = $(srcdir)/libchaos.def
+#PIE_DEF = libchaos.def
+@WIN32_TRUE@PIE_LDFLAGS += -Wl,--out-implib,lib$(PIE_NAME).a
+
+@WIN32_TRUE@@SHARED_TRUE@bin_EXEC = libchaos.dll
+
+CFLAGS     += $(LIBOWFAT_CFLAGS)
+LIBS     += $(LIBOWFAT_LIBS)
+LIBS     += $(DLFCN_LIBS)
+LIBS     += $(SSL_LIBS)
+@SQLITE_TRUE@CFLAGS += $(SQLITE_CFLAGS)
+@SQLITE_TRUE@LIBS     += $(SQLITE_LIBS)
+@MYSQL_TRUE@CFLAGS += $(MYSQL_CFLAGS)
+@MYSQL_TRUE@LIBS     += $(MYSQL_LIBS)
+@PSQL_TRUE@CFLAGS += $(PSQL_CFLAGS)
+@PSQL_TRUE@LIBS     += $(PSQL_LIBS)
+INCLUDES += $(SSL_CFLAGS)
+
+# targets for this directory
+# ---------------------------------------------------------------------------
+all: Makefile $(A_LIBRARY) $(PIE_LIBRARY)
+
+install: install-exec install-data
+
+# dependencies
+# ---------------------------------------------------------------------------
+@DEPS_TRUE@-include $(DEPS)
+
+# install config
+# ---------------------------------------------------------------------------
+@STATIC_TRUE@lib_DATA += $(A_LIBRARY)
+@WIN32_TRUE@@SHARED_TRUE@bin_EXEC += $(PIE_LIBRARY)
+@WIN32_FALSE@@SHARED_TRUE@lib_EXEC += $(PIE_LIBRARY)
+
+# build config
+# ---------------------------------------------------------------------------
+CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_LIBEXT)\" -DBUILD_LIBCHAOS
+@DLFCN_FALSE@FILES    += $(SYS_SOURCES)
+INCLUDES += -I$(thisdir) \
+            -I$(top_srcdir)/include \
+            -I. \
+            -I$(top_builddir)/include/libchaos
+
+CFLAGS += $(SSL_CFLAGS)
+
+$(DLM_FALSE)$(PIE_FALSE)$(A_LIBRARY): $(OBJECTS)
+$(DLM_FALSE)$(PIE_FALSE)$(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
+
+# include global make targets
+# ---------------------------------------------------------------------------
+include $(top_builddir)/build.mk
+

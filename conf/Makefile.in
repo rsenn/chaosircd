@@ -1,6 +1,6 @@
 srcdir               = @srcdir@
 top_srcdir           = @top_srcdir@
-builddir             = @builddir@
+builddir             = @relbuilddir@
 top_builddir         = @top_builddir@
 thisdir              = conf/
 
@@ -28,40 +28,40 @@ pidfile = @pidfile@
 
 install: install-data
 	@$(ECHO_MKDIR)$(logdir)
-	@-mkdir -p $(logdir)
+	@-mkdir -p $(DESTDIR)$(logdir)
 	@$(ECHO_MKDIR)$$(dirname $(pidfile))
-	@-mkdir -p $$(dirname $(pidfile))
+	@-mkdir -p $(DESTDIR)$$(dirname $(pidfile))
 
 CLEANFILES = *~ children.conf classes.conf inis.conf ircd.conf logs.conf modules.conf opers.conf ssl.conf
 DISTCLEANFILES = Makefile $(CLEANFILES) 
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES = Makefile.in children.conf.in classes.conf.in inis.conf.in ircd.conf.in logs.conf.in modules.conf.in opers.conf.in ssl.conf.in ircd.motd proxy.ini
-DEVFILES = CVS $(DISTFILES)
+DEVFILES = $(DISTFILES)
 
 children.conf: children.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/children.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/children.conf) >/dev/null
 classes.conf: classes.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/classes.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/classes.conf) >/dev/null
 inis.conf: inis.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/inis.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/inis.conf) >/dev/null
 ircd.conf: ircd.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/ircd.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/ircd.conf) >/dev/null
 logs.conf: logs.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/logs.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/logs.conf) >/dev/null
 modules.conf: modules.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/modules.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/modules.conf) >/dev/null
 opers.conf: opers.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/opers.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/opers.conf) >/dev/null
 ssl.conf: ssl.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/ssl.conf) >/dev/null
+	@(cd $(top_srcdir) && ./config.status conf/ssl.conf) >/dev/null
 
 dep:
 

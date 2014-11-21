@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,16 +22,16 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/hook.h>
+#include "libchaos/hook.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/ircd.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -91,7 +91,7 @@ static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
   struct chanuser *cuptr = chanuser_find(chptr, cptr);
 
   if(chptr->modes & CHFLG(m) &&
-     (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0ull))
+     (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0LLU))
   {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);
     return 1;

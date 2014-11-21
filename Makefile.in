@@ -11,17 +11,18 @@ top_builddir = @top_builddir@
 thisdir      =
 
 # Redirect to recursive targets
-all: makefiles all-recursive
+all: makefiles config.h all-recursive
 clean: makefiles clean-recursive
 distclean: makefiles distclean-recursive
 maintainer-clean: makefiles maintainer-clean-recursive
-install: makefiles install-recursive
+install: makefiles config.h install-recursive
 dep: makefiles dep-recursive
 
 # Subdirectories
 ROOT = 1
 RECURSIVE = 1
-SUBDIRS = m4 libchaos include src modules tools conf doc contrib test
+@DLM_TRUE@SUBDIRS = lib include src modules tools conf doc contrib test
+@DLM_FALSE@SUBDIRS = lib include modules src tools conf doc contrib test
 
 RECURSIVE_TARGETS = all-recursive \
                     install-recursive \
@@ -42,7 +43,7 @@ MAINTAINERCLEANFILES = aclocal.m4 configure *.bz2 *.gz autom4te.cache
 # Files that go into distribution tarball
 FILES =  autogen.sh \
          Makefile.in \
-         configure.in \
+         configure.ac \
          config.guess \
          config.sub \
          build.mk.in \
@@ -55,13 +56,13 @@ DISTFILES = $(FILES) configure
 
 #config.mak: config.mak.in config.status
 #	@echo -e "  \033[31:1mCONFIG\033[0m  $(reldir)$@"
-#	@($(SHELL) config.status config.mak) >/dev/null
+#	@(./config.status config.mak) >/dev/null
 
 # Files that go into development tarball
-DEVFILES = CVS $(FILES)
+DEVFILES = $(FILES)
 
 # Local targets
-all-local: Makefile config.mk $(srcdir)/configure
+all-local: Makefile config.mk $(srcdir)/configure 
 install-local:
 dep-local:
 

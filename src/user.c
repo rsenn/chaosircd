@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,25 +24,25 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/hook.h>
-#include <libchaos/timer.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/hook.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/usermode.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/numeric.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/oper.h"
+#include "ircd/usermode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -172,9 +172,9 @@ static void user_uid(struct user *uptr)
     {
       if(!(i & 0x03))
         val = user_random();
-     
-      uptr->uid[i] = user_base[(val & 0x7Full)];
-      
+
+      uptr->uid[i] = user_base[(val & 0x7FLLU)];
+
       val >>= 7;
     }
 

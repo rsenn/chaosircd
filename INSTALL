@@ -10,7 +10,7 @@ Install chaosircd (probably you must be root):
 If you want support for SSL encrypted connections, then you
 can generate a self-signed certificate this way:
 
-  /usr/chaosircd/sbin/mkcrt
+  /usr/ircd/sbin/mkcrt
 
 On FreeBSD and linux there is support for socket filters, which
 enables socket-based firewalling and thus blocking of connections

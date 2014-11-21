@@ -31,15 +31,13 @@
 
 #include "y.tab.h"
 
-#include "../config.h"
-
-#include <libchaos/dlink.h>
-#include <libchaos/str.h>
-#include <libchaos/syscall.h>
-#include <libchaos/log.h>
+#include "libchaos/dlink.h"
+#include "libchaos/str.h"
+#include "libchaos/syscall.h"
+#include "libchaos/log.h"
   
-#include <chaosircd/ircd.h>
-#include <chaosircd/conf.h>
+#include "ircd/ircd.h"
+#include "ircd/conf.h"
   
 #undef isatty
 #undef YY_INPUT
@@ -308,7 +306,7 @@ static void include(void)
 static int ieof(void)
 {
   if(include_sp)
-    io_close(conf_fd);
+    io_destroy(conf_fd);
   
   if(--include_sp < 0)
   {

@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,25 +24,25 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/numeric.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/user.h>
-#include <chaosircd/msg.h>
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/ircd.h"
+#include "ircd/oper.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Heap for the opers.                                                        *
@@ -119,7 +119,7 @@ void oper_default(struct oper *optr)
   strcpy(optr->name, "default");
   optr->passwd[0] = 0;
   optr->flags = 0;
-  optr->sources = 0ull;
+  optr->sources = 0LLU;
   optr->level = 0;
 }
 
@@ -294,7 +294,7 @@ void oper_down(struct oper *optr, struct client *cptr)
     dlink_find_delete(&optr->online, cptr);
 
     if(cptr->lclient)
-      lclient_set_type(cptr->lclient, LCLIENT_OPER);
+      lclient_set_type(cptr->lclient, LCLIENT_USER);
 
     if(cptr->source)
       numeric_send(cptr, RPL_NOTOPERANYMORE);

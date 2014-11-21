@@ -2,15 +2,15 @@
 
 inis {
   
-  load "@inidir@/kline.ini";      # INI file containing server bans 
+  load "@relinidir@/kline.ini";      # INI file containing server bans 
                                   # for the m_kline module
   
-  load "@inidir@/gline.ini";      # INI file containing network bans
+  load "@relinidir@/gline.ini";      # INI file containing network bans
                                   # for the m_kline module
 
-  load "@inidir@/spoof.ini";      # INI file containing spoof entries
+  load "@relinidir@/spoof.ini";      # INI file containing spoof entries
                                   # for the m_spoof module
                                           
-  load "@inidir@/proxy.ini";      # INI file containing proxy checklist
+  load "@relinidir@/proxy.ini";      # INI file containing proxy checklist
                                   # for the lc_sauth module
 };

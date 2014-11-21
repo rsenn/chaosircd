@@ -36,7 +36,6 @@ modules {
   load "m_nick";            # Changes nickname
   load "m_oper";            # Operator authentication
   load "m_omode";           # Oper mode
-  load "m_opart";           # Owner /PART
   load "m_part";            # Makes the client leave a channel
   load "m_pass";            # Client authentication
   load "m_ping";            # PING?
@@ -54,6 +53,7 @@ modules {
   load "m_user";            # Client login request
   load "m_userip";          # Shows real ip of a client
   load "m_userhost";        # Show real host of a client
+  load "m_userdb";
   load "m_version";         # Shows version of a server
   load "m_who";             # Shows channel members
   load "m_whois";           # Shows client info
@@ -61,14 +61,12 @@ modules {
   #load "lc_cookie";         # Client PING cookie
   #load "lc_mflood";         # Client message flood trigger
   #load "lc_sauth";          # Client AUTH/DNS resolver
-  load "lc_crowdguard";
   load "um_client";         # Usermode +c
   load "um_invisible";      # Usermode +i
   load "um_operator";       # Usermode +o
   load "um_paranoid";       # Usermode +p
   load "um_servnotice";     # Usermode +s
   load "um_wallops";        # Usermode +w
-  load "um_crowdguard";     # Usermode +g
   load "cm_op";             # Channel mode +o
   load "cm_halfop";         # Channel mode +h
   load "cm_voice";          # Channel mode +v
@@ -86,7 +84,6 @@ modules {
   load "cm_invex";          # Channel mode +I
   load "cm_limit";          # Channel mode +l
   load "cm_key";            # Channel mode +k
-  load "cm_persistent";     # Channel mode +P
   load "cm_alarm";          # Channel mode +A
 #  load "sv_sbb";            # SBB Timetable
 #  load "st_traffic";        # Traffic stats

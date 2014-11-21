@@ -13,31 +13,32 @@ MODULES              = um_client \
                        um_wallops \
                        um_crowdguard
 
-INCLUDES             = -I$(top_srcdir)/libchaos/include \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../libchaos/include \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)
 OBJEXT               = so
 DEPS                 = $(MODULES:%=%.d)
-SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
-@PIE_LIB@lib_EXEC = $(SHOBJECTS)
-@PIE_LIB@all: shobjects
-@PIE_LIB@install: install-pluginEXEC
+@DLM_TRUE@plugin_EXEC = $(SHOBJECTS)
+@DLM_TRUE@all: shobjects
+@DLM_TRUE@install: install-pluginEXEC
 
+plugin_PREFIX = /usermode
 plugin_EXEC = $(SHOBJECTS)
 
-@NO_PIE_LIB@all: $(CATEGORY).a
-@NO_PIE_LIB@install:
+@DLM_FALSE@all: $(CATEGORY).a
+@DLM_FALSE@install:
 
 $(CATEGORY).a: $(OBJECTS)
 	@$(ECHO_AR)
 	@$(RM) -f $@
-	@$(AR) cru $@ $^
+	@$(AR) $@ $^
 	@$(ECHO_RANLIB)
 	@$(RANLIB) $@
 
@@ -52,9 +53,15 @@ CLEANFILES           = *~ core core.* \
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
-DEVFILES             = CVS $(DISTFILES)
-                       
+DEVFILES             = $(DISTFILES)
+
+DEFS += -DBUILD_MODULE
+
+@DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
+@DLM_FALSE@DEFS += -DSTATIC_IRCD
+
+
 @WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
-@WIN32_TRUE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
+@SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 
 include $(top_builddir)/build.mk

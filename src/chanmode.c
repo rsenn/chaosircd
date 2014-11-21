@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,29 +24,29 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/dlink.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/timer.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/class.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/user.h>
+#include "ircd/ircd.h"
+#include "ircd/class.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/chars.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -118,8 +118,8 @@ struct chanmode *chanmode_register(struct chanmode *cmptr)
         "Channel mode char '%c' already registered.", cmptr->letter);
     return NULL;
   }
-  
-  mode->flag = 1ULL << (cmptr->letter - 0x40);
+
+  mode->flag = 1LLU << (cmptr->letter - 0x40);
   mode->type = cmptr->type;
   mode->prefix = cmptr->prefix;
   mode->cb = cmptr->cb;
@@ -158,8 +158,8 @@ int chanmode_unregister(struct chanmode *cmptr)
     chanuser_support();
   else
     chanmode_support();
-  
-  mode->flag = 0ULL;
+
+  mode->flag = 0LLU;
   mode->type = 0;
   mode->prefix = 0;
 
@@ -923,8 +923,8 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
 
   if(cmcptr->what == CHANMODE_ADD)
   {
-    sep1 = str_chr(cmcptr->arg, '!');
-    sep2 = str_chr(cmcptr->arg, '@');
+    sep1 = strchr(cmcptr->arg, '!');
+    sep2 = strchr(cmcptr->arg, '@');
 
     nick[0] = '*';
     user[0] = '*';
@@ -951,7 +951,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       if(cmcptr->arg[0])
         strlcpy(user, cmcptr->arg, sizeof(user));
 
-      if((sep1 = str_chr(cmcptr->arg, '@')))
+      if((sep1 = strchr(cmcptr->arg, '@')))
         *sep1 = '\0';
 
       if(sep2[0])
@@ -964,7 +964,7 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
       if(cmcptr->arg[0])
         strlcpy(nick, cmcptr->arg, sizeof(nick));
 
-      if((sep2 = str_chr(cmcptr->arg, '!')))
+      if((sep2 = strchr(cmcptr->arg, '!')))
         *sep2 = '\0';
 
       if(sep1[0])
@@ -981,16 +981,16 @@ int chanmode_bounce_ban(struct lclient *lcptr, struct client         *cptr,
 
       *sep2++ = '\0';
 
-      if((tmp = str_chr(sep1, '!')))
+      if((tmp = strchr(sep1, '!')))
         *tmp = '\0';
 
       if(sep1[0])
         strlcpy(user, sep1, sizeof(user));
 
-      if((tmp = str_chr(sep2, '@')))
+      if((tmp = strchr(sep2, '@')))
         *tmp = '\0';
 
-      if((tmp = str_chr(sep2, '!')))
+      if((tmp = strchr(sep2, '!')))
         *tmp = '\0';
 
       if(sep2[0])
@@ -1260,18 +1260,16 @@ void chanmode_prefix_make(char *pfx, uint64_t flags)
   uint32_t         top = (uint32_t)-1;
   struct chanmode *mode;
 
-  for(;;)
-  {
+  for(;;) {
     current = 0;
     mode = NULL;
 
-    for(i = 0; i < 64; i++)
-    {
+    for(i = 0; i < 64; i++) {
       if(chanmode_table[i].type != CHANMODE_TYPE_PRIVILEGE)
         continue;
 
-      if(chanmode_table[i].order < top &&
-         chanmode_table[i].order > current &&
+      if((uint32_t)chanmode_table[i].order < top &&
+         (uint32_t)chanmode_table[i].order > current &&
          chanmode_table[i].flag & flags)
       {
         mode = &chanmode_table[i];
@@ -1312,8 +1310,8 @@ void chanmode_changes_make(struct list *list, int what, struct chanuser *cuptr)
       if(chanmode_table[i].type != CHANMODE_TYPE_PRIVILEGE)
         continue;
 
-      if(chanmode_table[i].order < top &&
-         chanmode_table[i].order > current &&
+      if((uint32_t)chanmode_table[i].order < top &&
+         (uint32_t)chanmode_table[i].order > current &&
          chanmode_table[i].flag & cuptr->flags)
       {
         mode = &chanmode_table[i];
@@ -1336,8 +1334,8 @@ uint64_t chanmode_prefix_parse(const char *pfx)
 {
   size_t   i;
   size_t   j;
-  uint64_t ret = 0ULL;
-  
+  uint64_t ret = 0LLU;
+
   for(i = 0; pfx[i]; i++)
   {
     if(pfx[i] == ':')
@@ -1482,12 +1480,12 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     {
       if(lastts)
       {
-        tlen += str_snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1, 
+        tlen += str_snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1,
                          "%li", (long)(cmcptr->ts - lastts));
       }
       else
       {
-        tlen += str_snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1, 
+        tlen += str_snprintf(&timebuf[tlen], sizeof(timebuf) - tlen - 1,
                          "%lu", (unsigned long)(cmcptr->ts));
         lastts = cmcptr->ts;
       }
@@ -1514,7 +1512,7 @@ struct node *chanmode_assemble_list(char *buf, struct node *nptr, size_t len)
     timebuf[tlen] = '\0';
     maskbuf[mlen] = '\0';
 
-	str_snprintf(buf, len, "%s %s %s %s", flagbuf, infobuf, timebuf, maskbuf);
+    str_snprintf(buf, len, "%s %s %s %s", flagbuf, infobuf, timebuf, maskbuf);
   }
 
   return nptr;
@@ -1619,9 +1617,9 @@ void chanmode_drop(struct client *cptr, struct channel *chptr)
     if(mode->type == CHANMODE_TYPE_SINGLE && (chptr->modes & mode->flag))
       chanmode_change_add(&modelist, CHANMODE_DEL, i + 0x40, NULL, NULL);
   }
-  
-  chptr->modes = 0ULL;
-  
+
+  chptr->modes = 0LLU;
+
   for(i = 0; i < 0x40; i++)
   {
     if(chanmode_table[i].type != CHANMODE_TYPE_LIST)

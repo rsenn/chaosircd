@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 
-#include <chaosircd/chars.h>
+#include "ircd/chars.h"
 
 /* -------------------------------------------------------------------------- *
  * char attribute table                                                       *
@@ -63,7 +63,7 @@ const uint32_t chars[] = {
   /* 30 */     CNTRL_C|CHAN_C|NONEOS_C,
   /* 31 */     CNTRL_C|CHAN_C|NONEOS_C,
   /* SP */     PRINT_C|SPACE_C,
-  /* ! */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C,
+  /* ! */      PRINT_C|KWILD_C|CHANPFX_C|CHAN_C|NONEOS_C,
   /* " */      PRINT_C|CHAN_C|NONEOS_C,
   /* # */      PRINT_C|CHANPFX_C|CHAN_C|NONEOS_C,
   /* $ */      PRINT_C|CHAN_C|NONEOS_C|USER_C,
@@ -73,7 +73,7 @@ const uint32_t chars[] = {
   /* ( */      PRINT_C|CHAN_C|NONEOS_C,
   /* ) */      PRINT_C|CHAN_C|NONEOS_C,
   /* * */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C|SERV_C,
-  /* + */      PRINT_C|CHAN_C|NONEOS_C,
+  /* + */      PRINT_C|CHANPFX_C|CHAN_C|NONEOS_C,
   /* , */      PRINT_C|NONEOS_C,
   /* - */      PRINT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
   /* . */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C|USER_C|HOST_C|SERV_C,

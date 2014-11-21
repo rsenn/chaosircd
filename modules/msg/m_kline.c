@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,33 +22,33 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/ini.h>
-#include <libchaos/dlink.h>
-#include <libchaos/filter.h>
-#include <libchaos/listen.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/str.h>
+#include "libchaos/io.h"
+#include "libchaos/ini.h"
+#include "libchaos/dlink.h"
+#include "libchaos/filter.h"
+#include "libchaos/listen.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/server.h>
-#include <chaosircd/numeric.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/server.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
  * -------------------------------------------------------------------------- */
 #define M_KLINE_BLOCKSIZE 32
-#define M_KLINE_INTERVAL  (5 * 60 * 1000ull)
+#define M_KLINE_INTERVAL  (5 * 60 * 1000LLU)
 #define M_KLINE_INI       "kline.ini"
 #define M_KLINE_FILTER    "listen"
 
@@ -251,7 +251,7 @@ static void m_kline_mask(const char *host, net_addr_t *addr,
   /* Parse CIDR netmask */
   strlcpy(netmask, host, sizeof(netmask));
 
-  if((s = str_chr(netmask, '/')))
+  if((s = strchr(netmask, '/')))
   {
     *s++ = '\0';
     mbc = str_toul(s, NULL, 10);
@@ -310,8 +310,8 @@ static struct m_kline_entry *m_kline_new(const char *user, const char *host,
     filter_rule_insert(m_kline_filter,
                        FILTER_SRCNET, FILTER_DENY,
                        mkeptr->addr,
-                       mkeptr->mask, 0ull);
-    
+                       mkeptr->mask, 0LLU);
+
     filter_rule_compile(m_kline_filter);
 
     filter_reattach_all(m_kline_filter);
@@ -350,9 +350,9 @@ static struct m_kline_entry *m_kline_add(const char *user, const char *host,
   {
     struct ini_section *isptr;
     char                mask[IRCD_PREFIXLEN];
-  
+
     str_snprintf(mask, sizeof(mask), "%s@%s", user, host);
-  
+
     /* Maybe that k-line already exists, then just modify the section */
     if((isptr = ini_section_find(m_kline_ini, mask)) == NULL)
       isptr = ini_section_new(m_kline_ini, mask);
@@ -508,7 +508,7 @@ static int m_kline_loaddb(void)
     strlcpy(mask, isptr->name, sizeof(mask));
 
     /* Invalid section name, skip it */
-    if((host = str_chr(mask, '@')) == NULL)
+    if((host = strchr(mask, '@')) == NULL)
       continue;
 
     /* Null-terminate user mask */
@@ -585,7 +585,7 @@ static int m_kline_split(char  user[IRCD_USERLEN],
   host[1] = '\0';
 
   /* Split up the mask */
-  if((p = str_chr(mask, '@')))
+  if((p = strchr(mask, '@')))
   {
     *p++ = '\0';
 
@@ -680,7 +680,7 @@ static int m_kline_hook(struct lclient *lcptr)
       filter_rule_insert(m_kline_filter,
                          FILTER_SRCNET, FILTER_DENY,
                          mkeptr->addr,
-                         mkeptr->mask, 0ull);
+                         mkeptr->mask, 0LLU);
     else
       filter_rule_insert(m_kline_filter,
                          FILTER_SRCIP, FILTER_DENY,

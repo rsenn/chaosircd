@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,21 +22,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/class.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/class.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
@@ -186,7 +186,7 @@ static int lc_mflood_parse(struct lclient *lcptr, char *s)
         fd = lcptr->fds[0];
         lclient_exit(lcptr, "excess flood: %umsgs in %llumsecs",
                      lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines, delta);
-        io_close(fd);
+        io_destroy(fd);
         return 1;
       }
     }
@@ -257,7 +257,7 @@ static int lc_mflood_ttimer(struct lc_mflood *lcmfptr)
       fd = lcptr->fds[0];
       lclient_exit(lcptr, "excess flood: %umsgs in %llumsecs",
                    lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines, delta);
-      io_close(fd);
+      io_destroy(fd);
       return 0;
     }
   }

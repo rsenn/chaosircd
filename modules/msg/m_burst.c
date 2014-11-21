@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,19 +22,19 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/timer.h>
-#include <libchaos/log.h>
-#include <libchaos/str.h>
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -119,9 +119,9 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
     uint64_t burst_time = (uint64_t)(timer_mtime - cptr->server->bstart);
     uint32_t burst_sendq = (uint32_t)str_toul(argv[2], NULL, 10);
 
-    if(burst_time == 0ull)
-      burst_time = 1ull;
-    
+    if(burst_time == 0LLU)
+      burst_time = 1LLU;
+
     burst_servers = (uint32_t)str_toul(argv[3], NULL, 10);
     burst_clients = (uint32_t)str_toul(argv[4], NULL, 10);
     burst_channels = (uint32_t)str_toul(argv[5], NULL, 10);
@@ -152,8 +152,8 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
 
       burst_db = (uint32_t)(((burst_rate - (float)burst_kb) * 100) + 0.5);
       burst_kb = (uint32_t)(burst_rate + 0.5);
-
-      log(server_log, L_status,
+      
+      log(server_log, L_status, 
           "Burst from %N done in %llu msecs (%u.%02ukb/s)",
           cptr, burst_time, burst_kb, burst_db);
 
@@ -167,7 +167,7 @@ static void ms_burst(struct lclient *lcptr, struct client *cptr,
     }
     else
     {
-      log(server_log, L_status,
+      log(server_log, L_status, 
           "Burst from %N via %s done in %llu msecs",
           cptr, lcptr->name, burst_time);
 

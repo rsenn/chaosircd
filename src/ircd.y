@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2005  Roman Senn <smoli@paranoya.ch>
  *
@@ -28,25 +28,22 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <libchaos/defs.h>
-#include <libchaos/dlink.h>
-#include <libchaos/str.h>
-#include <libchaos/ini.h>
-#include <libchaos/log.h>
-#include <libchaos/child.h>
-#include <libchaos/mfile.h>
-#include <libchaos/module.h>
-#include <libchaos/listen.h>
-#include <libchaos/connect.h>
-#include <libchaos/ssl.h>
+#include "libchaos/defs.h"
+#include "libchaos/dlink.h"
+#include "libchaos/str.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/child.h"
+#include "libchaos/mfile.h"
+#include "libchaos/module.h"
+#include "libchaos/listen.h"
+#include "libchaos/connect.h"
+#include "libchaos/ssl.h"
+#include "ircd/ircd.h"
+#include "ircd/conf.h"
+#include "ircd/oper.h"
 
-#include <chaosircd/ircd.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/oper.h>
-
-#include "../config.h"
-
-
+  
 #define YY_FATAL_ERROR(x) log(conf_log, L_warning, x)
 
 /*#include "y.tab.h"*/
@@ -378,7 +375,24 @@ modules_load:		T_LOAD QSTRING ';'
           
           if(module == NULL)
           {
-            module = module_add(yylval.string);
+#define MAKE_TUPLE(ch1,ch2) ((((unsigned int)(unsigned char)(ch1))<<8)|(unsigned char)(ch2))
+	    unsigned int c = MAKE_TUPLE(yylval.string[0],yylval.string[1]);
+	    char pathbuf[256];
+
+            strlcpy(pathbuf, PLUGINDIR"/", sizeof(pathbuf));
+	    switch(c) {
+	      case MAKE_TUPLE('u','m'):  strlcat(pathbuf,"usermode/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('c','m'):  strlcat(pathbuf,"chanmode/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('l','c'):  strlcat(pathbuf,"lclient/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('s','t'):  strlcat(pathbuf,"stats/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('s','v'):  strlcat(pathbuf,"service/", sizeof(pathbuf)); break;
+	      case MAKE_TUPLE('m','_'):  strlcat(pathbuf,"msg/", sizeof(pathbuf)); break;
+	      default:  break;
+	    }
+
+            strlcat(pathbuf, yylval.string, sizeof(pathbuf));
+            strlcat(pathbuf, "." DLLEXT, sizeof(pathbuf));
+            module = module_add(pathbuf);
           }
           else
           {

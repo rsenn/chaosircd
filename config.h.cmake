@@ -1,7 +1,16 @@
-/* config.h.in.  Generated from configure.in by autoheader.  */
+/* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Creation time of this server */
 #cmakedefine CREATION @CREATION@
+
+/* Define to 1 if you have the setrlimit() function. */
+#cmakedefine HAVE_SETRLIMIT 1
+
+/* Define to 1 if you have the mmap() function. */
+#cmakedefine HAVE_MMAP 1
+
+/* Define to 1 if you have the mprotect() function. */
+#cmakedefine HAVE_MPROTECT 1
 
 /* Define to 1 if you have the <cygwin/in.h> header file. */
 #cmakedefine HAVE_CYGWIN_IN_H 1
@@ -87,26 +96,26 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H 1
 
-///* Define to the address where bug reports for this package should be sent. */
-//#cmakedefine PROJECT_BUGREPORT "@PROJECT_BUGREPORT@"
-//
-///* Define to the full name of this package. */
-//#cmakedefine PROJECT_NAME "@PROJECT_NAME@"
-//
-///* Define to the release name of this package. */
-//#cmakedefine PROJECT_RELEASE "@PROJECT_RELEASE@"
-//
-///* Define to the full name and version of this package. */
-//#cmakedefine PROJECT_STRING "@PROJECT_STRING@"
-//
-///* Define to the one symbol short name of this package. */
-//#cmakedefine PROJECT_TARNAME "@PROJECT_TARNAME@"
-//
-///* Define to the home page for this package. */
-//#cmakedefine PROJECT_URL "@PROJECT_URL@"
-//
-///* Define to the version of this package. */
-//#cmakedefine PROJECT_VERSION "@PROJECT_VERSION@"
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine PACKAGE_BUGREPORT "@PROJECT_BUGREPORT@"
+
+/* Define to the full name of this package. */
+#define PACKAGE_NAME "@PROJECT_NAME@"
+
+/* Define to the release name of this package. */
+#define PACKAGE_RELEASE "@PROJECT_RELEASE@"
+
+/* Define to the full name and version of this package. */
+#cmakedefine PACKAGE_STRING "@PROJECT_STRING@"
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine PACKAGE_TARNAME "@PROJECT_TARNAME@"
+
+/* Define to the home page for this package. */
+#cmakedefine PACKAGE_URL "@PROJECT_URL@"
+
+/* Define to the version of this package. */
+#define PACKAGE_VERSION "@PROJECT_VERSION@"
 
 /* Platform this server runs on */
 #cmakedefine PLATFORM "@PLATFORM@"

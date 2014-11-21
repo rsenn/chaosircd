@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,21 +22,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/class.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/class.h"
+#include "ircd/msg.h"
 
 #define LC_CLONES_MAX_HOST_LOCAL  4
 #define LC_CLONES_MAX_HOST_REMOTE 8
@@ -128,9 +128,9 @@ static int lc_clones_check_local (struct lclient *lcptr)
     {
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
-      
+
       str_snprintf(mask, sizeof(mask), "*@%s/24", net_ntoa(addr));
-      
+
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
 
@@ -147,9 +147,9 @@ static int lc_clones_check_local (struct lclient *lcptr)
     {
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
-      
+
       str_snprintf(mask, sizeof(mask), "*@%s", net_ntoa(addr));
-      
+
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
 
@@ -182,9 +182,9 @@ static int lc_clones_check_remote(struct client *cptr)
     {
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
-      
+
       str_snprintf(mask, sizeof(mask), "*@%s/24", net_ntoa(addr));
-      
+
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
 
@@ -201,9 +201,9 @@ static int lc_clones_check_remote(struct client *cptr)
     {
       char mask[32];
       char *argv[] = { client_me->name, "KLINE", mask, "clones", NULL };
-      
+
       str_snprintf(mask, sizeof(mask), "*@%s", net_ntoa(addr));
-      
+
       mptr->handlers[MSG_OPER](lclient_me, client_me, 4, argv);
     }
 

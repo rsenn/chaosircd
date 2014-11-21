@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,19 +22,19 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/dlink.h>
-#include <libchaos/str.h>
+#include "libchaos/dlink.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/client.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/client.h"
+#include "ircd/chars.h"
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -100,7 +100,7 @@ static void mr_nick(struct lclient *lcptr, struct client *cptr,
   /* Truncate nick */
   strlcpy(nick, argv[2], IRCD_NICKLEN + 1);
 
-  if((s = str_chr(nick, '~')))
+  if((s = strchr(nick, '~')))
     *s = '\0';
 
   if(lcptr->name[0] == '\0')

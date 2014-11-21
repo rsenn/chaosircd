@@ -13,7 +13,6 @@ MODULES              = m_away \
                        m_die \
                        m_dump \
                        m_error \
-                       m_geolocation \
                        m_gline \
                        m_help \
                        m_info \
@@ -43,7 +42,6 @@ MODULES              = m_away \
                        m_nuser \
                        m_omode \
                        m_oper \
-                       m_opart \
                        m_part \
                        m_pass \
                        m_ping \
@@ -62,43 +60,49 @@ MODULES              = m_away \
                        m_user \
                        m_userhost \
                        m_userip \
+                       m_userdb \
                        m_version \
                        m_who \
                        m_whois 
 
 #                       m_vuln 
 
-INCLUDES             = -I$(top_srcdir)/libchaos/include \
+INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
-                       -I../../libchaos/include \
+                       -I../../lib/include \
                        -I../../include
 
 SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)
 OBJEXT               = so
 DEPS                 = $(MODULES:%=%.d)
-SHOBJECTS            = $(MODULES:%=%.@PIE_EXEEXT@)
+SHOBJECTS            = $(MODULES:%=%.@PIE_LIBEXT@)
 DSO                  = @DSO@
 
 plugin_EXEC = $(SHOBJECTS)
+plugin_PREFIX = /msg
 
-@PIE_LIB@lib_EXEC = $(SHOBJECTS)
-@PIE_LIB@all: shobjects
-@PIE_LIB@install: install-pluginEXEC
+@DLM_TRUE@plugin_EXEC = $(SHOBJECTS)
+@DLM_TRUE@all: shobjects
+@DLM_TRUE@install: install-pluginEXEC
 
-@NO_PIE_LIB@all: $(CATEGORY).a
-@NO_PIE_LIB@install:
+@DLM_FALSE@all: $(CATEGORY).a
+@DLM_FALSE@install:
 
-$(CATEGORY).a: $(OBJECTS)
-	@$(ECHO_AR)
-	@$(RM) -f $@
-	@$(AR) cru $@ $^
-	@$(ECHO_RANLIB)
-	@$(RANLIB) $@
+@DLM_FALSE@$(CATEGORY).a: $(OBJECTS)
+@DLM_FALSE@	$(ECHO_AR)
+@DLM_FALSE@	$(RM) -f $@
+@DLM_FALSE@	$(AR) $@ $^
+@DLM_FALSE@	$(ECHO_RANLIB)
+@DLM_FALSE@	$(RANLIB) $@
 
 shobjects: $(SHOBJECTS)
 
 include $(top_builddir)/config.mk
+
+
+CFLAGS += $(LIBOWFAT_CFLAGS)
+@PIE_TRUE@LDFLAGS += $(PIE_LDFLAGS)
 
 #INSTALL = @INSTALL@
 
@@ -107,13 +111,19 @@ CLEANFILES           = *~ core core.* \
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 DEFS += -DBUILD_MODULE
 
-@WIN32_TRUE@@SHARED_FALSE@LIBS += -L$(top_builddir)/src -lircd
-@WIN32_TRUE@@SHARED_FALSE@LIBS += -L$(top_builddir)/libchaos/src -lchaos
-@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/src/ircd.dll
-@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/libchaos/src/chaos.dll
+@DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
+@DLM_FALSE@DEFS += -DSTATIC_IRCD
+
+CFLAGS += $(LIBOWFAT_CFLAGS)
+#LIBS += $(LIBOWFAT_LIBS)
+
+@WIN32_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/src -lircd
+@DLM_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
+#@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/src/ircd.dll
+#@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/lib/src/libchaos.dll
 
 include $(top_builddir)/build.mk

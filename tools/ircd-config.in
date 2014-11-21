@@ -1,0 +1,132 @@
+#!/bin/sh
+name="@PACKAGE_NAME@"
+version="@PACKAGE_VERSION@"
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+includedir="@includedir@"
+plugindir="@plugindir@"
+
+CC="@CC@"
+INSTALL="@INSTALL@"
+CFLAGS="@CFLAGS@ -fPIC -DPIC -I$includedir"
+LIBS="-bundle -bundle_loader @bindir@/@PACKAGE_NAME@ @LIBS@"
+
+usage="\
+Usage: $name-config [--prefix] [--exec-prefix] [--plugindir] 
+                        [--version] [--cflags] [--libs] 
+                        [--compile] [--install]
+                        
+   --prefix       Show prefix where $name is installed.
+   --exec-prefix  Show prefix where $name executables are installed.
+   --plugindir    Show directory where plugins are installed.
+   --version      Show $name version.
+   --cflags       Show compiler flags needed to compile a module.
+   --libs         Show linker flags needed to link a module.
+   --compile NAME Compile a loadable module.
+   --install NAME Install a loadable module.
+"
+
+if test $# -eq 0; then
+	echo "${usage}" 1>&2
+	exit 1
+fi
+
+while test $# -gt 0; do
+	case "$1" in
+	-*=*) 
+		optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` 
+		;;
+	*) 
+		optarg= 
+		;;
+	  esac
+
+	case $1 in
+	--prefix)
+		echo $prefix
+		;;
+	--exec-prefix)
+		echo $exec_prefix
+		;;
+	--plugindir)
+		echo $plugindir
+		;;
+	--version)
+		echo $version
+		;;
+	--cflags)
+		echo $CFLAGS
+		;;
+	--libs)
+		echo $LIBS
+		;;
+        --compile)
+                shift
+                
+                if [ "x$1" = "x" ]
+                then
+  	 	  echo "${usage}" 1>&2
+		  exit 1
+                fi
+                
+                src=`echo $1 | sed 's/\.c$//'`.c
+                obj=`echo $1 | sed 's/\.c$//'`.so
+                
+                if [ ! -f $src ]
+                then
+                  echo "Source file $src not found."
+                  break
+                fi
+                
+                echo $CC $LIBS $CFLAGS -shared -o $obj $src
+                $CC $LIBS $CFLAGS -pipe -shared -o $obj $src
+                ;;
+        --install)
+                shift
+                
+                if [ "x$1" = "x" ]
+                then
+  	 	  echo "${usage}" 1>&2
+		  exit 1
+                fi
+                
+                path=`echo $1 | sed 's/\.c$//' | sed 's/\.so$//'`.so
+                obj=`echo $path | sed 's/.*\///'`
+                pfx=`echo $obj | sed 's/_.*$//'`
+                
+                if [ ! -f $src ]
+                then
+                  echo "Object file $obj not found."
+                  break
+                fi
+                
+                case "$pfx" in
+			m)
+                        	dir="msg"
+                                ;;
+			um)
+                        	dir="usermode"
+                                ;;
+			cm)
+                        	dir="chanmode"
+                                ;;
+			lc)
+                        	dir="lclient"
+                                ;;
+                        *)
+                        	dir=""
+                                ;;
+                esac
+                
+                echo $INSTALL -m755 $path $plugindir/$dir/$obj
+                $INSTALL -m755 $path $plugindir/$dir/$obj
+                ;;
+	    *)
+		echo "${usage}" 1>&2
+		exit 1
+		;;
+	esac
+	shift
+done
+

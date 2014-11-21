@@ -10,7 +10,7 @@ install:
 include $(top_builddir)/config.mk
 
 DISTFILES            = chaosircd.init Makefile.in
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 CLEANFILES = *~
 DISTCLEANFILES = Makefile

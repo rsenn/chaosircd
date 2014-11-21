@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,21 +22,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/dlink.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
@@ -140,22 +140,22 @@ static uint32_t lc_cookie_random(void)
       lc_cookie_seed -= ns;
 
     lc_cookie_seed = ROR(lc_cookie_seed, ns >> 6);
-    
-    if(lc_cookie_seed & 0x02ULL)
+
+    if(lc_cookie_seed & 0x02LLU)
       lc_cookie_seed ^= ns;
     else
       ns ^= lc_cookie_seed;
 
     ns = ROL(ns, lc_cookie_seed >> 12);
-    
-    if(ns & 0x04ULL)
+
+    if(ns & 0x04LLU)
       lc_cookie_seed += 0xdeadbeef;
     else
       lc_cookie_seed -= 0xcafebabe;
 
     lc_cookie_seed = ROL(lc_cookie_seed, ns >> 16);
-    
-    if(ns & 0x08ULL)
+
+    if(ns & 0x08LLU)
       ns ^= lc_cookie_seed;
     else
       lc_cookie_seed ^= ns;

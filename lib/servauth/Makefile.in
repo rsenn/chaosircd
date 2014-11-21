@@ -1,0 +1,88 @@
+# $Id: Makefile.in,v 1.1.1.1 2006/09/27 10:08:58 roman Exp $
+# ===========================================================================
+#
+# Makefile for libchaos/servauth subdirectory
+#
+# relative directories
+# ---------------------------------------------------------------------------
+srcdir       = @srcdir@
+top_srcdir   = @top_srcdir@
+top_builddir = @top_builddir@
+thisdir      = servauth/
+
+VPATH        = $(srcdir)
+
+# include global make configuration
+# ---------------------------------------------------------------------------
+include $(top_builddir)/config.mk
+
+# configuration for this directory
+# ---------------------------------------------------------------------------
+PROGRAM = servauth
+MODULES = auth \
+          cache \
+          commands \
+          control \
+          dns \
+          proxy \
+          query \
+          servauth \
+	  userdb
+
+SOURCES = $(MODULES:%=%.c)
+HEADERS = $(MODULES:%=%.h)
+OBJECTS = $(MODULES:%=%.o)
+DEPS    = $(MODULES:%=%.d)
+
+CONFIG_H_IN = $(top_srcdir)/config.h.in
+CONFIG_H    = $(top_builddir)/config.h
+
+# targets for this directory
+# ---------------------------------------------------------------------------
+all: Makefile $(PROGRAM)
+install: install-exec
+
+# dependencies
+# ---------------------------------------------------------------------------
+@DEPS_TRUE@-include $(DEPS)
+
+# install config
+# ---------------------------------------------------------------------------
+@WIN32_FALSE@libexec_EXEC += $(PROGRAM)
+@WIN32_TRUE@bin_EXEC += $(PROGRAM)
+
+# build config
+# ---------------------------------------------------------------------------
+@PIE_TRUE@LIBS     += -L$(top_builddir)/src -lchaos
+@PIE_FALSE@LDADD     += $(top_builddir)/src/libchaos.a
+@WIN32_TRUE@@PIE_TRUE@LIBS     += $(top_builddir)/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
+@SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
+@SSL_TRUE@@SSL_STATIC_FALSE@LIBS     += $(SSL_LIBS)
+@SSL_TRUE@@SSL_STATIC_TRUE@LDADD     += $(SSL_LIBS)
+@MYSQL_TRUE@LIBS += $(MYSQL_LIBS)
+@MYSQL_TRUE@CPPFLAGS += $(MYSQL_CFLAGS)
+@LIBOWFAT_TRUE@CPPFLAGS += $(LIBOWFAT_CFLAGS)
+@LIBOWFAT_TRUE@LIBS += $(LIBOWFAT_LIBS)
+LIBS     += $(DLFCN_LIBS)
+LIBS     += -lowfat
+LIBS     += $(EFENCE_LIBS)
+CPPFLAGS += -DHAVE_CONFIG_H
+@A_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
+
+INCLUDES += \
+            -I$(top_srcdir) \
+            -I$(top_srcdir)/include \
+            -I$(builddir) \
+            -I$(top_builddir)/include/libchaos \
+            -I. \
+            -I../include/libchaos
+
+#$(PROGRAM): CFLAGS += -I$(srcdir)/../include
+$(PROGRAM): $(OBJECTS)
+$(PROGRAM): 
+	@$(ECHO_CCLD)
+	@QUIET@$(COMPLINK) $(CFLAGS) $(CPPFLAGS) $(INCLUDES) -o $@ $^ $(LDADD) $(LIBS)
+
+# include global make targets
+# ---------------------------------------------------------------------------
+include $(top_builddir)/build.mk

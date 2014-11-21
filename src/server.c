@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* chaosircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -21,44 +21,44 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <libchaos/connect.h>
-#include <libchaos/timer.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/log.h>
-#include <libchaos/hook.h>
-#include <libchaos/ssl.h>
+#include "libchaos/connect.h"
+#include "libchaos/timer.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/log.h"
+#include "libchaos/hook.h"
+#include "libchaos/ssl.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/user.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/class.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/msg.h"
+#include "ircd/conf.h"
+#include "ircd/user.h"
+#include "ircd/ircd.h"
+#include "ircd/chars.h"
+#include "ircd/class.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_DATA_DECL(int               server_log);
-IRCD_DATA_DECL(struct sheap      server_heap);
-IRCD_DATA_DECL(struct timer     *server_timer);
-IRCD_DATA_DECL(struct list       server_list);
-IRCD_DATA_DECL(struct list       server_lists[2]);
-IRCD_DATA_DECL(struct stats      server_stats[64]);
-IRCD_DATA_DECL(struct server    *server_me);
-IRCD_DATA_DECL(uint32_t          server_id);
-IRCD_DATA_DECL(int               server_default_caps) = CAP_DEFAULT;
-IRCD_DATA_DECL(int               server_default_cipher) = CAP_ENC_AES_256;
-IRCD_DATA_DECL(uint32_t          server_serial);
+int               server_log;
+struct sheap      server_heap;
+struct timer     *server_timer;
+struct list       server_list;
+struct list       server_lists[2];
+struct stats      server_stats[64];
+struct server    *server_me;
+uint32_t          server_id;
+int               server_default_caps   = CAP_DEFAULT;
+int               server_default_cipher = CAP_ENC_AES_256;
+uint32_t          server_serial;
 
-IRCD_DATA_DECL(struct capab server_caps[]) = {
+struct capab server_caps[] = {
   { "HUB", CAP_HUB },
   { "EOB", CAP_EOB },
   { "UID", CAP_UID },
@@ -83,7 +83,7 @@ int server_get_log() { return server_log; }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-IRCD_DATA_DECL(struct cryptcap server_ciphers[]) = {
+struct cryptcap server_ciphers[] = {
   { "AES/128",   CAP_ENC_AES_128,   16, CIPHER_AES_128 },
   { "AES/192",   CAP_ENC_AES_192,   24, CIPHER_AES_192 },
   { "AES/256",   CAP_ENC_AES_256,   32, CIPHER_AES_256 },
@@ -795,7 +795,7 @@ void server_register(struct lclient *lcptr, struct class *clptr)
  * -------------------------------------------------------------------------- */
 int server_ping(struct lclient *lcptr)
 {
-  if(lcptr->ping == 0ull)
+  if(lcptr->ping == 0LLU)
   {
 /*    int fds[2];
 
@@ -807,18 +807,17 @@ int server_ping(struct lclient *lcptr)
 
 /*    io_shutup(fds[0]);
     io_shutup(fds[1]);
-    io_close(fds[0]);
+    io_destroy(fds[0]);
 
     if(fds[0] != fds[1])
-      io_close(fds[1]);*/
+      io_destroy(fds[1]);*/
 
     return 0;
   }
-  
-  lcptr->ping = 0ULL;
 
+  lcptr->ping = 0LLU;
   lclient_send(lcptr, "PING :%llu", timer_mtime);
-
+  
   return 0;
 }
 
