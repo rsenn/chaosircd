@@ -129,3 +129,9 @@
 
 /* Define to 1 if the lexer must not include <unistd.h> */
 #cmakedefine YY_NO_UNISTD_H 1
+
+/* Creation time */
+#cmakedefine CREATION "@CREATION@"
+
+/* Server platform */
+#cmakedefine PLATFORM "@PLATFORM@"

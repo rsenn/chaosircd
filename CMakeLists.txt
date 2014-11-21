@@ -14,6 +14,14 @@ set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
 add_subdirectory(lib)
 
+execute_process(COMMAND date -R OUTPUT_VARIABLE "CREATION" OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND uname -a OUTPUT_VARIABLE "PLATFORM" OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  #set(CREATION `date -R`)
+
+  #add_definitions(-DCREATION=\\"${CREATION}\\")
+
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/FindBISON.cmake")
@@ -24,6 +32,7 @@ include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/ConfigBuildType.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseOpenSSL.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseMySQL.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseFreeType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseLibOWFAT.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/DllExt.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
@@ -54,6 +63,8 @@ include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DI
 substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
+
+
 
 set(CONFFILES
     conf/children.conf

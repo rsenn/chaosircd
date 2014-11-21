@@ -30,7 +30,7 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/config.h"
+#include "../../config.h"
 #include "ircd/msg.h"
 #include "ircd/user.h"
 #include "ircd/chars.h"
