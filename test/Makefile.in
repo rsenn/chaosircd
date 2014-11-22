@@ -13,7 +13,7 @@ CLEANFILES = *~ core core.*
 DISTCLEANFILES = Makefile $(CLEANFILES)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES = Makefile.in README test1.conf test10.conf test11.conf test12.conf test13.conf test14.conf test15.conf test2.conf test3.conf test4.conf test5.conf test6.conf test7.conf test8.conf test9.conf test.sh
-DEVFILES = CVS $(DISTFILES)
+DEVFILES = $(DISTFILES)
 
 dep:
 

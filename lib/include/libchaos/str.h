@@ -345,9 +345,9 @@ CHAOS_INLINE( int str_snprintf(char *str, size_t n, const char *format, ...)
  * ------------------------------------------------------------------------ */
 CHAOS_API(int) str_toi(const char *s);
 
+#define ISNUM(c) ((c) >= '0' && (c) <= '9')
 CHAOS_INLINE( int str_toi(const char *s)
 {
-#define ISNUM(c) ((c) >= '0' && (c) <= '9')
   register uint32_t i = 0;
   register uint32_t sign = 0;
   register const uint8_t *p = (const uint8_t *)s;
@@ -378,8 +378,8 @@ CHAOS_INLINE( int str_toi(const char *s)
   else
     return i;
 
-#undef ISNUM
 })
+#undef ISNUM
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                               *

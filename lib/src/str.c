@@ -197,7 +197,7 @@ static  unsigned int str_ptoa(char *buf, void *i)
   register size_t v = (size_t)i;
 
   if(i == NULL) {
-    str_copy(buf, "(nil)");
+    strcpy(buf, "(nil)");
     n = 5;
   } else {
     p[n++] = '0';
@@ -594,7 +594,7 @@ int str_vsprintf(char *str, const char *format, va_list args)
 /* ------------------------------------------------------------------------ *
  * Copy string from <s> to <d>.                                             *
  * ------------------------------------------------------------------------ */
-/*size_t str_copy(char *d, const char *s)
+/*size_t strcpy(char *d, const char *s)
 {
   size_t i = 0;
   
@@ -1057,7 +1057,7 @@ char *str_dup(const char *s)
   r = malloc(str_len(s) + 1);
 
   if(r != NULL)
-    str_copy(r, s);
+    strcpy(r, s);
 
   return r;
 }
@@ -1442,6 +1442,6 @@ void str_trim(char *s)
   while(i >= 0 && str_isspace(buf[i]))
     buf[i--] = '\0';
   
-  str_copy(s, buf);
+  strcpy(s, buf);
 }
 

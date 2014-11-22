@@ -268,6 +268,17 @@ userdb_fields(struct userdb_client *userdb, size_t* nfields, const char* excepti
 		const char* f = row[0] ? row[0] : "";
 		if(exception && !str_cmp(f, exception)) continue;
 
+    size_t l = str_len(f);
+    if(l > 9 && !str_cmp(f+l-9, "_location")) {
+      char* tmp = malloc(l + 8 + 1);
+      if(tmp) {
+        strcpy(tmp, "AsText(");
+        strcat(tmp, f);
+        strcat(tmp, ")");
+        ret[i++] = tmp;
+        continue;
+      }
+    }
 		ret[i++] = str_dup(f);
 	}
 	ret[i] = NULL;
@@ -353,7 +364,7 @@ where_part(struct db*db, stralloc* sa, char** v, size_t num_values) {
 		if(s)
 			strlcpy(varname, s, n + 1);
 		else
-			str_copy(varname, "uid");
+			strcpy(varname, "uid");
 
 		stralloc_catb(sa, varname, str_len(varname));
 		stralloc_catb(sa, "='", 2);
@@ -464,6 +475,7 @@ userdb_register(struct userdb_client *userdb, char* uid, char** v, size_t num_va
 int
 userdb_mutate(struct userdb_client *userdb, const char* uid, char** v, size_t num_values) {
 	stralloc values;
+  stralloc_init(&values);
 	size_t i;
 	for(i = 0; i < num_values; ++i) {
 		char *s = (char *)v[i];

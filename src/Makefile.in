@@ -103,7 +103,7 @@ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 
 FILES                = Makefile.in $(MODULES:%=%.c) $(HEADERS) ircd.l ircd.y
 DISTFILES            = $(FILES) y.tab.c y.tab.h lex.yy.c main.c
-DEVFILES             = CVS $(FILES)
+DEVFILES             = $(FILES)
 
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 @WIN32_TRUE@@DLM_TRUE@main.o: CPPFLAGS += -DBUILD_MAIN=1
@@ -117,7 +117,7 @@ CFLAGS += $(LIBOWFAT_CFLAGS)
 LIBS += $(LIBOWFAT_LIBS)
 @DLM_TRUE@LIBS += -Wl,--no-whole-archive
 
-@DLM_TRUE@LIBS += -ldl
+@DLM_TRUE@LIBS += $(DLFCN_LIBS)
 LIBS += $(EFENCE_LIBS)
 
 @WIN32_TRUE@PIE_LDFLAGS += -Wl,-out-implib,lib$(PIE_NAME).dll.a

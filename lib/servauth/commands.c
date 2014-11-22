@@ -165,22 +165,22 @@ static int cmd_userdb(control_t *cptr, int ac, char **av)
 
   if(!strcmp(cmd, "verify")) {
     char *s;
-    int v = userdb_verify(udb, (const char*)av[2], av[3] ? av[3] : "", &s);
-    control_send(&servauth_control, "userdb %s verify %s %d %s", id, av[2], !!v, s ? s : "");
+    int v = userdb_verify(udb, (const char*)av[2]?av[2]:"", av[3]?av[3]:"", &s);
+    control_send(&servauth_control, "userdb %s%sverify %s %d %s", id, id[0]?" ":"", av[2]?av[2]:"", !!v, s ? s : "");
     free(s);
 
   } else if(!strcmp(cmd, "register")) {
-    int v = userdb_register(udb, ( char*)av[2], &av[3], ac - 3);
-    control_send(&servauth_control, "userdb %s register %s %d", id, av[2], !v);
+    int v = userdb_register(udb, ( char*)av[2]?av[2]:"", &av[3], ac - 3);
+    control_send(&servauth_control, "userdb %s%sregister %s %d", id, id[0]?" ":"", av[2]?av[2]:"", !v);
   } else if(!strcmp(cmd, "mutate")) {
-    int v = userdb_mutate(udb, ( char*)&av[2], &av[3], ac - 3);
-    control_send(&servauth_control, "userdb %s mutate %s %d", id, av[2], !v);
+    int v = userdb_mutate(udb, ( char*)av[2]?av[2]:"", &av[3], ac - 3);
+    control_send(&servauth_control, "userdb %s%smutate %s %d", id, id[0]?" ":"", av[2]?av[2]:"", !v);
   } else if(!strcmp(cmd, "search")) {
     char *s;
-    //int v = userdb_search(udb, av[2], &av[3], ac - 3);
-    //control_send(&servauth_control, "userdb search %s %d %s", av[2], !v, s ? s : "");
+    //int v = userdb_search(udb, av[2]?av[2]:"", &av[3], ac - 3);
+    //control_send(&servauth_control, "userdb search %s %d %s", av[2]?av[2]:"", !v, s ? s : "");
     int v = userdb_search(udb, &av[2], ac - 2, &s);
-    control_send(&servauth_control, "userdb %s search %s %d %s", id, av[2], v, s ? s : "");
+    control_send(&servauth_control, "userdb %s%ssearch %s %d %s", id, id[0]?" ":"", av[2]?av[2]:"", v, s ? s : "");
     if(s) free(s);
   }
 
