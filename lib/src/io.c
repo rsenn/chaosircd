@@ -449,7 +449,7 @@ int io_queued_write(int fd)
 #endif /* HAVE_SSL */
     if(ret < 0)
     {
-      if(syscall_errno && syscall_errno != EWOULDBLOCK)
+      if(syscall_errno && (syscall_errno != EWOULDBLOCK  && syscall_errno != EAGAIN))
       {
         io_list[fd].error = syscall_errno;
         syscall_errno = 0;

@@ -2,7 +2,7 @@
 
 # Global settings
 global {
-  name   = "irc.yokto.net";    # Server name (doesn't need 
+  name   = "deluxe.gotdns.ch";    # Server name (doesn't need 
                                 # to match real hostname).
   info   = "kon.ath.cx tribal server";      # Information about the server
                                 # shown in /links, /whois and others

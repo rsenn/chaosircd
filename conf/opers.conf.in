@@ -2,7 +2,7 @@
 
 oper {
 
-  name     = "teamcg";           # Operator name
+  name     = "deluxe";           # Operator name
    
   password = "AcElp6ShryflujAf";             # Operator password
   

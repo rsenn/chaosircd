@@ -8,8 +8,7 @@ CATEGORY             = lclient
 MODULES              = lc_clones \
                        lc_cookie \
                        lc_mflood \
-                       lc_sauth \
-                       lc_crowdguard
+                       lc_sauth
 
 INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
