@@ -591,6 +591,10 @@ void io_handle_fd(int fd)
 
       if(io_list[fd].ret <= 0)
       {
+
+        if(!(io_list[fd].ret <= 0 && 
+            (io_list[fd].error == EAGAIN || io_list[fd].error == EWOULDBLOCK))) {
+
         io_list[fd].status.closed = 1;
         io_list[fd].status.err = (io_list[fd].ret < 0);
         io_list[fd].status.onread = 1;
@@ -600,6 +604,7 @@ void io_handle_fd(int fd)
 
         if(io_list[fd].control.events)
           io_unset_events(fd, IO_READ|IO_WRITE|IO_ERROR);
+        }
       }
     }
   }
