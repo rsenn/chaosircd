@@ -132,6 +132,14 @@ AC_TRY_COMPILE([#include <winsock2.h>],
 
 # runtime linker
 #echo "Host is: $host" 1>&2
+case "$host" in
+  *mingw* | *cygwin* | *msys*)
+   ;;
+  *)
+  PIC_CFLAGS="-fPIC"
+  ;;
+esac
+AC_SUBST([PIC_CFLAGS])
 
 case "$host" in
   *darwin*)

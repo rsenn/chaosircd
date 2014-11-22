@@ -23,8 +23,8 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 # ---------------------------------------------------------------------------
 @SHARED_TRUE@.c.pi@OBJEXT@:
 @SHARED_TRUE@	@$(ECHO_CC)
-@SHARED_TRUE@@DEPS_TRUE@	@QUIET@$(COMPILE) -fPIC -MD -c -o $@ $<
-@SHARED_TRUE@@DEPS_FALSE@	@QUIET@$(COMPILE) -fPIC -c -o $@ $<
+@SHARED_TRUE@@DEPS_TRUE@	@QUIET@$(COMPILE) @PIC_CFLAGS@ -MD -c -o $@ $<
+@SHARED_TRUE@@DEPS_FALSE@	@QUIET@$(COMPILE) @PIC_CFLAGS@ -c -o $@ $<
 
 .c.@OBJEXT@:
 	@$(ECHO_CC)

@@ -85,7 +85,7 @@ DEPS                 = $(MODULES:%=%.d)
 @DLM_FALSE@                       $(top_builddir)/modules/service/service.a
 
 #@STATIC_TRUE@LDADD +=  $(A_LIBRARY)
-#@STATIC_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.a
+@STATIC_TRUE@LDADD += $(top_builddir)/lib/src/libchaos.a
 
 #@STATIC_TRUE@ifeq ($(LINKFLAGS), -static)
 #@STATIC_TRUE@LDADD                = $(top_builddir)/lib/src/.libs/libchaos.a
@@ -93,8 +93,8 @@ DEPS                 = $(MODULES:%=%.d)
 
 #@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/lib/src -lchaos
 @SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
-#@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
-@SHARED_TRUE@LIBS += $(top_builddir)/lib/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
+@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
+@SHARED_TRUE@LDADD += $(top_builddir)/lib/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
 @DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/src/ircd.@PIE_LIBEXT@
 
 @DLM_FALSE@LDPRE += -Wl,--whole-archive
