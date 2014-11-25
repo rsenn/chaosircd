@@ -106,6 +106,7 @@ static void listen_accept(int fd, void *ptr)
 
         ssl_close(newfd);
         io_destroy(newfd);
+				return;
       }
     }
   }

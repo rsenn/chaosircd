@@ -186,6 +186,7 @@ static void io_remove_fd(int fd)
   }
 
 #else
+	io_unset_events(fd, IO_READ|IO_WRITE|IO_ERROR);
 
   /* Oh, it's the topmost fd, we need to decrease io_top */
   if(fd == io_top)
