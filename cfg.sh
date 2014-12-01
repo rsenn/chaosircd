@@ -2,7 +2,7 @@ IFS="
 "
 
 host=$(gcc -dumpmachine)
-prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;; s,^install: \(.*\)/bin/.*,\1,p')
+prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;; s,^install: \(.*\)/[bl]i[nb]/.*,\1,p')
 
 : ${DEBUG=enable}
 
