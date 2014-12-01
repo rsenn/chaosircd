@@ -22,7 +22,7 @@ then
   saved_libs="$LIBS"
   AC_CHECK_LIB(crypto, ERR_load_crypto_strings)
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" && test "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "no" -a "$ac_cv_ssl" = "yes"
   then
     AC_MSG_ERROR(could not find libcrypto, install openssl >= 0.9.7)
     exit 1
@@ -36,7 +36,7 @@ then
   LIBS="$SSL_LIBS $saved_libs"
   AC_CHECK_LIB(ssl, SSL_load_error_strings)
 
-  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" && test "$ac_cv_ssl" = "yes"
+  if test "$ac_cv_lib_ssl_SSL_load_error_strings" = "no" -a "$ac_cv_ssl" = "yes"
   then
     AC_MSG_ERROR(could not find libssl, install openssl >= 0.9.7)
     exit 1
@@ -48,13 +48,13 @@ then
   fi
 
   LIBS="$saved_libs"
-  AC_CHECK_HEADERS(openssl/opensslv.h)
-
-  if test "$ac_cv_header_openssl_opensslv_h" = "no" && test "$ac_cv_ssl" = "yes"
-  then
-    AC_MSG_ERROR(could not find openssl/opensslv.h, install openssl >= 0.9.7)
-    exit 1
-  fi
+dnl   AC_CHECK_HEADERS([openssl/opensslv.h])
+dnl 
+dnl   if test "$ac_cv_header_openssl_opensslv_h" = "no" -a "$ac_cv_ssl" = "yes"
+dnl   then
+dnl     AC_MSG_ERROR([could not find openssl/opensslv.h, install openssl >= 0.9.7])
+dnl     exit 1
+dnl   fi
 
   AC_MSG_CHECKING(for the OpenSSL UI)
 
@@ -73,13 +73,13 @@ then
     AC_MSG_RESULT($OPENSSL)
   fi
 
-  if test "x$OPENSSL" = "x" && test "$ac_cv_ssl" = "yes"
+  if test "x$OPENSSL" = "x" -a "$ac_cv_ssl" = "yes"
   then
     AC_MSG_ERROR(could not find OpenSSL command line tool, install openssl >= 0.9.7)
     exit 1
   fi
 
-  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes" && test "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes" && test "$ac_cv_header_openssl_opensslv_h" = "yes"
+  if test "$ac_cv_lib_crypto_ERR_load_crypto_strings" = "yes" -a "$ac_cv_lib_ssl_SSL_load_error_strings" = "yes" -a "$ac_cv_header_openssl_opensslv_h" = "yes"
   then
     HAVE_SSL=yes
     AC_DEFINE_UNQUOTED(HAVE_SSL, 1, [Define this if you have OpenSSL])

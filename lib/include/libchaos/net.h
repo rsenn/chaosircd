@@ -26,7 +26,7 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/config.h"
+#include "config.h"
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
 

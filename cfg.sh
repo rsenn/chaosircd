@@ -1,4 +1,5 @@
 host=$(gcc -dumpmachine)
+prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;; s,^install: \(.*\)/bin/.*,\1,p')
 
 : ${DEBUG=enable}
 
@@ -13,18 +14,20 @@ host=$(gcc -dumpmachine)
 	--with-ssl \
 	--disable-color \
 	--disable-silent-rules \
+  --with-libowfat="$prefix" \
 	--build=`gcc -dumpmachine` \
-        --with-mysql=/usr \
+  $(test -f "$prefix/include/mysql/mysql.h" && echo --with-mysql="$prefix" || echo --without-mysql) \
+  $(test -f "$prefix/include/sqlite3.h" && echo --with-sqlite="$prefix" || echo --without-sqlite) \
         ${DEBUG:+--${DEBUG}-debug} \
 	"$@" 
 )
 (set -x
 ./config.status)
 
-cat <<EOF | tee build-linux.sh |sed "s|^|build-linux.sh: |"
+cat <<EOF | tee build.sh |sed "s|^|build.sh: |"
 #!/bin/sh
 
-DESTDIR="\$PWD-linux"
+DESTDIR="\$PWD-${host##*-}"
 
 rm -rf "\$DESTDIR"
 

@@ -23,7 +23,9 @@
 #ifndef CHAOS_DEFS_H
 #define CHAOS_DEFS_H
 
-#include "libchaos/config.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #ifndef NULL
 #define NULL (void *)0
@@ -53,7 +55,7 @@
 typedef uintptr_t hash_t;
 
 #ifdef _MSC_VER
-#include <Windows.h>
+#include <windows.h>
 # define inline  __forceinline
 typedef HANDLE pid_t;
 # ifdef WIN64

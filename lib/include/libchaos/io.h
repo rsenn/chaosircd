@@ -33,7 +33,7 @@ struct io;
 /* ------------------------------------------------------------------------ *
  * Library headers                                                            *
  * ------------------------------------------------------------------------ */
-#include "libchaos/config.h"
+#include "config.h"
 #include "libchaos/defs.h"
 #include "libchaos/syscall.h"
 #include "libchaos/queue.h"
