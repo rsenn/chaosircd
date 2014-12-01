@@ -72,7 +72,7 @@ DEVFILES             = $(DISTFILES)
 @DLM_FALSE@DEFS += -DSTATIC_IRCD
 
 
-@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lircd
+@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lcgircd
 @SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 
 include $(top_builddir)/build.mk

@@ -679,6 +679,28 @@ void sauth_set_args(struct sauth *sauth, ...) {
 	va_end(args);
 }
 
+/* ------------------------------------------------------------------------ */
+struct sauth *sauth_push(struct sauth **sauth)
+{
+  if(*sauth)
+  {
+    if((*sauth)->refcount == 0)
+    {
+      log(sauth_log, L_warning, "Trying to push deprecated sauth #%u",
+          (*sauth)->id);
+    }
+    else
+    {
+      if(--(*sauth)->refcount == 0)
+        sauth_delete(*sauth);
+
+      (*sauth) = NULL;
+    }
+  }
+
+  return *sauth;
+}
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 void sauth_dump(struct sauth *saptr) {
