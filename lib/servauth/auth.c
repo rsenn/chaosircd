@@ -38,6 +38,8 @@
 
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
+#else
+#warning HAVE_SYS_STAT_H not defined!
 #endif
 
 /* -------------------------------------------------------------------------- *
