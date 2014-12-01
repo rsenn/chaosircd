@@ -23,7 +23,9 @@
 #ifndef CHAOS_DEFS_H
 #define CHAOS_DEFS_H
 
+#ifdef HAVE_CONFIG_H
 #include "libchaos/config.h"
+#endif
 
 #ifndef NULL
 #define NULL (void *)0
@@ -36,24 +38,23 @@
 #include <inttypes.h>
 #endif // HAVE_INTTYPES_H
 
-#include <sys/stat.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif // HAVE_STDINT_H
 
-/*
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <signal.h>
-#include <time.h>
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
- */
+#endif
+
+#include <limits.h>
+#include <time.h>
 
 #define HASH_BIT_SIZE (SIZEOF_UINTPTR_T*8)
 
 typedef uintptr_t hash_t;
 
 #ifdef _MSC_VER
-#include <Windows.h>
+#include <windows.h>
 # define inline  __forceinline
 typedef HANDLE pid_t;
 # ifdef WIN64

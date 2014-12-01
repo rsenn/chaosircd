@@ -26,7 +26,7 @@
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
 #include "libchaos/defs.h"
-#include "libchaos/config.h"
+#include "config.h"
 #include "libchaos/filter.h"
 #include "libchaos/listen.h"
 #include "libchaos/timer.h"
@@ -39,7 +39,7 @@
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_NET_ETHERNET_H
 #include <net/ethernet.h>

@@ -10,7 +10,8 @@ PROGRAM              = cgircd$(EXEEXT)
 LIBNAME              = ircd
 #@WIN32_FALSE@PIE_LIBRARY          =
 A_LIBRARY          = libircd.a
-@WIN32_TRUE@PIE_LIBRARY          = ircd.dll
+PIE_NAME          = cgircd
+@WIN32_TRUE@PIE_LIBRARY          = $(PIE_NAME).$(PIE_LIBEXT)
 
 
 
@@ -68,7 +69,7 @@ SOURCES              = $(MODULES:%=%.c) $(LEXERSRC) $(PARSERSRC)
 @DLM_TRUE@@WIN32_TRUE@OBJECTS              = main.o
 @DLM_TRUE@@WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @DLM_FALSE@@WIN32_TRUE@OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
-@WIN32_TRUE@LIBNAME              = ircd
+@WIN32_TRUE@LIBNAME              = cgircd
 PIE_DEF              = ircd.def
 OBJEXT               = o
 HEADERS              = y.tab.h
@@ -91,7 +92,9 @@ DEPS                 = $(MODULES:%=%.d)
 
 #@SHARED_TRUE@@WIN32_FALSE@LIBS += -L$(top_builddir)/lib/src -lchaos
 @SHARED_FALSE@LDADD += $(top_builddir)/lib/src/libchaos.a
-@DLM_TRUE@@WIN32_TRUE@LDADD += $(top_builddir)/src/ircd.@PIE_LIBEXT@
+#@DLM_TRUE@@WIN32_TRUE@LDADD += $(PIE_LIBRARY)
+@DLM_TRUE@@WIN32_TRUE@$(PROGRAM): $(PIE_LIBRARY)
+#@DLM_TRUE@@WIN32_TRUE@$(PROGRAM): LDADD += $(PIE_LIBRARY)
 
 @DLM_FALSE@LDPRE += -Wl,--whole-archive
 @DLM_FALSE@LDPOST += -Wl,--no-whole-archive
@@ -125,11 +128,11 @@ LIBS += $(EFENCE_LIBS)
 
 @WIN32_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@DLM_FALSE@OBJECTS += main.o
-@WIN32_TRUE@@SHARED_TRUE@cgircd$(EXEEXT): ircd.dll
+@WIN32_TRUE@@SHARED_TRUE@cgircd$(EXEEXT): $(PIE_LIBRARY) 
 @WIN32_TRUE@@SHARED_FALSE@cgircd$(EXEEXT): libircd.a
-@WIN32_TRUE@@SHARED_TRUE@cgircd: ircd.dll
+@WIN32_TRUE@@SHARED_TRUE@cgircd: $(PIE_LIBRARY)
 @WIN32_TRUE@@SHARED_FALSE@cgircd: libircd.a
-@WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
+@WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): $(PIE_LIBRARY)
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 
 .y.c:
@@ -153,12 +156,10 @@ $(PARSERSRC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
 	$(YACC) -d -o $(srcdir)/y.tab.c $(PARSER)
 
-$(PROGRAM): $(OBJECTS) $(LDADD)
-	@$(ECHO_LD)
-	$(LINK) $(LDFLAGS) -o $@ $(OBJECTS) $(LDPRE) $(LDADD) $(LDPOST) $(LIBS)
-@WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): main.o $(LDADD)
-@WIN32_TRUE@@SHARED_FALSE@	@$(ECHO_LD)
-@WIN32_TRUE@@SHARED_FALSE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+#@WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): main.o $(LDADD)
+#@WIN32_TRUE@@SHARED_FALSE@	@$(ECHO_LD)
+#@WIN32_TRUE@@SHARED_FALSE@	$(LINK) $(LDFLAGS) -o $@ $^ $(LIBS)
         
 $(A_LIBRARY): CPPFLAGS += -DSTATIC_LIBCHAOS
 $(A_LIBRARY): $(MODULES:%=%.o) $(LEXEROBJ) $(PARSEROBJ)
@@ -168,4 +169,11 @@ $(A_LIBRARY): $(MODULES:%=%.o) $(LEXEROBJ) $(PARSEROBJ)
 
 include $(top_builddir)/build.mk
 
+
+$(PROGRAM): $(OBJECTS) $(LDADD)
+	@$(ECHO_LD)
+	$(LINK) $(LDFLAGS) -o $@  $(LDPRE) $^ $(LDPOST) $(LIBS)
+#@WIN32_TRUE@$(PIE_LIBRARY): ircd.c $(LDADD)
+#	@WIN32_TRUE@	@$(ECHO_CCLD)
+#	@WIN32_TRUE@	$(COMPLINK) $(DEFS) $(PIC_CFLAGS) $(PIE_LDFLAGS) -o $@ $^ $(LIBS)
 #-include $(DEPS)

@@ -32,6 +32,16 @@
 
 #include "servauth/auth.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#else
+#warning HAVE_SYS_STAT_H not defined!
+#endif
+
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
  * -------------------------------------------------------------------------- */

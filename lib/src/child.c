@@ -38,7 +38,7 @@
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
@@ -52,7 +52,9 @@
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Local variables                                                          *
