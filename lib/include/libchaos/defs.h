@@ -42,17 +42,12 @@
 #include <stdint.h>
 #endif // HAVE_STDINT_H
 
-//#include <sys/stat.h>
-
-/*
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <signal.h>
-#include <time.h>
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
- */
+#endif
+
+#include <limits.h>
+#include <time.h>
 
 #define HASH_BIT_SIZE (SIZEOF_UINTPTR_T*8)
 
