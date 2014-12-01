@@ -2,7 +2,7 @@ IFS="
 "
 
 host=$(gcc -dumpmachine)
-prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;; s,^install: \(.*\)/bin/.*,\1,p')
+prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;; s,^install: \(.*\)/[bl]i[nb]/.*,\1,p')
 
 : ${DEBUG=enable}
 
@@ -23,11 +23,8 @@ set -- \
   $(test -f $prefix/include/sqlite3.h && echo --with-sqlite=$prefix || echo --without-sqlite) \
         ${DEBUG:+--${DEBUG}-debug} \
 	"$@" 
-(MSG="./configure"
-for ARG; do
-  MSG="$MSG \\
-  $ARG"
-done
+(MSG="./configure"; for ARG; do MSG="$MSG \\$IFS    $ARG"; done
+
  echo "+ $MSG" 1>&2
  ./configure "$@")
 
