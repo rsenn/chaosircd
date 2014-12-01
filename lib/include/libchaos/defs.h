@@ -24,7 +24,7 @@
 #define CHAOS_DEFS_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "libchaos/config.h"
 #endif
 
 #ifndef NULL
@@ -38,7 +38,11 @@
 #include <inttypes.h>
 #endif // HAVE_INTTYPES_H
 
-#include <sys/stat.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif // HAVE_STDINT_H
+
+//#include <sys/stat.h>
 
 /*
 #include <fcntl.h>
