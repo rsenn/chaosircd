@@ -42,8 +42,8 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 
 %.@PIE_LIBEXT@: %.c %.def
 	@$(ECHO_CCLD)
-@DEPS_TRUE@	@QUIET@$(COMPLINK) $(DEFS) $(PIC_CFLAGS) $(MOD_LDFLAGS) -MD -o $@ $< $(LIBS)
-@DEPS_FALSE@	@QUIET@$(COMPLINK) $(DEFS) $(PIC_CFLAGS) $(MOD_LDFLAGS) -o $@ $< $(LIBS)
+@DEPS_TRUE@	@QUIET@$(COMPLINK) $(DEFS) $(PIC_CFLAGS) $(DLM_LDFLAGS) -MD -o $@ $< $(LIBS)
+@DEPS_FALSE@	@QUIET@$(COMPLINK) $(DEFS) $(PIC_CFLAGS) $(DLM_LDFLAGS) -o $@ $< $(LIBS)
 
 %.def: %.c
 	@$(ECHO_MKDEF)
@@ -189,6 +189,8 @@ maintainer-clean-local: maintainer-clean-recursive
 $(ARCHIVE): $(OBJECTS)
 	@$(ECHO_AR)
 	@$(AR) $(ARCHIVE) $(OBJECTS)
+	@$(ECHO_RANIB))
+	@$(RANLIB) $(ARCHIVE) 
 
 # global rule for all makefiles
 # ---------------------------------------------------------------------------

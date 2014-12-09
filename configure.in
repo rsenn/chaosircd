@@ -156,6 +156,18 @@ AC_PROG_YACC
 AC_PROG_CYGPATH
 dnl AC_CHECK_PROG([NASM], [nasm], [$as_dir/$ac_word$ac_exec_ext], [], [$PATH])
 
+PREADD= POSTADD=
+AX_CHECK_LINK_FLAG([--no-whole-archive],[PREADD="--whole-archive" POSTADD="--no-whole-archive"],[
+  AX_CHECK_LINK_FLAG([-Wl,--no-whole-archive],[PREADD="-Wl,--whole-archive" POSTADD="-Wl,--no-whole-archive"],[
+    : test
+    dnl  AX_CHECK_COMPILE_FLAG([-Wl,--no-whole-archive],[PREADD="-Wl,--whole-archive" POSTADD="-Wl,--no-whole-archive"])
+])
+])
+AC_SUBST([PREADD])
+AC_SUBST([POSTADD])
+
+dnl AC_LIB_RPATH
+
 # check some system dependencies
 # ---------------------------------------------------------------------------
 AC_CHECK_LIB([m], [cos])
@@ -311,3 +323,4 @@ AC_SUMMARIZE([prefix bindir datadir includedir],
               host build |
 							DLM_ENABLE PIE_ENABLE A_ENABLE],
              "%20s: %s")
+

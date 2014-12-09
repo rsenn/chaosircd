@@ -2,7 +2,8 @@ IFS="
 "
 
 host=$(gcc -dumpmachine)
-prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;; s,^install: \(.*\)/[bl]i[nb]/.*,\1,p')
+prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;;; s,^install: \(.*\)/[bl]i[nb]/.*,\1,p')
+prefix=${prefix%%/Cellar/*}
 
 : ${DEBUG=enable}
 
@@ -17,6 +18,7 @@ set -- \
 	--disable-silent-rules \
 	--build=$host \
 	--host=$host \
+        --prefix=$prefix \
   --with-libowfat=$prefix \
   $(test -f $prefix/include/openssl/opensslv.h && echo --with-ssl=$prefix || echo --without-ssl) \
   $(test -f $prefix/include/mysql/mysql.h && echo --with-mysql=$prefix || echo --without-mysql) \

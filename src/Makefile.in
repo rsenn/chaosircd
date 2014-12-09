@@ -96,9 +96,6 @@ DEPS                 = $(MODULES:%=%.d)
 @DLM_TRUE@@WIN32_TRUE@$(PROGRAM): $(PIE_LIBRARY)
 #@DLM_TRUE@@WIN32_TRUE@$(PROGRAM): LDADD += $(PIE_LIBRARY)
 
-@DLM_FALSE@LDPRE += -Wl,--whole-archive
-@DLM_FALSE@LDPOST += -Wl,--no-whole-archive
-
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
                        $(OBJECTS) $(PIC_OBJECTS) $(LEXERSRC) $(PARSERSRC) $(PARSERINC)
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
@@ -116,9 +113,9 @@ $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 @SSL_STATIC_TRUE@LDADD += $(SSL_LIBS)
 CFLAGS += $(LIBOWFAT_CFLAGS)
 
-@DLM_TRUE@LIBS += -Wl,--whole-archive
+@DLM_TRUE@LIBS += $(PREADD)
 LIBS += $(LIBOWFAT_LIBS)
-@DLM_TRUE@LIBS += -Wl,--no-whole-archive
+@DLM_TRUE@LIBS += $(POSTADD)
 
 @DLM_TRUE@LIBS += $(DLFCN_LIBS)
 LIBS += $(EFENCE_LIBS)
@@ -172,7 +169,7 @@ include $(top_builddir)/build.mk
 
 $(PROGRAM): $(OBJECTS) $(LDADD)
 	@$(ECHO_LD)
-	$(LINK) $(LDFLAGS) -o $@  $(LDPRE) $^ $(LDPOST) $(LIBS)
+	$(LINK) $(LDFLAGS) -o $@  $(PREADD) $^ $(POSTADD) $(LIBS)
 #@WIN32_TRUE@$(PIE_LIBRARY): ircd.c $(LDADD)
 #	@WIN32_TRUE@	@$(ECHO_CCLD)
 #	@WIN32_TRUE@	$(COMPLINK) $(DEFS) $(PIC_CFLAGS) $(PIE_LDFLAGS) -o $@ $^ $(LIBS)

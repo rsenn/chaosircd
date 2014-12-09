@@ -154,6 +154,7 @@ dnl   fi
         PIE_LINK='$(LINK)'
         PIE_NAME='$(LIBNAME)'
         PIE_LDFLAGS="-dynamiclib -undefined error -install_name \$(libdir)/$PACKAGE_NAME.$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH.$PIE_LIBEXT -compatibility_version $VERSION_MAJOR.$VERSION_MINOR -current_version $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
+        DLM_LDFLAGS="-bundle -bundle_loader \$(top_builddir)/src/\$(PACKAGE_NAME)" 
         PIE_VERSION_PREFIX='.$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)'
         PIE_LINKS='$(PIE_NAME).$(VERSION_MAJOR).$(VERSION_MINOR).$(PIE_LIBEXT) $(PIE_NAME).$(VERSION_MAJOR).$(PIE_LIBEXT) $(PIE_NAME).$(PIE_LIBEXT)'
         PIE_LOADER='dlfcn_darwin'
@@ -266,6 +267,9 @@ dnl   fi
   AC_SUBST([PIE_VERSION_PREFIX])
   AC_SUBST([PIE_VERSION_SUFFIX])
   AC_SUBST([PIE_PREPEND])
+
+  AC_SUBST([DLM_LINK])
+  AC_SUBST([DLM_LDFLAGS])
 
   AC_SUBST([NO_PIC])
   AC_SUBST([PIC])
