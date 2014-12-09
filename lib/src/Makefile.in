@@ -108,7 +108,8 @@ CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_LIBEXT)\" -DBUILD_LIBC
 INCLUDES += -I$(thisdir) \
             -I$(top_srcdir)/include \
             -I. \
-            -I$(top_builddir)/include/libchaos
+            -I$(top_builddir) \
+            -I$(top_builddir)/include
 
 CFLAGS += $(SSL_CFLAGS)
 

@@ -25,7 +25,7 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/config.h"
+#include "config.h"
 #include "libchaos/io.h"
 #include "libchaos/ssl.h"
 #include "libchaos/mem.h"
@@ -35,7 +35,7 @@
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>

@@ -67,8 +67,8 @@ AC_CONFIG_HOST
 AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
 
-dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h])
-AC_CHECK_HEADERS([cygwin/in.h dlfcn.h elf.h fcntl.h inttypes.h io.h limits.h linux/filter.h linux/types.h net/bpf.h net/ethernet.h netinet/in.h signal.h sys/ioctl.h sys/mman.h sys/poll.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/types.h sys/wait.h unistd.h winsock.h ws.h])
+dnl AC_CHECK_HEADERS([fcntl.h  signal.h unistd.h        dlfcn.h      ])
+AC_CHECK_HEADERS([cygwin/in.h dlfcn.h elf.h fcntl.h inttypes.h io.h limits.h linux/filter.h linux/types.h netinet/in.h net/bpf.h net/ethernet.h signal.h sys/ioctl.h sys/mman.h sys/poll.h sys/select.h sys/socket.h sys/stat.h sys/timeb.h sys/time.h sys/types.h sys/wait.h unistd.h])
 AC_FUNC_MMAP
 
 AC_CHECK_SSL
@@ -101,7 +101,7 @@ AC_DEFINE_UNQUOTED(ENDIAN, $ENDIAN, [Define your machines endian])
 IA32INLINE="0"
 
 # check for winsuck
-AC_CHECK_HEADER([winsock2.h])
+dnl AC_CHECK_HEADER([])
 
 # FIXME: must be declared as pascal call and must have 2 arguments (8 bytes)
 dnl AC_CHECK_LIB([ws2_32], [WSAStartup])

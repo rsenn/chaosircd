@@ -20,8 +20,8 @@ for ac_cv_libowfat_dir in $ac_cv_with_libowfat; do
 	old_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS -I${ac_cv_libowfat_dir}/include"
 
-	AC_CHECK_HEADER([stralloc.h], [ac_cv_libowfat_stralloc_h_found=yes])
-	AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I${ac_cv_libowfat_dir}/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes])
+	AC_CHECK_HEADER([stralloc.h], [ac_cv_libowfat_stralloc_h_found=yes],[],[-])
+	AC_CHECK_HEADER([libowfat/stralloc.h], [LIBOWFAT_CFLAGS="-I${ac_cv_libowfat_dir}/include/libowfat"; ac_cv_libowfat_stralloc_h_found=yes], [], [-])
 
 	CPPFLAGS="$old_CPPFLAGS"
 	AC_MSG_CHECKING([for libowfat in ${ac_cv_libowfat_dir}])

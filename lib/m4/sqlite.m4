@@ -1,33 +1,25 @@
 # check for SQLite
 # ------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_SQLITE],
-[default_directory="/usr /usr/local" 
+[
 
-with_sqlite=yes
+ac_cv_with_sqlite="/usr /usr/local"
 AC_ARG_WITH(sqlite,
     [  --with-sqlite=DIR        support for SQLite],
-    [ with_sqlite="$withval" ],
-    [ with_sqlite=no ])
+    [ case "$withval" in
+         yes) ;;
+         no) ac_cv_with_sqlite="no" ;;
+         *) ac_cv_with_sqlite="$withval" ;;
+     esac ])
 
-if test "$with_sqlite" != no; then
-  if test "$with_sqlite" = yes; then
-    sqlite_directory="$default_directory";
-    sqlite_fail=yes
-  elif test -d $withval; then
-    sqlite_directory="$withval"
-    sqlite_fail=no
-  elif test "$with_sqlite" = ""; then
-    sqlite_directory="$default_directory";
-    sqlite_fail=no
-  fi
-
+if test "$ac_cv_with_sqlite" != no; then
   AC_MSG_CHECKING(for SQLite headers)
 
-  for i in $sqlite_directory; do
-    if test -r $i/include/sqlite/sqlite3.h; then
+  for i in $ac_cv_with_sqlite; do
+    if test -r "$i/include/sqlite/sqlite3.h"; then
       SQLITE_DIR=$i
       SQLITE_INC_DIR=$i/include/sqlite
-    elif test -r $i/include/sqlite3.h; then
+    elif test -r "$i/include/sqlite3.h"; then
       SQLITE_DIR=$i
       SQLITE_INC_DIR=$i/include
     fi
@@ -35,14 +27,14 @@ if test "$with_sqlite" != no; then
   done
 
   if test ! -d "$SQLITE_INC_DIR"; then
-    AC_MSG_RESULT(not found)
+    AC_MSG_RESULT([not found])
     with_sqlite=no
 #    FAIL_MESSAGE("SQLite Headers", "$SQLITE_DIR $SQLITE_INC_DIR")
   else
-    AC_MSG_RESULT($SQLITE_INC_DIR)
+    AC_MSG_RESULT([$SQLITE_INC_DIR])
   fi
 
-  AC_MSG_CHECKING(for SQLite client library)
+  AC_MSG_CHECKING([for SQLite client library])
 
   for i in lib64 lib lib64/sqlite lib/sqlite; do
     str="$SQLITE_DIR/$i/libsqlite3.*"

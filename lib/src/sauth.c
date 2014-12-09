@@ -38,7 +38,7 @@
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
-#include "../config.h"
+#include "config.h"
 
 #include <ctype.h>
 
@@ -677,6 +677,28 @@ void sauth_set_args(struct sauth *sauth, ...) {
 	va_start(args, sauth);
 	sauth_vset_args(sauth, args);
 	va_end(args);
+}
+
+/* ------------------------------------------------------------------------ */
+struct sauth *sauth_push(struct sauth **sauth)
+{
+  if(*sauth)
+  {
+    if((*sauth)->refcount == 0)
+    {
+      log(sauth_log, L_warning, "Trying to push deprecated sauth #%u",
+          (*sauth)->id);
+    }
+    else
+    {
+      if(--(*sauth)->refcount == 0)
+        sauth_delete(*sauth);
+
+      (*sauth) = NULL;
+    }
+  }
+
+  return *sauth;
 }
 
 /* ------------------------------------------------------------------------ *

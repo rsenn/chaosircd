@@ -154,7 +154,7 @@ AC_PROG_DLLWRAP
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_CYGPATH
-AC_CHECK_PROG([NASM], [nasm], [$as_dir/$ac_word$ac_exec_ext], [], [$PATH])
+dnl AC_CHECK_PROG([NASM], [nasm], [$as_dir/$ac_word$ac_exec_ext], [], [$PATH])
 
 # check some system dependencies
 # ---------------------------------------------------------------------------
@@ -165,10 +165,20 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
-AX_CHECK_LINK_FLAG([-Wl,--export-dynamic], [LDFLAGS="$LDFLAGS -Wl,--export-dynamic"], [])
 
-dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
-AC_CHECK_HEADERS([signal.h stdint.h sys/mman.h sys/resource.h sys/wait.h unistd.h])
+
+dnl echo host: "$host" 1>&2
+case "$host" in
+    *mingw* | *msys* | *cygwin*)
+      AX_CHECK_LINK_FLAG([-Wl,--export-all-symbols], [PIE_LDFLAGS="$PIE_LDFLAGS -Wl,--export-all-symbols"], [])
+    ;;
+    *)
+      AX_CHECK_LINK_FLAG([-Wl,--export-dynamic], [LDFLAGS="$LDFLAGS -Wl,--export-dynamic"], [])
+    ;;
+esac
+
+dnl AC_CHECK_HEADERS([fcntl.h  signal.h unistd.h        dlfcn.h  ])
+AC_CHECK_HEADERS([signal.h stdint.h unistd.h])
 
 dnl AC_FUNC_MMAP
 
@@ -193,7 +203,7 @@ dnl AC_DEFINE_UNQUOTED(ENDIAN, $ENDIAN, [Define your machines endian])
 IA32INLINE="0"
 
 # check for winsuck
-dnl AC_CHECK_HEADER([winsock2.h])
+dnl AC_CHECK_HEADER([])
 
 # FIXME: must be declared as pascal call and must have 2 arguments (8 bytes)
 dnl AC_CHECK_LIB([ws2_32], [WSAStartup])
