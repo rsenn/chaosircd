@@ -2,7 +2,15 @@ IFS="
 "
 
 host=$(gcc -dumpmachine)
-prefix=$(gcc -print-search-dirs | sed -n 's,\\,/,g ;;; s,^install: \(.*\)/[bl]i[nb]/.*,\1,p')
+
+prefix=$(gcc -print-search-dirs | 
+  sed -n 's,\\,/,g ;;; s,^libraries: =,,p' | 
+  sed 's,:,\n,g' | 
+ sed 's,/lib.*,,' | 
+ sed 's,/\?[^/]*/\.\.$,,g' | 
+ grep -v '^ *$' | 
+ sort -u | 
+ head -n1)
 prefix=${prefix%%/Cellar/*}
 
 : ${DEBUG=enable}

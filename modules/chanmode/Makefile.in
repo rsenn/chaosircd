@@ -58,6 +58,9 @@ shobjects: $(SHOBJECTS)
 
 include $(top_builddir)/config.mk
 
+DEFS += -DBUILD_MODULE
+@DLM_TRUE@LDFLAGS += -shared
+
 #INSTALL = @INSTALL@
 
 CLEANFILES           = *~ core core.* \

@@ -13,8 +13,6 @@ A_LIBRARY          = libircd.a
 PIE_NAME          = cgircd
 @WIN32_TRUE@PIE_LIBRARY          = $(PIE_NAME).$(PIE_LIBEXT)
 
-
-
 bin_EXEC = cgircd$(EXEEXT)
 @SHARED_TRUE@@WIN32_TRUE@bin_EXEC += $(PIE_LIBRARY)
 @STATIC_TRUE@@WIN32_TRUE@lib_DATA += $(A_LIBRARY)
@@ -104,6 +102,11 @@ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 FILES                = Makefile.in $(MODULES:%=%.c) $(HEADERS) ircd.l ircd.y
 DISTFILES            = $(FILES) y.tab.c y.tab.h lex.yy.c main.c
 DEVFILES             = $(FILES)
+
+
+$(PROGRAM) $(PIE_LIBRARY): CFLAGS += $(MYSQL_CFLAGS)
+$(PROGRAM) $(PIE_LIBRARY): LIBS += $(MYSQL_LIBS)
+
 
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 @WIN32_TRUE@@DLM_TRUE@main.o: CPPFLAGS += -DBUILD_MAIN=1

@@ -49,6 +49,8 @@ include $(top_builddir)/config.mk
 @DLM_FALSE@DEFS += -DSTATIC_LIBCHAOS
 @DLM_FALSE@DEFS += -DSTATIC_IRCD
 
+DEFS += -DBUILD_MODULE
+@DLM_TRUE@LDFLAGS += -shared
 
 CLEANFILES           = *~ core core.* \
                        $(OBJECTS) $(SHOBJECTS)
