@@ -2435,6 +2435,7 @@ EOF
 					#endif
 	EOF
 					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+<<<<<<< HEAD
 					TMPDIR='C:\\WINDOWS\\Temp'
 					eval $set_cc_for_build
 					sed 's/^        //' << EOF >$dummy.c
@@ -2477,6 +2478,8 @@ EOF
 					#endif
 	EOF
 					eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^MACHINE=`
+=======
+>>>>>>> 62a9e2fef206792dd7d1e446a11d01858318a0c9
         TMPDIR='C:\\WINDOWS\\Temp'
         eval $set_cc_for_build
         sed 's/^        //' << EOF >$dummy.c
