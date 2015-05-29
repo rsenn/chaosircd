@@ -41,6 +41,8 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#if HAVE_SOCKET_FILTER
+
 #ifdef HAVE_NET_ETHERNET_H
 #include <net/ethernet.h>
 #endif /* HAVE_NET_ETHERNET_H */
@@ -52,6 +54,8 @@
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif /* HAVE_SYS_SOCKET_H */
+
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Kernel headers                                                           *

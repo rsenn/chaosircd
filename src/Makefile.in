@@ -14,6 +14,9 @@ LIBNAME              = ircd
 bin_EXEC = chaosircd$(EXEEXT)
 @WIN32_TRUE@bin_EXEC += ircd.dll
 
+vpath @srcdir@
+
+VPATH = @srcdir@
 
 all: Makefile $(lib_EXEC) $(bin_EXEC)
 install: install-exec 
@@ -39,6 +42,7 @@ MODULES              = ircd \
                        
 DEFS                 = -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\" -DPLUGINDIR=\"$(plugindir)\" -DPID=\"$(PID)\"
 INCLUDES             = -I$(top_srcdir)/include \
+                       -I$(top_srcdir)/libchaos/include \
                        -I$(srcdir) \
                        -I../include \
                        -I. \
@@ -51,7 +55,7 @@ PARSERINC            = $(srcdir)/y.tab.h
 PARSEROBJ            = y.tab.o
 SOURCES              = $(MODULES:%=%.c) $(LEXERSRC) $(PARSERSRC)
 @WIN32_FALSE@OBJECTS              = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
-@WIN32_TRUE@OBJECTS              = main.o
+@WIN32_TRUE@OBJECTS              = $(builddir)/main.o
 @WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @WIN32_TRUE@LIBNAME              = ircd
 PIE_DEF              = ircd.def
@@ -80,7 +84,7 @@ CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 
-FILES                = Makefile.in $(MODULES:%=%.c) $(HEADERS) ircd.l ircd.y
+FILES                = Makefile.in $(MODULES:%=%.c) $(HEADERS) ircd.l $(srcdir)/ircd.y
 DISTFILES            = $(FILES) y.tab.c y.tab.h lex.yy.c main.c
 DEVFILES             = CVS $(FILES)
 
@@ -97,26 +101,30 @@ main.o: CPPFLAGS += -DBUILD_MAIN=1
 @WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): ircd.dll
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 
+@WIN32_TRUE@main.o: $(srcdir)/main.c
+@WIN32_TRUE@lex.yy.o: lex.yy.c
+
 .y.c:
 
 .l.c:
 
 ircd.c:
 
-$(LEXERSRC): ircd.l y.tab.h
+lex.yy.c: $(srcdir)/ircd.l y.tab.h
 	@$(ECHO_LEX)
-	@$(LEX) -o$@ ircd.l
+	@$(LEX) -o$@ $(srcdir)/ircd.l
 lex.yy.o: lex.yy.c y.tab.h
 y.tab.o: y.tab.c y.tab.h
-$(PARSERINC): ircd.y
+
+y.tab.h: $(srcdir)/ircd.y
 	@$(ECHO_YACC)
-	$(YACC) -d -o $(PARSERSRC) ircd.y
+	$(YACC) -d -o $(PARSERSRC) $(srcdir)/ircd.y
 #.y.c:
 #	@$(ECHO_YACC)
 #	@$(YACC) -d -o $(PARSERSRC) $(PARSER)
-$(PARSERSRC): $(srcdir)/ircd.y
+y.tab.c: $(srcdir)/ircd.y
 	@$(ECHO_YACC)
-	$(YACC) -d -o $(srcdir)/y.tab.c $(PARSER)
+	$(YACC) -d -o y.tab.c $(srcdir)/ircd.y
 
 $(PROGRAM): $(OBJECTS) $(LDADD)
 	@$(ECHO_LD)

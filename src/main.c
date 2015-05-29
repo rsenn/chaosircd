@@ -87,7 +87,7 @@ int main(int argc, char **argv, char **envp)
 #endif /* WIN32 */
   
   /* Always dump core! */
-#ifndef WIN32
+#if !(defined(WIN32) || defined(__CYGWIN__))
   struct rlimit core = { RLIM_INFINITY, RLIM_INFINITY };
   
   syscall_setrlimit(RLIMIT_CORE, &core);

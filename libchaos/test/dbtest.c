@@ -3,6 +3,7 @@
 #include "libchaos/log.h"
 #include "libchaos/db.h"
 
+
 int dbtest_type = DB_TYPE_MYSQL;
 char *dbtest_host = "localhost";
 char *dbtest_user = "visualize";
@@ -15,6 +16,8 @@ char *dbtest_pass = "***";
 char *dbtest_dbname = "babel";*/
 
 int dbtest_log;
+
+#if (defined HAVE_PGSQL) || (defined HAVE_MYSQL)
 
 void dbtest()
 {
@@ -38,6 +41,7 @@ void dbtest()
   
   db_close(db);
 }
+#endif
 
 int main()
 {
@@ -46,11 +50,15 @@ int main()
   io_init_except(STDOUT_FILENO, STDOUT_FILENO, STDOUT_FILENO);
   mem_init();
   dlink_init();
+  
+#if (defined HAVE_PGSQL) || (defined HAVE_MYSQL)
+
   db_init();
   
   dbtest();
   
   db_shutdown();
+#endif
   dlink_shutdown();
   mem_shutdown();
   log_shutdown();
