@@ -69,13 +69,13 @@ int cm_avoice_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_avoice_mode) == NULL)
     return -1;
-  
+
   /* register a hook in channel_join */
   hook_register(channel_join, HOOK_3RD, cm_avoice_hook);
 
   /* set support flag */
   ircd_support_set("AUTOVOICE", NULL);
-  
+
   return 0;
 }
 
@@ -83,10 +83,10 @@ void cm_avoice_unload(void)
 {
   /* unset the support flag */
   ircd_support_unset("AUTOVOICE");
-    
+
   /* unregister the channel mode */
   chanmode_unregister(&cm_avoice_mode);
-  
+
   /* unregister the hook in channel_join */
   hook_unregister(channel_join, HOOK_3RD, cm_avoice_hook);
 }
@@ -107,10 +107,10 @@ static void cm_avoice_hook(struct list *lptr, struct chanuser *cuptr)
   {
     /* if the client matched, then give him +v mode */
     cuptr->flags |= CHFLG(v);
-    
+
     /* update the nickname prefix (+) */
     chanmode_prefix_make(cuptr->prefix, cuptr->flags);
-    
+
     /* add the mode to the current mode change list */
     chanmode_change_add(lptr, CHANMODE_ADD, CM_VOICE_CHAR, NULL, cuptr);
   }

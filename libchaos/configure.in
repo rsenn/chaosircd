@@ -63,7 +63,8 @@ AC_CANONICAL_HOST
 AC_CONFIG_HOST
 AC_CONFIG_DYLIB
 
-AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h])
+dnl AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h net/ethernet.h net/bpf.h linux/types.h linux/filter.h])
+AC_CHECK_HEADERS([cygwin/in.h dlfcn.h elf.h fcntl.h inttypes.h io.h limits.h linux/filter.h linux/types.h net/bpf.h net/ethernet.h netinet/in.h signal.h sys/ioctl.h sys/mman.h sys/poll.h sys/select.h sys/socket.h sys/time.h sys/timeb.h sys/types.h sys/wait.h unistd.h winsock.h ws.h])
 AC_FUNC_MMAP
 
 AC_CHECK_SSL
@@ -73,6 +74,10 @@ AC_CHECK_MYSQL
 
 dnl AC_CHECK_FUNC([ltoa], AC_DEFINE_UNQUOTED([HAVE_LTOA], [Define this if you have the ltoa() function (defined in stdlib.h usually)]))
 dnl AC_CHECK_FUNC([lltoa], AC_DEFINE_UNQUOTED([HAVE_LLTOA], [Define this if you have the ltoa() function (defined in stdlib.h usually)]))
+
+AC_SIZEOF_TYPE([long])
+AC_SIZEOF_TYPE([long long])
+AC_SIZEOF_TYPE([uintptr_t])
 
 AC_C_BIGENDIAN([ENDIAN="ENDIAN_BIG"], 
                [ENDIAN="ENDIAN_LIL"])
@@ -91,7 +96,20 @@ AC_CHECK_HEADER([winsock2.h])
 dnl AC_CHECK_LIB([ws2_32], [WSAStartup])
 dnl AC_CHECK_LIB([wsock32], [WSAStartup])
 
+
+AC_MSG_CHECKING([for poll])
+AC_TRY_COMPILE([], 
+  [poll()],
+  AC_MSG_RESULT([yes]),
+  [AC_MSG_RESULT([no])
+  HAVE_POLL=yes])
+
+if test "$HAVE_POLL" = yes ; then
+AC_DEFINE_UNQUOTED([USE_POLL], [1], [Use poll() for i/o multiplexing])
+else
 AC_DEFINE_UNQUOTED([USE_SELECT], [1], [Use select() for i/o multiplexing])
+fi
+
 
 ac_cv_LIBS="$LIBS"
 LIBS="$LIBS -lws2_32"
@@ -141,6 +159,8 @@ AC_SUBST([plugindir])
 
 dnl LDFLAGS="${LDFLAGS:+$LDFLAGS }-rdynamic"
 DEFS='-DBUILD_CHAOS'
+dnl  test "$A_ENABLE" = yes && DEFS="$DEFS -DSTATIC_LIBCHAOS"
+
 
 AC_SUBST([LDFLAGS])
 AC_SUBST([DEFS])

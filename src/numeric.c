@@ -291,7 +291,7 @@ char *numeric_replies[] = {
 /* 249 */       NULL,
 /* 250 RPL_STATSCONN, */        "max. local/remote clients: %u/%u (%u connections received)",
 /* 251 RPL_LUSERCLIENT, */      ":there are %u users and %u invisible on %u servers",
-/* 252 RPL_LUSEROP, */          "%d :k-rad packet warriors online",
+/* 252 RPL_LUSEROP, */          "%d :IRC operators online",
 /* 253 RPL_LUSERUNKNOWN, */     "%d :unknown connection(s)",
 /* 254 RPL_LUSERCHANNELS, */    "%d :channels formed",
 /* 255 RPL_LUSERME, */          ":i have %d clients and %d servers",
@@ -353,7 +353,7 @@ char *numeric_replies[] = {
 /* 310 RPL_WHOISENFORCE */      "%s :is the elite cyberforce",
 /* 311 RPL_WHOISUSER, */        "%s %s %s * :%s",
 /* 312 RPL_WHOISSERVER, */      "%s %s :%s",
-/* 313 RPL_WHOISOPERATOR, */    "%s :is a k-rad packet warrior",
+/* 313 RPL_WHOISOPERATOR, */    "%s :is an IRC operator",
 /* 314 RPL_WHOWASUSER, */       "%s %s %s * :%s",
 /* 315 RPL_ENDOFWHO, */         "%s :End of /WHO list.",
 /* 316 RPL_WHOISCHANOP, */      NULL,
@@ -421,11 +421,11 @@ char *numeric_replies[] = {
 /* 378 */       NULL,
 /* 379 */       NULL,
 /* 380 */       NULL,
-/* 381 RPL_YOUREOPER, */        ":you're now a k-rad biatch, go /kill someone.",
+/* 381 RPL_YOUREOPER, */        ":you're now an IRC operator. act responsible.",
 /* 382 RPL_REHASHING, */        "%s :rehashing",
 /* 383 */       NULL,
 /* 384 RPL_MYPORTIS, */         "%d :port to local server is",
-/* 385 RPL_NOTOPERANYMORE, */   ":you're no longar a k-rad biatch, sayonara!",
+/* 385 RPL_NOTOPERANYMORE, */   ":you're no longer an IRC operator!",
 /* 386 */                       ":%s",
 /* 387 */       NULL,
 /* 388 */       NULL,
@@ -521,7 +521,7 @@ char *numeric_replies[] = {
 /* 478 ERR_BANLISTFULL, */      "%s %s :channel ban list is full",
 /* 479 ERR_BADCHANNAME */       "%s :illegal channel name",
 /* 480 ERR_SSLONLYCHAN, */      "%s :cannot join channel (+x)",
-/* 481 ERR_NOPRIVILEGES, */     ":only k-rad whores can do this.",
+/* 481 ERR_NOPRIVILEGES, */     ":you're not an IRC operator",
 /* 482 ERR_CHANOPRIVSNEEDED, */ "%s :you're not channel operator",
 /* 483 ERR_CANTKILLSERVER, */   ":you can't kill a server!",
 /* 484 ERR_RESTRICTED, */       ":you are restricted",
@@ -575,7 +575,7 @@ char *numeric_replies[] = {
 /* 532 */ NULL,
 /* 533 */ NULL,
 /* 534 */ NULL,
-/* 535 */ NULL, 
+/* 535 */ NULL,
 /* 536 */ NULL,
 /* 537 */ NULL,
 /* 538 */ NULL,
@@ -1049,14 +1049,14 @@ const char *numeric_format(int numeric)
 {
   static char buf[IRCD_LINELEN - 1];
   size_t      n;
-  
+
   if(numeric > ERR_LAST_ERR_MSG || numeric < 0 ||
      numeric_replies[numeric] == NULL)
   {
     log(ircd_log, L_fatal, "stupid coder using invalid numeric (%u)!", numeric);
     return NULL;
   }
-  
+
   n = 0;
   buf[n++] = ':';
   buf[n++] = '%';
@@ -1071,7 +1071,7 @@ const char *numeric_format(int numeric)
   buf[n++] = ' ';
 
   strlcpy(&buf[n], numeric_replies[numeric], sizeof(buf) - n);
-  
+
   return buf;
 }
 
@@ -1081,44 +1081,44 @@ void numeric_vsend(struct client *cptr, int numeric, va_list args)
 {
   char   buf[IRCD_LINELEN - 1];
   size_t n;
-  
+
   if(!client_is_user(cptr))
     return;
-  
+
   if(numeric > ERR_LAST_ERR_MSG || numeric < 0 ||
      numeric_replies[numeric] == NULL)
   {
     log(ircd_log, L_fatal, "stupid coder using invalid numeric (%u)!", numeric);
     return;
   }
-  
+
   n = 0;
   buf[n++] = ':';
   n += strlcpy(&buf[n], client_me->name, sizeof(buf) - n);
   buf[n++] = ' ';
-  
+
   buf[n++] = (numeric / 100) + '0';
   buf[n++] = ((numeric % 100) / 10) + '0';
   buf[n++] = (numeric % 10) + '0';
   buf[n++] = ' ';
-  
+
   if(cptr->source->caps & CAP_UID)
     n += strlcpy(&buf[n], cptr->user->uid, sizeof(buf) - n);
   else
     n += strlcpy(&buf[n], cptr->name, sizeof(buf) - n);
-  
+
   buf[n++] = ' ';
-  
+
   str_vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
-            
+
   client_send(cptr, "%s", buf);
 }
 
 void numeric_send(struct client *cptr, int numeric, ...)
 {
   va_list args;
-  
-  va_start(args, numeric);  
+
+  va_start(args, numeric);
   numeric_vsend(cptr, numeric, args);
   va_end(args);
 }
@@ -1129,38 +1129,38 @@ void numeric_vlsend(struct lclient *lcptr, int numeric, va_list args)
 {
   char   buf[IRCD_LINELEN - 1];
   size_t n;
-  
+
   if(numeric > ERR_LAST_ERR_MSG || numeric < 0 ||
      numeric_replies[numeric] == NULL)
   {
     log(ircd_log, L_fatal, "stupid coder using invalid numeric (%u)!", numeric);
     return;
   }
-  
+
   n = 0;
   buf[n++] = ':';
   n += strlcpy(&buf[n], lclient_me->name, sizeof(buf) - n);
   buf[n++] = ' ';
-  
+
   buf[n++] = (numeric / 100) + '0';
   buf[n++] = ((numeric % 100) / 10) + '0';
   buf[n++] = (numeric % 10) + '0';
   buf[n++] = ' ';
-  
+
   n += strlcpy(&buf[n], lcptr->name[0] ? lcptr->name : "*", sizeof(buf) - n);
-  
+
   buf[n++] = ' ';
-  
+
   str_vsnprintf(&buf[n], sizeof(buf) - n, numeric_replies[numeric], args);
-            
+
   lclient_send(lcptr, "%s", buf);
 }
 
 void numeric_lsend(struct lclient *lcptr, int numeric, ...)
 {
   va_list args;
-  
-  va_start(args, numeric);  
+
+  va_start(args, numeric);
   numeric_vlsend(lcptr, numeric, args);
   va_end(args);
 }

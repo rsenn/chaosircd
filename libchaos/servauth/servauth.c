@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: servauth.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -30,8 +30,8 @@
 #include <libchaos/io.h>
 #include <libchaos/syscall.h>
 
-#ifdef HAVE_CONFIG_H 
-#include "../config.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #ifdef HAVE_SIGNAL_H
@@ -78,17 +78,17 @@ void servauth_init(void)
   mem_init();
   timer_init();
   queue_init();
-  dlink_init();  
+  dlink_init();
   connect_init();
 
 #ifdef SIGPIPE
   syscall_signal(SIGPIPE, SIG_IGN);
 #endif /* SIGPIPE */
-  
+
   servauth_log = log_source_register("servauth");
 
   servauth_drain = log_drain_open("servauth.log", LOG_ALL, L_debug, 1, 1);
-  
+
   log(servauth_log, L_status, "Done initialising ircd library");
 }
 
@@ -106,9 +106,9 @@ void servauth_shutdown(void)
   mem_shutdown();
   log_shutdown();
   timer_shutdown();
-  
+
   log_source_unregister(servauth_log);
-  
+
   syscall_exit(0);
 }
 
@@ -120,9 +120,9 @@ void servauth_collect(void)
   dlink_collect();
   log_collect();
   timer_collect();
-  
+
   log_source_unregister(servauth_log);
-  
+
   exit(0);
 }
 
@@ -133,7 +133,7 @@ void servauth_collect(void)
 void servauth_dump(void)
 {
   debug(servauth_log, "--- sauth complete dump ---");
-  
+
   connect_dump(NULL);
 /*  log_dump(NULL);*/
   timer_dump(NULL);
@@ -152,26 +152,26 @@ void servauth_loop(void)
   int ret = 0;
   int64_t *timeout;
   int64_t remain = 0LL;
-    
+
   while(ret >= 0)
   {
     /* Calculate timeout value */
     timeout = timer_timeout();
-    
+
     /* Do I/O multiplexing and event handling */
 #ifdef USE_POLL
     ret = io_poll(&remain, timeout);
 #else
     ret = io_select(&remain, timeout);
 #endif /* USE_SELECT | USE_POLL */
-    
+
     /* Remaining time is 0msecs, we need to run a timer */
     if(remain == 0LL)
       timer_run();
-    
+
     if(timeout)
       timer_drift(*timeout - remain);
-    
+
     io_handle();
   }
 }
@@ -188,12 +188,12 @@ int main(int argc, char *argv[])
   /* get control connection */
   if(argc >= 2)
     recvfd = str_tol(argv[1], NULL, 10);
-  
+
   if(argc >= 3)
     sendfd = str_tol(argv[2], NULL, 10);
-    
+
   io_init_except(recvfd, sendfd, -1);
-    
+
   if(recvfd == sendfd)
   {
     /* socketpair() */
@@ -232,10 +232,10 @@ int main(int argc, char *argv[])
   cache_proxy_new(&servauth_proxycache, CACHE_PROXY_SIZE);
 
   cache_dns_put(&servauth_dnscache, CACHE_DNS_REVERSE, localhost, "localhost", (uint64_t)-1LL);
-  
+
   /* initialize control connection */
   control_init(&servauth_control, recvfd, sendfd);
-  
+
   /* clear query structs */
   memset(servauth_queries, 0, sizeof(servauth_queries));
 

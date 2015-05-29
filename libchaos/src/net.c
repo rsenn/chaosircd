@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: net.c,v 1.7 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -40,9 +40,14 @@
  * ------------------------------------------------------------------------ */
 #include "../config.h"
 
+#ifdef WIN32
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
+#else 
+#include <winsock.h>
 #endif /* HAVE_WINSOCK2_H */
+#include <windows.h>
+#endif
 
 #ifdef HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
@@ -85,7 +90,7 @@ int net_get_log() { return net_log; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static inline char tohex(char hexdigit)
+CHAOS_INLINE_FN(char tohex(char hexdigit))
 {
   return hexdigit > 9 ? hexdigit + 'a' - 10 : hexdigit + '0';
 }
@@ -132,6 +137,58 @@ static unsigned int i2a(char *dest, unsigned int x)
 
   return s - bak + 1;
 }*/
+
+
+/* ------------------------------------------------------------------------ *
+ * Convert a short from host to network byteorder                              *
+ * ------------------------------------------------------------------------ */
+CHAOS_INLINE_IMPL(net_port_t net_htons(uint16_t n)
+{
+  union {
+    uint8_t c[2];
+    uint16_t i;
+  } u;
+
+  u.c[0] = (n >> 8) & 0xff;
+  u.c[1] =  n       & 0xff;
+
+  return u.i;
+})
+
+/* ------------------------------------------------------------------------ *
+ * Convert a long from host to network byteorder                              *
+ * ------------------------------------------------------------------------ */
+CHAOS_INLINE_IMPL(net_addr_t net_htonl(uint32_t n)
+{
+  union {
+    uint8_t c[4];
+    uint32_t i;
+  } u;
+
+  u.c[0] = (n >> 24) & 0xff;
+  u.c[1] = (n >> 16) & 0xff;
+  u.c[2] = (n >>  8) & 0xff;
+  u.c[3] =  n        & 0xff;
+
+  return u.i;
+})
+
+/* ------------------------------------------------------------------------ *
+ * ------------------------------------------------------------------------ */
+CHAOS_INLINE_IMPL(uint32_t net_ntohl(net_addr_t n))
+{
+  union {
+    uint32_t i;
+    uint8_t c[4];
+  } u;
+
+  u.i = n;
+
+  return (u.c[0] << 24) |
+         (u.c[1] << 16) |
+         (u.c[2] <<  8) |
+          u.c[3];
+}
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -222,19 +279,22 @@ int net_aton(const char *cp, net_addr_t *inp)
  * ------------------------------------------------------------------------ */
 void net_init(void)
 {
+#ifdef WIN32
+  WSADATA wsa_data;
+  WORD wVersionRequested;
+#endif
   net_log = log_source_register("net");
-  
+
   mem_static_create(&net_heap, sizeof(struct protocol), NET_BLOCK_SIZE);
   mem_static_note(&net_heap, "protocol heap");
-  
+
   net_id = 0;
 
 /*  net_timer = timer_start(mem_static_collect, GC_INTERVAL, &net_heap);
   timer_note(net_timer, "garbage collect: net heap");*/
 #ifdef WIN32
-  WSADATA wsaData;
-  WORD wVersionRequested = MAKEWORD(2, 2);
-  WSAStartup(wVersionRequested, &wsaData);
+  wVersionRequested = MAKEWORD(2, 2);
+  WSAStartup(wVersionRequested, &wsa_data);
 #endif /* WIN32 */
 }
 
@@ -245,15 +305,15 @@ void net_shutdown(void)
 {
   struct node *node;
   struct node *next;
-  
+
   dlink_foreach_safe(&net_list, node, next)
   {
     dlink_delete(&net_list, node);
     mem_static_free(&net_heap, node);
   }
-  
+
   mem_static_destroy(&net_heap);
-  
+
   log_source_unregister(net_log);
 }
 
@@ -264,38 +324,38 @@ struct protocol *net_find(int type, const char *name)
 {
   struct protocol *p;
   struct node     *node;
-  uint32_t         hash;
+  hash_t           hash;
   
   hash = str_hash(name);
-  
+
   dlink_foreach(&net_list, node)
   {
     p = (struct protocol *)node;
-    
+
     if(p->hash == hash && p->type == type)
       return p;
   }
-  
+
   return NULL;
 }
-  
+
 struct protocol *net_find_id(uint32_t id)
 {
   struct protocol *p;
-  
+
   dlink_foreach(&net_list, p)
   {
     if(p->id == id)
       return p;
   }
-  
+
   return NULL;
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * Register a protocol.                                                     *
  * ------------------------------------------------------------------------ */
-struct protocol *net_register(int type, const char *name, 
+struct protocol *net_register(int type, const char *name,
                               void *handler)
 {
   struct protocol *p;
@@ -305,26 +365,26 @@ struct protocol *net_register(int type, const char *name,
     log(net_log, L_warning, "Protocol %s was already registered.", name);
     return NULL;
   }
-  
+
   p = mem_static_alloc(&net_heap);
-  
+
   strlcpy(p->name, name, sizeof(p->name));
-  
+
   p->hash = str_ihash(p->name);
   p->type = type;
   p->refcount = 1;
   p->id = net_id++;
-  
+
   p->handler = handler;
-  
+
   dlink_add_tail(&net_list, &p->node, p);
-  
+
   log(net_log, L_status, "Registered %s protocol %s.",
       (type == NET_CLIENT ? "client" : "server"), p->name);
-  
+
   return p;
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * Unregister a protocol.                                                   *
  * ------------------------------------------------------------------------ */
@@ -332,24 +392,24 @@ void *net_unregister(int type, const char *name)
 {
   void *ret = NULL;
   struct protocol *p;
-  
+
   p = net_find(type, name);
-  
+
   if(p)
   {
     log(net_log, L_status, "Unregistered %s protocol %s.",
         (type == NET_CLIENT ? "client" : "server"), name);
-    
+
     dlink_delete(&net_list, &p->node);
     mem_static_free(&net_heap, p);
     mem_static_collect(&net_heap);
   }
-  
+
   return ret;
-}  
+}
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 struct protocol *net_pop(struct protocol *pptr)
@@ -359,10 +419,10 @@ struct protocol *net_pop(struct protocol *pptr)
     if(!pptr->refcount)
       log(net_log, L_warning, "Poping deprecated %s proto: %s",
           (pptr->type == NET_CLIENT ? "client" : "server"), pptr->name);
-    
+
     pptr->refcount++;
   }
-  
+
   return pptr;
 }
 
@@ -381,7 +441,7 @@ struct protocol *net_push(struct protocol **pptrptr)
 
     (*pptrptr) = NULL;
   }
-  
+
   return *pptrptr;
 }
 
@@ -394,7 +454,7 @@ int net_socket(net_address_t at, net_socket_t st)
   int fd;
   int pf = 0;
   int type = 0;
-  
+
   switch(at)
   {
     case NET_ADDRESS_IPV4: pf = AF_INET; break;
@@ -404,19 +464,19 @@ int net_socket(net_address_t at, net_socket_t st)
     default: return -1;
 #endif
   }
- 
+
   switch(st)
   {
     case NET_SOCKET_DGRAM: type = SOCK_DGRAM; break;
     case NET_SOCKET_STREAM: type = SOCK_STREAM; break;
   }
- 
+
   /* Try to create TCP/UDP socket */
   fd = syscall_socket(pf, type, IPPROTO_IP);
- 
+
   if(fd < 0)
     return -1;
- 
+
   /* Set O_NONBLOCK flag */
   io_nonblock(fd);
 
@@ -425,7 +485,7 @@ int net_socket(net_address_t at, net_socket_t st)
         fd,
         pf == AF_INET ? "INET" : NULL,
         type == SOCK_DGRAM ? "UDP" : "TCP");*/
-  
+
   /* Register it in the io_list */
   return io_new(fd, FD_SOCKET);
 }
@@ -436,11 +496,11 @@ int net_socket(net_address_t at, net_socket_t st)
 int net_bind(int fd, net_addr_t addr, uint16_t port)
 {
   int opt = 1;
-  struct sockaddr_in local; 
+  struct sockaddr_in local;
   /* Validate fd */
 /*  if(!io_valid(fd))
     return -1;*/
-  
+
   local.sin_family = AF_INET;
   local.sin_addr.s_addr = addr;
   local.sin_port = net_htons(port);
@@ -450,16 +510,16 @@ int net_bind(int fd, net_addr_t addr, uint16_t port)
     io_close(fd);
     return -1;
   }
-  
+
   if(syscall_bind(fd, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) != 0)
   {
     io_list[fd].error = syscall_errno;
     return -1;
   }
-  
-/*  debug(net_log, "bound socket %i to %s:%u", 
+
+/*  debug(net_log, "bound socket %i to %s:%u",
         fd, net_ntoa(addr), port);*/
-  
+
   return 0;
 }
 
@@ -470,18 +530,18 @@ int net_vlisten(int fd, int backlog, void *callback, va_list args)
 {
 /*  if(!io_valid(fd))
     return -1;*/
-    
+
   if(syscall_listen(fd, backlog))
   {
     io_close(fd);
     return -1;
   }
-  
+
 /*  io_list[fd].status.listening = 1;*/
-  
+
   if(io_vregister(fd, IO_CB_READ, callback, args))
     return -1;
-  
+
   return 0;
 }
 
@@ -489,13 +549,13 @@ int net_listen(int fd, int backlog, void *callback, ...)
 {
   int     ret;
   va_list args;
-  
+
   va_start(args, callback);
-  
+
   ret = net_vlisten(fd, backlog, callback, args);
-  
+
   va_end(args);
-  
+
   return ret;
 }
 
@@ -506,14 +566,14 @@ int net_vconnect(int   fd,    net_addr_t addr,  uint16_t port,
 {
   struct sockaddr_in sina;
   void              *argp[4];
-  
+
 /*  if(!io_valid(fd))
     return -1;*/
-    
+
   sina.sin_family = AF_INET;
   sina.sin_addr.s_addr = addr;
   sina.sin_port = net_htons(port);
-  
+
   if(syscall_connect(fd, (struct sockaddr *)&sina, sizeof(struct sockaddr_in)))
   {
     if((syscall_errno != EINPROGRESS))
@@ -522,21 +582,21 @@ int net_vconnect(int   fd,    net_addr_t addr,  uint16_t port,
       return -1;
     }
   }
-  
+
 /*  io_list[fd].status.connecting = 1;*/
-  
+
   if(cb_rd && cb_wr)
   {
     argp[0] = va_arg(args, void *);
     argp[1] = va_arg(args, void *);
     argp[2] = va_arg(args, void *);
     argp[3] = va_arg(args, void *);
-  
+
     if(io_register(fd, IO_CB_READ, cb_rd, argp[0], argp[1], argp[2], argp[3]) ||
        io_register(fd, IO_CB_WRITE, cb_wr, argp[0], argp[1], argp[2], argp[3]))
       return -1;
   }
-  
+
   return 0;
 }
 
@@ -545,13 +605,13 @@ int net_connect(int   fd,    net_addr_t addr,  uint16_t port,
 {
   va_list args;
   int     ret;
-  
+
   va_start(args, cb_wr);
-  
+
   ret = net_vconnect(fd, addr, port, cb_rd, cb_wr, args);
-  
+
   va_end(args);
-  
+
   return ret;
 }
 
@@ -564,9 +624,9 @@ int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
   struct sockaddr_in local;
   int                ret;
   socklen_t          addrlen = sizeof(struct sockaddr_in);
-  
+
   ret = syscall_accept(fd, (struct sockaddr *)&addr, (unsigned int *)&addrlen);
-  
+
   if(ret == -1)
     return -1;
 
@@ -578,7 +638,7 @@ int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
 #endif
   addrlen = sizeof(struct sockaddr_in);
   syscall_getsockname(ret, (void *)&local, (unsigned int *)&addrlen);
-  
+
   if(io_new(ret, FD_SOCKET) != ret)
   {
 #ifdef WIN32
@@ -588,10 +648,10 @@ int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
 #endif /* WIN32 */
     return -1;
   }
-  
+
   if(addrptr) *addrptr = addr.sin_addr.s_addr;
   if(portptr) *portptr = addr.sin_port;
-  
+
   return ret;
 }
 
@@ -603,16 +663,16 @@ int net_getsockname(int fd, net_addr_t *addrptr, net_port_t *portptr)
   struct sockaddr_in addr;
   int                ret;
   int                addrlen = sizeof(struct sockaddr_in);
-  
+
   addrlen = sizeof(struct sockaddr_in);
   ret = syscall_getsockname(fd, (struct sockaddr *)&addr, (unsigned int *)&addrlen);
-  
+
   if(ret == -1)
     return -1;
 
   if(addrptr) *addrptr = addr.sin_addr.s_addr;
   if(portptr) *portptr = addr.sin_port;
-  
+
   return ret;
 }
 
@@ -623,7 +683,7 @@ void net_dump(struct protocol *nptr)
   if(nptr == NULL)
   {
     dump(net_log, "[================ net summary ================]");
-    
+
     dlink_foreach(&net_list, nptr)
     {
       dump(net_log, " #%u: [%u] %-20s (%s)",
@@ -636,15 +696,15 @@ void net_dump(struct protocol *nptr)
   else
   {
     dump(net_log, "[================= net dump =================]");
-    
+
     dump(net_log, "         id: #%u", nptr->id);
     dump(net_log, "   refcount: %u", nptr->refcount);
     dump(net_log, "       hash: %p", nptr->hash);
-    dump(net_log, "       type: %s", 
+    dump(net_log, "       type: %s",
          nptr->type == NET_SERVER ? "server" : "client");
     dump(net_log, "       name: %s", nptr->name);
     dump(net_log, "    handler: %p", nptr->handler);
-    
+
     dump(net_log, "[============== end of net dump =============]");
   }
 }

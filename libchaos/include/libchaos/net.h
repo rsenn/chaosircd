@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: net.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -29,15 +29,34 @@
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
 
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
 /* ------------------------------------------------------------------------ *
  * Constants                                                                *
  * ------------------------------------------------------------------------ */
 #define NET_SERVER 0
 #define NET_CLIENT 1
 
+#ifdef INADDR_ANY
+#define NET_ADDR_ANY		INADDR_ANY
+#else
 #define NET_ADDR_ANY       0x00000000
+#endif
+
+#ifdef INADDR_BROADCAST
+#define NET_ADDR_BROADCAST INADDR_BROADCAST
+#else
 #define NET_ADDR_BROADCAST 0xffffffff
+#endif
+
+#ifdef INADDR_LOOPBACK
+#define NET_ADDR_LOOPBACK  INADDR_LOOPBACK
+#else
 #define NET_ADDR_LOOPBACK  0x7f000001
+#endif
 
 #define NET_CLASSC_NET     0xffffff00
 #define NET_CLASSB_NET     0xffff0000
@@ -74,7 +93,7 @@ struct protocol
   struct node     node;
   uint32_t        id;
   int             refcount;
-  uint32_t        hash;
+  hash_t          hash;
   int             type;
   char            name[PROTOLEN + 1];
   net_callback_t *handler;
@@ -100,68 +119,68 @@ CHAOS_API(int) net_get_log(void);
 /* ------------------------------------------------------------------------ *
  * Convert a short from host to network byteorder                              *
  * ------------------------------------------------------------------------ */
-static inline net_port_t net_htons(uint16_t n)
+CHAOS_INLINE_FN(net_port_t net_htons(uint16_t n))
 {
   union {
     uint8_t c[2];
     uint16_t i;
   } u;
-  
+
   u.c[0] = (n >> 8) & 0xff;
   u.c[1] =  n       & 0xff;
-  
+
   return u.i;
 }
 
 /* ------------------------------------------------------------------------ *
  * Convert a short from network to host byteorder                             *
  * ------------------------------------------------------------------------ */
-static inline uint16_t net_ntohs(net_port_t n)
+CHAOS_INLINE_FN(uint16_t net_ntohs(net_port_t n))
 {
   union {
     uint16_t i;
     uint8_t c[2];
   } u;
-  
+
   u.i = n;
-  
-  
+
+
   return ((uint16_t)(u.c[0] << 8)) | ((uint16_t)u.c[1]);
 }
 
 /* ------------------------------------------------------------------------ *
  * Convert a long from host to network byteorder                              *
  * ------------------------------------------------------------------------ */
-static inline net_addr_t net_htonl(uint32_t n)
+CHAOS_INLINE_FN(net_addr_t net_htonl(uint32_t n))
 {
   union {
     uint8_t c[4];
     uint32_t i;
   } u;
-  
+
   u.c[0] = (n >> 24) & 0xff;
   u.c[1] = (n >> 16) & 0xff;
   u.c[2] = (n >>  8) & 0xff;
   u.c[3] =  n        & 0xff;
-  
+
   return u.i;
 }
 
 /* ------------------------------------------------------------------------ *
  * Convert a long from network to host byteorder                              *
  * ------------------------------------------------------------------------ */
-static inline uint32_t net_ntohl(net_addr_t n)
+CHAOS_INLINE_FN(uint32_t net_ntohl(net_addr_t n))
 {
   union {
     uint32_t i;
     uint8_t c[4];
   } u;
-  
+
   u.i = n;
-  
+
   return (u.c[0] << 24) |
          (u.c[1] << 16) |
-         (u.c[2] <<  8) | 
+         (u.c[2] <<  8) |
           u.c[3];
 }
 
@@ -179,7 +198,7 @@ CHAOS_API(char *)      net_ntoa     (net_addr_t      in);
 /* ------------------------------------------------------------------------ *
  * Convert from string to network address. (AF_INET)                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)         net_aton     (const char     *cp, 
+CHAOS_API(int)         net_aton     (const char     *cp,
                                      net_addr_t     *inp);
 
 /* ------------------------------------------------------------------------ *
@@ -187,7 +206,7 @@ CHAOS_API(int)         net_aton     (const char     *cp,
  * ------------------------------------------------------------------------ */
 CHAOS_API(const char *)net_ntop     (int             af,
                                      const void     *cp,
-                                     char           *buf, 
+                                     char           *buf,
                                      size_t          len);
 
 /* ------------------------------------------------------------------------ *
@@ -213,7 +232,7 @@ CHAOS_API(char *)      net_ntoa    (net_addr_t in);
  * Initialize protocol heap.                                                  *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)             net_init       (void);
-  
+
 /* ------------------------------------------------------------------------ *
  * Destroy protocol heap.                                                     *
  * ------------------------------------------------------------------------ */

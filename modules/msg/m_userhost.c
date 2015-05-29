@@ -52,7 +52,7 @@ static char *m_userhost_help[] = {
   "Displays the given nicks username, hostname, away status,",
   "operator status and real name in one single line.",
   NULL
-};    
+};
 
 static struct msg m_userhost_msg = {
   "USERHOST", 1, 1, MFLG_CLIENT | MFLG_UNREG,
@@ -67,7 +67,7 @@ int m_userhost_load(void)
 {
   if(msg_register(&m_userhost_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -100,26 +100,26 @@ static void m_userhost(struct lclient *lcptr, struct client *cptr,
   size_t         i;
   int            first = 1;
   
-  len = snprintf(result, sizeof(result), ":%s 302 %s :",
+	len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
                  client_me->name, cptr->name);
-  
+
   n = str_tokenize(argv[2], av, 63);
-  
+
   for(i = 0; i < n; i++)
   {
     acptr = client_find_nick(av[i]);
-    
+
     if(acptr == NULL)
       continue;
-    
+
     if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
-    
+
     if(!first)
       result[len++] = ' ';
-    
+
     len += strlcpy(&result[len], acptr->name, IRCD_LINELEN - 1 - len);
-    
+
 /*    if(acptr->user->modes & UFLG(o))
       result[len++] = '*';*/
     result[len++] = '=';
@@ -128,13 +128,15 @@ static void m_userhost(struct lclient *lcptr, struct client *cptr,
       result[len++] = '-';
     else
       result[len++] = '+';
-    
+
     len += strlcpy(&result[len], acptr->user->name, IRCD_LINELEN - 1 - len);
-    result[len++] = '@';
-    len += strlcpy(&result[len], acptr->hostreal, IRCD_LINELEN - 1 - len);
-    
+    if(len + 1 + strlen(acptr->hostreal) < IRCD_LINELEN - 2) {
+      result[len++] = '@';
+      len += strlcpy(&result[len], acptr->hostreal, IRCD_LINELEN - 1 - len);
+    }
+
     first = 0;
   }
-  
+
   client_send(cptr, "%s", result);
 }

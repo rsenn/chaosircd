@@ -44,7 +44,9 @@
 #include <chaosircd/conf.h>
 #include <chaosircd/oper.h>
 
-  
+#include "../config.h"
+
+
 #define YY_FATAL_ERROR(x) log(conf_log, L_warning, x)
 
 /*#include "y.tab.h"*/

@@ -41,7 +41,7 @@ int um_servernotice_bounce(struct user *uptr, struct usermodechange *umptr,
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_servnotice = 
+static struct usermode um_servnotice =
 {
   's',
   USERMODE_LIST_OFF,
@@ -57,7 +57,7 @@ int um_servnotice_load(void)
 {
   if(usermode_register(&um_servnotice))
     return -1;
-  
+
   return 0;
 }
 
@@ -74,7 +74,7 @@ int um_servernotice_bounce(struct user *uptr, struct usermodechange *umcptr,
 
   if(uptr->oper == NULL)
     return -1;
-  
+
   if(umcptr->arg == NULL)
     flag = 1ULL;
 
@@ -86,7 +86,7 @@ int um_servernotice_bounce(struct user *uptr, struct usermodechange *umcptr,
 
     flag = log_sources[index].flag;
   }
-  
+
   if(umcptr->change == USERMODE_ON)
     uptr->oper->sources |= flag;
   else

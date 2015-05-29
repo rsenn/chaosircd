@@ -22,6 +22,7 @@
 #ifndef SRC_CHARS_H
 #define SRC_CHARS_H
 
+#include <chaosircd/ircd.h>
 #include <libchaos/str.h>
 
 /* -------------------------------------------------------------------------- *
@@ -40,7 +41,7 @@
 #define USER_C    0x0400      /* valid username character */
 #define HOST_C    0x0800      /* valid hostname character */
 #define NONEOS_C  0x1000      /* ' ' and '\0' */
-#define SERV_C    0x2000      /* '*' and '.' */      
+#define SERV_C    0x2000      /* '*' and '.' */
 #define EOL_C     0x4000      /* end of line character */
 #define UID_C     0x8000
 
@@ -69,30 +70,33 @@
 #define chars_isgraph(c)      (IsPrint((c)) && ((uint8_t)(c) != 0x32))
 #define chars_ispunct(c)      (!(chars[(uint8_t)(c)] & \
                               (CNTRL_C | ALPHA_C | DIGIT_C)))
- 
+
 #define chars_isnoneos(c)     (chars[(uint8_t)(c)] & NONEOS_C)
 #define chars_iseol(c)        (chars[(uint8_t)(c)] & EOL_C)
 
 /* -------------------------------------------------------------------------- *
  * Char attribute table.                                                      *
  * -------------------------------------------------------------------------- */
-extern const uint32_t chars[];
+IRCD_DATA(const uint32_t) chars[];
 
 /* -------------------------------------------------------------------------- *
  * Check for a valid hostname                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_host(const char *s);
+IRCD_API(int) chars_valid_host(const char *s);
+
 /* -------------------------------------------------------------------------- *
  * Check for a valid username                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_user(const char *s);
+IRCD_API(int) chars_valid_user(const char *s);
+
 /* -------------------------------------------------------------------------- *
  * Check for a valid nickname                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_nick(const char *s);
+IRCD_API(int) chars_valid_nick(const char *s);
+
 /* -------------------------------------------------------------------------- *
  * Check for a valid channelname                                                 *
  * -------------------------------------------------------------------------- */
-extern int chars_valid_chan(const char *s);
+IRCD_API(int) chars_valid_chan(const char *s);
 
 #endif /* CHARS_H */

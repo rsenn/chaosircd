@@ -61,13 +61,13 @@ PIE_EXEEXT      = @PIE_EXEEXT@
 
 # package info
 # ---------------------------------------------------------------------------
-PACKAGE_NAME    = @PACKAGE_NAME@
-PACKAGE_VERSION = @PACKAGE_VERSION@
+PROJECT_NAME    = @PROJECT_NAME@
+PROJECT_VERSION = @PROJECT_VERSION@
 
 # be backward compatible with older autoconf
 # ---------------------------------------------------------------------------
-PACKAGE         = $(PACKAGE_NAME)
-VERSION         = $(PACKAGE_VERSION)
+PACKAGE         = $(PROJECT_NAME)
+VERSION         = $(PROJECT_VERSION)
 
 # detailed version info
 # ---------------------------------------------------------------------------
@@ -180,7 +180,7 @@ COLOR_DEFAULT   = $(@NAME_DEFAULT@)
 # ---------------------------------------------------------------------------
 ECHO            = @ECHO@
 MAKEFLAGS       = @MAKEFLAGS@
-QUIET           = @QUIET@
+SILENT_RULES           = @SILENT_RULES@
 REDIR           = @REDIR@
 REDIR2          = @REDIR2@
 

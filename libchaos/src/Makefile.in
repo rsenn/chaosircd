@@ -95,9 +95,8 @@ install: install-exec install-data
 # ---------------------------------------------------------------------------
 CPPFLAGS += -DPLUGINDIR=\"$(plugindir)\" -DDLLEXT=\"$(PIE_EXEEXT)\" -DBUILD_LIBCHAOS
 FILES    += $(SYS_SOURCES)
-INCLUDES += -I$(thisdir) \
+INCLUDES += \
             -I$(top_srcdir)/include \
-            -I. \
             -I$(top_builddir)/include 
 
 CFLAGS   += $(MYSQL_CFLAGS) $(PSQL_CFLAGS) $(SSL_CFLAGS)

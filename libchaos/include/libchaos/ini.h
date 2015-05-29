@@ -36,30 +36,30 @@ struct ini;
 
 typedef void (ini_callback_t)(struct ini *ini);
 
-struct ini_key 
+struct ini_key
 {
   struct node              node;
-  uint32_t                 hash;
+  hash_t                   hash;
   char                    *name;
   char                    *value;
 };
 
-struct ini_section 
+struct ini_section
 {
   struct node              node;
   struct list              keys;
   struct ini              *ini;
-  uint32_t                 hash;
+  hash_t                   hash;
   char                    *name;
 };
 
-struct ini 
+struct ini
 {
   struct node              node;
   uint32_t                 id;
   uint32_t                 refcount;
-  uint32_t                 nhash;
-  uint32_t                 phash;  
+  hash_t                   nhash;
+  hash_t                   phash;  
   struct list              keys;        /* keys & comments before first section */
   struct list              sections;
   int                      fd;
@@ -94,7 +94,7 @@ CHAOS_API(void)         ini_init(void);
  * Destroy INI heap and cancel timers.                                      *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)         ini_shutdown(void);
-  
+
 /* ------------------------------------------------------------------------ *
  * New INI context.                                                         *
  * ------------------------------------------------------------------------ */
@@ -144,7 +144,7 @@ CHAOS_API(int)                 ini_load             (struct ini         *ini);
 /* ------------------------------------------------------------------------ *
  * Save all sections to an INI file.                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)                 ini_save             (struct ini         *ini); 
+CHAOS_API(int)                 ini_save             (struct ini         *ini);
 
 /* ------------------------------------------------------------------------ *
  * Close INI file.                                                          *
@@ -165,13 +165,13 @@ CHAOS_API(void)                ini_callback         (struct ini         *ini,
 /* ------------------------------------------------------------------------ *
  * Find a INI section by name.                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct ini_section *)ini_section_find     (struct ini         *ini, 
+CHAOS_API(struct ini_section *)ini_section_find     (struct ini         *ini,
                                                  const char         *name);
 
 /* ------------------------------------------------------------------------ *
  * Find a INI section by name.                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct ini_section *)ini_section_find_next(struct ini         *ini, 
+CHAOS_API(struct ini_section *)ini_section_find_next(struct ini         *ini,
                                                  const char         *name);
 
 /* ------------------------------------------------------------------------ *
@@ -183,14 +183,14 @@ CHAOS_API(struct ini_section *)ini_section_new      (struct ini         *ini,
 /* ------------------------------------------------------------------------ *
  * Delete a section.                                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                ini_section_remove   (struct ini         *ini, 
+CHAOS_API(void)                ini_section_remove   (struct ini         *ini,
                                                  struct ini_section *section);
 
 /* ------------------------------------------------------------------------ *
  * Clear content.                                                           *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)                ini_clear            (struct ini         *ini);
-  
+
 /* ------------------------------------------------------------------------ *
  * Get current section name.                                                *
  * ------------------------------------------------------------------------ */
@@ -253,9 +253,9 @@ CHAOS_API(int)                 ini_read_str         (struct ini_section *section
                                                      const char         *key,
                                                      char              **str);
 
-CHAOS_API(int)                 ini_get_str          (struct ini_section *section, 
-                                                     const char         *key, 
-                                                     char               *str, 
+CHAOS_API(int)                 ini_get_str          (struct ini_section *section,
+                                                     const char         *key,
+                                                     char               *str,
                                                      size_t              len);
 
 CHAOS_API(int)                 ini_read_int         (struct ini_section *section,
@@ -301,7 +301,7 @@ CHAOS_API(int)                 ini_read_color       (struct ini_section *section
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct ini *)        ini_pop              (struct ini        *ini);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct ini *)        ini_push             (struct ini       **iniptr);

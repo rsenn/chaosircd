@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: syscall.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -301,7 +301,7 @@ _syscall3(int,               syscall_waitpid,
  * ssize_t read(int fd, void *buf, size_t count)                            *
  * ------------------------------------------------------------------------ */
 _syscall3(ssize_t,           syscall_read,  /* 0 on EOF, -1 on error */
-          int,               fd,            /* source fd */ 
+          int,               fd,            /* source fd */
           void *,            buf,           /* destination buffer */
           size_t,            count);        /* byte count */
 
@@ -332,23 +332,23 @@ psyscall3(int,               syscall_open,  /* -1 on error, else valid fd */
 {
   int     res;
   va_list args;
-  
+
   va_start(args, flags);
-  
-  __asm__ volatile ("int $0x80" 
+
+  __asm__ volatile ("int $0x80"
                     : "=a" (res)
                     : "0" ((long)__NR_open),
                       "b" ((long)pathname),
                       "c" ((long)flags),
-                      "d" (va_arg(args, long)));  
+                      "d" (va_arg(args, long)));
   va_end(args);
-  
+
   if((unsigned long)res >= (unsigned long)-125)
   {
     syscall_errno = -res;
     res = -1;
   }
-  
+
   return (int)res;
 };
 #else
@@ -384,7 +384,7 @@ psyscall3(int,                  syscall_fcntl,
 
   return (int)res;
 };
-#else     
+#else
 #error "no fcntl() syscall wrapper for non-x86"
 #endif /* __i386__ */
 
@@ -438,7 +438,7 @@ _oldmmapcall(void *,               syscall_mmap,
  * int socket(int domain, int type, int protocol);                          *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_SOCKET,
-             int,               syscall_socket,       
+             int,               syscall_socket,
              int,               domain,
              int,               type,
              int,               protocol);
@@ -447,7 +447,7 @@ _socketcall3(SYS_SOCKET,
  * int bind(int sockfd, struct sockaddr *my_addr, socklen_t addrlen)        *
  * ------------------------------------------------------------------------ */
 _socketcall3(SYS_BIND,
-             int,                     syscall_bind,               
+             int,                     syscall_bind,
              int,                     sockfd,
              const struct sockaddr *, my_addr,
              socklen_t,               addrlen);
@@ -552,19 +552,19 @@ void w00t(char *argv0)
   char **envp;
   int argc;*/
   int ret;
-/*  
+/*
   argv = &argv0;
-  
+
   envp = argv;
-  
+
   while(*envp) envp++;
-  
+
   argc = (size_t)(envp - argv);
-  
+
   envp++;
   */
   ret = main(0, NULL, NULL/*argc, argv, envp*/);
-  
+
   syscall_exit(ret);
 }
 

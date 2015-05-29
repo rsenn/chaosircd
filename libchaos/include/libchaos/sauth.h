@@ -1,22 +1,22 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
- * 
+ *
  * $Id: sauth.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -71,10 +71,10 @@ typedef void (sauth_callback_t)(struct sauth *, void *, void *, void *, void *);
  * Sauth block structure.                                                     *
  * ------------------------------------------------------------------------ */
 typedef struct sauth {
-  struct node       node;        /* linking node for sauth block list */  
+  struct node       node;        /* linking node for sauth block list */
   uint32_t          id;
   uint32_t          refcount;
-  
+
   /* externally initialised */
   int               type;
   int               status;
@@ -104,7 +104,7 @@ CHAOS_API(int)           sauth_fds[2];
 CHAOS_API(char)          sauth_readbuf[BUFSIZE];
 CHAOS_API(const char *)  sauth_types[6];
 CHAOS_API(const char *)  sauth_replies[8];
-  
+
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int) sauth_get_log(void);
 
@@ -123,14 +123,14 @@ CHAOS_API(void)          sauth_collect      (void);
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct sauth *)sauth_dns_forward  (const char    *address,
-                                             void          *callback, 
+                                             void          *callback,
                                              ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct sauth *)sauth_dns_reverse  (net_addr_t     address,
-                                             void          *callback, 
-                                             ...);  
+                                             void          *callback,
+                                             ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -138,7 +138,7 @@ CHAOS_API(int)           sauth_launch       (void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sauth *)sauth_auth         (net_addr_t     address,  
+CHAOS_API(struct sauth *)sauth_auth         (net_addr_t     address,
                                              net_port_t     local,
                                              net_port_t     remote,
                                              void          *callback,
@@ -147,21 +147,21 @@ CHAOS_API(struct sauth *)sauth_auth         (net_addr_t     address,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(struct sauth *)sauth_proxy        (int            type,
-                                             net_addr_t     remote_addr, 
+                                             net_addr_t     remote_addr,
                                              net_port_t     remote_port,
-                                             net_addr_t     local_addr,  
+                                             net_addr_t     local_addr,
                                              net_port_t     local_port,
-                                             void          *callback, 
+                                             void          *callback,
                                              ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)           sauth_proxy_reply  (const char    *reply);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(int)           sauth_proxy_type   (const char    *type);
-  
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)          sauth_delete       (struct sauth  *sauth);
@@ -187,11 +187,11 @@ CHAOS_API(void)          sauth_cancel       (struct sauth  *sauth);
 CHAOS_API(void)          sauth_vset_args    (struct sauth  *sauth,
                                              va_list        args);
 
-CHAOS_API(void)          sauth_set_args     (sauth_t       *sauth, 
+CHAOS_API(void)          sauth_set_args     (sauth_t       *sauth,
                                              ...);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void)          sauth_dump         (struct sauth  *saptr);
-  
+
 #endif /* LIB_SAUTH_H */

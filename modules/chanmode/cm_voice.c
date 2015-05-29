@@ -43,13 +43,13 @@ static int cm_voice_hook(struct list *lptr, struct chanuser *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_voice_help[] = 
+static const char *cm_voice_help[] =
 {
   "+v <nickname>   Voice status. User can talk even when the channel is +m.",
   NULL
 };
 
-static struct chanmode cm_voice_mode = 
+static struct chanmode cm_voice_mode =
 {
   CM_VOICE_CHAR,           /* mode character */
   '+',                     /* privilege prefix */
@@ -68,9 +68,9 @@ int cm_voice_load(void)
   /* register the channel mode */
   if(chanmode_register(&cm_voice_mode) == NULL)
     return -1;
-  
+
   hook_register(channel_join, HOOK_2ND, cm_voice_hook);
-  
+
   return 0;
 }
 
@@ -78,7 +78,7 @@ void cm_voice_unload(void)
 {
   /* unregister the channel mode */
   chanmode_unregister(&cm_voice_mode);
-  
+
   hook_unregister(channel_join, HOOK_2ND, cm_voice_hook);
 }
 
@@ -89,6 +89,6 @@ static int cm_voice_hook(struct list *lptr, struct chanuser *cuptr)
   cuptr->flags |= CHFLG(v);
   chanmode_prefix_make(cuptr->prefix, cuptr->flags);
   chanmode_change_add(lptr, CHANMODE_ADD, CM_VOICE_CHAR, NULL, cuptr);
-  
+
   return 0;
 }

@@ -26,9 +26,9 @@ AC_ARG_ENABLE([dep],
   [DEP="no"
   AC_MSG_RESULT([no])])
 if test "$DEP" = "yes"; then
-  NODEP=""
+  NO_DEPENDENCY_TRACKING=""
 else
-  NODEP="# "
+  NO_DEPENDENCY_TRACKING="# "
 fi
-AC_SUBST(NODEP)
+AC_SUBST(NO_DEPENDENCY_TRACKING)
 AC_SUBST(DEP)])

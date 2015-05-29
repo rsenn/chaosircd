@@ -41,6 +41,8 @@
 #include <chaosircd/channel.h>
 #include <chaosircd/chanuser.h>
 
+#include "../../config.h"
+
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
@@ -57,7 +59,7 @@ static char *m_version_help[] = {
   "without parameters, the information from the",
   "local server is displayed.",
   NULL
-};    
+};
 
 static struct msg m_version_msg = {
   "VERSION", 0, 1, MFLG_CLIENT,
@@ -72,7 +74,7 @@ int m_version_load(void)
 {
   if(msg_register(&m_version_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -101,7 +103,7 @@ static void m_version(struct lclient *lcptr, struct client *cptr,
                "PRODUCTION",
 #endif /* DEBUG */
                client_me->name, PACKAGE_RELEASE);
-  
+
   ircd_support_show(cptr);
 }
 

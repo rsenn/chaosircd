@@ -16,7 +16,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: mem.c,v 1.4 2006/09/28 08:38:31 roman Exp $ 
+ * $Id: mem.c,v 1.4 2006/09/28 08:38:31 roman Exp $
  */
 
 #define _GNU_SOURCE
@@ -100,7 +100,7 @@ void mem_init(void)
 
   /* Open /dev/zero if we don't have MAP_ANON */
   mem_zero = io_open(MEM_DEV_ZERO, IO_OPEN_READ|IO_OPEN_WRITE);
-  
+
   if(mem_zero < 0)
     mem_fatal();
 
@@ -123,7 +123,7 @@ void mem_shutdown(void)
   mem_dynamic_destroy(&mem_dheap);
 
   /* Close /dev/zero if we don't have MAP_ANON */
-#ifdef HAVE_MMAP 
+#ifdef HAVE_MMAP
 # ifndef MAP_ANON
 
   io_close(mem_zero);
@@ -140,7 +140,7 @@ void mem_shutdown(void)
  * ------------------------------------------------------------------------ */
 void mem_fatal(void)
 {
-  log(mem_log, L_fatal, 
+  log(mem_log, L_fatal,
       "I'm out of memory and there's nothing I can do about.");
 
   syscall_exit(1);
@@ -149,7 +149,7 @@ void mem_fatal(void)
 /* ------------------------------------------------------------------------ *
  * Allocates a block                                                        *
  * ------------------------------------------------------------------------ */
-static inline void *mem_block_alloc(size_t size)
+static void *mem_block_alloc(size_t size)
 {
   void *ptr;
 
@@ -176,7 +176,7 @@ static inline void *mem_block_alloc(size_t size)
 # endif /* SAFETY_MARGIN */
 #else
 
-  /* Fall back to ordinary malloc() if the 
+  /* Fall back to ordinary malloc() if the
      system doesn't support the other methods */
   ptr = malloc(size);
 
@@ -188,7 +188,7 @@ static inline void *mem_block_alloc(size_t size)
 /* ------------------------------------------------------------------------ *
  * Frees a previously allocated block                                       *
  * ------------------------------------------------------------------------ */
-static inline void mem_block_free(void *ptr, size_t size)
+static void mem_block_free(void *ptr, size_t size)
 {
 #ifdef HAVE_MMAP
 # ifdef SAFETY_MARGIN
@@ -196,18 +196,18 @@ static inline void mem_block_free(void *ptr, size_t size)
   ptrdiff_t map;
 
   map = ptr;
-  
-  syscall_mprotect(map + size, MEM_PAD_BLOCKS, 
+
+  syscall_mprotect(map + size, MEM_PAD_BLOCKS,
                    PROT_READ|PROT_WRITE|PROT_EXEC);
 
   ptr = map - MEM_PAD_BLOCKS;
   size += MEM_PAD_BLOCKS * 2;
-  
-  syscall_mprotect(ptr, MEM_PAD_BLOCKS, 
+
+  syscall_mprotect(ptr, MEM_PAD_BLOCKS,
                    PROT_READ|PROT_WRITE|PROT_EXEC);
 
 # endif /* SAFETY_MARGIN */
-  
+
   syscall_munmap(ptr, size);
 
 #else
@@ -229,11 +229,11 @@ static int mem_static_block_new(struct sheap *shptr)
   struct schunk *scptr;
   struct sblock *sbptr;
   size_t         i;
-    
-  /* 
+
+  /*
    * Allocate block.
    * We need space for the block descriptor and for
-   * several chunks (+1 for null termination) 
+   * several chunks (+1 for null termination)
    */
   sbptr = mem_block_alloc(shptr->block_size);
 
@@ -249,13 +249,13 @@ static int mem_static_block_new(struct sheap *shptr)
   /* Initialize lists with free/used blocks */
   dlink_list_zero(&sbptr->free_ones);
   dlink_list_zero(&sbptr->used_ones);
-  
+
   /* Put it in front of the chain in the heap */
   sbptr->next = shptr->base;
   sbptr->heap = shptr;
-  
+
   scptr = (struct schunk *)&sbptr[1];
-  
+
   /* Go through the block and initialize newly created chunks */
   for(i = 0; i < shptr->chunks_per_block; i++)
   {
@@ -263,12 +263,12 @@ static int mem_static_block_new(struct sheap *shptr)
     dlink_add_head(&sbptr->free_ones, &scptr->node, &scptr[1]);
     scptr = (struct schunk *)((size_t)&scptr[1] + shptr->chunk_size);
   }
-  
+
   /* Update heap structure */
   shptr->block_count++;
   shptr->free_chunks += shptr->chunks_per_block;
   shptr->base = sbptr;
-  
+
   return 0;
 }
 
@@ -286,17 +286,17 @@ static void mem_static_block_delete(struct sblock *sbptr)
 static void *mem_static_block_alloc(struct sblock *sbptr)
  {
   struct schunk *scptr;
-  
+
   sbptr->heap->free_chunks--;
   sbptr->free_chunks--;
-  
+
   scptr = (struct schunk *)sbptr->free_ones.head;
-  
+
   scptr->block = sbptr;
-   
+
   dlink_delete(&sbptr->free_ones, &scptr->node);
   dlink_add_tail(&sbptr->used_ones, &scptr->node, &scptr[1]);
-   
+
   return scptr->node.data;
 }
 
@@ -308,21 +308,21 @@ static int mem_static_block_valid(struct sblock *sbptr, struct schunk *scptr)
 {
   ssize_t offs;
   size_t ees;
-  
+
   offs = (size_t)scptr - (size_t)&sbptr[1];
   ees = (sbptr->heap->chunk_size + sizeof(struct schunk));
-  
+
   if(offs < 0)
     return 0;
-  
+
   if(offs % ees)
     return 0;
-  
+
   offs /= ees;
-  
+
   if(offs >= sbptr->heap->chunks_per_block)
     return 0;
-  
+
   return 1;
 }
 #endif /* DEBUG */
@@ -332,13 +332,13 @@ static int mem_static_block_valid(struct sblock *sbptr, struct schunk *scptr)
 struct sheap *mem_static_find(uint32_t id)
 {
   struct sheap *shptr;
-  
+
   dlink_foreach(&mem_slist, shptr)
   {
     if(shptr->id == id)
       return shptr;
   }
-  
+
   return NULL;
 }
 
@@ -350,7 +350,7 @@ void mem_static_dump(struct sheap *shptr)
   {
     uint32_t total_usage = 0;
     uint32_t total_mapped = 0;
-    
+
     dump(mem_log, "[============== sheap summary ===============]");
 
     dlink_foreach(&mem_slist, shptr)
@@ -368,7 +368,7 @@ void mem_static_dump(struct sheap *shptr)
     }
 
     dump(mem_log, "[=========== end of sheap summary ===========]");
-    
+
     dump(mem_log, "Total allocated memory: %u bytes", total_usage);
     dump(mem_log, "Total mapped memory: %u bytes", total_mapped);
   }
@@ -376,7 +376,7 @@ void mem_static_dump(struct sheap *shptr)
   {
     struct sblock *sbptr;
     uint32_t       i = 0;
-  
+
     dump(mem_log, "[============== sheap dump ===============]");
 
     dump(mem_log, "          id: %u", shptr->id);
@@ -386,9 +386,9 @@ void mem_static_dump(struct sheap *shptr)
     dump(mem_log, " free chunks: %u", shptr->free_chunks);
     dump(mem_log, "  chunk size: %u", shptr->chunk_size);
     dump(mem_log, "c. per block: %u", shptr->chunks_per_block);
-    
+
     dump(mem_log, "-------------- sheap blocks --------------");
-    
+
     for(sbptr = shptr->base; sbptr; sbptr = sbptr->next)
     {
       dump(mem_log, "#%03u: %3u/%3u (%u/%u bytes)",
@@ -396,7 +396,7 @@ void mem_static_dump(struct sheap *shptr)
            sbptr->used_ones.size * shptr->chunk_size,
            shptr->chunks_per_block * shptr->chunk_size);
     }
-    
+
     dump(mem_log, "[=========== end of sheap dump ===========]");
   }
 }
@@ -430,16 +430,16 @@ static struct dblock *mem_dynamic_block_new(struct dheap *dhptr)
     dbptr->used_bytes = 0;
     dbptr->max_bytes = dbptr->free_bytes - sizeof(struct dblock);
     dbptr->heap = dhptr;
-  
+
     dlink_list_zero(&dbptr->chunks);
-    
+
     dhptr->block_count++;
     dhptr->free_bytes += dbptr->size - sizeof(struct dblock);
     dhptr->max_bytes = dbptr->size - sizeof(struct dblock);
-    
+
     dhptr->base = dbptr;
   }
-  
+
   return dbptr;
 }
 
@@ -455,7 +455,7 @@ static void *mem_dynamic_block_alloc(struct dblock *dbptr, size_t size)
   struct dheap  *dhptr;
   size_t         avail;
   size_t         biggest = 0; /* biggest available chunk */
-  
+
   if(dbptr->chunks.head == NULL)
   {
     /* Chunk is at block start */
@@ -466,17 +466,17 @@ static void *mem_dynamic_block_alloc(struct dblock *dbptr, size_t size)
 
     /* New biggest continuous chunk */
     biggest = dbptr->size - size - sizeof(struct dchunk);
-  } 
-  else 
+  }
+  else
   {
     /* end points always to the end of the previous chunk */
     end = (struct dchunk *)&dbptr[1];
-    
+
     /* Check the chunk list for free space */
     dlink_foreach(&dbptr->chunks, node)
     {
       chnk = (struct dchunk *)node;
-      
+
       /* Available bytes before this chunk */
       avail = (size_t)node - (size_t)end;
 
@@ -484,10 +484,10 @@ static void *mem_dynamic_block_alloc(struct dblock *dbptr, size_t size)
       if(newchnk == NULL && avail >= size + sizeof(struct dchunk))
       {
         newchnk = end;
-        
+
         /* Yeah, add it in front of the chunk */
         dlink_add_before(&dbptr->chunks, &end->node, node, end);
-        
+
         end = (struct dchunk *)(((size_t)&newchnk[1]) + size);
         avail -= size + sizeof(struct dchunk);
       }
@@ -495,62 +495,62 @@ static void *mem_dynamic_block_alloc(struct dblock *dbptr, size_t size)
       {
         end = (struct dchunk *)(((size_t)&chnk[1]) + chnk->size);
       }
-      
+
 /*      if(avail > biggest)
         biggest = avail;*/
     }
-    
+
     /* Now check space after last chunk */
     avail = (size_t)&dbptr[1] + dbptr->size - (size_t)end;
-    
+
     if(newchnk == NULL && (size_t)end + sizeof(struct dchunk) + size <= (size_t)dbptr + dbptr->size)
     {
       newchnk = end;
-      
+
       dlink_add_tail(&dbptr->chunks, &newchnk->node, newchnk);
     }
     else if(newchnk == NULL)
       return NULL;
-#if 0    
+#if 0
     {
       /* damn, this shouldn't happen */
       if(avail < size + sizeof(struct dchunk))
       {
-        log(mem_log, L_fatal, 
+        log(mem_log, L_fatal,
             "i should have a chunk of %u bytes, but didn't find it.", size);
       }
 
       dlink_add_tail(&dbptr->chunks, &end->node, end);
-      
+
       newchnk = end;
       end = (void *)(((size_t)&newchnk[1]) + size);
       avail -= size + sizeof(struct dchunk);
     }
-#endif     
+#endif
     if(avail > biggest)
       biggest = avail;
   }
-  
+
   /* Initiliaze the chunk */
   newchnk->size = size;
-  newchnk->node.data = dbptr;  
-  
+  newchnk->node.data = dbptr;
+
   dhptr = dbptr->heap;
 
   if(biggest > dbptr->max_bytes)
   {
     if(biggest > dhptr->max_bytes)
       dhptr->max_bytes = biggest;
-    
+
     dbptr->max_bytes = biggest;
   }
-  
+
   dbptr->free_bytes -= sizeof(struct dchunk) + size;
   dbptr->used_bytes += sizeof(struct dchunk) + size;
   dhptr->free_bytes -= sizeof(struct dchunk) + size;
   dhptr->used_bytes += sizeof(struct dchunk) + size;
 /*  dbptr->chunk_count++;*/
-  
+
   return &newchnk[1];
 }
 
@@ -565,7 +565,7 @@ static void mem_dynamic_block_free(struct dblock *dbptr, struct dchunk *chnk)
   void            *top;
   size_t           size;
   size_t           avail;
-  
+
   heap = dbptr->heap;      /* Points to the heap this block is from */
   size = chnk->size;      /* Size of the chunk to free */
 
@@ -581,7 +581,7 @@ static void mem_dynamic_block_free(struct dblock *dbptr, struct dchunk *chnk)
     /* No previous chunk, bottom is at block start */
     bottom = &dbptr[1];
   }
-  
+
   /* Top of new free space */
   if(chnk->node.next)
   {
@@ -593,10 +593,10 @@ static void mem_dynamic_block_free(struct dblock *dbptr, struct dchunk *chnk)
     /* Top is the block end */
     top = (void *)((size_t)&dbptr[1] + dbptr->size);
   }
-  
+
   /* Delete reference to this chunk */
   dlink_delete(&dbptr->chunks, &chnk->node);
-  
+
   /* Size of the new free space */
   avail = (size_t)top - (size_t)bottom;
 
@@ -604,11 +604,11 @@ static void mem_dynamic_block_free(struct dblock *dbptr, struct dchunk *chnk)
   if(avail > dbptr->max_bytes)
   {
     dbptr->max_bytes = avail;
-    
+
     if(avail > heap->max_bytes)
       heap->max_bytes = avail;
   }
-  
+
   /* Update memory statistics */
   dbptr->free_bytes += size + sizeof(struct dchunk);
   dbptr->used_bytes -= size + sizeof(struct dchunk);
@@ -629,17 +629,17 @@ static int mem_dynamic_block_valid(struct dblock *dbptr, struct dchunk *chnk)
 {
   struct dchunk *ptr;
   struct node   *node;
-  
+
   /* walk through all chunks */
   dlink_foreach(&dbptr->chunks, node)
   {
     ptr = (struct dchunk *)node;
-    
+
     /* we found our chunk :D */
     if(ptr == chnk)
       return 1;
   }
-  
+
   return 0;
 }
 #endif /* DEBUG */
@@ -649,13 +649,13 @@ static int mem_dynamic_block_valid(struct dblock *dbptr, struct dchunk *chnk)
 struct dheap *mem_dynamic_find(uint32_t id)
 {
   struct dheap *dhptr;
-  
+
   dlink_foreach(&mem_dlist, dhptr)
   {
     if(dhptr->id == id)
       return dhptr;
   }
-  
+
   return NULL;
 }
 
@@ -685,7 +685,7 @@ void mem_dynamic_dump(struct dheap *dhptr)
   {
     struct dblock *dbptr;
     uint32_t       i = 0;
-  
+
     dump(mem_log, "[============== dheap dump ===============]");
 
     dump(mem_log, "          id: %u", dhptr->id);
@@ -696,9 +696,9 @@ void mem_dynamic_dump(struct dheap *dhptr)
     dump(mem_log, "  used bytes: %u", dhptr->used_bytes);
     dump(mem_log, "   max bytes: %u", dhptr->max_bytes);
     dump(mem_log, "        note: %s", dhptr->note);
-    
+
     dump(mem_log, "-------------- dheap blocks --------------");
-    
+
     for(dbptr = dhptr->base; dbptr; dbptr = dbptr->next)
     {
       dump(mem_log, "#%03u: %3u/%3u:%3u (%u chunks)",
@@ -708,7 +708,7 @@ void mem_dynamic_dump(struct dheap *dhptr)
            dbptr->max_bytes,
            dbptr->chunks.size);
     }
-    
+
     dump(mem_log, "[=========== end of dheap dump ===========]");
   }
 }
@@ -724,21 +724,21 @@ void mem_dynamic_dump(struct dheap *dhptr)
 void mem_static_create(struct sheap *shptr, size_t size, size_t count)
 {
   size_t blocksize;
-  
+
   /* The blocksize we would get if we don't pad */
   blocksize = ((size + sizeof(struct schunk)) * count) + sizeof(struct sblock);
-  
+
   /* Now align size to next boundary */
   if(blocksize & (MEM_PAD_BLOCKS - 1))
   {
     blocksize += MEM_PAD_BLOCKS - 1;
     blocksize &= ~(MEM_PAD_BLOCKS - 1);
   }
-  
+
   /* This may have created space for additional chunks */
   count = (blocksize - sizeof(struct sblock)) /
           (size + sizeof(struct schunk));
-  
+
   /* Init heap struct */
   shptr->chunk_size = size;
   shptr->chunks_per_block = count;
@@ -746,11 +746,11 @@ void mem_static_create(struct sheap *shptr, size_t size, size_t count)
   shptr->block_count = 0;
   shptr->free_chunks = 0;
   shptr->base = NULL;
-  
+
   /* Now get an initial block */
   if(mem_static_block_new(shptr))
     mem_fatal();
-  
+
   dlink_add_tail(&mem_slist, &shptr->node, shptr);
   shptr->id = mem_id++;
 }
@@ -760,11 +760,11 @@ void mem_static_create(struct sheap *shptr, size_t size, size_t count)
 void mem_static_note(struct sheap *shptr, const char *format, ...)
 {
   va_list args;
-  
+
   va_start(args, format);
-  
+
   str_vsnprintf(shptr->note, sizeof(shptr->note), format, args);
-  
+
   va_end(args);
 }
 
@@ -775,7 +775,7 @@ void mem_static_note(struct sheap *shptr, const char *format, ...)
 void *mem_static_alloc(struct sheap *shptr)
 {
   struct sblock *sbptr;
-  
+
   if(shptr->free_chunks == 0)
   {
     /* Allocate new block */
@@ -787,7 +787,7 @@ void *mem_static_alloc(struct sheap *shptr)
         mem_fatal();
     }
   }
-  
+
   /* Occupy a free chunk in the first block which has space */
   for(sbptr = shptr->base; sbptr; sbptr = sbptr->next)
   {
@@ -795,7 +795,7 @@ void *mem_static_alloc(struct sheap *shptr)
     if(sbptr->free_chunks)
       return mem_static_block_alloc(sbptr);
   }
-  
+
   return NULL;
 }
 
@@ -806,36 +806,36 @@ void mem_static_free(struct sheap *shptr, void *ptr)
 {
   struct sblock *dbptr;
   struct schunk *scptr;
-  
+
   /* Ignore stewpid calls */
   if(shptr == NULL || ptr == NULL)
     return;
-  
+
   /* Get pointer to chunk header */
   scptr = (void *)((size_t)ptr - sizeof(struct schunk));
-  
+
 #ifdef DEBUG
   if(!mem_static_valid(shptr, scptr))
   {
-    log(mem_log, L_fatal, "invalid chunk in mem_static_free(%p, %p)", 
+    log(mem_log, L_fatal, "invalid chunk in mem_static_free(%p, %p)",
         shptr, ptr);
     syscall_exit(-1);
   }
 #endif /* DEBUG */
-  
+
   /* How can this happen? */
   if(scptr->block == NULL)
     mem_fatal();
-  
+
   /* Modify usage count */
   dbptr = scptr->block;
   shptr->free_chunks++;
   dbptr->free_chunks++;
-  
+
   /* Remove from used linklist */
   dlink_delete(&dbptr->used_ones, &scptr->node);
   dlink_add_head(&dbptr->free_ones, &scptr->node, ptr);
-  
+
   if(dbptr->used_ones.size == 0)
     mem_static_collect(dbptr->heap);
 }
@@ -848,18 +848,18 @@ int mem_static_collect(struct sheap *shptr)
   struct sblock *dbptr;
   struct sblock *tofr;
   struct sblock *prev;
-  
+
   /* Huh? */
   if(shptr == NULL)
     return 0;
-  
+
   /* Heap must have at least 1 block */
   if(shptr->free_chunks < shptr->chunks_per_block || shptr->block_count == 1)
     return 0;
-  
+
   prev = NULL;
   dbptr = shptr->base;
-  
+
   /* Now loop through all blocks */
   while(dbptr)
   {
@@ -867,8 +867,8 @@ int mem_static_collect(struct sheap *shptr)
     if(dbptr->free_chunks == shptr->chunks_per_block)
     {
       tofr = dbptr;
-      
-      /* 
+
+      /*
        * There was a previous block, remove its
        * reference to the current block
        */
@@ -877,8 +877,8 @@ int mem_static_collect(struct sheap *shptr)
         prev->next = dbptr->next;
         dbptr = prev->next;
       }
-      /* 
-       * There was no previous block, 
+      /*
+       * There was no previous block,
        * update the base pointer.
        */
       else
@@ -886,11 +886,11 @@ int mem_static_collect(struct sheap *shptr)
         shptr->base = dbptr->next;
         dbptr = shptr->base;
       }
-      
+
       /* Update allocation statistics */
       shptr->block_count--;
       shptr->free_chunks -= shptr->chunks_per_block;
-      
+
       mem_static_block_delete(tofr);
     }
     /* Still beeing used, skip it */
@@ -900,9 +900,9 @@ int mem_static_collect(struct sheap *shptr)
       dbptr = dbptr->next;
     }
   }
-  
+
   return 0;
-}    
+}
 
 /* ------------------------------------------------------------------------ *
  * Destroy the whole heap.                                                  *
@@ -911,25 +911,25 @@ void mem_static_destroy(struct sheap *shptr)
 {
   struct sblock *dbptr;
   struct sblock *next;
-  
+
   /* Walk through all blocks and free them */
   for(dbptr = shptr->base; dbptr; dbptr = next)
   {
     next = dbptr->next;
-    
+
     mem_static_block_delete(dbptr);
   }
-  
+
   /* Zero the heap struct */
   shptr->base = NULL;
   shptr->block_count = 0;
   shptr->free_chunks = 0;
   shptr->chunk_size = 0;
   shptr->chunks_per_block = 0;
-  
+
   dlink_delete(&mem_slist, &shptr->node);
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <chunk> is valid.                                 *
  * ------------------------------------------------------------------------ */
@@ -937,7 +937,7 @@ void mem_static_destroy(struct sheap *shptr)
 int mem_static_valid(struct sheap *shptr, void *scptr)
 {
   struct sblock *sbptr;
-  
+
   /* walk through all blocks */
   for(sbptr = shptr->base; sbptr; sbptr = sbptr->next)
   {
@@ -945,7 +945,7 @@ int mem_static_valid(struct sheap *shptr, void *scptr)
     if(mem_static_block_valid(sbptr, scptr))
       return 1;
   }
-  
+
   return 0;
 }
 #endif /* DEBUG */
@@ -957,7 +957,7 @@ void mem_dynamic_create(struct dheap *dhptr, size_t blocksize)
 {
   if(!dhptr || !blocksize)
     mem_fatal();
-  
+
   if(blocksize & (MEM_PAD_BLOCKS - 1))
   {
     blocksize += MEM_PAD_BLOCKS - 1;
@@ -969,10 +969,10 @@ void mem_dynamic_create(struct dheap *dhptr, size_t blocksize)
   dhptr->block_size = blocksize;
   dhptr->free_bytes = 0;
   dhptr->used_bytes = 0;
-  
+
   if(mem_dynamic_block_new(dhptr) == NULL)
     mem_fatal();
-  
+
   dlink_add_tail(&mem_dlist, &dhptr->node, dhptr);
   dhptr->id = mem_id++;
 }
@@ -982,11 +982,11 @@ void mem_dynamic_create(struct dheap *dhptr, size_t blocksize)
 void mem_dynamic_note(struct dheap *dhptr, const char *format, ...)
 {
   va_list args;
-  
+
   va_start(args, format);
-  
+
   str_vsnprintf(dhptr->note, sizeof(dhptr->note), format, args);
-  
+
   va_end(args);
 }
 
@@ -997,19 +997,19 @@ void *mem_dynamic_alloc(struct dheap *dhptr, size_t size)
 {
   struct dblock *dbptr;
   void            *ret;
-  
+
   /* Pad to pointer boundary */
   if((size & (sizeof(void *) - 1)) != 0)
   {
     size += sizeof(void *);
     size &= ~(sizeof(void *) - 1);
   }
-  
+
   /* Does it fit? Allocate dynblock otherwise */
 /*  if(size + sizeof(struct dchunk) > dhptr->max_bytes)
   {
   }*/
-  
+
   /* Find a block with a gap thats big enough for our new chunk */
   for(dbptr = dhptr->base; dbptr; dbptr = dbptr->next)
   {
@@ -1017,26 +1017,26 @@ void *mem_dynamic_alloc(struct dheap *dhptr, size_t size)
     if((ret = mem_dynamic_block_alloc(dbptr, size)))
     {
       memset(ret, 0, size);
-    
+
       return ret;
     }
   }
-  
+
   if((dbptr = mem_dynamic_block_new(dhptr)) == NULL)
   {
     mem_fatal();
   }
-  
+
   if((ret = mem_dynamic_block_alloc(dbptr, size)))
   {
     memset(ret, 0, size);
-    
+
     return ret;
   }
-  
+
   return NULL;
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * Try to resize block, otherwise free and allocate new one.                *
  * ------------------------------------------------------------------------ */
@@ -1047,35 +1047,35 @@ void *mem_dynamic_realloc(struct dheap *dhptr, void *ptr, size_t size)
   void          *top;
   int            avail;
   size_t         oldsize;
-  
+
   if(ptr == NULL)
     return mem_dynamic_alloc(dhptr, size);
-  
+
   dcptr = &((struct dchunk *)ptr)[-1];
-  
+
 #ifdef DEBUG
   if(!mem_dynamic_valid(dhptr, dcptr))
   {
-    log(mem_log, L_fatal, "invalid chunk in mem_dynamic_realloc(%p, %p, %u)", 
+    log(mem_log, L_fatal, "invalid chunk in mem_dynamic_realloc(%p, %p, %u)",
         dhptr, ptr, size);
     syscall_exit(-1);
   }
-#endif /* DEBUG */  
-  
+#endif /* DEBUG */
+
   dbptr = dcptr->node.data;
-  
+
   /* Calculate free space after chunk */
   if(dcptr->node.next)
     top = dcptr->node.next;
   else
     top = (void *)((size_t)&dbptr[1] + dbptr->size);
-  
+
   avail = (size_t)top - (size_t)ptr;
   oldsize = dcptr->size;
-  
+
   /* Shrink block */
   if(size <= dcptr->size)
-  {    
+  {
     dcptr->size = size;
   }
   /* Rocks, chunk still fits with new size */
@@ -1083,46 +1083,46 @@ void *mem_dynamic_realloc(struct dheap *dhptr, void *ptr, size_t size)
   {
     if(size - oldsize)
       memset((void *)((size_t)ptr + oldsize), 0, size - oldsize);
-    
+
     dcptr->size = size;
   }
   /* *shrug* we have to alloc new chunk and free this one :/ */
   else
   {
     top = mem_dynamic_alloc(dhptr, size);
-  
+
     if(top == NULL)
       return top;
-    
+
     memcpy(top, ptr, dcptr->size);
-  
+
     mem_dynamic_free(dhptr, ptr);
-    
+
     return top;
   }
-  
+
   if(avail == dbptr->max_bytes)
   {
     avail += oldsize - size;
-    
+
     if(avail < 0)
       avail = 0;
-    
+
     if(avail >= 0)
     {
       if(dhptr->max_bytes == dbptr->max_bytes)
         dhptr->max_bytes = avail;
-      
+
       dbptr->max_bytes = avail;
     }
   }
-  
+
   /* Update memory statistics */
   dbptr->free_bytes += oldsize - size;
   dbptr->used_bytes += size - oldsize;
   dhptr->free_bytes += oldsize - size;
   dhptr->used_bytes += size - oldsize;
-  
+
   return ptr;
 }
 
@@ -1132,9 +1132,9 @@ void *mem_dynamic_realloc(struct dheap *dhptr, void *ptr, size_t size)
 void mem_dynamic_free(struct dheap *dhptr, void *ptr)
 {
   struct dchunk *dcptr;
-  
+
   dcptr = &((struct dchunk *)ptr)[-1];
-  
+
 #ifdef DEBUG
   if(!mem_dynamic_valid(dhptr, dcptr))
   {
@@ -1143,9 +1143,9 @@ void mem_dynamic_free(struct dheap *dhptr, void *ptr)
     dcptr->node.data = NULL;
     syscall_exit(-1);
   }
-#endif /* DEBUG */  
-  
-  mem_dynamic_block_free(dcptr->node.data, dcptr);  
+#endif /* DEBUG */
+
+  mem_dynamic_block_free(dcptr->node.data, dcptr);
 }
 
 /* ------------------------------------------------------------------------ *
@@ -1156,18 +1156,18 @@ int mem_dynamic_collect(struct dheap *dhptr)
   struct dblock *dbptr;
   struct dblock *tofr;
   struct dblock *prev;
-  
+
   /* Huh? */
   if(dhptr == NULL)
     return 0;
-  
+
   /* Heap must have at least 1 block */
   if(dhptr->block_count == 1)
     return 0;
-  
+
   prev = NULL;
   dbptr = dhptr->base;
-  
+
   /* Now loop through all blocks */
   while(dbptr)
   {
@@ -1175,8 +1175,8 @@ int mem_dynamic_collect(struct dheap *dhptr)
     if(dbptr->chunks.size == 0)
     {
       tofr = dbptr;
-      
-      /* 
+
+      /*
        * There was a previous block, remove its
        * reference to the current block
        */
@@ -1185,8 +1185,8 @@ int mem_dynamic_collect(struct dheap *dhptr)
         prev->next = dbptr->next;
         dbptr = prev->next;
       }
-      /* 
-       * There was no previous block, 
+      /*
+       * There was no previous block,
        * update the base pointer.
        */
       else
@@ -1194,10 +1194,10 @@ int mem_dynamic_collect(struct dheap *dhptr)
         dhptr->base = dbptr->next;
         dbptr = dhptr->base;
       }
-      
+
       /* Update allocation statistics */
       dhptr->block_count--;
-      
+
       mem_dynamic_block_delete(tofr);
     }
     /* Still beeing used, skip it */
@@ -1207,9 +1207,9 @@ int mem_dynamic_collect(struct dheap *dhptr)
       dbptr = dbptr->next;
     }
   }
-  
+
   return 0;
-}    
+}
 
 /* ------------------------------------------------------------------------ *
  * Destroy a dynamic heap, munmap() the blocks.                             *
@@ -1218,15 +1218,15 @@ void mem_dynamic_destroy(struct dheap *dhptr)
 {
   struct dblock *dbptr;
   struct dblock *next;
-  
+
   /* Walk through all blocks and free them */
   for(dbptr = dhptr->base; dbptr; dbptr = next)
   {
     next = dbptr->next;
-    
+
     mem_dynamic_block_delete(dbptr);
   }
-  
+
   /* Zero the heap struct */
   dhptr->base = NULL;
   dhptr->block_count = 0;
@@ -1234,10 +1234,10 @@ void mem_dynamic_destroy(struct dheap *dhptr)
   dhptr->free_bytes = 0;
   dhptr->used_bytes = 0;
   dhptr->max_bytes = 0;
-  
+
   dlink_delete(&mem_dlist, &dhptr->node);
 }
-  
+
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <dcptr> is valid.                                 *
  * this is time-consuming and will not be built without -DDEBUG             *
@@ -1246,7 +1246,7 @@ void mem_dynamic_destroy(struct dheap *dhptr)
 int mem_dynamic_valid(struct dheap *dhptr, void *dcptr)
 {
   struct dblock *dbptr;
-  
+
   /* Walk through all blocks */
   for(dbptr = dhptr->base; dbptr; dbptr = dbptr->next)
   {
@@ -1254,11 +1254,11 @@ int mem_dynamic_valid(struct dheap *dhptr, void *dcptr)
     if(mem_dynamic_block_valid(dbptr, dcptr))
       return 1;
   }
-  
+
   return 0;
 }
 #endif /* DEBUG */
- 
+
 /* ------------------------------------------------------------------------ *
  * Fuck libc! :P                                                            *
  * ------------------------------------------------------------------------ */
@@ -1297,7 +1297,7 @@ void *memset(void *s, int c, size_t n)
   }
   /* n is a multiple of 2, so do 16bit copying */
   else if(!(n & 0x01) && (n & -2))
-  { 
+  {
     int16_t q = ((int16_t)(c & 0xff) << 0) |
                 ((int16_t)(c & 0xff) << 8);
     n >>= 1;
@@ -1307,13 +1307,13 @@ void *memset(void *s, int c, size_t n)
   }
   /* otherwise do 8bit copying */
   else
-  { 
+  {
     int8_t q = (int8_t)(c & 0xff);
 
     for(i = 0; i < n; i++)
       ((int8_t *)s)[i] = q;
   }
-  
+
   return s;
 }
 #endif /* USE_IA32_LINUX_INLINE */
@@ -1343,8 +1343,8 @@ void *memcpy(void *d, const void *s, size_t n)
       ((int32_t *)d)[i] = ((int32_t *)s)[i];
   }
   /* n is a multiple of 2, so do 16bit copying */
-  else if(!(n & 0x01) && (n >= 2)) 
-  { 
+  else if(!(n & 0x01) && (n >= 2))
+  {
     n >>= 1;
 
     for(i = 0; i < n; i++)
@@ -1352,7 +1352,7 @@ void *memcpy(void *d, const void *s, size_t n)
   }
   /* otherwise do 8bit copying */
   else
-  { 
+  {
     for(i = 0; i < n; i++)
       ((int8_t *)d)[i] = ((int8_t *)s)[i];
   }
@@ -1366,14 +1366,14 @@ void *memmove(void *d, const void *s, size_t n)
   ssize_t dist;
 
   dist = (size_t)d - (size_t)s;
-  
+
   if(dist <= 0)
   {
     /* n is a multiple of 8, so do 64bit copying */
     if(!(n & 0x07) && (n >= 8) && (dist >= 8 || dist == 0))
     {
       n >>= 3;
-      
+
       for(i = 0; i < n; i++)
         ((int64_t *)d)[i] = ((int64_t *)s)[i];
     }
@@ -1381,24 +1381,24 @@ void *memmove(void *d, const void *s, size_t n)
     else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
     {
       n >>= 2;
-      
+
       for(i = 0; i < n; i++)
         ((int32_t *)d)[i] = ((int32_t *)s)[i];
     }
     /* n is a multiple of 2, so do 16bit copying */
-    else if(!(n & 0x01) && (n >= 2) && (dist >= 2)) 
-    { 
+    else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
+    {
       n >>= 1;
-      
+
       for(i = 0; i < n; i++)
         ((int16_t *)d)[i] = ((int16_t *)s)[i];
     }
     /* otherwise do 8bit copying */
     else
-    { 
+    {
       for(i = 0; i < n; i++)
         ((int8_t *)d)[i] = ((int8_t *)s)[i];
-    }    
+    }
   }
   else
   {
@@ -1406,11 +1406,11 @@ void *memmove(void *d, const void *s, size_t n)
     if(!(n & 0x07) && (n >= 8) && (dist <= -8))
     {
       n >>= 3;
-      
+
       for(i = n - 1;; i--)
       {
         ((int64_t *)d)[i] = ((int64_t *)s)[i];
-        if(i == 0) 
+        if(i == 0)
           break;
       }
     }
@@ -1418,38 +1418,38 @@ void *memmove(void *d, const void *s, size_t n)
     else if(!(n & 0x03) && (n >= 4) && (dist >= 4))
     {
       n >>= 2;
-      
+
       for(i = n - 1;; i--)
       {
         ((int32_t *)d)[i] = ((int32_t *)s)[i];
-        if(i == 0) 
+        if(i == 0)
           break;
       }
     }
     /* n is a multiple of 2, so do 16bit copying */
-    else if(!(n & 0x01) && (n >= 2) && (dist >= 2)) 
-    { 
+    else if(!(n & 0x01) && (n >= 2) && (dist >= 2))
+    {
       n >>= 1;
-      
+
       for(i = n - 1;; i--)
       {
         ((int16_t *)d)[i] = ((int16_t *)s)[i];
-        if(i == 0) 
+        if(i == 0)
           break;
       }
     }
     /* otherwise do 8bit copying */
     else
-    { 
+    {
       for(i = n - 1;; i--)
       {
         ((int8_t *)d)[i] = ((int8_t *)s)[i];
-        if(i == 0) 
+        if(i == 0)
           break;
       }
-    }    
+    }
   }
-  
+
   return d;
 }
 
@@ -1476,8 +1476,8 @@ int memcmp(const void *d, const void *s, size_t n)
         return 1;
   }
   /* n is a multiple of 2, so do 16bit comparing */
-  else if(!(n & 0x01) && (n >= 2)) 
-  { 
+  else if(!(n & 0x01) && (n >= 2))
+  {
     n >>= 1;
 
     for(i = 0; i < n; i++)
@@ -1486,7 +1486,7 @@ int memcmp(const void *d, const void *s, size_t n)
   }
   /* otherwise do 8bit comparing */
   else
-  { 
+  {
     for(i = 0; i < n; i++)
       if(((int8_t *)d)[i] != ((int8_t *)s)[i])
         return 1;

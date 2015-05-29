@@ -25,7 +25,7 @@
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #define USER_HASH_SIZE      16
-  
+
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
  * -------------------------------------------------------------------------- */
@@ -37,8 +37,8 @@ struct user {
   struct node    hnode;         /* node for user_lists[] */
   uint32_t       id;            /* a unique id */
   uint32_t       refcount;      /* how many times this block is referenced */
-  uint32_t       nhash;
-  uint32_t       uhash;
+  hash_t         nhash;
+  hash_t         uhash;
   struct client *client;
   struct oper   *oper;
   struct list    channels;
@@ -49,15 +49,15 @@ struct user {
   char           uid [IRCD_IDLEN + 1];
   char           away[IRCD_AWAYLEN + 1];
   char           mode[IRCD_MODEBUFLEN + 1];
-};  
+};
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-extern int          user_log;      /* user log source */
-extern struct sheap user_heap;     /* heap for lclient_t */
-extern struct list  user_list;     /* list with all of them */
-extern uint32_t     user_id;
+IRCD_DATA(int)         user_log;      /* user log source */
+extern struct sheap    user_heap;     /* heap for lclient_t */
+IRCD_DATA(struct list) user_list;     /* list with all of them */
+IRCD_DATA(uint32_t)    user_id;
 
 /* ------------------------------------------------------------------------ */
 IRCD_API(int) user_get_log(void);
@@ -65,71 +65,71 @@ IRCD_API(int) user_get_log(void);
 /* -------------------------------------------------------------------------- *
  * Initialize user module.                                                    *
  * -------------------------------------------------------------------------- */
-extern void         user_init         (void);
+IRCD_API(void)         user_init         (void);
 
 /* -------------------------------------------------------------------------- *
  * Shutdown the user module.                                                  *
  * -------------------------------------------------------------------------- */
-extern void         user_shutdown     (void);
+IRCD_API(void)         user_shutdown     (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_collect      (void);
+IRCD_API(void)         user_collect      (void);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct user *user_new          (const char     *name,
-                                       const char     *id);
+IRCD_API(struct user*) user_new          (const char     *name,
+                                          const char     *id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_delete       (struct user    *uptr);
+IRCD_API(void)         user_delete       (struct user    *uptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct user *user_find_id      (uint32_t        id);
+IRCD_API(struct user*) user_find_id      (uint32_t        id);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct user *user_find_uid     (const char     *uid);
+IRCD_API(struct user*) user_find_uid     (const char     *uid);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct user *user_find_name    (const char     *name);
+IRCD_API(struct user*) user_find_name    (const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_set_name     (struct user    *uptr, 
-                                       const char     *name);
+IRCD_API(void)         user_set_name     (struct user    *uptr,
+                                          const char     *name);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_whois        (struct client  *cptr,
-                                       struct user    *auptr);
+IRCD_API(void)         user_whois        (struct client  *cptr,
+                                          struct user    *auptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_invite       (struct user    *uptr, 
-                                       struct channel *chptr);
+IRCD_API(void)         user_invite       (struct user    *uptr,
+                                          struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_uninvite     (struct invite  *ivptr);
+IRCD_API(void)         user_uninvite     (struct invite  *ivptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_release      (struct user    *uptr);
+IRCD_API(void)         user_release      (struct user    *uptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct user *user_pop          (struct user    *uptr);
+IRCD_API(struct user*) user_pop          (struct user    *uptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern struct user *user_push         (struct user   **ucptrptr);
- 
+IRCD_API(struct user*) user_push         (struct user   **ucptrptr);
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-extern void         user_dump         (struct user    *uptr);
-  
+IRCD_API(void)         user_dump         (struct user    *uptr);
+
 #endif /* SRC_USER_H */

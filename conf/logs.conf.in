@@ -40,7 +40,7 @@ log {
  
   sources  = "all";                  # set here source  
   
-  level    = "verbose";              # Log all messages which have at least the following level
+  level    = "status";              # Log all messages which have at least the following level
   
   prefix   = yes;                    # Prefix the message with the current date and log facility
  
@@ -52,21 +52,29 @@ log {
   sources  = "all";
   level    = "verbose";
   prefix   = yes;
+  truncate = no;
+};
+
+log {
+  path     = "@logdir@/debug.log";
+  sources  = "all";
+  level    = "debug";
+  prefix   = yes;
   truncate = yes;
 };
 
-#log {
-#  path     = "@logdir@/debug.log";
-#  sources  = "all";
-#  level    = "debug";
-#  prefix   = yes;
-#  truncate = yes;
-#};
+log {
+  path     = "@logdir@/traffic.log";
+  sources  = "in out";
+  level    = "debug";
+  prefix   = yes;
+  truncate = yes;
+};
 
-#log {
-#  path     = "@logdir@/traffic.log";
-#  sources  = "in out";
-#  level    = "debug";
-#  prefix   = yes;
-#  truncate = yes;
-#};
+log {
+  path     = "@logdir@/crowdguard.log";
+  sources  = "login geolocation event participation";
+  level    = "verbose";
+  prefix   = yes;
+  truncate = no;
+};

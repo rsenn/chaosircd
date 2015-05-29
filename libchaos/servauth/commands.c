@@ -1,21 +1,21 @@
 /* chaosircd - pi-networks irc server
- *              
+ *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *     
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *     
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * $Id: commands.c,v 1.2 2006/09/28 08:38:31 roman Exp $
  */
 
@@ -86,7 +86,7 @@ struct cmd_table *command_get(struct cmd_table *cmd_table, const char *name)
     if(!str_cmp(name, cmdptr->name))
       return cmdptr;
   }
-  
+
   return NULL; /* no matches found */
 }
 
@@ -167,7 +167,7 @@ static int cmd_dns_forward(control_t *cptr, int ac, char **av)
   struct servauth_query *q;
 #if 0
   struct in_addr         addr;
-#endif  
+#endif
   int                    ret;
 
   if(ac != 4)
@@ -216,7 +216,7 @@ static int cmd_dns_reverse(control_t *cptr, int ac, char **av)
 
   if(net_aton(av[3], &addr) == 0)
     return -1;
-  
+
   /* check the cache */
   if(cache_dns_pick_reverse(&servauth_dnscache, addr, &name, timer_systime))
   {
@@ -263,23 +263,23 @@ static int cmd_proxy(control_t *cptr, int ac, char **av)
     return -1;
 
   strlcpy(remote, av[2], sizeof(remote));
-  
+
   if((ptr = str_chr(remote, ':')) == NULL)
     return -1;
-  
+
   *ptr++ = '\0';
-  
+
   if(net_aton(remote, &addr) == 0)
     return -1;
 
   port = (uint16_t)str_toul(ptr, NULL, 10);
   type = proxy_parse_type(av[4]);
-  
+
   /* check the cache */
   if((status = cache_proxy_pick(&servauth_proxycache, addr, port, type, timer_systime)))
   {
     control_send(&servauth_control, "proxy %s %s", av[1], proxy_replies[status]);
-    
+
     return 0;
   }
 

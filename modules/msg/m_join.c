@@ -46,7 +46,7 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_join (struct lclient *lcptr, struct client *cptr, 
+static void m_join (struct lclient *lcptr, struct client *cptr,
                     int             argc,  char         **argv);
 
 /* -------------------------------------------------------------------------- *
@@ -60,8 +60,8 @@ static char *m_join_help[] = {
   "give the key, or the keys as the second parameter.",
   "Multiple channel names, or keys are seperated with",
   "commata.",
-  NULL    
-};    
+  NULL
+};
 
 static struct msg m_join_msg = {
   "JOIN", 1, 2, MFLG_CLIENT,
@@ -76,7 +76,7 @@ int m_join_load(void)
 {
   if(msg_register(&m_join_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
@@ -93,7 +93,7 @@ void m_join_unload(void)
  * -------------------------------------------------------------------------- */
 static void m_join(struct lclient *lcptr, struct client *cptr,
                    int             argc,  char         **argv)
-{ 
+{
   char    *chanv[IRCD_MAXCHANNELS + 1];
   char    *keyv[IRCD_MAXCHANNELS + 1];
   uint32_t n;
@@ -101,10 +101,10 @@ static void m_join(struct lclient *lcptr, struct client *cptr,
 
   n = str_tokenize_s(argv[2], chanv, IRCD_MAXCHANNELS, ',');
   memset(keyv, 0, sizeof(keyv));
-  
+
   if(argv[3])
     str_tokenize_s(argv[3], keyv, IRCD_MAXCHANNELS, ',');
-  
+
   for(i = 0; i < n; i++)
   {
     /* Check for valid channel name */
@@ -113,19 +113,19 @@ static void m_join(struct lclient *lcptr, struct client *cptr,
       numeric_send(cptr, ERR_BADCHANNAME, chanv[i]);
       return;
     }
-    
+
     if(!channel_is_valid(chanv[i]))
     {
       numeric_send(cptr, ERR_NOSUCHCHANNEL, chanv[i]);
       return;
     }
-  
+
     if(cptr->user->channels.size == IRCD_MAXCHANNELS)
     {
       numeric_send(cptr, ERR_TOOMANYCHANNELS, chanv[i]);
       return;
     }
-    
+
     channel_join(lcptr, cptr, chanv[i], keyv[i]);
   }
 }
