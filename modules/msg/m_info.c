@@ -41,7 +41,9 @@
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
 
-#include "../../config.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *

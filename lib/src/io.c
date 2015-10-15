@@ -55,7 +55,7 @@
 #include <openssl/ssl.h>
 #endif
 
-#ifdef HAVE_IO_H
+#if 0
 #include <io.h>
 #endif
 

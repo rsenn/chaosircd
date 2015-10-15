@@ -25,6 +25,7 @@
 
 #ifdef HAVE_CONFIG_H
 #include "libchaos/config.h"
+#include "config.h"
 #endif
 
 #ifndef NULL
@@ -40,6 +41,10 @@
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
 #endif
 
 #ifdef HAVE_SYS_TIME_H

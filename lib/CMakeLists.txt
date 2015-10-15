@@ -60,7 +60,7 @@ check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
 check_include_file(sys/stat.h HAVE_SYS_STAT_H)
 check_include_file(sys/timeb.h HAVE_SYS_TIMEB_H)
 check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
-check_include_file(winsock2.h HAVE_WINSOCK__H)
+check_include_file(winsock2.h HAVE_WINSOCK2_H)
 check_include_file(ws2tcpip.h HAVE_WS_TCPIP_H)
 check_include_file(unistd.h HAVE_UNISTD_H)
 

@@ -12,6 +12,11 @@ cmake_minimum_required(VERSION 2.6)
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
+include_directories(
+	"${CMAKE_CURRENT_BINARY_DIR}"
+#	"${CMAKE_CURRENT_BINARY_DIR}/lib"
+)
+
 add_subdirectory(lib)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
@@ -68,17 +73,21 @@ check_include_file(sys/timeb.h HAVE_SYS_TIMEB_H)
 check_include_file(sys/time.h HAVE_SYS_TIME_H)
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
+check_include_file(unistd.h HAVE_UNISTD_H)
+check_include_file(linux/filter.h HAVE_LINUX_FILTER_H)
+check_include_file(linux/types.h HAVE_LINUX_TYPES_H)
+check_include_file(net/bpf.h HAVE_NET_BPF_H)
+check_include_file(net/ethernet.h HAVE_NET_ETHERNET_H)
+check_include_file(elf.h HAVE_ELF_H)
+check_include_file(limits.h HAVE_LIMITS_H)
+check_include_file(winsock2.h HAVE_WINSOCK2_H)
+check_include_file(ws2tcpip.h HAVE_WS_TCPIP_H)
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 #substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
-
-include_directories(
-	"${CMAKE_CURRENT_BINARY_DIR}/lib"
-	"${CMAKE_CURRENT_BINARY_DIR}"
-)
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
