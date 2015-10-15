@@ -8,23 +8,23 @@
 # check for maintainer mode
 # ---------------------------------------------------------------------------
 AC_DEFUN([AC_CHECK_MAINTAINER],
-[ac_cv_maintainer_mode="no"
+[ac_cv_maintainer="no"
 
 AC_MSG_CHECKING([whether to enable maintainer mode])
 
 AC_ARG_ENABLE([maintainer],
-[  --enable-maintainer-mode maintainer mode
-  --disable-maintainer-modeno maintainer mode (default)],
+[  --enable-maintainer      maintainer mode
+  --disable-maintainer     no maintainer mode (default)],
 [case "$enableval" in
   yes)
-    ac_cv_maintainer_mode="yes"
+    ac_cv_maintainer="yes"
     ;;
   no)
-    ac_cv_maintainer_mode="no"
+    ac_cv_maintainer="no"
     ;;
 esac])
 
-if test "$ac_cv_maintainer_mode" = "yes"; then
+if test "$ac_cv_maintainer" = "yes"; then
   MAINTAINER_MODE=""
   NO_MAINTAINER_MODE="#"
   AC_MSG_RESULT([yes])
