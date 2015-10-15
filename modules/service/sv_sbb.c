@@ -176,7 +176,7 @@ int sv_sbb_load(void)
   sv_sbb_htmlp = htmlp_new("sv_sbb");
 
   /* Create a HTTP client */
-  sv_sbb_httpc = httpc_add("http:/*fahrplan.sbb.ch/bin/query.exe/dn?OK");*/
+  sv_sbb_httpc = httpc_add("http://fahrplan.sbb.ch/bin/query.exe/dn?OK");
 
   /* Register a message handler */
   msg_register(&m_sbb_msg);

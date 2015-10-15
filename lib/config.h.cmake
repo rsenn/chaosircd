@@ -1,14 +1,52 @@
+#ifndef LIB_CONFIG_H__
+#define LIB_CONFIG_H__
+
+/* Define to 1 if you have the 'socketpair' function. */
+#cmakedefine HAVE_SOCKETPAIR 1
+
+/* Define to 1 if you have the 'select' function. */
+#cmakedefine HAVE_SELECT 1
+
+/* Define to 1 if you have the 'poll' function. */
+#cmakedefine HAVE_POLL 1
+
+/* Define to 1 if you want to use select(2) */
+/* #define USE_SELECT @USE_SELECT@*/
+#cmakedefine USE_SELECT 1
+
+/* Define to 1 if you want to use poll(2) */
+/* #define USE_POLL @USE_POLL@*/
+#cmakedefine USE_POLL 1
+
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #cmakedefine HAVE_SYS_IOCTL_H 1
 
 /* Define to 1 if you have the <sys/mman.h> header file. */
 #cmakedefine HAVE_SYS_MMAN_H 1
 
+/* Define to 1 if you have the <sys/time.h> header file. */
+#cmakedefine HAVE_SYS_TIME_H 1
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H 1
+
 /* Define to 1 if you have the <sys/timeb.h> header file. */
 #cmakedefine HAVE_SYS_TIMEB_H 1
 
 /* Define to 1 if you have the <sys/wait.h> header file. */
 #cmakedefine HAVE_SYS_WAIT_H 1
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#cmakedefine HAVE_SYS_SOCKET_H 1
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#cmakedefine HAVE_SYS_SELECT_H 1
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#cmakedefine HAVE_SYS_PARAM 1
+
+/* Define to 1 if you have the <sys/poll.h> header file. */
+#cmakedefine HAVE_SYS_POLL_H 1
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #cmakedefine HAVE_NETINET_IN_H 1
@@ -49,13 +87,15 @@
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 #cmakedefine HAVE_WS2TCPIP_H 1
 
+/* Define to 1 if you have the <fcntl.h> header file. */
+#cmakedefine HAVE_FCNTL_H 1
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the socklen_t type. */
 #cmakedefine HAVE_SOCKLEN_T 1
 
-#if 0
 /* Define to the address where bug reports for this package should be sent. */
 #cmakedefine PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 
@@ -79,10 +119,15 @@
 
 /* Platform this server runs on */
 #cmakedefine PLATFORM "@PLATFORM@"
-#endif
 
 /* Dynamic linkable library filename extension */
 #cmakedefine DLLEXT "@DLLEXT@"
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #cmakedefine HAVE_SYS_STAT_H 1
+
+#define SIZEOF_UINTPTR_T @SIZEOF_UINTPTR_T@
+/* Creation time of this server */
+#cmakedefine CREATION @CREATION@
+
+#endif
 

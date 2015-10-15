@@ -1,10 +1,8 @@
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 #include "libchaos/io.h"
 #include "libchaos/mem.h"

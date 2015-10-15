@@ -1,4 +1,4 @@
-#include <stralloc.h>
+#include "libowfat/stralloc.h"
 #include <buffer.h>
 #include <io.h>
 #include <errmsg.h>

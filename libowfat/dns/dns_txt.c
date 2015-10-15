@@ -1,5 +1,5 @@
 #include <errno.h>
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 #include "uint16.h"
 #include "byte.h"
 #include "dns.h"

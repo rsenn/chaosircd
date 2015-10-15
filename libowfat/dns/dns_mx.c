@@ -1,4 +1,4 @@
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 #include "byte.h"
 #include "uint16.h"
 #include "dns.h"

@@ -1,4 +1,4 @@
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 
 /* stralloc_append adds one byte in[0] to the end of the string stored
  * in sa. It is the same as stralloc_catb(&sa,in,1). */

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 #include "buffer.h"
 
 int main() {

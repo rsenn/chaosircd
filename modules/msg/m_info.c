@@ -22,6 +22,10 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
+#ifdef HAVE_CONFIG_H
+#include "ircd/config.h"
+#endif
+
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
 #include "libchaos/log.h"
@@ -30,7 +34,6 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/config.h"
 #include "ircd/msg.h"
 #include "ircd/user.h"
 #include "ircd/chars.h"
@@ -40,10 +43,6 @@
 #include "ircd/numeric.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -92,11 +91,11 @@ static const char *m_info_text[] = {
   "           ___/       CH           "    "Laboratories as part of a large research prog-",
   "          /   \\      /  2          "   "ram dealing with ergot alkaloid derivatives.",
   "   H C---N     |  H C              "    "D-Lysergic Acid Diethylamide, commonly called",
-  "    3     \\__/*    3               "   "acid, LSD, or LSD-25, is a powerful semisynth-",*/
+  "    3     \\__//    3               "   "acid, LSD, or LSD-25, is a powerful semisynth-",
   "          /   \\                    "   "etic hallucinogen and psychedelic entheogen.",
   "         |     |---.               "    "A typical dose of LSD is only 100 micrograms,",
   "          \\___/  `` \\              "  "a tiny amount equal to 1/10th the weight of a",
-  "          /   \\\\   /*              "  "grain of sand.  LSD causes a powerful intensi-",*/
+  "          /   \\\\   //              "  "grain of sand.  LSD causes a powerful intensi-",
   "          \\   / ---'               "   "fication and alteration of feelings, memories,",
   "           `N'                     "    "senses and self-awareness for 6-12 hours.  In",
   "            |                      "    "addition, LSD usually produces visual effects",

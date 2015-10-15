@@ -5,7 +5,7 @@ MACRO(substitute_project_includes NAME)
 include_directories(
     "${ARGV1}/src"
     "${ARGV1}/include"
-    "${ARGV1}/include/${ARGV0}"
+#    "${ARGV1}/include/${ARGV0}"
     "${ARGV2}/include"
   )
   
@@ -23,7 +23,7 @@ MACRO(include_project_includes NAME)
 include_directories(
     "${ARGV1}/src"
     "${ARGV1}/include"
-    "${ARGV1}/include/${ARGV0}"
+ #   "${ARGV1}/include/${ARGV0}"
     "${ARGV2}/include"
   )
 ENDMACRO(include_project_includes)

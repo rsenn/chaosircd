@@ -1,4 +1,4 @@
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 #include <stdlib.h>
 
 /* stralloc_ready makes sure that sa has enough space allocated to hold

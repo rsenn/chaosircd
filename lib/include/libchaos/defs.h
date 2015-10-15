@@ -24,7 +24,7 @@
 #define CHAOS_DEFS_H
 
 #ifdef HAVE_CONFIG_H
-#include "libchaos/config.h"
+/*#include "libchaos/config.h"*/
 #include "config.h"
 #endif
 

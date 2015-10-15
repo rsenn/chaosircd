@@ -1,4 +1,4 @@
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 #include "str.h"
 
 extern int stralloc_cat(stralloc *sa,stralloc *sa2) {

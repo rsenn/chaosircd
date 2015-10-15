@@ -1,4 +1,4 @@
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 #include "case.h"
 #include "byte.h"
 #include "str.h"

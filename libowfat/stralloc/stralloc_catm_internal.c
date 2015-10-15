@@ -1,6 +1,6 @@
 #include <stdarg.h>
 #include <string.h>
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 
 int stralloc_catm_internal(stralloc* sa, ...) {
   va_list a;

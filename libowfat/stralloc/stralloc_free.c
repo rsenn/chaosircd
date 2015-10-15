@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 
 void stralloc_free(stralloc *sa) {
   if (sa->s) free(sa->s);
