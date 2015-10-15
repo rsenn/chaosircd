@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,25 +22,25 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/log.h>
-#include <libchaos/str.h>
-#include <libchaos/dlink.h>
-#include <libchaos/timer.h>
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/server.h>
-#include <chaosircd/service.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/chanmode.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/server.h"
+#include "ircd/service.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
@@ -144,8 +144,7 @@ static void m_multimsg(int            type, const char *cmd,  struct lclient *lc
                        struct client *cptr, int         argc, char          **argv)
 {
   char  *recipients[IRCD_MAXTARGETS + 1];
-  size_t n;
-  int    i;
+  size_t i, n;
 
   if(argc < 3)
   {

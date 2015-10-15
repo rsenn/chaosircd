@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,24 +22,24 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/timer.h>
-#include <libchaos/log.h>
-#include <libchaos/str.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/timer.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -137,7 +137,7 @@ static void m_part(struct lclient *lcptr, struct client *cptr,
   }
 
   if(chanuser_is_owner(cuptr) && client_is_local(cptr) && channel_is_persistent(chptr))
-//     !str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])))
+/*     !str_ncmp(cptr->name, &chptr->name[1], str_len(&chptr->name[1])))*/
   {
     client_send(cptr, ":%s NOTICE %N :*** You need to /OPART if you really want to leave %s.",
                 server_me->name, cptr, chptr->name);

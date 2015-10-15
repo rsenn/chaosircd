@@ -40,7 +40,7 @@ CLEANFILES           = *~ core core.*
 DISTCLEANFILES       = Makefile $(CLEANFILES)
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in import-modules.sh
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 module_import.h: import-modules.sh $(SUBDIRS:%=%/Makefile)
 	@$(ECHO_CONFIG)

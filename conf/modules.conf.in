@@ -54,6 +54,7 @@ modules {
   load "m_user";            # Client login request
   load "m_userip";          # Shows real ip of a client
   load "m_userhost";        # Show real host of a client
+  load "m_userdb";
   load "m_version";         # Shows version of a server
   load "m_who";             # Shows channel members
   load "m_whois";           # Shows client info

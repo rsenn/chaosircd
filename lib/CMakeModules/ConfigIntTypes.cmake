@@ -1,0 +1,15 @@
+include(CheckIncludeFile)
+
+check_include_file(limits.h HAVE_LIMITS_H)
+check_include_file(stdint.h HAVE_STDINT_H)
+check_include_file(inttypes.h HAVE_INTTYPES_H)
+
+if(MSVC)
+  include_directories("${LIBCHAOS_SOURCE_DIR}/include/msinttypes")
+  set(HAVE_STDINT_H 1)
+  set(HAVE_INTTYPES_H 1)
+#  add_definitions(-D_POSIX_)
+#  add_definitions( "/W0 /D_CRT_SECURE_NO_WARNINGS /wd4005 /wd4996 /nologo" )
+add_definitions("/W0 /D_CRT_SECURE_NO_WARNINGS")
+set(MSINTTYPES_HEADERS "${LIBCHAOS_SOURCE_DIR}/include/msinttypes/stdint.h"  "${LIBCHAOS_SOURCE_DIR}/include/msinttypes/inttypes.h")
+endif()

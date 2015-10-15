@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,28 +24,30 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/connect.h>
-#include <libchaos/syscall.h>
-#include <libchaos/listen.h>
-#include <libchaos/module.h>
-#include <libchaos/mfile.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/ssl.h>
-#include <libchaos/io.h>
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/syscall.h"
+#include "libchaos/listen.h"
+#include "libchaos/module.h"
+#include "libchaos/mfile.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/config.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/client.h>
-#include <chaosircd/class.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/oper.h>
+#include "ircd/config.h"
+#include "ircd/ircd.h"
+#include "ircd/client.h"
+#include "ircd/class.h"
+#include "ircd/conf.h"
+#include "ircd/oper.h"
+
+#include "../config.h"
 
 #include "../config.h"
 
@@ -95,7 +97,7 @@ again:
   if(argv[conf_optind][1] == '-')
   {
     char *arg = &argv[conf_optind][2];      /* Option name */
-    char *max = str_chr(arg, '=');      /* Points to end of name */
+    char *max = strchr(arg, '=');      /* Points to end of name */
     const struct option *o;            /* Points to switch in option struct */
 
     /* We haven't found a '=', set end of name */
@@ -170,7 +172,7 @@ again:
 
   conf_optopt = argv[conf_optind][lastofs + 1];
 
-  if((tmp = str_chr(optstring, conf_optopt)))
+  if((tmp = strchr(optstring, conf_optopt)))
   {
     /* Apparently, we looked for \0, i.e. end of argument */
     if(*tmp == 0)
@@ -293,7 +295,7 @@ void conf_shutdown(void)
 {
 /*  conf_free(&conf_current);
   conf_free(&conf_new);*/
-  io_close(conf_fd);
+  io_destroy(conf_fd);
 
   log_source_unregister(conf_log);
 }
@@ -354,7 +356,7 @@ void conf_read_callback(int fd, void *ptr)
     conf_free(&conf_current);
     conf_done();
 
-    io_close(fd);
+    io_destroy(fd);
   }
 }
 

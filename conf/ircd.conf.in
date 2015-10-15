@@ -10,38 +10,38 @@ global {
                                 # configfile coldstart
   hub    = yes;                  # Hub mode: server forwards messages
                                 # between two or more servers
-  pid    = "@pidfile@";
+  pid    = "@relpidfile@";
 };
 
 # Message files
 mfiles {
-  load "@sysconfdir@/ircd.motd";  # Message of the day 
+  load "@relsysconfdir@/ircd.motd";  # Message of the day 
                                   # (used by the m_motd module) 
 };
 
-.include "@sysconfdir@/logs.conf"         # Log files
-.include "@sysconfdir@/inis.conf"         # INI databases
-.include "@sysconfdir@/modules.conf"      # Loadable modules
-.include "@sysconfdir@/children.conf"     # Child processes
-.include "@sysconfdir@/classes.conf"      # Connection classes
-.include "@sysconfdir@/opers.conf"        # IRC Operators
-.include "@sysconfdir@/ssl.conf"          # SSL contexts
+.include "@relsysconfdir@/logs.conf"         # Log files
+.include "@relsysconfdir@/inis.conf"         # INI databases
+.include "@relsysconfdir@/modules.conf"      # Loadable modules
+.include "@relsysconfdir@/children.conf"     # Child processes
+.include "@relsysconfdir@/classes.conf"      # Connection classes
+.include "@relsysconfdir@/opers.conf"        # IRC Operators
+.include "@relsysconfdir@/ssl.conf"          # SSL contexts
 
 # Listen for incoming SSL connections on port 9200
-listen {
-  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-  port     = 9200;                         # Port to listen to
-  protocol = "irc";                       # Protocol handler for this port
-  class    = "clients";                   # Class for client connects
-  ssl      = yes;                         # Use OpenSSL encryption?
-  context  = "listen";                    # SSL context to use 
-                                          # (must be of 'server' type)
-  backlog  = 5;                           # Backlog argument for listen(),
-                                          # this defines how many incoming
-                                          # connections can be buffered before
-                                          # accept() is called.
-};
-
+@SSL_TRUE@listen {
+@SSL_TRUE@  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
+@SSL_TRUE@  port     = 9200;                         # Port to listen to
+@SSL_TRUE@  protocol = "irc";                       # Protocol handler for this port
+@SSL_TRUE@  class    = "clients";                   # Class for client connects
+@SSL_TRUE@  ssl      = yes;                         # Use OpenSSL encryption?
+@SSL_TRUE@  context  = "listen";                    # SSL context to use 
+@SSL_TRUE@                                          # (must be of 'server' type)
+@SSL_TRUE@  backlog  = 5;                           # Backlog argument for listen(),
+@SSL_TRUE@                                          # this defines how many incoming
+@SSL_TRUE@                                          # connections can be buffered before
+@SSL_TRUE@                                          # accept() is called.
+@SSL_TRUE@};
+@SSL_TRUE@
 # Listen for incoming connections on port 9990
 listen {
   address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
@@ -74,8 +74,8 @@ listen {
 #  port     = 7007;                        # Port to listen to
 #  protocol = "irc";                       # Protocol handler for this port
 #  class    = "clients";                   # Class for client connects
-#  ssl      = yes;                         # Use OpenSSL encryption?
-#  context  = "listen";                    # SSL context to use
+@SSL_TRUE@#  ssl      = yes;                         # Use OpenSSL encryption?
+@SSL_TRUE@#  context  = "listen";                    # SSL context to use
 #                                          # (must be of 'server' type)
 #  backlog  = 5;                           # Backlog argument for listen(),
 #                                          # this defines how many incoming

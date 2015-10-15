@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,24 +22,24 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/module.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/module.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/config.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/config.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 
 #include "../../config.h"
 
@@ -90,11 +90,11 @@ static const char *m_info_text[] = {
   "           ___/       CH           "    "Laboratories as part of a large research prog-",
   "          /   \\      /  2          "   "ram dealing with ergot alkaloid derivatives.",
   "   H C---N     |  H C              "    "D-Lysergic Acid Diethylamide, commonly called",
-  "    3     \\__//    3               "   "acid, LSD, or LSD-25, is a powerful semisynth-",
+  "    3     \\__/*    3               "   "acid, LSD, or LSD-25, is a powerful semisynth-",*/
   "          /   \\                    "   "etic hallucinogen and psychedelic entheogen.",
   "         |     |---.               "    "A typical dose of LSD is only 100 micrograms,",
   "          \\___/  `` \\              "  "a tiny amount equal to 1/10th the weight of a",
-  "          /   \\\\   //              "  "grain of sand.  LSD causes a powerful intensi-",
+  "          /   \\\\   /*              "  "grain of sand.  LSD causes a powerful intensi-",*/
   "          \\   / ---'               "   "fication and alteration of feelings, memories,",
   "           `N'                     "    "senses and self-awareness for 6-12 hours.  In",
   "            |                      "    "addition, LSD usually produces visual effects",

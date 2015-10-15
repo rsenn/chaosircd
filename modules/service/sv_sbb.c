@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,24 +22,24 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/log.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/str.h>
-#include <libchaos/httpc.h>
-#include <libchaos/htmlp.h>
+#include "libchaos/log.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/str.h"
+#include "libchaos/httpc.h"
+#include "libchaos/htmlp.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/service.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/user.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/numeric.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/service.h"
+#include "ircd/chanuser.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -176,7 +176,7 @@ int sv_sbb_load(void)
   sv_sbb_htmlp = htmlp_new("sv_sbb");
 
   /* Create a HTTP client */
-  sv_sbb_httpc = httpc_add("http://fahrplan.sbb.ch/bin/query.exe/dn?OK");
+  sv_sbb_httpc = httpc_add("http:/*fahrplan.sbb.ch/bin/query.exe/dn?OK");*/
 
   /* Register a message handler */
   msg_register(&m_sbb_msg);
@@ -959,7 +959,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
     *p++ = '\0';
     *p++ = '\0';
 
-    if((timestr = str_chr(p, ':')))
+    if((timestr = strchr(p, ':')))
     {
       while(*timestr != ' ' && timestr > p)
         timestr--;
@@ -975,7 +975,7 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
         if((q_time = timer_parse_time(timestr)) == (uint64_t)-1LL)
           q_time = timer_mtime - timer_today;
 
-        if((datestr = str_chr(timestr, ' ')))
+        if((datestr = strchr(timestr, ' ')))
         {
           *datestr++ = '\0';
 

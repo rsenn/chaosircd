@@ -1,0 +1,12 @@
+include(CheckIncludeFile)
+
+check_include_file(unistd.h HAVE_UNISTD_H)
+check_include_file(signal.h HAVE_SIGNAL_H)
+check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+check_include_file(sys/time.h HAVE_SYS_TIME_H)
+check_include_file(sys/ioctl.h HAVE_SYS_IOCTL_H)
+check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
+check_include_file(sys/timeb.h HAVE_SYS_TIMEB_H)
+check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
+check_include_file(dlfcn.h HAVE_DLFCN_H)
+check_include_file(elf.h HAVE_ELF_H)

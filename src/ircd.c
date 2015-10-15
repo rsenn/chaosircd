@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,49 +24,50 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/connect.h>
-#include <libchaos/syscall.h>
-#include <libchaos/filter.h>
-#include <libchaos/listen.h>
-#include <libchaos/module.h>
-#include <libchaos/child.h>
-#include <libchaos/dlink.h>
-#include <libchaos/graph.h>
-#include <libchaos/htmlp.h>
-#include <libchaos/httpc.h>
-#include <libchaos/image.h>
-#include <libchaos/mfile.h>
-#include <libchaos/queue.h>
-#include <libchaos/sauth.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/gif.h>
-#include <libchaos/ini.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/ssl.h>
-#include <libchaos/io.h>
+#include "ircd/config.h"
+#include "libchaos/connect.h"
+#include "libchaos/syscall.h"
+#include "libchaos/filter.h"
+#include "libchaos/listen.h"
+#include "libchaos/module.h"
+#include "libchaos/child.h"
+#include "libchaos/dlink.h"
+#include "libchaos/graph.h"
+#include "libchaos/htmlp.h"
+#include "libchaos/httpc.h"
+#include "libchaos/image.h"
+#include "libchaos/mfile.h"
+#include "libchaos/queue.h"
+#include "libchaos/sauth.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/gif.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/ssl.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/config.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/usermode.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/service.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/user.h>
-#include <chaosircd/msg.h>
+#include "ircd/config.h"
+#include "ircd/ircd.h"
+#include "ircd/chanmode.h"
+#include "ircd/usermode.h"
+#include "ircd/chanuser.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/service.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/conf.h"
+#include "ircd/oper.h"
+#include "ircd/user.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
@@ -77,19 +78,19 @@
 
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
-#endif /* HAVE_SYS_MMAN_H */
+#endif
 
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif /* HAVE_SYS_WAIT_H */
+#endif
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
-#endif /* HAVE_UNISTD_H */
+#endif
 
 #ifdef HAVE_SIGNAL_H
 # include <signal.h>
-#endif /* HAVE_SIGNAL_H */
+#endif
 
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
@@ -116,9 +117,9 @@ IRCD_DATA_DECL(char)   ircd_path[PATHLEN];
 /* -------------------------------------------------------------------------- *
  * Install mmap()ed and mprotect()ed stack into ircd core                     *
  * -------------------------------------------------------------------------- */
-#if 0 /* (defined __linux__) && (defined __i386__)*/
-static void ircd_stack_install(void)
-{
+void ircd_stack_install(void) {
+
+#ifdef HAVE_MPROTECT
   void   *old_esp;
   void   *old_ebp;
   size_t  old_size;
@@ -149,8 +150,8 @@ static void ircd_stack_install(void)
   __asm__ __volatile__("movl\t%0,%%esp\n\t"
                        "movl\t%1,%%ebp\n\t"
                        : : "a" (new_esp), "b" (new_ebp));
+#endif
 }
-#endif /* (defined __linux__) && (defined __i386__) */
 
 /* -------------------------------------------------------------------------- *
  * Die if we cannot bind to a port during coldstart.                          *
@@ -220,7 +221,7 @@ static int ircd_writepid(struct config *config, long pid)
 
   io_queue_control(fd, OFF, OFF, OFF);
   io_puts(fd, "%u", pid);
-  io_close(fd);
+  io_destroy(fd);
 
   return 0;
 }
@@ -257,12 +258,12 @@ static void ircd_detach(struct config *config)
 
     syscall_exit(0);
   }
-#endif /* WIN32 */
+#endif
 }
 
 /* -------------------------------------------------------------------------- *
  * Read the file with the process ID and check if there is already a running  *
- * chaosircd...                                                               *
+ * cgircd...                                                               *
  * -------------------------------------------------------------------------- */
 static long ircd_check(struct config *config)
 {
@@ -304,19 +305,19 @@ static int ircd_coldstart(struct config *config)
 
   if(config->global.name[0] == '\0')
   {
-    log(ircd_log, L_fatal, "chaosircd has no name!!!");
+    log(ircd_log, L_fatal, "cgircd has no name!!!");
     syscall_exit(1);
   }
 
   if(config->global.pidfile[0] == '\0')
   {
-    log(ircd_log, L_fatal, "chaosircd has no PID file!!!");
+    log(ircd_log, L_fatal, "cgircd has no PID file!!!");
     syscall_exit(1);
   }
 
   if((pid = ircd_check(config)))
   {
-    log(ircd_log, L_fatal, "chaosircd already running [%u]", pid);
+    log(ircd_log, L_fatal, "cgircd already running [%u]", pid);
     syscall_exit(1);
   }
 
@@ -370,14 +371,13 @@ void ircd_init(int argc, char **argv, char **envp)
   ini_init();
   hook_init();
   child_init();
-  sauth_init();
   mfile_init();
   ssl_init();
   httpc_init();
   htmlp_init();
 #ifdef HAVE_SOCKET_FILTER
   filter_init();
-#endif /* HAVE_SOCKET_FILTER */
+#endif
   gif_init();
   image_init();
   graph_init();
@@ -415,7 +415,9 @@ void ircd_init(int argc, char **argv, char **envp)
   ircd_drain = log_drain_setfd(1, LOG_ALL & log_source_filter, L_debug, 0);
 #else
   ircd_drain = log_drain_setfd(1, LOG_ALL & log_source_filter, L_status, 0);
-#endif /* DEBUG */
+#endif
+
+  sauth_init();
 
   hook_register(conf_done, HOOK_DEFAULT, ircd_coldstart);
   hook_register(listen_add, HOOK_DEFAULT, ircd_listen);
@@ -439,11 +441,15 @@ void ircd_loop(void)
     timeout = timer_timeout();
 
     /* Do I/O multiplexing and event handling */
-#if (defined USE_SELECT)
-    ret = io_select(&remain, timeout);
-#elif (defined USE_POLL)
+#if (defined USE_POLL)
     ret = io_poll(&remain, timeout);
-#endif /* USE_SELECT | USE_POLL */
+#elif (defined USE_SELECT)
+    ret = io_select(&remain, timeout);
+#else 
+#warning No I/O
+#endif
+
+/*log(ircd_log, L_debug, "I/O multiplex returned: %d", ret);*/
 
     /* Remaining time is 0msecs, we need to run a timer */
     if(remain == 0LL)
@@ -465,7 +471,7 @@ void ircd_loop(void)
 #ifdef DEBUG
 void ircd_dump(void)
 {
-  debug(ircd_log, "--- chaosircd complete dump ---");
+  debug(ircd_log, "--- cgircd complete dump ---");
 
 /*  conf_dump(&conf_current);*/
 
@@ -480,9 +486,9 @@ void ircd_dump(void)
   net_dump(NULL);
 /*  ini_dump(NULL);*/
 
-  debug(ircd_log, "--- end of chaosircd complete dump ---");
+  debug(ircd_log, "--- end of cgircd complete dump ---");
 }
-#endif /* DEBUG */
+#endif
 
 /* -------------------------------------------------------------------------- *
  * Garbage collect.                                                           *
@@ -507,7 +513,7 @@ int ircd_restart(void)
 
 #ifdef HAVE_SOCKET_FILTER
   filter_shutdown();
-#endif /* HAVE_SOCKET_FILTER */
+#endif
   listen_shutdown();
   child_shutdown();
 
@@ -530,7 +536,7 @@ int ircd_restart(void)
   log(ircd_log, L_status, "Restart succeeded.");
 
   ircd_shutdown();
-#endif /* WIN32 */
+#endif
   return 0;
 }
 
@@ -568,7 +574,7 @@ void ircd_shutdown(void)
   gif_shutdown();
 #ifdef HAVE_SOCKET_FILTER
   filter_shutdown();
-#endif /* HAVE_SOCKET_FILTER */
+#endif
   httpc_shutdown();
   htmlp_shutdown();
   ssl_shutdown();

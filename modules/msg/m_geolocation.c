@@ -16,18 +16,18 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "chaosircd/msg.h"
-#include "chaosircd/user.h"
-#include "chaosircd/chars.h"
-#include "chaosircd/client.h"
-#include "chaosircd/server.h"
-#include "chaosircd/lclient.h"
-#include "chaosircd/numeric.h"
-#include "chaosircd/channel.h"
-#include "chaosircd/chanuser.h"
-#include "chaosircd/chanmode.h"
-#include "chaosircd/crowdguard.h"
-#include "chaosircd/usermode.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
+#include "ircd/chanmode.h"
+#include "ircd/crowdguard.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -63,11 +63,12 @@ static const char base32[] = {
   0
 };
 
+/* -------------------------------------------------------------------------- */
 static int valid_base32(const char *s)
 {
   while(*s)
   {
-    if(!str_chr(base32, *s))
+    if(!strchr(base32, *s))
       return 0;
 
     s++;
@@ -84,7 +85,7 @@ static int check_hashes(int nhashes, char *hasharray[], const char *hash)
   {
     size_t len = str_len(hasharray[i]);
 
-    //debug(ircd_log, "checking hash[%d](%s) against %s", i, hasharray[i], hash);
+    /*debug(ircd_log, "checking hash[%d](%s) against %s", i, hasharray[i], hash);*/
 
     if(!str_ncmp(hasharray[i], hash, len))
       return 1;
@@ -113,6 +114,22 @@ void m_geolocation_unload(void)
   msg_unregister(&m_geolocation_msg);
 }
 
+/* -------------------------------------------------------------------------- */
+static int
+have_common_channel(struct user* u1, struct user* u2) {
+	struct chanuser *cu1, *cu2;
+	struct node *n1, *n2;
+
+	dlink_foreach_data(&u1->channels, n1, cu1) {
+		struct channel* chptr = cu1->channel;
+		dlink_foreach_data(&u2->channels, n2, cu2) {
+			if(chptr == cu2->channel)
+				return 1;
+		}
+	}
+	return 0;
+}
+
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'GEOLOCATION'                                                    *
@@ -124,7 +141,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
 {
   if(!str_icmp(argv[2], "SET"))
   {
-  //  char channame[IRCD_CHANNELLEN+1];
+  /*  char channame[IRCD_CHANNELLEN+1];*/
 
     if(client_is_user(cptr))
     {
@@ -133,7 +150,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
       int do_log = 0;
       struct chanuser *cuptr;
       struct channel *chptr = NULL;
-      struct node *nptr;
+           struct node *nptr;
 
       strlcpy(cptr->user->name, argv[3], IRCD_USERLEN);
 
@@ -146,7 +163,7 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
       {
         chptr = cuptr->channel;
 
-        // if this server is responsible for that channel and the channel is persistent, then log
+        /* if this server is responsible for that channel and the channel is persistent, then log*/
         if(chptr->server == server_me && (chptr->modes & CHFLG(P)))
         {
           do_log = 1;
@@ -169,17 +186,17 @@ static void ms_geolocation (struct lclient *lcptr, struct client *cptr,
         }                                                                   
       } 
 
-      // Log the geolocation if there's a channel for this user (user has been set to sharp)
-    //  if((chptr = channel_find_name(channame)))
+      /* Log the geolocation if there's a channel for this user (user has been set to sharp)*/
+    /*  if((chptr = channel_find_name(channame)))*/
       if(do_log && changed_location)
       {
-        // CrowdGuard functionality requires a persistent (+P) channel
-    //    if(chptr->modes & CHFLG(P))
+        /* CrowdGuard functionality requires a persistent (+P) channel*/
+    /*    if(chptr->modes & CHFLG(P))*/
           log(m_geolocation_log, L_verbose, "%s geolocation for %s to %s", (first_location ? "Set" : "Changed"), cptr->name, cptr->user->name);
       }
     }
 
-    server_send(lcptr, NULL, CAP_NONE, CAP_NONE, ":%C GEOLOCATION SET :%s", argv[3]);
+    server_send(lcptr, NULL, CAP_NONE, CAP_NONE, ":%C GEOLOCATION SET :%s", cptr, argv[3]);
   }
 }
 
@@ -191,9 +208,7 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
                           int             argc,  char         **argv)
 {
   enum { SET, SEARCH } mode;
-  int minlen = 9;
-  int i;
-  int len,  hashcount;
+  size_t minlen = 9, i, len,  hashcount;
   char **hasharray;
 
   if(argc <= 3)
@@ -256,37 +271,42 @@ static void m_geolocation(struct lclient *lcptr, struct client *cptr,
 
      count = 0;
 
-     dlink_foreach_data(&user_list, node, user)
-     {
+     dlink_foreach_data(&user_list, node, user) {
        if(!user->client) continue;
        if(user->client == cptr) continue;
        if(str_len(user->name) < len) continue;
        if(!valid_base32(user->name)) continue;
 
-//       if(!str_ncmp(user->name, argv[3], len))
+/*       if(!str_ncmp(user->name, argv[3], len))*/
        if(check_hashes(hashcount, hasharray, user->name))
        {
-         size_t toklen = str_len(user->client->name) + 1 + str_len(user->name);
+         size_t toklen = str_len(user->client->name);
+         int show_geohash = have_common_channel(cptr->user, user);
 
+         if(show_geohash)
+        	 toklen += 1 + str_len(user->name);
+
+         /* location reply only when the searching and the found user have at least 1 channel in common*/
          if(di+dlen+1+toklen > IRCD_LINELEN)
-         {
-           client_send(cptr, "%s", buffer);
-           dlen = 0;
-         }
-         dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), " %N!%U", user->client, user->client);
+		 {
+		   client_send(cptr, "%s", buffer);
+		   dlen = 0;
+		 }
+		 dlen += str_snprintf(&buffer[di+dlen], sizeof(buffer)-(di+dlen), (show_geohash?" %N!%U":" %N"), user->client, user->client);
 
-         if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
-           lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
+		 if(lclient_is_oper(lcptr)) /* && cptr->user->name[0] == '~')*/
+		   lclient_send(lcptr, ":%S NOTICE %N :--- geolocation reply: %N!%U", server_me, cptr, user->client, user->client);
 
          count++;
        }
      }
+
      if(dlen)
        client_send(cptr, "%s", buffer);
 
-     client_send(cptr, ":%S 601 %s %u :end of /GEOLOCATION query", server_me, argv[3], count);
+     client_send(cptr, ":%S 601 %N %s %u :end of /GEOLOCATION query", server_me, cptr, argv[3], count);
 
-     if(lclient_is_oper(lcptr) && cptr->user->name[0] == '~')
+     if(lclient_is_oper(lcptr)) /* && cptr->user->name[0] == '~')*/
        lclient_send(lcptr, ":%S NOTICE %N :--- end of /geolocation (%d replies)", server_me, cptr, count);
   }
 }

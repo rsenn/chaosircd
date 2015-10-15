@@ -45,17 +45,17 @@
 #include <winsock2.h>
 #else 
 #include <winsock.h>
-#endif /* HAVE_WINSOCK2_H */
+#endif
 #include <windows.h>
 #endif
 
 #ifdef HAVE_CYGWIN_IN_H
 #include <cygwin/in.h>
-#endif /* HAVE_CYGWIN_IN_H */
+#endif
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
-#endif /* HAVE_NETINET_IN_H */
+#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -409,7 +409,7 @@ int sauth_launch(void)
         sauth_fds[CHILD_WRITE] = sauth_child->channels[0][CHILD_PARENT][CHILD_WRITE];
         io_queue_control(sauth_fds[CHILD_READ], ON, OFF, ON);
         io_queue_control(sauth_fds[CHILD_WRITE], OFF, ON, ON);
-#endif /* HAVE_SOCKETPAIR */
+#endif
 
         io_register(sauth_fds[CHILD_READ], IO_CB_READ, sauth_read, NULL);
       }

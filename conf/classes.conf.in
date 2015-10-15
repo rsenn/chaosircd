@@ -39,6 +39,24 @@ class {
 # Connection class for clients  
 
 class {
+  name = "local";                      # Class name
+  
+  ping_freq = 900000;                    # Ping every <n> msecs 
+                                         
+  max_clients = 10000;                     # Allow this many clients in this class (unimplemented)
+  
+  clients_per_ip = 10000;                   # Only allow this many clients per IP
+  
+  recvq = 65536;                         # Disconnect the client when the receive 
+                                         # queue exceeds this many bytes 
+  
+  sendq = 262144;                        # Disconnect the client when the send 
+};
+  
+
+# Connection class for clients  
+
+class {
   name = "clients";                      # Class name
   
   ping_freq = 180000;                    # Ping every <n> msecs 

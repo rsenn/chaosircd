@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,22 +22,22 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/log.h>
-#include <libchaos/dlink.h>
+#include "libchaos/log.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -90,9 +90,9 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
   struct chanuser *cuptr = NULL;
   struct channel  *chptr;
   struct node     *nptr;
-  unsigned long    ts;
+  time_t ts;
   struct list      chanusers;
-//  int              dropts = 0;
+/*  int              dropts = 0;*/
   int              dropremote = 0;
 
   if(!client_is_server(cptr))
@@ -123,7 +123,7 @@ static void ms_njoin(struct lclient *lcptr, struct client *cptr,
     /* Check the TS */
     if(chptr->ts > ts)
     {
-//      dropts = 1;
+/*      dropts = 1;*/
       chptr->ts = ts;
 
       log(channel_log, L_warning, "Dropping TS for channel %s.",

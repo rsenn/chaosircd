@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,34 +22,34 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/io.h>
-#include <libchaos/ini.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/child.h>
-#include <libchaos/htmlp.h>
-#include <libchaos/httpc.h>
-#include <libchaos/sauth.h>
-#include <libchaos/timer.h>
-#include <libchaos/mfile.h>
-#include <libchaos/filter.h>
-#include <libchaos/module.h>
-#include <libchaos/listen.h>
-#include <libchaos/connect.h>
+#include "libchaos/io.h"
+#include "libchaos/ini.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/child.h"
+#include "libchaos/htmlp.h"
+#include "libchaos/httpc.h"
+#include "libchaos/sauth.h"
+#include "libchaos/timer.h"
+#include "libchaos/mfile.h"
+#include "libchaos/filter.h"
+#include "libchaos/module.h"
+#include "libchaos/listen.h"
+#include "libchaos/connect.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/class.h>
-#include <chaosircd/server.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/usermode.h>
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/class.h"
+#include "ircd/server.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/channel.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -107,7 +107,7 @@ static void m_dump_filter(char *arg)
 
   filter_dump(filter);
 }
-#endif /* HAVE_SOCKET_FILTER */
+#endif
 
 static void m_dump_htmlp(char *arg)
 {
@@ -528,7 +528,7 @@ static struct {
   { "client",  m_dump_client,  client_get_log   },
 #ifdef HAVE_SOCKET_FILTER
   { "filter",  m_dump_filter,  filter_get_log   },
-#endif /* HAVE_SOCKET_FILTER */
+#endif
   { "listen",  m_dump_listen,  listen_get_log   },
   { "module",  m_dump_module,  module_get_log   },
   { "server",  m_dump_server,  server_get_log   },
