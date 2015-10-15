@@ -112,7 +112,7 @@
 #endif
 
 #ifndef IRCD_DATA_DECL
-#define IRCD_DATA_DECL(type) IRCD_DATA(type)
+#define IRCD_DATA_DECL(type) type
 #endif
 
 extern int         ircd_log;
