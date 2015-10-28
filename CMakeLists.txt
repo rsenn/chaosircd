@@ -1,50 +1,101 @@
+set(PACKAGENAME cgircd)
+set(PACKAGEVERSION 2.2.1)
+set(PACKAGERELEASE "peace, love & hippie edition")
+set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
-set(PROJECT_NAME chaosircd)
-set(PROJECT_VERSION 2.2.1)
-set(PROJECT_RELEASE "peace, love & hippie edition")
-set(PROJECT_TARNAME ${PROJECT_NAME}-${PROJECT_VERSION})
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
+execute_process(COMMAND date -R OUTPUT_VARIABLE CREATION
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-project(${PROJECT_NAME} C)
+execute_process(COMMAND uname -a OUTPUT_VARIABLE PLATFORM
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+project(${PACKAGENAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
-#set(DEFAULT_SHARED_LIB TRUE)
-#set(BUILD_SHARED_LIBS TRUE)
+set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
-set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libchaos")
-set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libchaos")
+include_directories(
+	"${CMAKE_CURRENT_BINARY_DIR}"
+#	"${CMAKE_CURRENT_BINARY_DIR}/lib"
+)
 
-add_subdirectory(libchaos)
+add_subdirectory(lib)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libchaos/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeModules")
 
-include("${CMAKE_SOURCE_DIR}/libchaos/cmake/PlatformChecks.cmake")
-include("${CMAKE_SOURCE_DIR}/libchaos/cmake/ConfigBuildType.cmake")
+include("${CMAKE_SOURCE_DIR}/CMakeModules/FindBISON.cmake")
+include("${CMAKE_SOURCE_DIR}/CMakeModules/FindFLEX.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/BuildShared.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/PlatformChecks.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/ConfigBuildType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseOpenSSL.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseMySQL.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseFreeType.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/DllExt.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
+
+#if(NOT BUILD_SHARED)                                                                                                                                              add_definitions(-DSTATIC_LIBCHAOS=1)
+#  add_definitions(-DSTATIC_IRCD=1)
+#endif()
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
 endif()
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ${DEFAULT_SHARED_LIB})
-endif(NOT DEFINED BUILD_SHARED_LIBS)
-
-if(NOT BUILD_SHARED_LIBS)
-#  add_definitions(-DSTATIC_LIBCHAOS=1)
-endif(NOT BUILD_SHARED_LIBS)
-
 include(CheckIncludeFile)
+include(CheckFunctionExists)
 
+check_function_exists(setrlimit HAVE_SETRLIMIT)
+check_function_exists(mmap HAVE_MMAP)
+check_function_exists(mprotect HAVE_MPROTECT)
+
+add_definitions(-std=c89)
+add_definitions(-DHAVE_CONFIG_H=1)
+
+check_include_file(sys/stat.h HAVE_SYS_STAT_H)
+check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
 check_include_file(sys/resource.h HAVE_SYS_RESOURCE_H)
 
+check_include_file(cygwin/in.h HAVE_CYGWIN_IN_H)
+check_include_file(dlfcn.h HAVE_DLFCN_H)
+check_include_file(fcntl.h HAVE_FCNTL_H)
+check_include_file(inttypes.h HAVE_INTTYPES_H)
+check_include_file(io.h HAVE_IO_H)
+check_include_file(memory.h HAVE_MEMORY_H)
+check_include_file(netinet/in.h HAVE_NETINET_IN_H)
+check_include_file(signal.h HAVE_SIGNAL_H)
+check_include_file(stdint.h HAVE_STDINT_H)
+check_include_file(stdlib.h HAVE_STDLIB_H)
+check_include_file(strings.h HAVE_STRINGS_H)
+check_include_file(string.h HAVE_STRING_H)
+check_include_file(sys/ioctl.h HAVE_SYS_IOCTL_H)
+check_include_file(sys/param.h HAVE_SYS_PARAM_H)
+check_include_file(sys/socket.h HAVE_SYS_SOCKET_H)
+check_include_file(sys/timeb.h HAVE_SYS_TIMEB_H)
+check_include_file(sys/time.h HAVE_SYS_TIME_H)
+check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+check_include_file(sys/wait.h HAVE_SYS_WAIT_H)
+check_include_file(unistd.h HAVE_UNISTD_H)
+check_include_file(linux/filter.h HAVE_LINUX_FILTER_H)
+check_include_file(linux/types.h HAVE_LINUX_TYPES_H)
+check_include_file(net/bpf.h HAVE_NET_BPF_H)
+check_include_file(net/ethernet.h HAVE_NET_ETHERNET_H)
+check_include_file(elf.h HAVE_ELF_H)
+check_include_file(limits.h HAVE_LIMITS_H)
+check_include_file(winsock2.h HAVE_WINSOCK2_H)
+check_include_file(ws2tcpip.h HAVE_WS_TCPIP_H)
 
-include("${CMAKE_SOURCE_DIR}/libchaos/cmake/SubstituteProjectIncludes.cmake")
+include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
-substitute_project_includes("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+#substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 
-include("${CMAKE_SOURCE_DIR}/cmake/ConfigGNUVars.cmake")
+include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 set(CONFFILES
     conf/children.conf
@@ -57,7 +108,7 @@ set(CONFFILES
     conf/ssl.conf)
 
 set(TOOLS
-    tools/chaosircd-config
+    tools/ircd-config
     tools/mkca
     tools/mkcrt
     tools/mkkeys
@@ -72,30 +123,30 @@ foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
 endforeach(SUBSTFILE)
 
 set(CHAOSIRCD_HEADERS
-    include/chaosircd/chanmode.h
-    include/chaosircd/channel.h
-    include/chaosircd/chanuser.h
-    include/chaosircd/chars.h
-    include/chaosircd/class.h
-    include/chaosircd/client.h
-    include/chaosircd/conf.h
-    include/chaosircd/config.h
-    include/chaosircd/ircd.h
-    include/chaosircd/lclient.h
-    include/chaosircd/msg.h
-    include/chaosircd/numeric.h
-    include/chaosircd/oper.h
-    include/chaosircd/server.h
-    include/chaosircd/service.h
-    include/chaosircd/user.h
-    include/chaosircd/usermode.h)
+    include/ircd/chanmode.h
+    include/ircd/channel.h
+    include/ircd/chanuser.h
+    include/ircd/chars.h
+    include/ircd/class.h
+    include/ircd/client.h
+    include/ircd/conf.h
+    include/ircd/config.h
+    include/ircd/ircd.h
+    include/ircd/lclient.h
+    include/ircd/msg.h
+    include/ircd/numeric.h
+    include/ircd/oper.h
+    include/ircd/server.h
+    include/ircd/service.h
+    include/ircd/user.h
+    include/ircd/usermode.h)
 
-install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/chaosircd)
-install(FILES ${CONFFILES} DESTINATION etc/chaosircd)
+install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
+install(FILES ${CONFFILES} DESTINATION etc/cgircd)
 install(FILES ${TOOLS} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
 
 set(TOOLS 
-   tools/chaosircd-config tools/mkca tools/mkcrt tools/mkkeys
+   tools/ircd-config tools/mkca tools/mkcrt tools/mkkeys
    tools/mkreq tools/openssl.cnf tools/sign)
 
 foreach(SUBSTFILE ${TOOLS})

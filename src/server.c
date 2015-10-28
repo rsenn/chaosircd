@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -21,28 +21,28 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <libchaos/connect.h>
-#include <libchaos/timer.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/log.h>
-#include <libchaos/hook.h>
-#include <libchaos/ssl.h>
+#include "libchaos/connect.h"
+#include "libchaos/timer.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/log.h"
+#include "libchaos/hook.h"
+#include "libchaos/ssl.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/user.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/class.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/msg.h"
+#include "ircd/conf.h"
+#include "ircd/user.h"
+#include "ircd/ircd.h"
+#include "ircd/chars.h"
+#include "ircd/class.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -376,7 +376,7 @@ void server_vsend(struct lclient *one,    struct channel *chptr,
 #ifdef DEBUG
         buf[n - 2] = '\0';
         debug(ircd_log_out, "To %s: %s", lcptr->name, buf);
-#endif /* DEBUG */
+#endif
       }
       else
       {
@@ -413,7 +413,7 @@ void server_vsend(struct lclient *one,    struct channel *chptr,
 #ifdef DEBUG
       buf[n - 2] = '\0';
       debug(ircd_log_out, "To %s: %s", lcptr->name, buf);
-#endif /* DEBUG */
+#endif
       lcptr->serial = lclient_serial;
     }
   }
@@ -807,10 +807,10 @@ int server_ping(struct lclient *lcptr)
 
 /*    io_shutup(fds[0]);
     io_shutup(fds[1]);
-    io_close(fds[0]);
+    io_destroy(fds[0]);
 
     if(fds[0] != fds[1])
-      io_close(fds[1]);*/
+      io_destroy(fds[1]);*/
 
     return 0;
   }
@@ -818,7 +818,7 @@ int server_ping(struct lclient *lcptr)
   lcptr->ping = 0ULL;
 
   lclient_send(lcptr, "PING :%llu", timer_mtime);
-
+  
   return 0;
 }
 

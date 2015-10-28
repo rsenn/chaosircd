@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,30 +24,30 @@
 /* -------------------------------------------------------------------------- *
  * Library headers.                                                           *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/dlink.h>
-#include <libchaos/timer.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers.                                                              *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/client.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/server.h>
-#include <chaosircd/service.h>
-#include <chaosircd/msg.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/chanuser.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/service.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables.                                                          *
@@ -371,7 +371,7 @@ void channel_vsend(struct lclient *lcptr,  struct channel *chptr,
 #ifdef DEBUG
     buf[n - 2] = '\0';
     debug(ircd_log_out, "To %s: %s", cuptr->client->lclient->name, buf);
-#endif /* DEBUG */
+#endif
   }
 
   /* End multicasting */
@@ -458,7 +458,7 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
                      cptr, cmd, chptr->name, text);
 
 
-  //  debug(channel_log, "Message to channel %s from %s.", chptr->name, lcptr->name);
+  /*  debug(channel_log, "Message to channel %s from %s.", chptr->name, lcptr->name);*/
 
   dlink_foreach_data(&chptr->lchanusers, node, acuptr)
   {
@@ -680,7 +680,7 @@ void channel_backlog(struct channel *chptr, struct client *cptr,
   if(text && text[0])
   {
     e->text = mem_dynamic_alloc(&channel_msglog_heap, str_len(text)+1);
-    str_copy(e->text, text);
+    strcpy(e->text, text);
   }
   else
     e->text = NULL;

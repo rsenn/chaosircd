@@ -49,7 +49,7 @@ OBJECTS              = $(MODULES:%=%.o) shellcode.o
 OBJEXT               = o
 HEADERS              = 
 DEPS                 = $(MODULES:%=%.d)
-@PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_EXEEXT@
+@PIE_LIB@LDADD                = $(top_builddir)/libchaos/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
 CLEANFILES           = $(PROGRAM) *~ core core.* *.log la \
                        $(OBJECTS)
 DISTCLEANFILES       = Makefile $(CLEANFILES) $(DEPS)
@@ -57,7 +57,7 @@ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 
 FILES                = Makefile.in $(SOURCES) shellcode.asm shellcode.h syscalls.inc dumpcode.c
 DISTFILES            = $(FILES)
-DEVFILES             = CVS $(DISTFILES)
+DEVFILES             = $(DISTFILES)
 
 noinst_EXEC = dumpcode sploit
 
@@ -82,7 +82,7 @@ shellcode.h: shellcode.o dumpcode
 ifneq ($(NASM),)
 dep: Makefile $(DEPS)
 
--include $(DEPS)
+@DEPS_TRUE@-include $(DEPS)
 endif
 
 include $(top_builddir)/build.mk

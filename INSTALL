@@ -1,16 +1,16 @@
-Configure and compile chaosircd from source:
+Configure and compile cgircd from source:
 
-  ./configure --prefix=/usr/chaosircd
+  ./configure --prefix=/usr/cgircd
   make
 
-Install chaosircd (probably you must be root):
+Install cgircd (probably you must be root):
 	
   make install
 
 If you want support for SSL encrypted connections, then you
 can generate a self-signed certificate this way:
 
-  /usr/chaosircd/sbin/mkcrt
+  /usr/ircd/sbin/mkcrt
 
 On FreeBSD and linux there is support for socket filters, which
 enables socket-based firewalling and thus blocking of connections
