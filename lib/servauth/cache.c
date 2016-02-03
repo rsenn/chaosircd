@@ -30,8 +30,13 @@
  * System headers                                                             *
  * -------------------------------------------------------------------------- */
 #ifdef HAVE_CONFIG_H
+<<<<<<< HEAD:libchaos/servauth/cache.c
+#include "../config.h"
+#endif /* HAVE_CONFIG_H */
+=======
 #include "config.h"
 #endif
+>>>>>>> ba8ffb52eff4a0e3c2d6c42458ab53e8ab3d38b7:lib/servauth/cache.c
 
 #include <stdarg.h>
 #include <stdlib.h>

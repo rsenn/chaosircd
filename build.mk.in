@@ -19,6 +19,7 @@ COMPLINK        = $(LINK) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 .SUFFIXES:
 .SUFFIXES: .c .h .o .s .in .d .@PIE_LIBEXT@ .@PIC_OBJEXT@ .@PIC_DEPEXT@
 
+
 # compilation rules by file extension
 # ---------------------------------------------------------------------------
 .c.@OBJEXT@:

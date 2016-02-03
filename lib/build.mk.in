@@ -230,6 +230,16 @@ $(top_builddir)/config.status: $(top_srcdir)/configure
 # ---------------------------------------------------------------------------
 $(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
 	@$(ECHO_CONFIG)
+<<<<<<< HEAD:libchaos/build.mk.in
+	@SILENT_RULES@test -z $(CONFIG_H_TOP) || { cd $(top_builddir) && rm -f $(CONFIG_H_TOP) && ./config.status $(CONFIG_H_TOP) $(REDIR); }
+
+# targets for maintainer generated files
+# ---------------------------------------------------------------------------
+@MAINTAINER_MODE@$(top_srcdir)/configure: $(top_srcdir)/configure.in $(top_srcdir)/aclocal.m4
+@MAINTAINER_MODE@	@$(ECHO_AUTOCONF)
+@MAINTAINER_MODE@	@SILENT_RULES@rm -f $(top_srcdir)/configure
+@MAINTAINER_MODE@	@SILENT_RULES@cd $(top_srcdir) && (autoconf && mv configure configure.tmp && sed 's,###ESCAPE###,[,' < configure.tmp > configure && chmod 755 configure)
+=======
 	@QUIET@test -z $(CONFIG_H_TOP) || { cd $(top_builddir) && \
 	rm -f $(CONFIG_H_TOP) && \
 	./config.status $(CONFIG_H_TOP) $(REDIR); }
@@ -243,6 +253,7 @@ $(CONFIG_H): $(top_builddir)/config.status $(CONFIG_H_IN)
 @MAINTAINER@	mv configure configure.tmp && \
 @MAINTAINER@	sed 's,###ESCAPE###,[,' < configure.tmp > configure && \
 @MAINTAINER@	chmod 755 configure)
+>>>>>>> ba8ffb52eff4a0e3c2d6c42458ab53e8ab3d38b7:lib/build.mk.in
 
 @MAINTAINER@$(top_srcdir)/aclocal.m4: $(top_srcdir)/m4/*.m4 $(top_srcdir)/configure.in
 @MAINTAINER@	@$(ECHO_ACLOCAL)
