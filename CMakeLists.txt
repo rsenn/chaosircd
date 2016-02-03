@@ -5,7 +5,7 @@ set(PROJECT_RELEASE "peace, love & hippie edition")
 set(PROJECT_TARNAME ${PROJECT_NAME}-${PROJECT_VERSION})
 
 
-project(${PROJECT_NAME} C)
+project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} LANGUAGES C)
 
 cmake_minimum_required(VERSION 2.6)
 
