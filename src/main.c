@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -19,23 +19,22 @@
  * $Id: ircd.c,v 1.6 2006/09/28 08:38:31 roman Exp $
  */
 
-#define MAIN 1
+#define _GNU_SOURCE
 
 /* -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/syscall.h>
-#include <libchaos/str.h>
+#include "libchaos/defs.h"
+#include "libchaos/syscall.h"
+#include "libchaos/str.h"
 /* -------------------------------------------------------------------------- */
 
 #include "../config.h"
 
-#include <chaosircd/ircd.h>
+#include "ircd/ircd.h"
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
-#ifdef HAVE_SYS_RESOURCE_H
+#ifdef HAVE_SETRLIMIT
+#warning setrlimit
 #include <sys/resource.h>
 #endif
 #include <signal.h>
@@ -45,7 +44,7 @@
 char       **ircd_argv = NULL;
 char       **ircd_envp = NULL;
 char         ircd_path[PATHLEN];*/
-
+extern void ircd_stack_install(void);
 /* -------------------------------------------------------------------------- *
  * Program entry.                                                             *
  * -------------------------------------------------------------------------- */
@@ -54,11 +53,16 @@ int main(int argc, char **argv, char **envp)
   char          link[64];
   int           n;
 
-#if 0 /*(defined __linux__) && (defined __i386__)*/
-  struct rlimit stack = { 1024, 1024 };
+#ifdef HAVE_SETRLIMIT
+  static struct rlimit 
+# ifdef __CYGWIN__
+   { unsigned long a; unsigned long b; } 
+# endif
+   stack = { 1024, 1024 }
+  ;
   syscall_setrlimit(RLIMIT_STACK, &stack);
+#endif
   ircd_stack_install();
-#endif /* (defined __linux__) && (defined __i386__) */
 
   ircd_argc = argc;
   ircd_argv = argv;
@@ -79,7 +83,7 @@ int main(int argc, char **argv, char **envp)
   {
     ircd_path[0] = '\0';
   }
-#endif /* WIN32 */
+#endif
 
   /* Catch some signals */
 #ifndef WIN32
@@ -87,14 +91,23 @@ int main(int argc, char **argv, char **envp)
   syscall_signal(SIGHUP, (void *)ircd_shutdown);
   syscall_signal(SIGTERM, (void *)ircd_shutdown);
   syscall_signal(SIGPIPE, (void *)1);
-#endif /* WIN32 */
+#endif
 
   /* Always dump core! */
+<<<<<<< HEAD
 #if !(defined(WIN32) || defined(__CYGWIN__))
   struct rlimit core = { RLIM_INFINITY, RLIM_INFINITY };
+=======
+#ifdef HAVE_SETRLIMIT
+  struct rlimit 
+# ifdef __CYGWIN__
+   { unsigned long a; unsigned long b; } 
+# endif
+  core = { RLIM_INFINITY, RLIM_INFINITY };
+>>>>>>> ba8ffb52eff4a0e3c2d6c42458ab53e8ab3d38b7
 
   syscall_setrlimit(RLIMIT_CORE, &core);
-#endif /* WIN32 */
+#endif
 
   /* Initialise all modules */
   ircd_init(argc, argv, envp);

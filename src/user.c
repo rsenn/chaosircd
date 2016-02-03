@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,25 +24,25 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/net.h>
-#include <libchaos/str.h>
-#include <libchaos/hook.h>
-#include <libchaos/timer.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/net.h"
+#include "libchaos/str.h"
+#include "libchaos/hook.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/oper.h>
-#include <chaosircd/usermode.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanuser.h>
-#include <chaosircd/numeric.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/oper.h"
+#include "ircd/usermode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -231,7 +231,7 @@ struct user *user_new(const char *name, const char *uid)
   }
 
   /* Inform about the new user */
-  //debug(user_log, "New user block: %s (%s)", name, uptr->uid);
+  /*debug(user_log, "New user block: %s (%s)", name, uptr->uid);*/
 
   dlink_add_tail(&user_list, &uptr->node, uptr);
 

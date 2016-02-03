@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003-2006  Roman Senn <r.senn@nexbyte.com>
  *
@@ -24,33 +24,33 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/connect.h>
-#include <libchaos/listen.h>
-#include <libchaos/dlink.h>
-#include <libchaos/timer.h>
-#include <libchaos/sauth.h>
-#include <libchaos/hook.h>
-#include <libchaos/log.h>
-#include <libchaos/mem.h>
-#include <libchaos/str.h>
-#include <libchaos/io.h>
+#include "libchaos/defs.h"
+#include "libchaos/connect.h"
+#include "libchaos/listen.h"
+#include "libchaos/dlink.h"
+#include "libchaos/timer.h"
+#include "libchaos/sauth.h"
+#include "libchaos/hook.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
+#include "libchaos/io.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/ircd.h>
-#include <chaosircd/conf.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/class.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/chanmode.h>
-#include <chaosircd/usermode.h>
+#include "ircd/msg.h"
+#include "ircd/ircd.h"
+#include "ircd/conf.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/class.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
@@ -283,14 +283,14 @@ void lclient_release(struct lclient *lcptr)
   {
     io_unregister(lcptr->fds[1], IO_CB_READ);
     io_unregister(lcptr->fds[1], IO_CB_WRITE);
-    io_close(lcptr->fds[1]);
+    io_destroy(lcptr->fds[1]);
   }
 
   if(io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
   {
     io_unregister(lcptr->fds[0], IO_CB_READ);
     io_unregister(lcptr->fds[0], IO_CB_WRITE);
-    io_close(lcptr->fds[0]);
+    io_destroy(lcptr->fds[0]);
   }
 
   lcptr->fds[0] = -1;
@@ -435,7 +435,7 @@ void lclient_accept(int fd, struct listen *listen)
     {
       log(lclient_log, L_warning,
           "Invalid class in listener %s: %s", listen->name, lconf->class);
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -444,7 +444,7 @@ void lclient_accept(int fd, struct listen *listen)
     {
       log(lclient_log, L_warning, "Too many connects in class '%s'.",
           clptr->name);
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -452,7 +452,7 @@ void lclient_accept(int fd, struct listen *listen)
     {
       log(lclient_log, L_warning, "Too many connects from %s.",
           net_ntoa(listen->addr_remote));
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -463,7 +463,7 @@ void lclient_accept(int fd, struct listen *listen)
           "Could not allocate new lclient struct for listen %s",
           listen->name);
 
-      io_close(fd);
+      io_destroy(fd);
       return;
     }
 
@@ -478,7 +478,7 @@ void lclient_accept(int fd, struct listen *listen)
     /* Setup ping timeout callback */
     lcptr->ptimer = timer_start(lclient_exit, clptr->ping_freq, lcptr,
                                 "timeout: %llumsecs", clptr->ping_freq);
-
+    
     timer_note(lcptr->ptimer, "ping timer for %s:%u",
                net_ntoa(lcptr->addr_remote), lcptr->port_remote);
 
@@ -655,18 +655,18 @@ void lclient_process(int fd, struct lclient *lcptr)
 
   lclient_update_recvb(lcptr, n);
 #ifdef DEBUG
-  p = str_chr(lclient_recvbuf, '\r');
+  p = strchr(lclient_recvbuf, '\r');
   if(p)
   {
     *p = '\0';
   }
   else
   {
-    p = str_chr(lclient_recvbuf, '\n');
+    p = strchr(lclient_recvbuf, '\n');
     if(p) *p = '\0';
   }
   debug(ircd_log_in, "From %s: %s", lcptr->name, lclient_recvbuf);
-#endif /* DEBUG */
+#endif
   lclient_parse(lcptr, lclient_recvbuf, n);
 }
 
@@ -1007,10 +1007,10 @@ void lclient_vexit(struct lclient *lcptr, char *format, va_list args)
   }
 
   if(io_valid(lcptr->fds[1]))
-    io_close(lcptr->fds[1]);
+    io_destroy(lcptr->fds[1]);
 
   if(io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
-    io_close(lcptr->fds[0]);
+    io_destroy(lcptr->fds[0]);
 
   lcptr->fds[0] = -1;
   lcptr->fds[1] = -1;
@@ -1299,7 +1299,7 @@ int lclient_ping(struct lclient *lcptr)
     saved = lcptr->fds[0];
     client_exit(NULL, lcptr->client, "ping timeout: %u seconds",
                 (uint32_t)((lcptr->class->ping_freq + 500LL) / 1000LL));
-    io_close(saved);
+    io_destroy(saved);
   }
 
   return 0;
@@ -1371,7 +1371,7 @@ struct lclient *lclient_find_id(int id)
   struct lclient *lcptr;
 
   dlink_foreach(&lclient_list, lcptr)
-    if(lcptr->id == id)
+    if(lcptr->id == (uint32_t)id)
       return lcptr;
 
   return NULL;

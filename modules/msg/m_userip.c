@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,17 +22,17 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/str.h>
-#include <libchaos/dlink.h>
+#include "libchaos/str.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/numeric.h>
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -49,7 +49,7 @@ static char *m_userip_help[] = {
   "Displays the given nicks username, ip address, away status,",
   "operator status and real name in one single line.",
   NULL
-};
+};    
 
 static struct msg m_userip_msg = {
   "USERIP", 1, 1, MFLG_CLIENT,
@@ -64,7 +64,7 @@ int m_userip_load(void)
 {
   if(msg_register(&m_userip_msg) == NULL)
     return -1;
-
+  
   return 0;
 }
 
@@ -93,24 +93,24 @@ static void m_userip(struct lclient *lcptr, struct client *cptr,
   
 	len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
                  client_me->name, cptr->name);
-
+  
   n = str_tokenize(argv[2], av, 63);
-
+  
   for(i = 0; i < n; i++)
   {
     acptr = client_find_nick(av[i]);
-
+    
     if(acptr == NULL)
       continue;
-
+    
     if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
-
+    
     if(!first)
       result[len++] = ' ';
-
+    
     len += strlcpy(&result[len], acptr->name, IRCD_LINELEN - 1 - len);
-
+    
 /*    if(acptr->user->modes & UFLG(o))
       result[len++] = '*';*/
     result[len++] = '=';
@@ -119,16 +119,13 @@ static void m_userip(struct lclient *lcptr, struct client *cptr,
       result[len++] = '-';
     else
       result[len++] = '+';
-
+    
     len += strlcpy(&result[len], acptr->user->name, IRCD_LINELEN - 1 - len);
-    if(len + 1 + strlen(acptr->hostip) < IRCD_LINELEN - 2)
-    {
-      result[len++] = '@';
-      len += strlcpy(&result[len], acptr->hostip, IRCD_LINELEN - 1 - len);
-    }
-
+    result[len++] = '@';
+    len += strlcpy(&result[len], acptr->hostip, IRCD_LINELEN - 1 - len);
+    
     first = 0;
   }
-
+  
   client_send(cptr, "%s", result);
 }

@@ -11,17 +11,22 @@ top_builddir = @top_builddir@
 thisdir      =
 
 # Redirect to recursive targets
-all: makefiles all-recursive
+all: makefiles config.h all-recursive
 clean: makefiles clean-recursive
 distclean: makefiles distclean-recursive
 maintainer-clean: makefiles maintainer-clean-recursive
-install: makefiles install-recursive
+install: makefiles config.h install-recursive
 dep: makefiles dep-recursive
 
 # Subdirectories
 ROOT = 1
 RECURSIVE = 1
+<<<<<<< HEAD
 SUBDIRS = libchaos include src modules tools conf doc contrib test
+=======
+@DLM_TRUE@SUBDIRS = lib include src modules tools conf doc contrib test
+@DLM_FALSE@SUBDIRS = lib include modules src tools conf doc contrib test
+>>>>>>> ba8ffb52eff4a0e3c2d6c42458ab53e8ab3d38b7
 
 RECURSIVE_TARGETS = all-recursive \
                     install-recursive \
@@ -58,10 +63,10 @@ DISTFILES = $(FILES) configure
 #	@($(SHELL) config.status config.mak) >/dev/null
 
 # Files that go into development tarball
-DEVFILES = CVS $(FILES)
+DEVFILES = $(FILES)
 
 # Local targets
-all-local: Makefile config.mk $(srcdir)/configure
+all-local: Makefile config.mk $(srcdir)/configure 
 install-local:
 dep-local:
 

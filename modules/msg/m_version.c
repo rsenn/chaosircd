@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003,2004  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,24 +22,24 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/defs.h>
-#include <libchaos/io.h>
-#include <libchaos/log.h>
-#include <libchaos/module.h>
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/module.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/config.h>
-#include <chaosircd/msg.h>
-#include <chaosircd/user.h>
-#include <chaosircd/chars.h>
-#include <chaosircd/client.h>
-#include <chaosircd/server.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/channel.h>
-#include <chaosircd/chanuser.h>
+#include "ircd/config.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 
 #include "../../config.h"
 
@@ -59,7 +59,7 @@ static char *m_version_help[] = {
   "without parameters, the information from the",
   "local server is displayed.",
   NULL
-};
+};    
 
 static struct msg m_version_msg = {
   "VERSION", 0, 1, MFLG_CLIENT,
@@ -74,7 +74,7 @@ int m_version_load(void)
 {
   if(msg_register(&m_version_msg) == NULL)
     return -1;
-
+  
   return 0;
 }
 
@@ -101,9 +101,9 @@ static void m_version(struct lclient *lcptr, struct client *cptr,
                "DEBUG",
 #else
                "PRODUCTION",
-#endif /* DEBUG */
+#endif
                client_me->name, PACKAGE_RELEASE);
-
-  ircd_support_show(cptr);
+  
+	ircd_support_show(cptr);
 }
 

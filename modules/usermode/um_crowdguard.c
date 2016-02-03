@@ -1,4 +1,4 @@
-/* chaosircd - pi-networks irc server
+/* cgircd - CrowdGuard IRC daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -22,19 +22,19 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include <libchaos/hook.h>
-#include <libchaos/ssl.h>
+#include "libchaos/hook.h"
+#include "libchaos/ssl.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include <chaosircd/ircd.h>
-#include <chaosircd/user.h>
-#include <chaosircd/server.h>
-#include <chaosircd/client.h>
-#include <chaosircd/lclient.h>
-#include <chaosircd/numeric.h>
-#include <chaosircd/usermode.h>
+#include "ircd/ircd.h"
+#include "ircd/user.h"
+#include "ircd/server.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/numeric.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -81,7 +81,7 @@ void um_crowdguard_unload(void)
 int um_crowdguard_bounce(struct user *uptr, struct usermodechange *umcptr,
                          uint32_t flags)
 {
-//  return -1;
+/*  return -1;*/
 
 /*  if(flags & USERMODE_OPTION_PERMISSION)
     return -1;

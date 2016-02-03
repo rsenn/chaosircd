@@ -17,16 +17,16 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "chaosircd/msg.h"
-#include "chaosircd/user.h"
-#include "chaosircd/chars.h"
-#include "chaosircd/client.h"
-#include "chaosircd/server.h"
-#include "chaosircd/channel.h"
-#include "chaosircd/numeric.h"
-#include "chaosircd/chanmode.h"
-#include "chaosircd/chanuser.h"
-#include "chaosircd/crowdguard.h"
+#include "ircd/msg.h"
+#include "ircd/user.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/server.h"
+#include "ircd/channel.h"
+#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
+#include "ircd/chanuser.h"
+#include "ircd/crowdguard.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -174,7 +174,7 @@ static void m_opart(struct lclient *lcptr, struct client *cptr,
   }
   chanuser_delete(cuptr);
 
-//  if(chptr->chanusers.size == 0)
+/*  if(chptr->chanusers.size == 0)*/
     channel_delete(chptr);
 }
 
@@ -211,7 +211,7 @@ static void ms_opart(struct lclient *lcptr, struct client *cptr,
 
   chanuser_delete(cuptr);
 
- // if(chptr->chanusers.size == 0)
+ /* if(chptr->chanusers.size == 0)*/
     channel_delete(chptr);
 }
 

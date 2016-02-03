@@ -1,3 +1,6 @@
+#ifndef LIB_CONFIG_H__
+#define LIB_CONFIG_H__
+
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #cmakedefine HAVE_SYS_IOCTL_H 1
 
@@ -49,9 +52,13 @@
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 #cmakedefine HAVE_WS2TCPIP_H 1
 
+/* Define to 1 if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H 1
+
 /* Define to 1 if you have the socklen_t type. */
 #cmakedefine HAVE_SOCKLEN_T 1
 
+#if 0
 /* Define to the address where bug reports for this package should be sent. */
 #cmakedefine PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 
@@ -75,3 +82,19 @@
 
 /* Platform this server runs on */
 #cmakedefine PLATFORM "@PLATFORM@"
+#endif
+
+/* Dynamic linkable library filename extension */
+#cmakedefine DLLEXT "@DLLEXT@"
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#cmakedefine HAVE_SYS_STAT_H 1
+
+#define SIZEOF_UINTPTR_T @SIZEOF_UINTPTR_T@
+/* Creation time of this server */
+#cmakedefine CREATION @CREATION@
+
+#endif
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H 1
+

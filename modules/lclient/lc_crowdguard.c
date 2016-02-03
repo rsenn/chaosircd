@@ -13,10 +13,10 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "chaosircd/ircd.h"
-#include "chaosircd/lclient.h"
-#include "chaosircd/client.h"
-#include "chaosircd/msg.h"
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/client.h"
+#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
@@ -24,18 +24,29 @@
 static int              lc_crowdguard_hook    (struct lclient   *lcptr);
 
 /* -------------------------------------------------------------------------- *
+ * Types                                                                      *
+ * -------------------------------------------------------------------------- */
+struct lc_sauth {
+	struct node node;
+	struct lclient *lclient;
+	struct timer *timer_auth;
+	struct sauth *sauth_userdb;
+	int done_auth;
+};
+
+/* -------------------------------------------------------------------------- *
  * Local variables                                                            *
  * -------------------------------------------------------------------------- */
-static int lc_crowdguard_login_log;
+static int lc_crowdguard_log;
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
 int lc_crowdguard_load(void)
 {
-  lc_crowdguard_login_log = log_source_find("login");                                                                                                                            
-  if(lc_crowdguard_login_log == -1)                                                                                                                                              
-    lc_crowdguard_login_log = log_source_register("login");              
+  lc_crowdguard_log = log_source_find("login");
+  if(lc_crowdguard_log == -1)
+    lc_crowdguard_log = log_source_register("login");
 
   if(hook_register(lclient_login, HOOK_DEFAULT, lc_crowdguard_hook) == NULL)
     return -1;
@@ -47,8 +58,8 @@ void lc_crowdguard_unload(void)
 {
   hook_unregister(lclient_login, HOOK_DEFAULT, lc_crowdguard_hook);
 
-  log_source_unregister(lc_crowdguard_login_log);                                                                                                                                
-  lc_crowdguard_login_log = -1;                                                                                                                                                   
+  log_source_unregister(lc_crowdguard_log);
+  lc_crowdguard_log = -1;
 }
 
 /* -------------------------------------------------------------------------- *
@@ -68,7 +79,7 @@ static int lc_crowdguard_hook(struct lclient *lcptr)
       info[i] = ' ';
   }
 
-  log(lc_crowdguard_login_log, L_status, "User login from %s with handle %s, info: %s",
+  log(lc_crowdguard_log, L_status, "User login from %s with handle %s, info: %s",
       lcptr->host, lcptr->name, info);
 
   return 0;

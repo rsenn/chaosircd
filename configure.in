@@ -1,13 +1,16 @@
 # $Id: configure.in,v 1.16 2006/09/28 09:47:03 roman Exp $
 # ===========================================================================
 #
-# GNU autoconf template for chaosircd
+# GNU autoconf template for cgircd
 #
 # initialize autoconf (require version 2.5x)
 # ---------------------------------------------------------------------------
 AC_PREREQ(2.59)
-AC_INIT([chaosircd],[2.2.1])
-AC_CONFIG_SUBDIRS([libchaos])
+AC_INIT([cgircd],[2.2.1])
+AC_CONFIG_SUBDIRS([lib])
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
 
 # check for compiling modes
 # ---------------------------------------------------------------------------
@@ -37,23 +40,35 @@ AC_DEFINE_UNQUOTED(PLATFORM, "$PLATFORM", [Platform this server runs on])
 
 # set directories
 # ---------------------------------------------------------------------------
-AC_CONFIG_HEADERS([config.h include/chaosircd/config.h])
+AC_CONFIG_HEADERS([config.h include/ircd/config.h])
 AC_CONFIG_SRCDIR([src/ircd.c])
 
 test "$prefix" = "NONE" && prefix=${ac_default_prefix}
 test "$exec_prefix" = "NONE" && exec_prefix=${prefix}
+ 
+eval "tmp_prefix=\"${prefix}\""
 
 eval sysconfdir=${sysconfdir}
 case $sysconfdir in
   *ircd*) sysconfdir=${sysconfdir} ;;
-  *) sysconfdir=${sysconfdir}/chaosircd ;;
+  *) sysconfdir=${sysconfdir}/cgircd ;;
 esac
+
+relsysconfdir=${sysconfdir#$tmp_prefix/}
+test "$relsysconfdir" = "$sysconfdir" && relsysconfdir=etc${sysconfdir##*/etc}
+AC_SUBST([relsysconfdir])
+
+
+eval "rellibexecdir=\"${libexecdir}\""
+rellibexecdir=${rellibexecdir#$tmp_prefix/}
+test "$rellibexecdir" = "$libexecdir" && rellibexecdir=libexec${libexecdir##*libexec}
+AC_SUBST([rellibexecdir])
 
 eval libexecdir=${libexecdir}
 eval localstatedir=${localstatedir}
 
-eval pidfile=${localstatedir}/run/chaosircd.pid
-AC_ARG_WITH([pidfile], [  --with-pidfile=PATH     location of the pid-file [[LOCALSTATEDIR/run/chaosircd.pid]]], 
+eval pidfile=${localstatedir}/run/cgircd.pid
+AC_ARG_WITH([pidfile], [  --with-pidfile=PATH     location of the pid-file [[LOCALSTATEDIR/run/cgircd.pid]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval pidfile=$withval; fi])
 AC_SUBST([pidfile])
 
@@ -63,41 +78,62 @@ AC_SUBST([pidfile])
 #eval prefix=${prefix}
 #eval libdir=${libdir}
 
-case $prefix in
+AC_MSG_CHECKING([for prefix])
+AC_MSG_RESULT([$tmp_prefix])
+
+case $tmp_prefix in
   *ircd*)
-    plugindir=${libdir}
+    eval "plugindir=${libdir}/modules"
     ;;
   *)
-    plugindir=${libdir}/chaosircd
+    eval "plugindir=${libdir}/cgircd"
     ;;
 esac
-AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/chaosircd]]], 
+relplugindir=${plugindir#$tmp_prefix/}
+test "$relplugindir" = "$plugindir" && relplugindir=lib/${plugindir##*/lib/}
+AC_ARG_WITH([plugindir], [  --with-plugindir=PATH   location of the plugins [[LIBDIR/cgircd]]], 
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval plugindir=$withval; fi])
 AC_SUBST([plugindir])
-
-case $prefix in
-  *ircd*)
-    logdir=${prefix}/logs
-    ;;
-  *)
-    logdir=${localstatedir}/log
-    ;;
+AC_SUBST([relplugindir])
+case $tmp_prefix in
+  *ircd*) eval "inidir=${localstatedir}/lib"  ;;
+  *) eval "inidir=${localstatedir}/lib/cgircd"  ;;
 esac
+relinidir=${inidir#$tmp_prefix/}
+if test "$relinidir" = "$inidir"; then
+   relinidir=${localstatedir##*/}${inidir##*${localstatedir##*/}}
+fi 
+AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
+[if test "$withval" != "yes" && test "$withval" != "no"; then eval inidir=$withval; fi])
+
+AC_MSG_CHECKING([For .ini directory])
+AC_SUBST([inidir])
+AC_SUBST([relinidir])
+AC_MSG_RESULT([$inidir $relinidir])
+
+case $tmp_prefix in
+  *ircd*) eval "logdir=${localstatedir}/log" ;; 
+  *) eval "logdir=${localstatedir}/log/cgircd" ;;
+esac
+rellogdir=${logdir#$tmp_prefix/}
+test "$rellogdir" = "$logdir" && rellogdir=${localstatedir##*/}${logdir##*${localstatedir##*/}}
 AC_ARG_WITH([logdir], [  --with-logdir=PATH   location of the logs [[LOCALSTATEDIR/log]]],
 [if test "$withval" != "yes" && test "$withval" != "no"; then eval logdir=$withval; fi])
 AC_SUBST([logdir])
+AC_SUBST([rellogdir])
 
-case $prefix in
-  *ircd*)
-    eval "inidir=${localstatedir}/lib"
-    ;;
-  *)
-    eval "inidir=${localstatedir}/lib/chaosircd"
-    ;;
-esac
-AC_ARG_WITH([inidir], [  --with-inidir=PATH   location of the inis [[SHAREDSTATEDIR/ini]]],
-[if test "$withval" != "yes" && test "$withval" != "no"; then eval inidir=$withval; fi])
-AC_SUBST([inidir])
+eval "rundir=${localstatedir}/run"
+relrundir=${rundir#$tmp_prefix/}
+test "$relrundir" = "$rundir" && relrundir=${localstatedir##*/}${rundir##*${localstatedir##*/}}
+AC_ARG_WITH([rundir], [  --with-rundir=PATH   location of the runs [[LOCALSTATEDIR/run]]],
+[if test "$withval" != "yes" && test "$withval" != "no"; then eval rundir=$withval; fi])
+AC_SUBST([rundir])
+AC_SUBST([relrundir])
+
+pidfile="$rundir/cgircd.pid"
+relpidfile="$relrundir/cgircd.pid"
+AC_SUBST([pidfile])
+AC_SUBST([relpidfile])
 
 # set extensions and flags
 # ---------------------------------------------------------------------------
@@ -109,7 +145,7 @@ FFLAGS=""
 # check for libs and programs needed to build tichu-server
 # ---------------------------------------------------------------------------
 AC_DIETLIBC([/opt/diet /usr/diet])
-AC_PROG_CC([cc gcc])
+dnl AC_PROG_CC([cc gcc])
 AC_PROG_AR
 AC_PROG_RANLIB
 AC_PROG_INSTALL
@@ -117,8 +153,20 @@ AC_PROG_LN
 AC_PROG_DLLWRAP
 AC_PROG_LEX
 AC_PROG_YACC
-AC_CHECK_PROG([CYGPATH], [cygpath])
-AC_CHECK_PROG([NASM], [nasm], [$as_dir/$ac_word$ac_exec_ext], [], [$PATH])
+AC_PROG_CYGPATH
+dnl AC_CHECK_PROG([NASM], [nasm], [$as_dir/$ac_word$ac_exec_ext], [], [$PATH])
+
+PREADD= POSTADD=
+AX_CHECK_LINK_FLAG([--no-whole-archive],[PREADD="--whole-archive" POSTADD="--no-whole-archive"],[
+  AX_CHECK_LINK_FLAG([-Wl,--no-whole-archive],[PREADD="-Wl,--whole-archive" POSTADD="-Wl,--no-whole-archive"],[
+    : test
+    dnl  AX_CHECK_COMPILE_FLAG([-Wl,--no-whole-archive],[PREADD="-Wl,--whole-archive" POSTADD="-Wl,--no-whole-archive"])
+])
+])
+AC_SUBST([PREADD])
+AC_SUBST([POSTADD])
+
+dnl AC_LIB_RPATH
 
 # check some system dependencies
 # ---------------------------------------------------------------------------
@@ -127,15 +175,31 @@ AC_CHECK_LIB([m], [cos])
 AC_CANONICAL_HOST
 
 AC_CONFIG_HOST
+AC_CHECK_DLFCN
 AC_CONFIG_DYLIB
 
-AC_CHECK_HEADERS([fcntl.h io.h signal.h unistd.h sys/ioctl.h sys/mman.h sys/resource.h sys/socket.h sys/time.h sys/timeb.h sys/wait.h dlfcn.h netinet/in.h cygwin/in.h])
-AC_FUNC_MMAP
 
-dnl AC_CHECK_SSL
-dnl AC_CHECK_FT2
-dnl AC_CHECK_PSQL
-dnl AC_CHECK_MYSQL
+dnl echo host: "$host" 1>&2
+case "$host" in
+    *mingw* | *msys* | *cygwin*)
+      AX_CHECK_LINK_FLAG([-Wl,--export-all-symbols], [PIE_LDFLAGS="$PIE_LDFLAGS -Wl,--export-all-symbols"], [])
+    ;;
+    *)
+      AX_CHECK_LINK_FLAG([-Wl,--export-dynamic], [LDFLAGS="$LDFLAGS -Wl,--export-dynamic"], [])
+    ;;
+esac
+
+dnl AC_CHECK_HEADERS([fcntl.h  signal.h unistd.h        dlfcn.h  ])
+AC_CHECK_HEADERS([signal.h stdint.h unistd.h])
+
+dnl AC_FUNC_MMAP
+
+AC_CHECK_SSL
+AC_CHECK_LIBOWFAT
+AC_CHECK_EFENCE
+AC_CHECK_SQLITE
+AC_CHECK_PSQL
+AC_CHECK_MYSQL
 
 dnl AC_CHECK_FUNC([ltoa], AC_DEFINE_UNQUOTED([HAVE_LTOA], [Define this if you have the ltoa() function (defined in stdlib.h usually)]))
 dnl AC_CHECK_FUNC([lltoa], AC_DEFINE_UNQUOTED([HAVE_LLTOA], [Define this if you have the ltoa() function (defined in stdlib.h usually)]))
@@ -151,7 +215,7 @@ dnl AC_DEFINE_UNQUOTED(ENDIAN, $ENDIAN, [Define your machines endian])
 IA32INLINE="0"
 
 # check for winsuck
-dnl AC_CHECK_HEADER([winsock2.h])
+dnl AC_CHECK_HEADER([])
 
 # FIXME: must be declared as pascal call and must have 2 arguments (8 bytes)
 dnl AC_CHECK_LIB([ws2_32], [WSAStartup])
@@ -177,19 +241,30 @@ dnl esac
 
 dnl AC_SUBST([DLFCN_LDADD])
 
+if test "$HAVE_SSL" = yes; then
+  SSL_FALSE='#' 
+else
+ SSL_TRUE='#'
+fi
+AC_SUBST([SSL_TRUE])
+AC_SUBST([SSL_FALSE])
+
 # set debugging stuff after compiler test (-Werror could fuck it up)
 # ---------------------------------------------------------------------------
 AC_CHECK_DEP
 AC_CHECK_DEBUG
 AC_CHECK_MAINTAINER
+AC_CHECK_WERROR
 
 # ---------------------------------------------------------------------------
-case $libdir in
-  /lib | /usr/lib) ;;
+
+eval "case $libdir in
+  /lib64 | /usr/lib64 | /usr/local/lib64) ;;
+  /lib | /usr/lib | /usr/local/lib) ;;
   *)
-    LDFLAGS="${LDFLAGS:+$LDFLAGS }-Xlinker -rpath=\$(libdir)"
+    LDFLAGS=\"\${LDFLAGS:+\$LDFLAGS }-Wl,-rpath=\\\${libdir}\"
     ;;
-esac
+esac"
 
 case $host in
   *-linux*)
@@ -219,8 +294,7 @@ contrib/Makefile
 contrib/debian/Makefile
 doc/Makefile
 include/Makefile
-include/chaosircd/Makefile
-m4/Makefile
+include/ircd/Makefile
 modules/Makefile
 modules/chanmode/Makefile
 modules/lclient/Makefile
@@ -231,7 +305,7 @@ modules/usermode/Makefile
 src/Makefile
 test/Makefile
 tools/Makefile
-tools/chaosircd-config
+tools/ircd-config
 tools/mkca
 tools/mkcrt
 tools/mkkeys
@@ -246,5 +320,7 @@ AC_CONFIG_STATUS
 AC_SUMMARIZE([prefix bindir datadir includedir],
              [COLOR DEP DEBUG |
               CC CFLAGS LDFLAGS LIBS |
-              host build],
+              host build |
+							DLM_ENABLE PIE_ENABLE A_ENABLE],
              "%20s: %s")
+
