@@ -196,7 +196,7 @@ COLOR_DEFAULT   = $(@NAME_DEFAULT@)
 # ---------------------------------------------------------------------------
 ECHO            = @ECHO@
 MAKEFLAGS       = @MAKEFLAGS@
-SILENT_RULES           = @SILENT_RULES@
+SILENT           = @SILENT@
 REDIR           = @REDIR@
 REDIR2          = @REDIR2@
 

@@ -37,17 +37,12 @@
  * System headers                                                             *
  * -------------------------------------------------------------------------- */
 #ifdef HAVE_CONFIG_H
-<<<<<<< HEAD:libchaos/servauth/dns.c
 #include "../config.h"
 #endif /* HAVE_CONFIG_H */
-=======
-#include "config.h"
-#endif
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
->>>>>>> ba8ffb52eff4a0e3c2d6c42458ab53e8ab3d38b7:lib/servauth/dns.c
 
 #ifdef WIN32
 #include <windows.h>

@@ -94,17 +94,12 @@ int main(int argc, char **argv, char **envp)
 #endif
 
   /* Always dump core! */
-<<<<<<< HEAD
-#if !(defined(WIN32) || defined(__CYGWIN__))
-  struct rlimit core = { RLIM_INFINITY, RLIM_INFINITY };
-=======
 #ifdef HAVE_SETRLIMIT
   struct rlimit 
 # ifdef __CYGWIN__
    { unsigned long a; unsigned long b; } 
 # endif
   core = { RLIM_INFINITY, RLIM_INFINITY };
->>>>>>> ba8ffb52eff4a0e3c2d6c42458ab53e8ab3d38b7
 
   syscall_setrlimit(RLIMIT_CORE, &core);
 #endif
