@@ -78,114 +78,114 @@ struct listen
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            listen_log;
-CHAOS_API(struct sheap)   listen_heap;       /* heap containing listen blocks */
-CHAOS_API(struct list)    listen_list;       /* list linking listen blocks */
-CHAOS_API(uint32_t)       listen_id;
-CHAOS_API(int)            listen_dirty;
+CHAOS_DATA(int)            listen_log;
+CHAOS_DATA(struct sheap)   listen_heap;       /* heap containing listen blocks */
+CHAOS_DATA(struct list)    listen_list;       /* list linking listen blocks */
+CHAOS_DATA(uint32_t)       listen_id;
+CHAOS_DATA(int)            listen_dirty;
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) listen_get_log(void);
+CHAOS_API(int  listen_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Initialize listener heap and add garbage collect timer.                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_init          (void);
+CHAOS_API(void            listen_init          (void))
 
 /* ------------------------------------------------------------------------ *
  * Destroy listener heap and cancel timer.                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_shutdown      (void);
+CHAOS_API(void            listen_shutdown      (void))
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            listen_collect       (void);
+CHAOS_API(int             listen_collect       (void))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_default       (struct listen  *liptr);
+CHAOS_API(void            listen_default       (struct listen  *liptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct listen *)listen_add           (const char     *address,
+CHAOS_API(struct listen * listen_add           (const char     *address,
                                                 uint16_t        port,
                                                 int             backlog,
                                                 int             ssl,
                                                 const char     *context,
-                                                const char     *protocol);
+                                                const char     *protocol))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            listen_update        (struct listen  *liptr,
+CHAOS_API(int             listen_update        (struct listen  *liptr,
                                                 int             backlog,
                                                 int             ssl,
                                                 const char     *context,
-                                                const char     *protocol);
+                                                const char     *protocol))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_delete        (struct listen  *liptr);
+CHAOS_API(void            listen_delete        (struct listen  *liptr))
 
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_release       (struct listen  *liptr);
+CHAOS_API(void            listen_release       (struct listen  *liptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct listen *)listen_pop           (struct listen  *liptr);
+CHAOS_API(struct listen * listen_pop           (struct listen  *liptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct listen *)listen_push          (struct listen **liptrptr);
+CHAOS_API(struct listen * listen_push          (struct listen **liptrptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct listen *)listen_find          (const char     *address,
-                                                uint16_t        port);
+CHAOS_API(struct listen * listen_find          (const char     *address,
+                                                uint16_t        port))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_set_args      (struct listen  *liptr,
+CHAOS_API(void            listen_set_args      (struct listen  *liptr,
                                                 const void     *argbuf,
-                                                size_t          n);
+                                                size_t          n))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_get_args      (struct listen  *liptr,
+CHAOS_API(void            listen_get_args      (struct listen  *liptr,
                                                 void           *argbuf,
-                                                size_t          n);
+                                                size_t          n))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_set_name      (struct listen  *liptr,
-                                                const char     *name);
+CHAOS_API(void            listen_set_name      (struct listen  *liptr,
+                                                const char     *name))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(const char *)   listen_get_name      (struct listen  *liptr);
+CHAOS_API(const char *    listen_get_name      (struct listen  *liptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct listen *)listen_find_name     (const char     *name);
+CHAOS_API(struct listen * listen_find_name     (const char     *name))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct listen *)listen_find_id       (uint32_t        id);
+CHAOS_API(struct listen * listen_find_id       (uint32_t        id))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            listen_attach_filter (struct listen *lptr,
-                                                struct filter *fptr);
+CHAOS_API(int             listen_attach_filter (struct listen *lptr,
+                                                struct filter *fptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)            listen_detach_filter (struct listen *lptr);
+CHAOS_API(int             listen_detach_filter (struct listen *lptr))
 
 /* ------------------------------------------------------------------------ *
  * Dump listeners and listen heap.                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)           listen_dump          (struct listen  *lptr);
+CHAOS_API(void            listen_dump          (struct listen  *lptr))
 
 #endif

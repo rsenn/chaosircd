@@ -115,7 +115,7 @@ CHAOS_DATA(net_addr_t    )net_addr_loopback;
 CHAOS_DATA(net_addr_t    )net_addr_any;
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) net_get_log(void);
+CHAOS_API(int  net_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Convert a short from host to network byteorder                              *
@@ -188,38 +188,38 @@ CHAOS_INLINE(uint32_t net_ntohl(net_addr_t n)
 /* ------------------------------------------------------------------------ *
  * Convert from network address to string (re-entrant). (AF_INET)             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char *)      net_ntoa_r   (net_addr_t      in,
-                                     char           *buf);
+CHAOS_API(char *       net_ntoa_r   (net_addr_t      in,
+                                     char           *buf))
 
 /* ------------------------------------------------------------------------ *
  * Convert from network address to string. (AF_INET)                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char *)      net_ntoa     (net_addr_t      in);
+CHAOS_API(char *       net_ntoa     (net_addr_t      in))
 
 /* ------------------------------------------------------------------------ *
  * Convert from string to network address. (AF_INET)                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)         net_aton     (const char     *cp,
-                                     net_addr_t     *inp);
+CHAOS_API(int          net_aton     (const char     *cp,
+                                     net_addr_t     *inp))
 
 /* ------------------------------------------------------------------------ *
  * Convert from network address to string. (AF_INET and AF_INET6)             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(const char *)net_ntop     (int             af,
+CHAOS_API(const char * net_ntop     (int             af,
                                      const void     *cp,
                                      char           *buf,
-                                     size_t          len);
+                                     size_t          len))
 
 /* ------------------------------------------------------------------------ *
  * Convert from string to network address. (AF_INET and AF_INET6)             *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)         net_pton     (int             af,
+CHAOS_API(int          net_pton     (int             af,
                                      const char     *cp,
-                                     void           *buf);
+                                     void           *buf))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(char *)      net_ntoa    (net_addr_t in);
+CHAOS_API(char *       net_ntoa    (net_addr_t in))
 /*{
   static char buf[16];
   return net_ntoa_r(in, buf);
@@ -228,103 +228,103 @@ CHAOS_API(char *)      net_ntoa    (net_addr_t in);
 /* ------------------------------------------------------------------------ *
  * Initialize protocol heap.                                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)             net_init       (void);
+CHAOS_API(void              net_init       (void))
 
 /* ------------------------------------------------------------------------ *
  * Destroy protocol heap.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)             net_shutdown   (void);
+CHAOS_API(void              net_shutdown   (void))
 
 /* ------------------------------------------------------------------------ *
  * Find a protocol.                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct protocol *)net_find       (int             type,
-                                            const char     *name);
+CHAOS_API(struct protocol * net_find       (int             type,
+                                            const char     *name))
 
-CHAOS_API(struct protocol *)net_find_id    (uint32_t        id);
+CHAOS_API(struct protocol * net_find_id    (uint32_t        id))
 
 /* ------------------------------------------------------------------------ *
  * Register a protocol.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct protocol *)net_register   (int             type,
+CHAOS_API(struct protocol * net_register   (int             type,
                                             const char     *name,
-                                            void           *handler);
+                                            void           *handler))
 
 /* ------------------------------------------------------------------------ *
  * Unregister a protocol.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)           net_unregister (int               type,
-                                            const char       *name);
+CHAOS_API(void *            net_unregister (int               type,
+                                            const char       *name))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct protocol *)net_pop        (struct protocol  *pptr);
+CHAOS_API(struct protocol * net_pop        (struct protocol  *pptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct protocol *)net_push       (struct protocol **pptrptr);
+CHAOS_API(struct protocol * net_push       (struct protocol **pptrptr))
 
 
 /* ------------------------------------------------------------------------ *
  * Create a streaming socket with desired protocol family and type            *
  * (SOCK_DGRAM or SOCK_STREAM)                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)              net_socket     (net_address_t   at,
-                                            net_socket_t    st);
+CHAOS_API(int               net_socket     (net_address_t   at,
+                                            net_socket_t    st))
 
 /* ------------------------------------------------------------------------ *
  * Bind a socket to a specified address/port                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)              net_bind       (int             fd,
+CHAOS_API(int               net_bind       (int             fd,
                                             net_addr_t      addr,
-                                            uint16_t        port);
+                                            uint16_t        port))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)              net_vconnect   (int             fd,
+CHAOS_API(int               net_vconnect   (int             fd,
                                             net_addr_t      addr,
                                             uint16_t        port,
                                             void           *cb_rd,
                                             void           *cb_wr,
-                                            va_list         args);
+                                            va_list         args))
 
-CHAOS_API(int)              net_connect    (int             fd,
+CHAOS_API(int               net_connect    (int             fd,
                                             net_addr_t      addr,
                                             uint16_t        port,
                                             void           *cb_rd,
                                             void           *cb_wr,
-                                            ...);
+                                            ...))
 
 /* ------------------------------------------------------------------------ *
  * Listen for incoming connections and register read callback.                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)              net_vlisten    (int             fd,
+CHAOS_API(int               net_vlisten    (int             fd,
                                             int             backlog,
                                             void           *callback,
-                                            va_list         args);
+                                            va_list         args))
 
-CHAOS_API(int)              net_listen     (int             fd,
+CHAOS_API(int               net_listen     (int             fd,
                                             int             backlog,
                                             void           *callback,
-                                            ...);
+                                            ...))
 
 /* ------------------------------------------------------------------------ *
  * Accept a pending connection.                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)              net_accept     (int             fd,
+CHAOS_API(int               net_accept     (int             fd,
                                             net_addr_t     *addrptr,
-                                            net_port_t     *portptr);
+                                            net_port_t     *portptr))
 
 /* ------------------------------------------------------------------------ *
  * Get local socket address.                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)              net_getsockname(int             fd,
+CHAOS_API(int               net_getsockname(int             fd,
                                             net_addr_t     *addrptr,
-                                            net_port_t     *portptr);
+                                            net_port_t     *portptr))
 
 /* ------------------------------------------------------------------------ *
  * Dump protocol stack.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)             net_dump       (struct protocol  *nptr);
+CHAOS_API(void              net_dump       (struct protocol  *nptr))
 
 #endif

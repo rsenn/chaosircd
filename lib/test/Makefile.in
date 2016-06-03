@@ -50,13 +50,13 @@ LIB      += $(LIBOWFAT_LIBS)
 LIB += $(EFENCE_LIBS)
 LIB      += $(LIBS)
 CFLAGS   += $(SSL_CFLAGS) $(SQLITE_CFLAGS) $(PSQL_CFLAGS) $(MYSQL_CFLAGS) $(FT2_CFLAGS) $(LIBOWFAT_CFLAGS)
-INCLUDES += -I$(top_srcdir)/include -I../include 
+INCLUDES += -I$(top_srcdir)/include -I$(top_builddir)/include/libchaos -I$(top_builddir)/include 
 
 # local make targets
 # ---------------------------------------------------------------------------
 $(TESTS): $(LDADD)
 	@$(ECHO_CCLD)
-	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $(@:%=%.c) $^ $(LIB)
+	@QUIET@$(COMPLINK) $(CFLAGS) $(INCLUDES) -o $@ $(@:%=@srcdir@/%.c) $^ $(LIB)
 
 # include global make targets
 # ---------------------------------------------------------------------------

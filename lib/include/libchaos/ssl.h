@@ -80,48 +80,48 @@ CHAOS_DATA(struct list         )ssl_list;
 CHAOS_DATA(uint32_t            )ssl_id;
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) ssl_get_log(void);
+CHAOS_API(int  ssl_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Prototypes                                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)                ssl_init       (void);
-CHAOS_API(void)                ssl_shutdown   (void);
-CHAOS_API(void)                ssl_seed       (void);
-CHAOS_API(void)                ssl_default    (struct ssl_context  *scptr);
-CHAOS_API(struct ssl_context *)ssl_add        (const char          *name,
+CHAOS_API(void                 ssl_init       (void))
+CHAOS_API(void                 ssl_shutdown   (void))
+CHAOS_API(void                 ssl_seed       (void))
+CHAOS_API(void                 ssl_default    (struct ssl_context  *scptr))
+CHAOS_API(struct ssl_context * ssl_add        (const char          *name,
                                                int                  context,
                                                const char          *cert,
                                                const char          *key,
-                                               const char          *ciphers);
-CHAOS_API(int)                 ssl_update     (struct ssl_context  *scptr,
+                                               const char          *ciphers))
+CHAOS_API(int                  ssl_update     (struct ssl_context  *scptr,
                                                const char          *name,
                                                int                  context,
                                                const char          *cert,
                                                const char          *key,
-                                               const char          *ciphers);
-CHAOS_API(struct ssl_context *)ssl_find_name  (const char          *name);
-CHAOS_API(struct ssl_context *)ssl_find_id    (uint32_t             id);
-CHAOS_API(int)                 ssl_new        (int                  fd,
-                                               struct ssl_context  *scptr);
-CHAOS_API(int)                 ssl_accept     (int                  fd);
-CHAOS_API(int)                 ssl_connect    (int                  fd);
-CHAOS_API(int)                 ssl_read       (int                  fd,
+                                               const char          *ciphers))
+CHAOS_API(struct ssl_context * ssl_find_name  (const char          *name))
+CHAOS_API(struct ssl_context * ssl_find_id    (uint32_t             id))
+CHAOS_API(int                  ssl_new        (int                  fd,
+                                               struct ssl_context  *scptr))
+CHAOS_API(int                  ssl_accept     (int                  fd))
+CHAOS_API(int                  ssl_connect    (int                  fd))
+CHAOS_API(int                  ssl_read       (int                  fd,
                                                void                *buf,
-                                               size_t               n);
-CHAOS_API(int)                 ssl_write      (int                  fd,
+                                               size_t               n))
+CHAOS_API(int                  ssl_write      (int                  fd,
                                                const void          *buf,
-                                               size_t               n);
-CHAOS_API(const char *)        ssl_strerror   (int                  err);
-CHAOS_API(void)                ssl_close      (int                  fd);
-CHAOS_API(int)                 ssl_handshake  (int                  fd,
-                                               struct io           *iofd);
-CHAOS_API(void)                ssl_cipher     (int                  fd,
+                                               size_t               n))
+CHAOS_API(const char *         ssl_strerror   (int                  err))
+CHAOS_API(void                 ssl_close      (int                  fd))
+CHAOS_API(int                  ssl_handshake  (int                  fd,
+                                               struct io           *iofd))
+CHAOS_API(void                 ssl_cipher     (int                  fd,
                                                char                *ciphbuf,
-                                               size_t               n);
-CHAOS_API(struct ssl_context *)ssl_pop        (struct ssl_context  *scptr);
-CHAOS_API(struct ssl_context *)ssl_push       (struct ssl_context **scptr);
-CHAOS_API(void)                ssl_delete     (struct ssl_context  *scptr);
-CHAOS_API(void)                ssl_dump       (struct ssl_context  *scptr);
+                                               size_t               n))
+CHAOS_API(struct ssl_context * ssl_pop        (struct ssl_context  *scptr))
+CHAOS_API(struct ssl_context * ssl_push       (struct ssl_context **scptr))
+CHAOS_API(void                 ssl_delete     (struct ssl_context  *scptr))
+CHAOS_API(void                 ssl_dump       (struct ssl_context  *scptr))
 
 #endif

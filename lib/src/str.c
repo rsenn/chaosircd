@@ -615,6 +615,7 @@ int str_vsprintf(char *str, const char *format, va_list args)
  * Copy string from <s> to <d>. Write max <n> bytes to <d> and always       *
  * null-terminate it. Returns new string length of <d>.                     *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *d, const char *s, size_t n)
 {
@@ -639,11 +640,13 @@ size_t strlcpy(char *d, const char *s, size_t n)
   return i;
 }
 #endif
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Append string <src> to <dst>. Don't let <dst> be bigger than <siz> bytes *
  * and always null-terminate. Returns new string length of <dst>            *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *d, const char *s, size_t n)
 {
@@ -681,9 +684,12 @@ size_t strlcat(char *d, const char *s, size_t n)
   return i;
 }
 #endif
+#endif
+
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 int str_cmp(const char *s1, const char *s2)
 {
   size_t i = 0;
@@ -699,10 +705,12 @@ int str_cmp(const char *s1, const char *s2)
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 int str_icmp(const char *s1, const char *s2)
 {
   size_t i = 0;
@@ -718,10 +726,12 @@ int str_icmp(const char *s1, const char *s2)
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 int str_ncmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
@@ -740,6 +750,7 @@ int str_ncmp(const char *s1, const char *s2, size_t n)
   return ((int)(unsigned int)(unsigned char)s1[i]) -
          ((int)(unsigned int)(unsigned char)s2[i]);
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
@@ -766,6 +777,7 @@ int str_nicmp(const char *s1, const char *s2, size_t n)
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 int str_snprintf(char *str, size_t n, const char *format, ...)
 {
   int ret;
@@ -810,10 +822,12 @@ int str_sprintf(char *str, const char *format, ...)
   
   return ret;
 }*/
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Converts a string to a signed int.                                       *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 int str_toi(const char *s)
 {
 #define ISNUM(c) ((c) >= '0' && (c) <= '9')
@@ -849,6 +863,7 @@ int str_toi(const char *s)
   
 #undef ISNUM
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                             *
@@ -867,6 +882,7 @@ int str_toi(const char *s)
  *                                                                          *
  * return value will not be bigger than maxtok                              *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 size_t str_tokenize(char *s, char **v, size_t maxtok)
 {
   size_t c = 0;
@@ -931,6 +947,7 @@ size_t str_tokenize(char *s, char **v, size_t maxtok)
   
   return c;
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                             *
@@ -1050,6 +1067,7 @@ size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 char *str_dup(const char *s)
 {
   char *r;
@@ -1061,9 +1079,11 @@ char *str_dup(const char *s)
 
   return r;
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 #define ROR(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
 #define ROL(v, n) ((v >> (n & (HASH_BIT_SIZE-1))) | (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE-1)))))
 hash_t str_hash(const char *s)
@@ -1091,9 +1111,10 @@ hash_t str_hash(const char *s)
 
   return ret;
 }
-
+#endif
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 hash_t str_ihash(const char *s)
 {  
   hash_t ret = 0xdefaced;
@@ -1121,6 +1142,7 @@ hash_t str_ihash(const char *s)
 }
 #undef ROL
 #undef ROR
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                    *

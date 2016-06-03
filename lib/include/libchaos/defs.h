@@ -82,7 +82,7 @@ typedef int ssize_t;
 #endif
 
 #ifndef CHAOS_API
-# define CHAOS_API(type) type
+# define CHAOS_API(type) type;
 #endif
 #ifndef CHAOS_DATA
 # define CHAOS_DATA(type) extern type
@@ -98,17 +98,30 @@ typedef int ssize_t;
 #define CHAOS_INLINE_FN(x) x
 # elif defined __GNUC__
 #define CHAOS_INLINE(x)  static __inline__ x
+#  if __GNUC__ > 4
+#define CHAOS_INLINE_API(proto) 
+#define CHAOS_INLINE_FN(x)  static __inline__ x
+#  else
 #define CHAOS_INLINE_FN(x)  extern __inline__ x
+#  endif
 # else
 #define CHAOS_INLINE(x) extern inline x
 #define CHAOS_INLINE_FN(x) x
 # endif
 #endif
 
+#ifndef CHAOS_INLINE_API
+# define CHAOS_INLINE_API(proto) proto;
+#endif
+
 #ifdef __clang__
 #undef NO_C99
 #else
 #define NO_C99 1
+#endif
+
+#if __GNUC__ > 4
+#define ALREADY_INLINED 1
 #endif
 
 /*#ifdef HAVE_SYS_TYPES_H

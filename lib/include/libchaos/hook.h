@@ -52,28 +52,28 @@ struct hook {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)         hook_init       (void);
+CHAOS_API(void          hook_init       (void))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)         hook_shutdown   (void);
+CHAOS_API(void          hook_shutdown   (void))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct hook *)hook_register   (void *function,
+CHAOS_API(struct hook * hook_register   (void *function,
                                          int   type,
-                                         void *callback);
+                                         void *callback))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)          hook_unregister (void *function,
+CHAOS_API(int           hook_unregister (void *function,
                                          int   type,
-                                         void *callback);
+                                         void *callback))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)          hooks_call      (void *function,
+CHAOS_API(int           hooks_call      (void *function,
                                          int   type,
-                                         ...);
+                                         ...))
 
 #endif

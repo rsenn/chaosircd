@@ -162,22 +162,22 @@ CHAOS_DATA(int)          mem_zero;      /* /dev/zero if we havent MAP_ANON */
 #endif
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) mem_get_log(void);
+CHAOS_API(int  mem_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Initialize allocator                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_init                (void);
+CHAOS_API(void   mem_init                (void))
 
 /* ------------------------------------------------------------------------ *
  * Close fd for allocator                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_shutdown            (void);
+CHAOS_API(void   mem_shutdown            (void))
 
 /* ------------------------------------------------------------------------ *
  * Whine and exit if we got no memory                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_fatal               (void);
+CHAOS_API(void   mem_fatal               (void))
 
 /* ------------------------------------------------------------------------ *
  * Create a static heap                                                       *
@@ -187,15 +187,15 @@ CHAOS_API(void)  mem_fatal               (void);
  *                  you want to store)                                        *
  * <count>          How many elements a block can contain                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_static_create       (struct sheap *shptr,
+CHAOS_API(void   mem_static_create       (struct sheap *shptr,
                                           size_t        size,
-                                          size_t        count);
+                                          size_t        count))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_static_note         (struct sheap *shptr,
+CHAOS_API(void   mem_static_note         (struct sheap *shptr,
                                           const char   *format,
-                                          ...);
+                                          ...))
 
 /* ------------------------------------------------------------------------ *
  * Return pointer to a free element on a static heap                          *
@@ -204,7 +204,7 @@ CHAOS_API(void)  mem_static_note         (struct sheap *shptr,
  *                                                                            *
  * Returns pointer to free element or exits the program if failed.            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)mem_static_alloc        (struct sheap *shptr);
+CHAOS_API(void * mem_static_alloc        (struct sheap *shptr))
 
 /* ------------------------------------------------------------------------ *
  * Free an element on a static heap                                           *
@@ -213,25 +213,25 @@ CHAOS_API(void *)mem_static_alloc        (struct sheap *shptr);
  *
  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_static_free         (struct sheap *shptr,
-                                          void         *scptr);
+CHAOS_API(void   mem_static_free         (struct sheap *shptr,
+                                          void         *scptr))
 
 /* ------------------------------------------------------------------------ *
  * Free all blocks which have no used elements.                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)   mem_static_collect      (struct sheap *shptr);
+CHAOS_API(int    mem_static_collect      (struct sheap *shptr))
 
 /* ------------------------------------------------------------------------ *
  * Destroy the whole heap.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_static_destroy      (struct sheap *shptr);
+CHAOS_API(void   mem_static_destroy      (struct sheap *shptr))
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <element> is valid.                                 *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(int)   mem_static_valid        (struct sheap *shptr,
-                                          void         *scptr);
+CHAOS_API(int    mem_static_valid        (struct sheap *shptr,
+                                          void         *scptr))
 #endif
 
 /* ------------------------------------------------------------------------ *
@@ -240,58 +240,58 @@ CHAOS_API(int)   mem_static_valid        (struct sheap *shptr,
  * <dhptr>   Pointer to a dynamic heap structure                              *
  * <size>    How big the a chunk can be at the maximum                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_dynamic_create      (struct dheap *dhptr,
-                                          size_t        size);
+CHAOS_API(void   mem_dynamic_create      (struct dheap *dhptr,
+                                          size_t        size))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_dynamic_note        (struct dheap *dhptr,
+CHAOS_API(void   mem_dynamic_note        (struct dheap *dhptr,
                                           const char   *format,
-                                          ...);
+                                          ...))
 
 /* ------------------------------------------------------------------------ *
  * Return pointer to a newly allocated chunk on the heap.                     *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)mem_dynamic_alloc       (struct dheap *dhptr,
-                                          size_t        size);
+CHAOS_API(void * mem_dynamic_alloc       (struct dheap *dhptr,
+                                          size_t        size))
 
 /* ------------------------------------------------------------------------ *
  * Try to resize block, otherwise free and allocate new one.                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)mem_dynamic_realloc     (struct dheap *dhptr,
+CHAOS_API(void * mem_dynamic_realloc     (struct dheap *dhptr,
                                           void         *ptr,
-                                          size_t        size);
+                                          size_t        size))
 
 /* ------------------------------------------------------------------------ *
  * Free a chunk. haha                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_dynamic_free        (struct dheap *dhptr,
-                                          void         *ptr);
+CHAOS_API(void   mem_dynamic_free        (struct dheap *dhptr,
+                                          void         *ptr))
 
 /* ------------------------------------------------------------------------ *
  * Free all blocks which have no chunks.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)   mem_dynamic_collect     (struct dheap *dhptr);
+CHAOS_API(int    mem_dynamic_collect     (struct dheap *dhptr))
 
 /* ------------------------------------------------------------------------ *
  * Destroy a dynamic heap, munmap() the blocks.                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)  mem_dynamic_destroy     (struct dheap *dhptr);
+CHAOS_API(void   mem_dynamic_destroy     (struct dheap *dhptr))
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: see if <chnk> is valid.                                    *
  * this is time-consuming and will not be built without -DDEBUG               *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(int)   mem_dynamic_valid       (struct dheap *dhptr,
-                                          void         *dcptr);
+CHAOS_API(int    mem_dynamic_valid       (struct dheap *dhptr,
+                                          void         *dcptr))
 #endif
 
 /* ------------------------------------------------------------------------ *
  * DEBUG FUNCTION: dump a heap                                                *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(void)  mem_dynamic_dump        (struct dheap *dhptr);
+CHAOS_API(void   mem_dynamic_dump        (struct dheap *dhptr);
 #endif
 
 /* ------------------------------------------------------------------------ *
@@ -301,20 +301,20 @@ CHAOS_API(void)  mem_dynamic_dump        (struct dheap *dhptr);
 #undef memset
 CHAOS_API(void *)memset               (void       *s,
                                    int         c,
-                                   size_t      n);
+                                   size_t      n))
 
 #undef memcpy
-CHAOS_API(void *)memcpy               (void       *d,
+CHAOS_API(void * memcpy               (void       *d,
                                    const void *s,
-                                   size_t      n);
+                                   size_t      n))
 
 #undef memcmp
-CHAOS_API(int)   memcmp               (const void *d,
+CHAOS_API(int    memcmp               (const void *d,
                                    const void *s,
-                                   size_t      n);
+                                   size_t      n))
 
 #ifdef __GCC__
-CHAOS_API(inline) void *memset(void *s, int c, size_t n)
+CHAOS_API(inline  void *memset(void *s, int c, size_t n)
 {
   size_t i;
 
@@ -328,7 +328,7 @@ CHAOS_API(inline) void *memset(void *s, int c, size_t n)
                 ((int64_t)(c & 0xff) << 32) |
                 ((int64_t)(c & 0xff) << 40) |
                 ((int64_t)(c & 0xff) << 48) |
-                ((int64_t)(c & 0xff) << 56);
+                ((int64_t)(c & 0xff) << 56))
     n >>= 3;
 
     for(i = 0; i < n; i++)
@@ -368,7 +368,7 @@ CHAOS_API(inline) void *memset(void *s, int c, size_t n)
   return s;
 }
 
-CHAOS_API(inline) void *memcpy(void *d, const void *s, size_t n)
+CHAOS_API(inline  void *memcpy(void *d, const void *s, size_t n)
 {
   size_t i;
 
@@ -573,13 +573,13 @@ CHAOS_API(inline) int memcmp(const void *d, const void *s, size_t n)
 /* ------------------------------------------------------------------------ *
  * Dump static heap information                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct sheap *)mem_static_find         (uint32_t      id);
-CHAOS_API(void)          mem_static_dump         (struct sheap *shptr);
+CHAOS_API(struct sheap * mem_static_find         (uint32_t      id))
+CHAOS_API(void           mem_static_dump         (struct sheap *shptr))
 
 /* ------------------------------------------------------------------------ *
  * Dump dynamic heap information                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct dheap *)mem_dynamic_find        (uint32_t      id);
-CHAOS_API(void)          mem_dynamic_dump        (struct dheap *dhptr);
+CHAOS_API(struct dheap * mem_dynamic_find        (uint32_t      id))
+CHAOS_API(void           mem_dynamic_dump        (struct dheap *dhptr))
 
 #endif

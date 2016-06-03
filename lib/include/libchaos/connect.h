@@ -98,14 +98,14 @@ struct connect
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_log;        /* Log source */
-CHAOS_API(struct sheap)    connect_heap;       /* Heap containing connect blocks */
-CHAOS_API(struct timer *)  connect_timer;      /* Garbage collect timer */
-CHAOS_API(struct list)     connect_list;       /* List linking connect blocks */
-CHAOS_API(uint32_t)        connect_id;         /* Next serial number */
+CHAOS_DATA(int)              connect_log;        /* Log source */
+CHAOS_DATA(struct sheap)    connect_heap;       /* Heap containing connect blocks */
+CHAOS_DATA(struct timer *)  connect_timer;      /* Garbage collect timer */
+CHAOS_DATA(struct list)     connect_list;       /* List linking connect blocks */
+CHAOS_DATA(uint32_t)        connect_id;         /* Next serial number */
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) connect_get_log(void);
+CHAOS_API(int connect_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Initialize the connect module.                                           *
@@ -116,7 +116,7 @@ CHAOS_API(int) connect_get_log(void);
  * - zero connect_list                                                      *
  * - report success                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_init           (void);
+CHAOS_API(void             connect_init           (void))
 
 /* ------------------------------------------------------------------------ *
  * Shut down the connect module.                                            *
@@ -127,7 +127,7 @@ CHAOS_API(void)            connect_init           (void);
  * - destroy connect_heap                                                   *
  * - unregister connect_log                                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_shutdown       (void);
+CHAOS_API(void             connect_shutdown       (void))
 
 /* ------------------------------------------------------------------------ *
  * Collect connect block garbage.                                           *
@@ -136,14 +136,14 @@ CHAOS_API(void)            connect_shutdown       (void);
  * - free all connect blocks with a zero refcount                           *
  * - collect garbage on connect_heap                                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_collect        (void);
+CHAOS_API(int              connect_collect        (void))
 
 /* ------------------------------------------------------------------------ *
  * Fill a connect block with default values.                                *
  *                                                                          *
  * <cnptr>           pointer to connect block                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_default        (struct connect  *cnptr);
+CHAOS_API(void             connect_default        (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * Add a new connect block if we got a valid address and a valid protocol   *
@@ -161,14 +161,14 @@ CHAOS_API(void)            connect_default        (struct connect  *cnptr);
  *                                                                          *
  * Will return a pointer to the connect block or NULL on failure.           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct connect *)connect_add          (const char      *address,
+CHAOS_API(struct connect * connect_add          (const char      *address,
                                                  uint16_t         port,
                                                  struct protocol *pptr,
                                                  uint64_t         timeout,
                                                  uint64_t         interval,
                                                  int              autoconn,
                                                  int              ssl,
-                                                 const char      *context);
+                                                 const char      *context))
 
 /* ------------------------------------------------------------------------ *
  * Update the externally initialised stuff of a connect block.              *
@@ -182,7 +182,7 @@ CHAOS_API(struct connect *)connect_add          (const char      *address,
  * <autoconn>          Flag for autoconnect                                 *
  * <ssl>               SSL connection?                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_update       (struct connect  *cnptr,
+CHAOS_API(int              connect_update       (struct connect  *cnptr,
                                                  const char      *address,
                                                  uint16_t         port,
                                                  struct protocol *pptr,
@@ -190,36 +190,36 @@ CHAOS_API(int)             connect_update       (struct connect  *cnptr,
                                                  uint64_t         interval,
                                                  int              autoconn,
                                                  int              ssl,
-                                                 const char      *context);
+                                                 const char      *context))
 
 /* ------------------------------------------------------------------------ *
  * Remove and free a connect block.                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_delete       (struct connect  *cnptr);
+CHAOS_API(void             connect_delete       (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct connect *)connect_pop          (struct connect  *cnptr);
+CHAOS_API(struct connect * connect_pop          (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct connect *)connect_push         (struct connect **cnptrptr);
+CHAOS_API(struct connect * connect_push         (struct connect **cnptrptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_resolve      (struct connect  *cnptr);
+CHAOS_API(int              connect_resolve      (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_start        (struct connect  *cnptr);
+CHAOS_API(int              connect_start        (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_initiate     (struct connect  *cnptr);
+CHAOS_API(int              connect_initiate     (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_cancel       (struct connect  *cnptr);
+CHAOS_API(void             connect_cancel       (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * If the connect block has an interval value then schedule a connection    *
@@ -227,43 +227,43 @@ CHAOS_API(void)            connect_cancel       (struct connect  *cnptr);
  * initiation (cnptr->start) 'til next interval (cnptr->start + interval)   *
  * Returns 0 if a retry was scheduled.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)             connect_retry        (struct connect  *cnptr);
+CHAOS_API(int              connect_retry        (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_set_arg      (struct connect  *cnptr,
-                                                 void            *arg);
+CHAOS_API(void             connect_set_arg      (struct connect  *cnptr,
+                                                 void            *arg))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_set_args     (struct connect  *cnptr,
+CHAOS_API(void             connect_set_args     (struct connect  *cnptr,
                                                  const void      *argbuf,
-                                                 size_t           n);
+                                                 size_t           n))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void *)          connect_get_args     (struct connect  *cnptr);
+CHAOS_API(void *           connect_get_args     (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_set_name     (struct connect   *cnptr,
-                                                 const char       *name);
+CHAOS_API(void             connect_set_name     (struct connect   *cnptr,
+                                                 const char       *name))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(const char *)    connect_get_name     (struct connect  *cnptr);
+CHAOS_API(const char *     connect_get_name     (struct connect  *cnptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct connect *)connect_find_name    (const char      *name);
+CHAOS_API(struct connect * connect_find_name    (const char      *name))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct connect *)connect_find_id      (uint32_t         id);
+CHAOS_API(struct connect * connect_find_id      (uint32_t         id))
 
 /* ------------------------------------------------------------------------ *
  * Dump connects and connect heap.                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)            connect_dump         (struct connect  *cnptr);
+CHAOS_API(void             connect_dump         (struct connect  *cnptr))
 
 #endif

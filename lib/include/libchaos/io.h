@@ -203,29 +203,29 @@ CHAOS_DATA(struct io *) io_list;
 CHAOS_DATA(int)         io_top;
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int) io_get_log(void);
+CHAOS_API(int  io_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Initialize I/O code.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_init           (void);
-CHAOS_API(void)       io_init_except    (int            fd0,
+CHAOS_API(void        io_init           (void))
+CHAOS_API(void        io_init_except    (int            fd0,
                                          int            fd1,
-                                         int            fd2);
+                                         int            fd2))
 
 /* ------------------------------------------------------------------------ *
  * Shutdown I/O code.                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_shutdown       (void);
+CHAOS_API(void        io_shutdown       (void))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_flush          (int            fd);
+CHAOS_API(int         io_flush          (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * Put a file descriptor into non-blocking mode.                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_nonblocking       (int            fd);
+CHAOS_API(int         io_nonblocking       (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * Control the queue behaviour.                                               *
@@ -239,56 +239,56 @@ CHAOS_API(int)        io_nonblocking       (int            fd);
  *                                                                            *
  * Note that none of the queues can be disabled if they still contain data.   *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_queue_control  (int            fd,
+CHAOS_API(int         io_queue_control  (int            fd,
                                          int            recvq,
                                          int            sendq,
-                                         int            linebuf);
+                                         int            linebuf))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_queued_read    (int            fd);
+CHAOS_API(int         io_queued_read    (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_queued_write   (int            fd);
+CHAOS_API(int         io_queued_write   (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_handle_fd      (int            fd);
+CHAOS_API(void        io_handle_fd      (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * Register a file descriptor to the io_list.                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_new            (int            fd,
-                                         int            type);
+CHAOS_API(int         io_new            (int            fd,
+                                         int            type))
 
 /* ------------------------------------------------------------------------ *
  * Open a file.                                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_open           (const char    *path,
+CHAOS_API(int         io_open           (const char    *path,
                                          int            flags,
-                                         ...);
+                                         ...))
 
 /* ------------------------------------------------------------------------ *
  * Shut a filedescriptor                                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_shutup         (int            fd);
+CHAOS_API(void        io_shutup         (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_push           (int           *fdptr);
+CHAOS_API(int         io_push           (int           *fdptr))
 
 /* ------------------------------------------------------------------------ *
  * Close an fd.                                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_destroy          (int            fd);
+CHAOS_API(void        io_destroy          (int            fd))
 
 /* ------------------------------------------------------------------------ *
  * Write a description string.                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_note           (int            fd,
+CHAOS_API(void        io_note           (int            fd,
                                          const char    *format,
-                                         ...);
+                                         ...))
 
 /* ------------------------------------------------------------------------ *
  * Register a I/O event callback.                                             *
@@ -310,66 +310,66 @@ CHAOS_API(void)       io_note           (int            fd,
  *                   then call the callback anyway.                           *
  *                                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_vregister      (int            fd,
+CHAOS_API(int         io_vregister      (int            fd,
                                          int            type,
                                          void          *callback,
-                                         va_list        args);
+                                         va_list        args))
 
-CHAOS_API(int)        io_register       (int            fd,
+CHAOS_API(int         io_register       (int            fd,
                                          int            type,
                                          void          *callback,
-                                         ...);
+                                         ...))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_unregister     (int           fd,
-                                         int           type);
+CHAOS_API(int         io_unregister     (int           fd,
+                                         int           type))
 
 /* ------------------------------------------------------------------------ *
  * Read either from the fd directly or from its queue.                        *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_read           (int            fd,
+CHAOS_API(int         io_read           (int            fd,
                                          void          *buf,
-                                         size_t         n);
+                                         size_t         n))
 
 /* ------------------------------------------------------------------------ *
  * Write either to the fd directly or to its queue.                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_write          (int            fd,
+CHAOS_API(int         io_write          (int            fd,
                                          const void    *buf,
-                                         size_t         n);
+                                         size_t         n))
 
 /* ------------------------------------------------------------------------ *
  * Read a line from queue.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_gets           (int            fd,
+CHAOS_API(int         io_gets           (int            fd,
                                          void          *buf,
-                                         size_t         n);
+                                         size_t         n))
 
 /* ------------------------------------------------------------------------ *
  * Write a line to fd or queue.                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_puts           (int            fd,
+CHAOS_API(int         io_puts           (int            fd,
                                          const char    *s,
-                                         ...);
+                                         ...))
 
 /* ------------------------------------------------------------------------ *
  * Write a line to fd or queue.                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)           io_vputs       (int            fd,
+CHAOS_API(int            io_vputs       (int            fd,
                                          const char    *s,
-                                         va_list        args);
+                                         va_list        args))
 
 /* ------------------------------------------------------------------------ *
  *                                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_multi_start    (struct fqueue *fifoptr);
-CHAOS_API(uint32_t)   io_multi_write    (struct fqueue *fifoptr,
+CHAOS_API(void        io_multi_start    (struct fqueue *fifoptr))
+CHAOS_API(uint32_t    io_multi_write    (struct fqueue *fifoptr,
                                          const void    *buf,
-                                         uint32_t       n);
-CHAOS_API(void)       io_multi_link     (struct fqueue *fifoptr,
-                                         int            fd);
-CHAOS_API(void)       io_multi_end      (struct fqueue *fifoptr);
+                                         uint32_t       n))
+CHAOS_API(void        io_multi_link     (struct fqueue *fifoptr,
+                                         int            fd))
+CHAOS_API(void        io_multi_end      (struct fqueue *fifoptr))
 
 /* ------------------------------------------------------------------------ *
  * Do a select() system call.                                                 *
@@ -378,8 +378,8 @@ CHAOS_API(void)       io_multi_end      (struct fqueue *fifoptr);
  * else return after <timeout> miliseconds or when there was an event.        *
  * In the latter case the remaining time will be in *timeout.                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_select         (int64_t       *remain,
-                                         int64_t       *timeout);
+CHAOS_API(int         io_select         (int64_t       *remain,
+                                         int64_t       *timeout))
 
 /* ------------------------------------------------------------------------ *
  * Do a poll() system call.                                                   *
@@ -388,48 +388,48 @@ CHAOS_API(int)        io_select         (int64_t       *remain,
  * else return after <timeout> miliseconds or when there was an event.        *
  * In the latter case the remaining time will be in *timeout.                 *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int)        io_poll           (int64_t       *remain,
-                                         int64_t       *timeout);
+CHAOS_API(int         io_poll           (int64_t       *remain,
+                                         int64_t       *timeout))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_wait_blocking           (void);
+CHAOS_API(void        io_wait_blocking           (void))
 
 /* ------------------------------------------------------------------------ *
  * Handle pending I/O events                                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_handle         (void);
+CHAOS_API(void        io_handle         (void))
 
 /* ------------------------------------------------------------------------ *
  * Move an fd.                                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_move           (int            from,
-                                         int            to);
+CHAOS_API(void        io_move           (int            from,
+                                         int            to))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_vset_args      (int            fd,
-                                         va_list        args);
+CHAOS_API(void        io_vset_args      (int            fd,
+                                         va_list        args))
 
-CHAOS_API(void)       io_set_args       (int            fd,
-                                         ...);
+CHAOS_API(void        io_set_args       (int            fd,
+                                         ...))
 
 /* ------------------------------------------------------------------------ *
  * This function will set the necessary flags in the fd_sets/pollfds for the  *
  * requested events.                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_set_events     (int            fd,
-                                         int            events);
+CHAOS_API(void        io_set_events     (int            fd,
+                                         int            events))
 
 /* ------------------------------------------------------------------------ *
  * This function will unset the necessary flags in the fd_sets/pollfds for    *
  * the requested events.                                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_unset_events   (int            fd,
-                                         int            events);
+CHAOS_API(void        io_unset_events   (int            fd,
+                                         int            events))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void)       io_dump           (int            fd);
+CHAOS_API(void        io_dump           (int            fd))
 
 #endif
