@@ -70,6 +70,7 @@ CPPFLAGS += -DHAVE_CONFIG_H
 @A_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
 
 INCLUDES += \
+            -I$(top_srcdir)/.. \
             -I$(top_srcdir) \
             -I$(top_srcdir)/include \
             -I. \

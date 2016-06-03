@@ -73,6 +73,7 @@ MODULES              = m_away \
 
 INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
+                       -I$(top_srcdir) \
                        -I../../lib/include \
                        -I../../include \
                        -I$(top_builddir)

@@ -48,9 +48,9 @@ for ac_cv_libowfat_dir in $ac_cv_with_libowfat; do
 		break
 done
 
-	if ! test "$ac_cv_libowfat_stralloc_h_found" = yes -a -d "${LIBOWFAT_LIBDIR}"; then
-		AC_MSG_ERROR([Need libowfat!])
-	fi
+dnl	if ! test "$ac_cv_libowfat_stralloc_h_found" = yes -a -d "${LIBOWFAT_LIBDIR}"; then
+dnl		AC_MSG_ERROR([Need libowfat!])
+dnl	fi
 
 AM_CONDITIONAL([LIBOWFAT], [test "$ac_cv_libowfat_stralloc_h_found" = yes])
 AC_SUBST([LIBOWFAT_CFLAGS])

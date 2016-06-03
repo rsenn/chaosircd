@@ -10,6 +10,8 @@ top_builddir         = @top_builddir@
 thisdir              = include/ircd/
 PACKAGE              = @PACKAGE_NAME@
 
+VPATH = $(srcdir)
+
 include_PREFIX = /cgircd
 include_DATA = $(HEADERS)
 
