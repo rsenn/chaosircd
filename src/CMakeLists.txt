@@ -27,28 +27,28 @@ ${BISON_IRCD_PARSER_OUTPUTS}
    "${CMAKE_SOURCE_DIR}/include/ircd/numeric.h" "${CMAKE_SOURCE_DIR}/include/ircd/oper.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/server.h" "${CMAKE_SOURCE_DIR}/include/ircd/service.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/user.h" "${CMAKE_SOURCE_DIR}/include/ircd/usermode.h") 
-	
-	
-	
+    
+    
+    
 if(WINDOWS OR CYGWIN)
 
   add_library(ircd SHARED ${SOURCES})
-	set_target_properties(ircd PROPERTIES PREFIX "")
-	target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
+    set_target_properties(ircd PROPERTIES PREFIX "")
+    target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
-	add_executable(cgircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
-	
-	  link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "${LIBCHAOS_BINARY_DIR}")
+    add_executable(cgircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
+    
+      link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "${LIBCHAOS_BINARY_DIR}")
 
-	target_link_libraries(ircd chaos ${SOCKET_LIBRARIES})
-	target_link_libraries(cgircd ircd)
+    target_link_libraries(ircd chaos ${SOCKET_LIBRARIES})
+    target_link_libraries(cgircd ircd)
 
 else()
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
-	add_executable(cgircd ${SOURCES} main.c)
+    add_executable(cgircd ${SOURCES} main.c)
 
-	link_directories("${LIBCHAOS_BINARY_DIR}")
-		 
+    link_directories("${LIBCHAOS_BINARY_DIR}")
+         
         target_link_libraries(cgircd chaos ${MYSQL_LIBS} ${OPENSSL_LIBS} ${SOCKET_LIBRARIES})
 endif()
 

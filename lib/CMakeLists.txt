@@ -77,9 +77,9 @@ check_function_exists(poll HAVE_POLL)
 check_function_exists(socketpair HAVE_SOCKETPAIR)
 
 if(HAVE_POLL)
-	set(USE_POLL 1)
+    set(USE_POLL 1)
 else(HAVE_POLL)
-	set(USE_SELECT 1)
+    set(USE_SELECT 1)
 endif(HAVE_POLL)
 
 check_library_exists(owfat stralloc_init "${CMAKE_INSTALL_PREFIX}/lib" HAVE_LOWFAT)

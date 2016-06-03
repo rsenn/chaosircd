@@ -36,7 +36,7 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
 endif(NOT DEFINED BUILD_SHARED_LIBS)
 
 set(DLLEXT "${CMAKE_SHARED_MODULE_SUFFIX}")
-	add_definitions(-DDLLEXT=\"${DLLEXT}\")
+    add_definitions(-DDLLEXT=\"${DLLEXT}\")
 
 if(NOT BUILD_SHARED_LIBS)
 #  add_definitions(-DSTATIC_LIBCHAOS=1)
@@ -49,7 +49,7 @@ include("${LIBCHAOS_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
 
 substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
-	       
+           
 set(PLUGINDIR ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME} CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
