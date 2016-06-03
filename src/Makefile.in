@@ -143,12 +143,12 @@ ircd.c:
 
 $(LEXERSRC): $(srcdir)/ircd.l $(PARSERINC)
 	@$(ECHO_LEX)
-	@$(LEX) -o$@ ircd.l
+	@$(LEX) -o$@ $(srcdir)/ircd.l
 $(LEXEROBJ): $(LEXERSRC) $(PARSERINC)
 $(PARSEROBJ): $(PARSERSRC) $(PARSERINC)
 $(PARSERINC): $(srcdir)/ircd.y
 	@$(ECHO_YACC)
-	$(YACC) -d -o $(PARSERSRC) ircd.y
+	$(YACC) -d -o $(PARSERSRC) $(srcdir)/ircd.y
 #.y.c:
 #	@$(ECHO_YACC)
 #	@$(YACC) -d -o $(PARSERSRC) $(PARSER)

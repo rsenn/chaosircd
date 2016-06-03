@@ -72,7 +72,8 @@ MODULES              = m_away \
 INCLUDES             = -I$(top_srcdir)/lib/include \
                        -I$(top_srcdir)/include \
                        -I../../lib/include \
-                       -I../../include
+                       -I../../include \
+                       -I$(top_builddir)
 
 SOURCES              = $(MODULES:%=%.c)
 OBJECTS              = $(MODULES:%=%.o)

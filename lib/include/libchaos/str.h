@@ -287,7 +287,7 @@ CHAOS_INLINE_FN( int str_ncmp(const char *s1, const char *s2, size_t n)
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(int  str_nicmp(const char *s1, const char *s2, size_t n))
 
-CHAOS_INLINE_FN( int str_incmp(const char *s1, const char *s2, size_t n)
+CHAOS_INLINE_FN( int str_nicmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
 

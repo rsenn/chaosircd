@@ -1,4 +1,4 @@
-/* this header file comes from libowfat, http:/*www.fefe.de/libowfat/ */*/
+/* this header file comes from libowfat, http:/*www.fefe.de/libowfat/ */
 #ifndef STRALLOC_H
 #define STRALLOC_H
 
@@ -18,7 +18,7 @@ extern "C" {
  * a is the allocated length of the string.
  */
 
-typedef struct stralloc {
+typedef struct stralloc_s {
   char* s;
   size_t len;
   size_t a;

@@ -22,9 +22,7 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#ifdef HAVE_CONFIG_H
-#include "ircd/config.h"
-#endif
+#include "config.h"
 
 #include "libchaos/defs.h"
 #include "libchaos/io.h"

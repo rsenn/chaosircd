@@ -755,6 +755,7 @@ int str_ncmp(const char *s1, const char *s2, size_t n)
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
+#ifndef ALREADY_INLINED
 int str_nicmp(const char *s1, const char *s2, size_t n)
 {
   size_t i = 0;
@@ -773,6 +774,7 @@ int str_nicmp(const char *s1, const char *s2, size_t n)
   return ((int)(unsigned int)(unsigned char)str_tolower(s1[i])) -
          ((int)(unsigned int)(unsigned char)str_tolower(s2[i]));
 }
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                *
