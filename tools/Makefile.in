@@ -4,6 +4,8 @@ builddir             = @builddir@
 top_builddir         = @top_builddir@
 thisdir              = tools/
 
+VPATH = $(srcdir)
+
 sbin_EXEC = mkca mkcrt mkkeys mkreq sign openssl.cnf
 bin_EXEC = ircd-config
 EXEC = $(sbin_EXEC) $(bin_EXEC)
@@ -23,25 +25,25 @@ DEVFILES = $(DISTFILES)
 
 mkca: mkca.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/mkca) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/mkca) >/dev/null
 mkcrt: mkcrt.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/mkcrt) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/mkcrt) >/dev/null
 mkkeys: mkkeys.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/mkkeys) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/mkkeys) >/dev/null
 mkreq: mkreq.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/mkreq) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/mkreq) >/dev/null
 sign: sign.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/sign) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/sign) >/dev/null
 openssl.cnf: openssl.cnf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/openssl.cnf) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/openssl.cnf) >/dev/null
 ircd-config: ircd-config.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && ./config.status tools/ircd-config) >/dev/null
+	@(cd $(top_builddir) && ./config.status tools/ircd-config) >/dev/null
 
 dep:
 

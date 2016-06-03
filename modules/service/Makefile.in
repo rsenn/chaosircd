@@ -4,6 +4,8 @@ builddir             = @builddir@
 top_builddir         = @top_builddir@
 thisdir              = modules/service/
 
+VPATH = $(srcdir)
+
 CATEGORY             = service
 MODULES              = sv_sbb
 

@@ -9,6 +9,8 @@ builddir             = @builddir@
 top_builddir         = @top_builddir@
 thisdir              = modules/
 
+VPATH = $(srcdir)
+
 # Redirect to recursive targets
 ifeq ($(DSO), yes)
 all: makefiles all-recursive
@@ -44,7 +46,7 @@ DEVFILES             = $(DISTFILES)
 
 module_import.h: import-modules.sh $(SUBDIRS:%=%/Makefile)
 	@$(ECHO_CONFIG)
-	@sh import-modules.sh > $@
+	@sh $< > $@
 
 all: all-recursive
 clean: clean-recursive

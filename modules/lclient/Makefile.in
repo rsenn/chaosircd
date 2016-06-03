@@ -4,6 +4,8 @@ builddir             = @builddir@
 top_builddir         = @top_builddir@
 thisdir              = modules/lclient/
 
+VPATH = $(srcdir)
+
 CATEGORY             = lclient
 MODULES              = lc_clones \
                        lc_cookie \

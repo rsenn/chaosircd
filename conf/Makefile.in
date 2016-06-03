@@ -4,6 +4,8 @@ builddir             = @relbuilddir@
 top_builddir         = @top_builddir@
 thisdir              = conf/
 
+VPATH = $(srcdir)
+
 sysconf_DATA = children.conf \
                classes.conf \
                inis.conf \
@@ -40,28 +42,28 @@ DEVFILES = $(DISTFILES)
 
 children.conf: children.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/children.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/children.conf) >/dev/null
 classes.conf: classes.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/classes.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/classes.conf) >/dev/null
 inis.conf: inis.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/inis.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/inis.conf) >/dev/null
 ircd.conf: ircd.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/ircd.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/ircd.conf) >/dev/null
 logs.conf: logs.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/logs.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/logs.conf) >/dev/null
 modules.conf: modules.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/modules.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/modules.conf) >/dev/null
 opers.conf: opers.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/opers.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/opers.conf) >/dev/null
 ssl.conf: ssl.conf.in $(top_builddir)/config.status
 	@$(ECHO_CONFIG)
-	@(cd $(top_srcdir) && $(SHELL) config.status conf/ssl.conf) >/dev/null
+	@(cd $(top_builddir) && $(SHELL) config.status conf/ssl.conf) >/dev/null
 
 dep:
 

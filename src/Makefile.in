@@ -5,6 +5,8 @@ top_builddir         = @top_builddir@
 thisdir              = src/
 plugindir            = @plugindir@
 
+VPATH = $(srcdir)
+
 EXEEXT               = @EXEEXT@
 PROGRAM              = cgircd$(EXEEXT)
 LIBNAME              = ircd
@@ -108,6 +110,7 @@ $(PROGRAM) $(PIE_LIBRARY): CFLAGS += $(MYSQL_CFLAGS)
 $(PROGRAM) $(PIE_LIBRARY): LIBS += $(MYSQL_LIBS)
 
 
+$(MODULES:%=%.o): $(MODULES:%=$(srcdir)/%.c)
 $(MODULES:%=%.o): CPPFLAGS += -DBUILD_IRCD=1
 @WIN32_TRUE@@DLM_TRUE@main.o: CPPFLAGS += -DBUILD_MAIN=1
 @STATIC_TRUE@CPPFLAGS += -DSTATIC_LIBCHAOS
