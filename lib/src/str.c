@@ -20,7 +20,9 @@
  * $Id: str.c,v 1.4 2006/09/28 09:38:20 roman Exp $
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *

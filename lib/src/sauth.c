@@ -20,7 +20,9 @@
  * $Id: sauth.c,v 1.6 2006/09/28 08:38:31 roman Exp $
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *

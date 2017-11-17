@@ -20,7 +20,9 @@
  * $Id: httpc.c,v 1.6 2006/09/28 09:44:11 roman Exp $
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include "config.h"
 

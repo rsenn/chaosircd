@@ -20,7 +20,9 @@
  * $Id: syscall.h,v 1.3 2006/09/28 08:38:31 roman Exp $
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #ifndef LIB_SYSCALL_H
 #define LIB_SYSCALL_H

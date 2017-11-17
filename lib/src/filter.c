@@ -20,7 +20,9 @@
  * $Id: filter.c,v 1.11 2006/09/28 09:11:02 roman Exp $
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
