@@ -72,41 +72,41 @@ typedef int ssize_t;
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 # ifndef STATIC_LIBCHAOS
 #  ifdef BUILD_LIBCHAOS
-#   define CHAOS_API(type) __declspec(dllexport) type
-#   define CHAOS_DATA(type) extern __declspec(dllexport) type
+#   define CHAOS_API(type...) __declspec(dllexport) type
+#   define CHAOS_DATA(type...) extern __declspec(dllexport) type
 #  else
-#   define CHAOS_API(type) type
-#   define CHAOS_DATA(type) extern __declspec(dllimport) type
+#   define CHAOS_API(type...) type
+#   define CHAOS_DATA(type...) extern __declspec(dllimport) type
 #  endif
 # endif
 #endif
 
 #ifndef CHAOS_API
-# define CHAOS_API(type) type;
+# define CHAOS_API(type...) type;
 #endif
 #ifndef CHAOS_DATA
-# define CHAOS_DATA(type) extern type
+# define CHAOS_DATA(type...) extern type
 #endif
 
 #ifndef CHAOS_DATA_DECL
-# define CHAOS_DATA_DECL(type) type
+# define CHAOS_DATA_DECL(type...) type
 #endif
 
 #ifndef CHAOS_INLINE
 # ifdef __clang__
-#define CHAOS_INLINE(x) /*static inline x*/
-#define CHAOS_INLINE_FN(x) x
+#define CHAOS_INLINE(x...) /*static inline x*/
+#define CHAOS_INLINE_FN(x...) x
 # elif defined __GNUC__
-#define CHAOS_INLINE(x)  static __inline__ x
+#define CHAOS_INLINE(x...)  static __inline__ x
 #  if __GNUC__ > 4
 #define CHAOS_INLINE_API(proto) 
-#define CHAOS_INLINE_FN(x)  static __inline__ x
+#define CHAOS_INLINE_FN(x...)  static __inline__ x
 #  else
-#define CHAOS_INLINE_FN(x)  extern __inline__ x
+#define CHAOS_INLINE_FN(x...)  extern __inline__ x
 #  endif
 # else
-#define CHAOS_INLINE(x) extern inline x
-#define CHAOS_INLINE_FN(x) x
+#define CHAOS_INLINE(x...) extern inline x
+#define CHAOS_INLINE_FN(x...) x
 # endif
 #endif
 

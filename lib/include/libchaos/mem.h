@@ -291,7 +291,7 @@ CHAOS_API(int    mem_dynamic_valid       (struct dheap *dhptr,
  * DEBUG FUNCTION: dump a heap                                                *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-CHAOS_API(void   mem_dynamic_dump        (struct dheap *dhptr);
+CHAOS_API(void   mem_dynamic_dump        (struct dheap *dhptr))
 #endif
 
 /* ------------------------------------------------------------------------ *
