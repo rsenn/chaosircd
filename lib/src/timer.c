@@ -727,11 +727,11 @@ int timer_collect(void)
  * <src>            - pointer to timeval to convert                         *
  * <dst>            - pointer to 64bit integer to store result              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void) timer_to_msec(uint64_t *dst, struct timeval *src)
+CHAOS_API(void timer_to_msec(uint64_t *dst, struct timeval *src)
 {
   *dst = ((uint64_t)src->tv_sec * 1000ULL) +
          ((uint32_t)src->tv_usec / 1000ULL);
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Convert from miliseconds to timeval.                                     *

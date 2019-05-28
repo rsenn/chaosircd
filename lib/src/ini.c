@@ -42,6 +42,8 @@
 #include <fcntl.h>
 #endif
 
+#undef CHAOS_INLINE
+#define CHAOS_INLINE(x...) x
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 int           ini_log;
@@ -69,7 +71,7 @@ int ini_collect(void)
 /* ------------------------------------------------------------------------ *
  * Strip whitespace                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(void) ini_strip(char *s)
+void ini_strip(char *s)
 {
   uint32_t i;
   uint32_t len;
@@ -98,7 +100,7 @@ CHAOS_INLINE(void) ini_strip(char *s)
 /* ------------------------------------------------------------------------ *
  * Convert a hex digit to its value                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(uint8_t) ini_get_hex(char c)
+uint8_t ini_get_hex(char c)
 {
   uint8_t ret;
 
@@ -117,7 +119,7 @@ CHAOS_INLINE(uint8_t) ini_get_hex(char c)
 /* ------------------------------------------------------------------------ *
  * Search a key in current section.                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(struct) ini_key *ini_key_get(struct ini_section *section, const char *name)
+struct ini_key *ini_key_get(struct ini_section *section, const char *name)
 {
   struct ini_key     *key;
   struct node    *node;
@@ -145,7 +147,7 @@ CHAOS_INLINE(struct) ini_key *ini_key_get(struct ini_section *section, const cha
 /* ------------------------------------------------------------------------ *
  * Create new key in current section.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(struct) ini_key *ini_key_new(struct ini_section *section, const char *name)
+CHAOS_INLINE(struct ini_key *ini_key_new(struct ini_section *section, const char *name)
 {
   struct ini_key *key;
 
@@ -167,7 +169,7 @@ CHAOS_INLINE(struct) ini_key *ini_key_new(struct ini_section *section, const cha
   dlink_add_tail(&section->keys, &key->node, key);
 
   return key;
-}
+})
 
 /* ------------------------------------------------------------------------ *
  * Write key to file.                                                       *

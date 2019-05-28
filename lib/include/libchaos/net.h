@@ -120,7 +120,7 @@ CHAOS_API(int  net_get_log(void))
 /* ------------------------------------------------------------------------ *
  * Convert a short from host to network byteorder                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(net_port_t net_htons(uint16_t n)
+CHAOS_INLINE_FN(net_port_t net_htons(uint16_t n)
 {
   union {
     uint8_t c[2];
@@ -136,7 +136,7 @@ CHAOS_INLINE(net_port_t net_htons(uint16_t n)
 /* ------------------------------------------------------------------------ *
  * Convert a short from network to host byteorder                             *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(uint16_t net_ntohs(net_port_t n)
+CHAOS_INLINE_FN(uint16_t net_ntohs(net_port_t n)
 {
   union {
     uint16_t i;
@@ -152,7 +152,7 @@ CHAOS_INLINE(uint16_t net_ntohs(net_port_t n)
 /* ------------------------------------------------------------------------ *
  * Convert a long from host to network byteorder                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(net_addr_t net_htonl(uint32_t n)
+CHAOS_INLINE_FN(net_addr_t net_htonl(uint32_t n)
 {
   union {
     uint8_t c[4];
@@ -170,7 +170,7 @@ CHAOS_INLINE(net_addr_t net_htonl(uint32_t n)
 /* ------------------------------------------------------------------------ *
  * Convert a long from network to host byteorder                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(uint32_t net_ntohl(net_addr_t n)
+CHAOS_INLINE_FN(uint32_t net_ntohl(net_addr_t n)
 {
   union {
     uint32_t i;
