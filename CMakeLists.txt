@@ -53,7 +53,7 @@ check_function_exists(setrlimit HAVE_SETRLIMIT)
 check_function_exists(mmap HAVE_MMAP)
 check_function_exists(mprotect HAVE_MPROTECT)
 
-add_definitions(-std=c89)
+##add_definitions(-std=c89)
 add_definitions(-DHAVE_CONFIG_H=1)
 
 check_include_file(sys/stat.h HAVE_SYS_STAT_H)

@@ -17,10 +17,10 @@ cfg() {
   if [ -e "$TOOLCHAIN" ]; then
     cmakebuild=$(basename "$TOOLCHAIN" .cmake)
     cmakebuild=${cmakebuild%.toolchain}
-    cmakebuild=cmake-${cmakebuild#toolchain-}
-    : ${builddir=build/cmake-$cmakebuild}
+    cmakebuild=${cmakebuild#toolchain-}
+    : ${builddir=build/$cmakebuild}
   else
-   : ${builddir=build/cmake-$host}
+   : ${builddir=build/$host}
   fi
 
   case $(uname -o) in

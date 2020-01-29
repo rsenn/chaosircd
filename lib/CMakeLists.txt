@@ -39,7 +39,7 @@ if(BUILD_STATIC)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif()
 
-add_definitions(-std=c89)
+#add_definitions(-std=c89)
 
 include(CheckLibraryExists)
 include(CheckIncludeFile)

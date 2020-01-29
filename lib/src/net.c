@@ -50,13 +50,9 @@
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
-#endif
 
-#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
-#endif
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -389,6 +385,7 @@ int net_socket(net_address_t at, net_socket_t st)
   int fd;
   int pf = 0;
   int type = 0;
+  int proto = 0;
 
   switch(at)
   {
@@ -407,7 +404,7 @@ int net_socket(net_address_t at, net_socket_t st)
   }
 
   /* Try to create TCP/UDP socket */
-  fd = syscall_socket(pf, type, IPPROTO_IP);
+  fd = syscall_socket(pf, type, proto);
 
   if(fd < 0)
     return -1;
