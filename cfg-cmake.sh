@@ -10,7 +10,7 @@ cfg() {
       i686-pc-*) host="$host" builddir=build/${host} prefix=/usr ;;
     esac
   fi
-  : ${prefix:=/usr}
+  : ${prefix:=/usr/local}
   : ${libdir:=$prefix/lib}
   [ -d "$libdir/$host" ] && libdir=$libdir/$host
 
@@ -42,7 +42,7 @@ cfg() {
   ${CMAKE:-cmake} -Wno-dev \
     -DCMAKE_INSTALL_PREFIX="${prefix-/usr}" \
     -G "$generator" \
-    ${VERBOSE+:-DCMAKE_VERBOSE_MAKEFILE=TRUE} \
+    ${VERBOSE:+-DCMAKE_VERBOSE_MAKEFILE=TRUE} \
     -DCMAKE_BUILD_TYPE="${TYPE:-Debug}" \
     ${CC:+-DCMAKE_C_COMPILER="$CC"} \
     ${CXX:+-DCMAKE_CXX_COMPILER="$CXX"} \

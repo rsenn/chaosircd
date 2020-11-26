@@ -98,10 +98,10 @@ substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 set(CONFFILES
-    conf/children.conf
-    conf/classes.conf
+  conf/children.conf
+     conf/classes.conf
     conf/inis.conf
-    conf/ircd.conf
+   conf/ircd.conf
     conf/logs.conf
     conf/modules.conf
     conf/opers.conf
@@ -115,11 +115,12 @@ set(TOOLS
     tools/mkreq
     tools/openssl.cnf
     tools/sign)
-
+  set(INSTALL_CONF_FILES )
 foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
+  list(APPEND INSTALL_CONF_FILES  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
 
 set(CHAOSIRCD_HEADERS
@@ -130,7 +131,7 @@ set(CHAOSIRCD_HEADERS
     include/ircd/class.h
     include/ircd/client.h
     include/ircd/conf.h
-    include/ircd/config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/include/ircd/config.h
     include/ircd/ircd.h
     include/ircd/lclient.h
     include/ircd/msg.h
@@ -142,19 +143,20 @@ set(CHAOSIRCD_HEADERS
     include/ircd/usermode.h)
 
 install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
-install(FILES ${CONFFILES} DESTINATION etc/cgircd)
-install(FILES ${TOOLS} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
+install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/cgircd)
 
 set(TOOLS 
    tools/ircd-config tools/mkca tools/mkcrt tools/mkkeys
    tools/mkreq tools/openssl.cnf tools/sign)
-
+ set(INSTALL_SUBST_FILES )
 foreach(SUBSTFILE ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY NEWLINE_STYLE UNIX)
+               list(APPEND INSTALL_SUBST_FILES  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
 
+install(FILES ${INSTALL_SUBST_FILES} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
 add_subdirectory(src)
 
 

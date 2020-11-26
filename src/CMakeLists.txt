@@ -22,7 +22,7 @@ ${BISON_IRCD_PARSER_OUTPUTS}
    "${CMAKE_SOURCE_DIR}/include/ircd/channel.h" "${CMAKE_SOURCE_DIR}/include/ircd/chanuser.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/chars.h" "${CMAKE_SOURCE_DIR}/include/ircd/class.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/client.h" "${CMAKE_SOURCE_DIR}/include/ircd/conf.h"
-   "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h"
+   "${CMAKE_BINARY_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/lclient.h" "${CMAKE_SOURCE_DIR}/include/ircd/msg.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/numeric.h" "${CMAKE_SOURCE_DIR}/include/ircd/oper.h"
    "${CMAKE_SOURCE_DIR}/include/ircd/server.h" "${CMAKE_SOURCE_DIR}/include/ircd/service.h"
@@ -36,7 +36,7 @@ if(WINDOWS OR CYGWIN)
     set_target_properties(ircd PROPERTIES PREFIX "")
     target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
-    add_executable(cgircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_SOURCE_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
+    add_executable(cgircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_BINARY_DIR}/include/ircd/config.h" "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
     
       link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "${LIBCHAOS_BINARY_DIR}")
 
