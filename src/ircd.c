@@ -314,7 +314,7 @@ static int ircd_coldstart(struct config *config)
   if(config->global.pidfile[0] == '\0')
   {
     log(ircd_log, L_fatal, "cgircd has no PID file!!!");
-    syscall_exit(1);
+    //syscall_exit(1);
   }
 
   if((pid = ircd_check(config)))
