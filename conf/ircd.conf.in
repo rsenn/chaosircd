@@ -10,7 +10,7 @@ global {
                                 # configfile coldstart
   hub    = yes;                  # Hub mode: server forwards messages
                                 # between two or more servers
-  pid    = "@relpidfile@";
+  pid    = "/var/run/cgircd.pid;
 };
 
 # Message files

@@ -51,6 +51,8 @@ set(SOURCES
     "${CMAKE_SOURCE_DIR}/include/ircd/user.h"
     "${CMAKE_SOURCE_DIR}/include/ircd/usermode.h")
 
+
+  add_definitions(-DHAVE_SSL=1)
 if(WINDOWS OR CYGWIN)
 
   add_library(ircd SHARED ${SOURCES})

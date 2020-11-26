@@ -64,11 +64,13 @@ int ssl_get_log() { return ssl_log; }
 static int ssl_bio_read(BIO *h, char *buf, int size)
 {
   int ret = 0;
+  int fd;
 
   if(buf != NULL)
   {
     errno = 0;
-    ret = recv(h->num, buf, size, 0);
+    BIO_get_fd(h, &fd);
+    ret = recv(fd, buf, size, 0);
     BIO_clear_retry_flags(h);
 
     if(ret <= 0)
@@ -87,9 +89,11 @@ static int ssl_bio_read(BIO *h, char *buf, int size)
 static int ssl_bio_write(BIO *h, const char *buf, int size)
 {
   int ret;
+  int fd;
 
   errno = 0;
-  ret = send(h->num, buf, size, 0);
+  BIO_get_fd(h, &fd);
+  ret = send(fd, buf, size, 0);
   BIO_clear_retry_flags(h);
 
   if(ret <= 0)
@@ -115,8 +119,9 @@ static void ssl_set_sock(SSL *ssl, int fd)
   rbio = SSL_get_rbio(ssl);
   wbio = SSL_get_wbio(ssl);
 
-  rbio->method->bread = (void *)&ssl_bio_read;
-  rbio->method->bwrite = (void *)&ssl_bio_write;
+  BIO_meth_set_read(rbio, &ssl_bio_read);
+  BIO_meth_set_write(wbio, &ssl_bio_write);
+  //rbio->method->bwrite = (void *)&ssl_bio_write;
 }
 #endif
 
@@ -205,7 +210,7 @@ struct ssl_context *ssl_add(const char *name, int         context,
   }
   if(context == SSL_CONTEXT_CLIENT)
   {
-    meth = SSLv3_client_method();
+    meth = SSLv23_client_method();
   }
 
   if(meth == NULL)

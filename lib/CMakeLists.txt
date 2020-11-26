@@ -95,14 +95,18 @@ substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
                             "${LIBCHAOS_BINARY_DIR}")
 
 set(PLUGINDIR
-    ${CMAKE_INSTALL_PREFIX}/lib/${PACKAGE_NAME}
+    ${CMAKE_INSTALL_PREFIX}/lib/cgircd
     CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_LIBCHAOS=1)
 
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+include_directories(
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "${CMAKE_CURRENT_BINARY_DIR}/lib"
+  "${CMAKE_CURRENT_BINARY_DIR}/include"
+  )
 
 set(LIBCHAOS_HEADERS
     include/libchaos/cfg.h

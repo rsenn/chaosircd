@@ -382,18 +382,21 @@ modules_load:		T_LOAD QSTRING ';'
 	    char pathbuf[256];
 
             strlcpy(pathbuf, PLUGINDIR"/", sizeof(pathbuf));
-	    switch(c) {
-	      case MAKE_TUPLE('u','m'):  strlcat(pathbuf,"usermode/", sizeof(pathbuf)); break;
-	      case MAKE_TUPLE('c','m'):  strlcat(pathbuf,"chanmode/", sizeof(pathbuf)); break;
-	      case MAKE_TUPLE('l','c'):  strlcat(pathbuf,"lclient/", sizeof(pathbuf)); break;
-	      case MAKE_TUPLE('s','t'):  strlcat(pathbuf,"stats/", sizeof(pathbuf)); break;
-	      case MAKE_TUPLE('s','v'):  strlcat(pathbuf,"service/", sizeof(pathbuf)); break;
-	      case MAKE_TUPLE('m','_'):  strlcat(pathbuf,"msg/", sizeof(pathbuf)); break;
-	      default:  break;
-	    }
-
+            if(0) {
+              switch(c) {
+                case MAKE_TUPLE('u','m'):  strlcat(pathbuf,"usermode/", sizeof(pathbuf)); break;
+                case MAKE_TUPLE('c','m'):  strlcat(pathbuf,"chanmode/", sizeof(pathbuf)); break;
+                case MAKE_TUPLE('l','c'):  strlcat(pathbuf,"lclient/", sizeof(pathbuf)); break;
+                case MAKE_TUPLE('s','t'):  strlcat(pathbuf,"stats/", sizeof(pathbuf)); break;
+                case MAKE_TUPLE('s','v'):  strlcat(pathbuf,"service/", sizeof(pathbuf)); break;
+                case MAKE_TUPLE('m','_'):  strlcat(pathbuf,"msg/", sizeof(pathbuf)); break;
+                default:  break;
+              }
+            }
             strlcat(pathbuf, yylval.string, sizeof(pathbuf));
-            strlcat(pathbuf, "." DLLEXT, sizeof(pathbuf));
+            if(DLLEXT[0] != '.')
+              strlcat(pathbuf, ".", sizeof(pathbuf));
+            strlcat(pathbuf, DLLEXT, sizeof(pathbuf));
             module = module_add(pathbuf);
           }
           else
