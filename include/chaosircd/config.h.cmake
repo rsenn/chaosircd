@@ -1,5 +1,7 @@
 /* Creation time of this server */
+#ifndef CREATION
 #cmakedefine CREATION
+#endif
 
 /* Define to the address where bug reports for this package should be sent. */
 #cmakedefine PROJECT_BUGREPORT "@PROJECT_BUGREPORT@"

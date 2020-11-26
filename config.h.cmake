@@ -60,8 +60,11 @@
 #cmakedefine HAVE_SYS_TYPES_H 1
 
 /* Creation time of this server */
+#ifndef CREATION
 #cmakedefine CREATION "@CREATION@"
+#endif
 
 /* Platform this server runs on */
+#ifndef PLATFORM
 #cmakedefine PLATFORM "@PLATFORM@"
-
+#endif

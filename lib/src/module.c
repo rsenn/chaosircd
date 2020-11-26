@@ -282,7 +282,8 @@ const char *module_expand(const char *name)
         strlcat(ret, module_table[i][0], sizeof(ret));
         strlcat(ret, "_", sizeof(ret));
         strlcat(ret, lala, sizeof(ret));
-        strlcat(ret, ".", sizeof(ret));
+        if(DLLEXT[0] != '.')
+          strlcat(ret, ".", sizeof(ret));
         strlcat(ret, DLLEXT, sizeof(ret));
 
         break;

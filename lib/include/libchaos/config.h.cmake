@@ -101,8 +101,9 @@
 
 #define SIZEOF_UINTPTR_T @SIZEOF_UINTPTR_T@
 /* Creation time of this server */
+#ifndef CREATION
 #cmakedefine CREATION @CREATION@
-
+#endif
 #endif
 
 /* Define to 1 if you want to use select(2) */

@@ -90,9 +90,11 @@
 #cmakedefine HAVE_SYS_STAT_H 1
 
 #define SIZEOF_UINTPTR_T @SIZEOF_UINTPTR_T@
-/* Creation time of this server */
-#cmakedefine CREATION @CREATION@
 
+/* Creation time of this server */
+#ifndef CREATION
+#cmakedefine CREATION @CREATION@
+#endif
 #endif
 
 /* Define to 1 if you have the <sys/types.h> header file. */

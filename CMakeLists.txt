@@ -5,22 +5,33 @@ set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-execute_process(COMMAND date -R OUTPUT_VARIABLE CREATION
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(
+  COMMAND date -R
+  OUTPUT_VARIABLE CREATION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-execute_process(COMMAND uname -a OUTPUT_VARIABLE PLATFORM
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(
+  COMMAND uname -a
+  OUTPUT_VARIABLE PLATFORM
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 project(${PACKAGENAME} C)
 
 cmake_minimum_required(VERSION 2.6)
 
+set(SYSCONFDIR
+    ${CMAKE_INSTALL_PREFIX}/etc/ircd
+    CACHE PATH "configuration directory")
+set(relsysconfdir
+    ${CMAKE_INSTALL_PREFIX}/etc/ircd
+    CACHE PATH "sysconf dir")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
 include_directories(
-    "${CMAKE_CURRENT_BINARY_DIR}"
-#    "${CMAKE_CURRENT_BINARY_DIR}/lib"
+  "${CMAKE_CURRENT_BINARY_DIR}" # "${CMAKE_CURRENT_BINARY_DIR}/lib"
 )
 
 add_subdirectory(lib)
@@ -38,9 +49,8 @@ include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseFreeType.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/DllExt.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
-#if(NOT BUILD_SHARED)                                                                                                                                              add_definitions(-DSTATIC_LIBCHAOS=1)
-#  add_definitions(-DSTATIC_IRCD=1)
-#endif()
+# if(NOT BUILD_SHARED) add_definitions(-DSTATIC_LIBCHAOS=1)
+# add_definitions(-DSTATIC_IRCD=1) endif()
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
@@ -53,7 +63,7 @@ check_function_exists(setrlimit HAVE_SETRLIMIT)
 check_function_exists(mmap HAVE_MMAP)
 check_function_exists(mprotect HAVE_MPROTECT)
 
-##add_definitions(-std=c89)
+# add_definitions(-std=c89)
 add_definitions(-DHAVE_CONFIG_H=1)
 
 check_include_file(sys/stat.h HAVE_SYS_STAT_H)
@@ -91,17 +101,19 @@ check_include_file(ws2tcpip.h HAVE_WS_TCPIP_H)
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
-include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
-#substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
+                         "${LIBCHAOS_BINARY_DIR}")
+# substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}"
+# "${CMAKE_CURRENT_BINARY_DIR}")
 substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 
 set(CONFFILES
-  conf/children.conf
-     conf/classes.conf
+    conf/children.conf
+    conf/classes.conf
     conf/inis.conf
-   conf/ircd.conf
+    conf/ircd.conf
     conf/logs.conf
     conf/modules.conf
     conf/opers.conf
@@ -115,12 +127,12 @@ set(TOOLS
     tools/mkreq
     tools/openssl.cnf
     tools/sign)
-  set(INSTALL_CONF_FILES )
+set(INSTALL_CONF_FILES)
 foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
-  list(APPEND INSTALL_CONF_FILES  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
+  list(APPEND INSTALL_CONF_FILES ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
 
 set(CHAOSIRCD_HEADERS
@@ -145,19 +157,27 @@ set(CHAOSIRCD_HEADERS
 install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
 install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/cgircd)
 
-set(TOOLS 
-   tools/ircd-config tools/mkca tools/mkcrt tools/mkkeys
-   tools/mkreq tools/openssl.cnf tools/sign)
- set(INSTALL_SUBST_FILES )
+set(TOOLS
+    tools/ircd-config
+    tools/mkca
+    tools/mkcrt
+    tools/mkkeys
+    tools/mkreq
+    tools/openssl.cnf
+    tools/sign)
+set(INSTALL_SUBST_FILES)
 foreach(SUBSTFILE ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY NEWLINE_STYLE UNIX)
-               list(APPEND INSTALL_SUBST_FILES  ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY NEWLINE_STYLE UNIX)
+  list(APPEND INSTALL_SUBST_FILES ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
 
-install(FILES ${INSTALL_SUBST_FILES} DESTINATION sbin PERMISSIONS WORLD_EXECUTE)
+install(
+  FILES ${INSTALL_SUBST_FILES}
+  DESTINATION sbin
+  PERMISSIONS WORLD_EXECUTE)
 add_subdirectory(src)
-
 
 add_subdirectory(modules)

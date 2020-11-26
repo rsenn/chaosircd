@@ -127,7 +127,8 @@
 
 #define SIZEOF_UINTPTR_T @SIZEOF_UINTPTR_T@
 /* Creation time of this server */
+#ifndef CREATION
 #cmakedefine CREATION @CREATION@
-
+#endif
 #endif
 

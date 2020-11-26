@@ -2,7 +2,9 @@
 #define IRCD_CONFIG_H__
 
 /* Creation time of this server */
+#ifndef CREATION
 #cmakedefine CREATION "@CREATION@"
+#endif
 
 /* Define to 1 if you have the setrlimit() function. */
 #cmakedefine HAVE_SETRLIMIT 1

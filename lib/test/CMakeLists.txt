@@ -14,10 +14,10 @@ endif(NOT BUILD_SHARED)
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 
-include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
+include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
+                         "${LIBCHAOS_BINARY_DIR}")
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
-
 
 set(TESTS cfgtest dbtest giftest graphtest imagetest ttftest)
 
