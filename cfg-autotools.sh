@@ -24,7 +24,7 @@ cfg ()
     mkdir -p $builddir;
     : ${relsrcdir=`realpath --relative-to "$builddir" .`}
 
-    ( set -x; cd $builddir;
+    ( : set -x; cd $builddir;
     "$relsrcdir"/configure \
       ${build:+--build="$build"} \
       ${host:+--host="$host"} \
@@ -35,7 +35,6 @@ cfg ()
           --enable-debug \
           "$@"
     )
-#         #grep -r '\-O[0-9]' $builddir -lI |xargs sed -i 's,-O[1-9],-ggdb -O0,'
 
 
 }

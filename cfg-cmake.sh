@@ -50,8 +50,6 @@ cfg() {
     ${TOOLCHAIN:+-DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"} \
     ${CC:+-DCMAKE_C_COMPILER="$CC"} \
     ${CXX:+-DCMAKE_CXX_COMPILER="$CXX"} \
-    -DCMAKE_{C,CXX}_FLAGS_DEBUG="-g -ggdb3" \
-    -DCMAKE_{C,CXX}_FLAGS_RELWITHDEBINFO="-O2 -g -ggdb3 -DNDEBUG" \
     ${MAKE:+-DCMAKE_MAKE_PROGRAM="$MAKE"} \
     "$@" \
     $relsrcdir 2>&1 ) |tee "${builddir##*/}.log"
