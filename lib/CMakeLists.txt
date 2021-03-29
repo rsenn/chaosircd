@@ -95,7 +95,7 @@ substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
                             "${LIBCHAOS_BINARY_DIR}")
 
 set(PLUGINDIR
-    ${CMAKE_INSTALL_PREFIX}/lib/cgircd
+    ${CMAKE_INSTALL_PREFIX}/lib/chaosircd
     CACHE FILEPATH "plugin directory")
 
 add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")

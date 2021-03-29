@@ -1,4 +1,4 @@
-/* cgircd - CrowdGuard IRC daemon
+/* chaosircd - Chaoz's IRC daemon daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -265,7 +265,7 @@ static void ircd_detach(struct config *config)
 
 /* -------------------------------------------------------------------------- *
  * Read the file with the process ID and check if there is already a running  *
- * cgircd...                                                               *
+ * chaosircd...                                                               *
  * -------------------------------------------------------------------------- */
 static long ircd_check(struct config *config)
 {
@@ -307,19 +307,19 @@ static int ircd_coldstart(struct config *config)
 
   if(config->global.name[0] == '\0')
   {
-    log(ircd_log, L_fatal, "cgircd has no name!!!");
+    log(ircd_log, L_fatal, "chaosircd has no name!!!");
     syscall_exit(1);
   }
 
   if(config->global.pidfile[0] == '\0')
   {
-    log(ircd_log, L_fatal, "cgircd has no PID file!!!");
+    log(ircd_log, L_fatal, "chaosircd has no PID file!!!");
     //syscall_exit(1);
   }
 
   if((pid = ircd_check(config)))
   {
-    log(ircd_log, L_fatal, "cgircd already running [%u]", pid);
+    log(ircd_log, L_fatal, "chaosircd already running [%u]", pid);
     syscall_exit(1);
   }
 
@@ -473,7 +473,7 @@ void ircd_loop(void)
 #ifdef DEBUG
 void ircd_dump(void)
 {
-  debug(ircd_log, "--- cgircd complete dump ---");
+  debug(ircd_log, "--- chaosircd complete dump ---");
 
 /*  conf_dump(&conf_current);*/
 
@@ -488,7 +488,7 @@ void ircd_dump(void)
   net_dump(NULL);
 /*  ini_dump(NULL);*/
 
-  debug(ircd_log, "--- end of cgircd complete dump ---");
+  debug(ircd_log, "--- end of chaosircd complete dump ---");
 }
 #endif
 

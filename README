@@ -1,6 +1,6 @@
-cgircd
+chaosircd
 
-cgircd is an IRC daemon with commands, channel modes, user modes,
+chaosircd is an IRC daemon with commands, channel modes, user modes,
 and flood control implemented as runtime (re)loadable modules. DNS and
 AUTH (ident) queries are done in a single child process so as to not
 waste valuable file descriptors and responsiveness. It also features a

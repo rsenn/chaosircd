@@ -1,4 +1,4 @@
-set(PACKAGENAME cgircd)
+set(PACKAGENAME chaosircd)
 set(PACKAGEVERSION 2.2.1)
 set(PACKAGERELEASE "peace, love & hippie edition")
 set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
@@ -155,7 +155,7 @@ set(CHAOSIRCD_HEADERS
     include/ircd/usermode.h)
 
 install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
-install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/cgircd)
+install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/chaosircd)
 
 set(TOOLS
     tools/ircd-config

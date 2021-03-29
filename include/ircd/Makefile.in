@@ -12,7 +12,7 @@ PACKAGE              = @PACKAGE_NAME@
 
 VPATH = $(srcdir)
 
-include_PREFIX = /cgircd
+include_PREFIX = /chaosircd
 include_DATA = $(HEADERS)
 
 all: Makefile config.h

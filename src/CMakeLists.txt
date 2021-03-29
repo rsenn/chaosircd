@@ -62,27 +62,27 @@ if(WINDOWS OR CYGWIN)
   target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
   add_executable(
-    cgircd
+    chaosircd
     main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h"
     "${CMAKE_BINARY_DIR}/include/ircd/config.h"
     "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
-  set_target_properties(cgircd PROPERTIES INSTALL_RPATH
+  set_target_properties(chaosircd PROPERTIES INSTALL_RPATH
                                           "${CMAKE_INSTALL_PREFIX}/lib")
 
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib"
                    "${LIBCHAOS_BINARY_DIR}")
 
   target_link_libraries(ircd chaos ${SOCKET_LIBRARIES})
-  target_link_libraries(cgircd ircd)
+  target_link_libraries(chaosircd ircd)
 
 else()
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
-  add_executable(cgircd ${SOURCES} main.c)
+  add_executable(chaosircd ${SOURCES} main.c)
 
   link_directories("${LIBCHAOS_BINARY_DIR}")
 
-  target_link_libraries(cgircd chaos ${MYSQL_LIBS} ${OPENSSL_LIBS}
+  target_link_libraries(chaosircd chaos ${MYSQL_LIBS} ${OPENSSL_LIBS}
                         ${SOCKET_LIBRARIES})
 endif()
 
-install(TARGETS cgircd RUNTIME DESTINATION bin)
+install(TARGETS chaosircd RUNTIME DESTINATION bin)

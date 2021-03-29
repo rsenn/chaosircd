@@ -14,7 +14,7 @@ int dbtest_type = DB_TYPE_MYSQL;
 char *dbtest_host = "127.0.0.1";
 char *dbtest_user = "root";
 char *dbtest_pass = ""; /*OttovPauwid";*/
-char *dbtest_dbname = "cgircd";
+char *dbtest_dbname = "chaosircd";
 /*int dbtest_type = DB_TYPE_PGSQL;
 char *dbtest_host = "localhost";
 char *dbtest_user = "enki";
@@ -38,7 +38,7 @@ void dbtest()
   else
     return;
 
-  result = db_query(db, "SELECT * FROM cgircd.users ORDER BY uid;");
+  result = db_query(db, "SELECT * FROM chaosircd.users ORDER BY uid;");
 
   while((row = db_fetch_row(result)))
   {

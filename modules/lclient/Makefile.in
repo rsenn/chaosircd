@@ -61,7 +61,7 @@ MAINTAINERCLEANFILES = $(DISTCLEANFILES)
 DISTFILES            = Makefile.in $(SOURCES)
 DEVFILES             = $(DISTFILES)
 
-@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lcgircd
+@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lchaosircd
 @SHARED_TRUE@@DLM_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 
 include $(top_builddir)/build.mk

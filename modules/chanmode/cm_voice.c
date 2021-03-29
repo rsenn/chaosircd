@@ -1,4 +1,4 @@
-/* cgircd - CrowdGuard IRC daemon
+/* chaosircd - Chaoz's IRC daemon daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *

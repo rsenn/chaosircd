@@ -1,4 +1,4 @@
-/* cgircd - CrowdGuard IRC daemon
+/* chaosircd - Chaoz's IRC daemon daemon
  *
  * Copyright (C) 2003-2005  Roman Senn <smoli@paranoya.ch>
  *
@@ -198,12 +198,12 @@ global_entry:		T_GLOBAL
           if(conf_current.global.name[0])
             strcpy(conf_new.global.name, conf_current.global.name);
           else
-            strcpy(conf_new.global.name, "cgircd.com");
+            strcpy(conf_new.global.name, "chaosircd.com");
           
           if(conf_current.global.info[0])
             strcpy(conf_new.global.info, conf_current.global.info);
           else
-            strcpy(conf_new.global.info, "cgircd");
+            strcpy(conf_new.global.info, "chaosircd");
           conf_current.global.nodetach = 1;
 	}
 			'{' global_items '}' ';';

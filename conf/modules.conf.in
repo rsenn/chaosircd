@@ -62,7 +62,7 @@ modules {
   #load "lc_cookie";         # Client PING cookie
   #load "lc_mflood";         # Client message flood trigger
   #load "lc_sauth";          # Client AUTH/DNS resolver
-  load "lc_crowdguard";
+  #load "lc_crowdguard";
   load "um_client";         # Usermode +c
   load "um_invisible";      # Usermode +i
   load "um_operator";       # Usermode +o

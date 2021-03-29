@@ -128,10 +128,10 @@ DEFS += -DBUILD_MODULE
 CFLAGS += $(LIBOWFAT_CFLAGS)
 #LIBS += $(LIBOWFAT_LIBS)
 
-@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lcgircd
+@WIN32_TRUE@LIBS += -L$(top_builddir)/src -lchaosircd
 @DLM_TRUE@@SHARED_TRUE@LIBS += -L$(top_builddir)/lib/src -lchaos
 @DLM_TRUE@@SHARED_TRUE@LIBS += $(LIBOWFAT_LIBS)
-#@WIN32_TRUE@@DLM_TRUE@LIBS += $(top_builddir)/src/cgircd.dll
+#@WIN32_TRUE@@DLM_TRUE@LIBS += $(top_builddir)/src/chaosircd.dll
 #@WIN32_TRUE@@SHARED_TRUE@LIBS += $(top_builddir)/lib/src/libchaos.dll
 
 include $(top_builddir)/build.mk

@@ -2,15 +2,15 @@
 
 # Global settings
 global {
-  name   = "crowdguard.org";    # Server name (doesn't need 
-                                # to match real hostname).
-  info   = "CrowdGuard Server";      # Information about the server
+  name   = "senn-shell.gotdns.ch";  # Server name (doesn't need 
+                                    # to match real hostname).
+  info   = "ChaosIRCD Server";      # Information about the server
                                 # shown in /links, /whois and others
   detach = yes;                 # Detach from terminal after 
                                 # configfile coldstart
   hub    = yes;                  # Hub mode: server forwards messages
                                 # between two or more servers
-  pid    = "/var/run/cgircd.pid;
+  pid    = "/var/run/chaosircd.pid;
 };
 
 # Message files

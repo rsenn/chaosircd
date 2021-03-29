@@ -1,4 +1,4 @@
-/* cgircd - CrowdGuard IRC daemon
+/* chaosircd - Chaoz's IRC daemon daemon
  *
  * Copyright (C) 2003  Roman Senn <r.senn@nexbyte.com>
  *
@@ -139,7 +139,7 @@ int
 userdb_connect(struct userdb_client *userdb, const char* host, const char* user, const char* password) {
 	userdb->handle = db_new(DB_TYPE_MYSQL);
 
-	return db_connect(userdb->handle, host, user, password, "cgircd");
+	return db_connect(userdb->handle, host, user, password, "chaosircd");
 }
 
 /* -------------------------------------------------------------------------- *
@@ -434,7 +434,7 @@ userdb_verify(struct userdb_client *userdb, const char* uid, const char* passwor
 	userdb->result =
 	        db_query(
 	                userdb->handle,
-	                "SELECT msisdn,imsi,imei,flag_level,last_login,last_location FROM cgircd.users WHERE uid='%s' AND password='%s';",
+	                "SELECT msisdn,imsi,imei,flag_level,last_login,last_location FROM chaosircd.users WHERE uid='%s' AND password='%s';",
 	                uid, password);
 
 	if(!userdb->result) {

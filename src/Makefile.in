@@ -8,14 +8,14 @@ plugindir            = @plugindir@
 VPATH = $(srcdir)
 
 EXEEXT               = @EXEEXT@
-PROGRAM              = cgircd$(EXEEXT)
+PROGRAM              = chaosircd$(EXEEXT)
 LIBNAME              = ircd
 #@WIN32_FALSE@PIE_LIBRARY          =
 A_LIBRARY          = libircd.a
-PIE_NAME          = cgircd
+PIE_NAME          = chaosircd
 @WIN32_TRUE@PIE_LIBRARY          = $(PIE_NAME).$(PIE_LIBEXT)
 
-bin_EXEC = cgircd$(EXEEXT)
+bin_EXEC = chaosircd$(EXEEXT)
 @SHARED_TRUE@@WIN32_TRUE@bin_EXEC += $(PIE_LIBRARY)
 @STATIC_TRUE@@WIN32_TRUE@lib_DATA += $(A_LIBRARY)
 
@@ -69,7 +69,7 @@ SOURCES              = $(MODULES:%=%.c) $(LEXERSRC) $(PARSERSRC)
 @DLM_TRUE@@WIN32_TRUE@OBJECTS              = main.o
 @DLM_TRUE@@WIN32_TRUE@PIC_OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
 @DLM_FALSE@@WIN32_TRUE@OBJECTS          = $(LEXEROBJ) $(PARSEROBJ) $(MODULES:%=%.o)
-@WIN32_TRUE@LIBNAME              = cgircd
+@WIN32_TRUE@LIBNAME              = chaosircd
 PIE_DEF              = ircd.def
 OBJEXT               = o
 HEADERS              = y.tab.h
@@ -131,10 +131,10 @@ LIBS += $(EFENCE_LIBS)
 
 @WIN32_FALSE@OBJECTS += main.o
 @WIN32_TRUE@@DLM_FALSE@OBJECTS += main.o
-@WIN32_TRUE@@SHARED_TRUE@cgircd$(EXEEXT): $(PIE_LIBRARY) 
-@WIN32_TRUE@@SHARED_FALSE@cgircd$(EXEEXT): libircd.a
-@WIN32_TRUE@@SHARED_TRUE@cgircd: $(PIE_LIBRARY)
-@WIN32_TRUE@@SHARED_FALSE@cgircd: libircd.a
+@WIN32_TRUE@@SHARED_TRUE@chaosircd$(EXEEXT): $(PIE_LIBRARY) 
+@WIN32_TRUE@@SHARED_FALSE@chaosircd$(EXEEXT): libircd.a
+@WIN32_TRUE@@SHARED_TRUE@chaosircd: $(PIE_LIBRARY)
+@WIN32_TRUE@@SHARED_FALSE@chaosircd: libircd.a
 @WIN32_TRUE@@SHARED_TRUE@$(PROGRAM): $(PIE_LIBRARY)
 @WIN32_TRUE@@SHARED_FALSE@$(PROGRAM): libircd.a
 

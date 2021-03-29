@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- * This exploits cgircd and spawns /bin/sh on the socket                   *
+ * This exploits chaosircd and spawns /bin/sh on the socket                   *
  * -------------------------------------------------------------------------- */
 
 #include "ircd/config.h"

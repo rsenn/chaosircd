@@ -9,7 +9,7 @@ install:
 
 include $(top_builddir)/config.mk
 
-DISTFILES            = cgircd.init Makefile.in
+DISTFILES            = chaosircd.init Makefile.in
 DEVFILES             = $(DISTFILES)
 
 CLEANFILES = *~
