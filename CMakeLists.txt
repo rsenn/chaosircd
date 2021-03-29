@@ -20,10 +20,10 @@ project(${PACKAGENAME} C)
 cmake_minimum_required(VERSION 2.6)
 
 set(SYSCONFDIR
-    ${CMAKE_INSTALL_PREFIX}/etc/ircd
+    ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME}
     CACHE PATH "configuration directory")
 set(relsysconfdir
-    ${CMAKE_INSTALL_PREFIX}/etc/ircd
+    ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME}
     CACHE PATH "sysconf dir")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 
@@ -155,7 +155,7 @@ set(CHAOSIRCD_HEADERS
     include/ircd/usermode.h)
 
 install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
-install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/chaosircd)
+install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/${PROJECT_NAME})
 
 set(TOOLS
     tools/ircd-config
