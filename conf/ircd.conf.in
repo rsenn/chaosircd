@@ -30,7 +30,7 @@ mfiles {
 # Listen for incoming SSL connections on port 9200
 @SSL_TRUE@listen {
 @SSL_TRUE@  address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-@SSL_TRUE@  port     = 9200;                         # Port to listen to
+@SSL_TRUE@  port     = 6697;                        # Port to listen to
 @SSL_TRUE@  protocol = "irc";                       # Protocol handler for this port
 @SSL_TRUE@  class    = "clients";                   # Class for client connects
 @SSL_TRUE@  ssl      = yes;                         # Use OpenSSL encryption?
@@ -42,10 +42,11 @@ mfiles {
 @SSL_TRUE@                                          # accept() is called.
 @SSL_TRUE@};
 @SSL_TRUE@
+
 # Listen for incoming connections on port 9990
 listen {
   address  = "0.0.0.0";                   # Address to listen to (0.0.0.0 = any)
-  port     = 9990;                        # Port to listen to
+  port     = 6667;                        # Port to listen to
   protocol = "irc";                       # Protocol handler for this port
   class    = "clients";                   # Class for client connects
   ssl      = no;                          # Use OpenSSL encryption?
@@ -58,7 +59,7 @@ listen {
 # Listen for incoming connections on 127.0.0.1:9989
 listen {
   address  = "127.0.0.1";                   # Address to listen to (0.0.0.0 = any)
-  port     = 9989;                        # Port to listen to
+  port     = 6668;                        # Port to listen to
   protocol = "irc";                       # Protocol handler for this port
   class    = "local";                   # Class for client connects
   ssl      = no;                          # Use OpenSSL encryption?
