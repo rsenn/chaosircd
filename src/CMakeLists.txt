@@ -8,10 +8,10 @@ include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 include(FindBISON)
 
 bison_target(
-  IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c
+  IRCD_PARSER ircd.y ${CMAKE_CURRENT_BINARY_DIR}/ircd_parser.c
   VERBOSE bison.log
   COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/y.tab.h")
-flex_target(IRCD_SCANNER ircd.l ${CMAKE_CURRENT_SOURCE_DIR}/ircd_lexer.c)
+flex_target(IRCD_SCANNER ircd.l ${CMAKE_CURRENT_BINARY_DIR}/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
 set(SOURCES
