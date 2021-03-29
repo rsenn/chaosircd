@@ -206,11 +206,11 @@ struct ssl_context *ssl_add(const char *name, int         context,
 
   if(context == SSL_CONTEXT_SERVER)
   {
-    meth = SSLv23_server_method();
+    meth = TLS_server_method();
   }
   if(context == SSL_CONTEXT_CLIENT)
   {
-    meth = SSLv23_client_method();
+    meth = TLS_client_method();
   }
 
   if(meth == NULL)
