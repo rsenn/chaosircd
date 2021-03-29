@@ -8,15 +8,15 @@ include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 include(FindBISON)
 
 bison_target(
-  IRCD_PARSER ircd.y ${CMAKE_CURRENT_BINARY_DIR}/ircd_parser.c
+  IRCD_PARSER ircd.y ircd_parser.c
   VERBOSE bison.log
   COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/y.tab.h")
 flex_target(IRCD_SCANNER ircd.l ${CMAKE_CURRENT_BINARY_DIR}/ircd_lexer.c)
 add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
 
 set(SOURCES
-    ${BISON_IRCD_PARSER_OUTPUTS}
-    ${FLEX_IRCD_SCANNER_OUTPUTS}
+    ${CMAKE_CURRENT_BINARY_DIR}/ircd_parser.c
+    ${CMAKE_CURRENT_BINARY_DIR}/ircd_lexer.c
     chanmode.c
     channel.c
     chanuser.c
@@ -52,8 +52,7 @@ set(SOURCES
     "${CMAKE_SOURCE_DIR}/include/ircd/user.h"
     "${CMAKE_SOURCE_DIR}/include/ircd/usermode.h")
 
-
-  add_definitions(-DHAVE_SSL=1)
+add_definitions(-DHAVE_SSL=1)
 if(WINDOWS OR CYGWIN)
 
   add_library(ircd SHARED ${SOURCES})
@@ -67,7 +66,7 @@ if(WINDOWS OR CYGWIN)
     "${CMAKE_BINARY_DIR}/include/ircd/config.h"
     "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
   set_target_properties(chaosircd PROPERTIES INSTALL_RPATH
-                                          "${CMAKE_INSTALL_PREFIX}/lib")
+                                             "${CMAKE_INSTALL_PREFIX}/lib")
 
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib"
                    "${LIBCHAOS_BINARY_DIR}")
