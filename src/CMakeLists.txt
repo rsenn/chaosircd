@@ -7,16 +7,14 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 include(FindBISON)
 
-bison_target(
-  IRCD_PARSER ircd.y ircd_parser.c
-  VERBOSE bison.log
-  COMPILE_FLAGS "--defines=${CMAKE_CURRENT_SOURCE_DIR}/y.tab.h")
-flex_target(IRCD_SCANNER ircd.l ${CMAKE_CURRENT_BINARY_DIR}/ircd_lexer.c)
-add_flex_bison_dependency(IRCD_SCANNER IRCD_PARSER)
+bison_target(ircd-parser ircd.y ${CMAKE_CURRENT_BINARY_DIR}/ircd-parser.c
+             DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/y.tab.h)
+flex_target(ircd-scanner ircd.l ${CMAKE_CURRENT_BINARY_DIR}/ircd-lexer.c)
+add_flex_bison_dependency(ircd-scanner ircd-parser)
 
 set(SOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/ircd_parser.c
-    ${CMAKE_CURRENT_BINARY_DIR}/ircd_lexer.c
+    ${CMAKE_CURRENT_BINARY_DIR}/ircd-parser.c
+    ${CMAKE_CURRENT_BINARY_DIR}/ircd-lexer.c
     chanmode.c
     channel.c
     chanuser.c
