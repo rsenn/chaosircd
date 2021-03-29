@@ -84,7 +84,6 @@ cfg-diet() {
   cfg \
     -DSHARED_LIBS=OFF \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
     "$@")
 }
 
@@ -102,7 +101,6 @@ cfg-musl() {
   cfg \
     -DSHARED_LIBS=OFF \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
     "$@")
 }
 
