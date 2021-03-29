@@ -116,11 +116,11 @@ static void ssl_set_sock(SSL *ssl, int fd)
 
   SSL_set_fd(ssl, fd);
 
-  rbio = SSL_get_rbio(ssl);
+  /*rbio = SSL_get_rbio(ssl);
   wbio = SSL_get_wbio(ssl);
 
   BIO_meth_set_read(rbio, &ssl_bio_read);
-  BIO_meth_set_write(wbio, &ssl_bio_write);
+  BIO_meth_set_write(wbio, &ssl_bio_write);*/
   //rbio->method->bwrite = (void *)&ssl_bio_write;
 }
 #endif
@@ -137,8 +137,16 @@ void ssl_init(void)
   mem_static_create(&ssl_heap, sizeof(struct ssl_context), SSL_BLOCK_SIZE);
   mem_static_note(&ssl_heap, "ssl context heap");
 
+#if OPENSSL_API_COMPAT >= 0x10100000L
+  const OPENSSL_INIT_SETTINGS* settings = OPENSSL_INIT_new();
+  OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ADD_ALL_CIPHERS,
+                   settings);
+#else
+  SSL_library_init();
+  ERR_load_crypto_strings();
   SSL_load_error_strings();
-  SSLeay_add_ssl_algorithms();
+  OpenSSL_add_all_algorithms();
+#endif
 #endif
 }
 
@@ -188,6 +196,14 @@ void ssl_default(struct ssl_context *scptr)
   scptr->cert[0] = '\0';
   scptr->key[0] = '\0';
   strcpy(scptr->ciphers, "RSA+HIGH:RSA+MEDIUM");
+}
+
+int
+ssl_verify(int ok, X509_STORE_CTX* cert) {
+ 
+  if(!ok)
+    return 0; // stop immediately
+  return 1;
 }
 
 /* ------------------------------------------------------------------------ *
@@ -265,6 +281,7 @@ struct ssl_context *ssl_add(const char *name, int         context,
     SSL_CTX_free(ctxt);
     return NULL;
   }
+  SSL_CTX_set_verify(ctxt, SSL_VERIFY_NONE, ssl_verify);
 
   scptr = mem_static_alloc(&ssl_heap);
 
