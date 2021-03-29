@@ -4,7 +4,7 @@ child {
   name      = "-sauth";                 # Name MUST be "-sauth" so the 
                                         # [sauth] module can find it!!!
 
-  path      = "@rellibexecdir@/servauth";  # Path to the servauth executable
+  path      = "libexec/servauth";       # Path to the servauth executable
 
   channels  = 1;                        # Number of bidirectional channels 
                                         # to the child (pipes/socketpairs)
