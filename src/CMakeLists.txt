@@ -5,6 +5,7 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSharedLib.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseMySQL.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
+include(FindBISON)
 
 bison_target(
   IRCD_PARSER ircd.y ${CMAKE_CURRENT_SOURCE_DIR}/ircd_parser.c

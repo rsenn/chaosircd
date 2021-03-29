@@ -1,4 +1,4 @@
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include "str.h"
 
 extern int stralloc_copy(stralloc *sa,const stralloc *sa2) {

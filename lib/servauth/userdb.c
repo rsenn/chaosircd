@@ -22,7 +22,7 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 
 #include "libchaos/defs.h"
 #include "libchaos/io.h"

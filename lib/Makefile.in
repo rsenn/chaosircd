@@ -42,7 +42,7 @@ bootfiles: config.status config.h
 
 # directory configuration
 # ---------------------------------------------------------------------------
-SUBDIRS     = m4 include src servauth test
+SUBDIRS     = include m4 servauth src test
 SUBMAKE     = $(SUBDIRS)
 ROOT        = 1
 RECURSIVE   = 1

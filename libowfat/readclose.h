@@ -1,7 +1,7 @@
 #ifndef READCLOSE_H
 #define READCLOSE_H
 
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 
 #ifdef __cplusplus
 extern "C" {

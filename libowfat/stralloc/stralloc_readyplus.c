@@ -1,4 +1,4 @@
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include <stdlib.h>
 
 /* stralloc_readyplus is like stralloc_ready except that, if sa is

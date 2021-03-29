@@ -1,5 +1,5 @@
 #include "byte.h"
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include "buffer.h"
 #include <assert.h>
 

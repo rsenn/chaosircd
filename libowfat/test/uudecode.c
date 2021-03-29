@@ -13,7 +13,7 @@
 #include "str.h"
 #include "buffer.h"
 #include "open.h"
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include "scan.h"
 #include "case.h"
 

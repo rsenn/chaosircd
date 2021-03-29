@@ -1,4 +1,4 @@
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include "buffer.h"
 
 static ssize_t strallocwrite(int fd,char* buf,size_t len,void* myself) {

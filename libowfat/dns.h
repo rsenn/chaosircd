@@ -2,7 +2,7 @@
 #ifndef DNS_H
 #define DNS_H
 
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include "iopause.h"
 #include "taia.h"
 

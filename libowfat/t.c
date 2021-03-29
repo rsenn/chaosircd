@@ -3,7 +3,7 @@
 #include "str.h"
 #include "uint16.h"
 #include "uint32.h"
-#include "libowfat/stralloc.h"
+#include "stralloc.h"
 #include "socket.h"
 #include "buffer.h"
 #include "ip4.h"

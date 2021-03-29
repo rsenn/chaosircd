@@ -53,9 +53,9 @@ install: install-exec
 
 # build config
 # ---------------------------------------------------------------------------
-@PIE_TRUE@LIBS     += -L$(top_builddir)/src -lchaos
-@PIE_FALSE@LDADD     += $(top_builddir)/src/libchaos.a
-@WIN32_TRUE@@PIE_TRUE@LIBS     += $(top_builddir)/src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
+@PIE_TRUE@LIBS     += -L$(top_builddir)/../src -lchaos
+#@PIE_FALSE@LDADD     += $(builddir)/../src/libchaos.a
+@WIN32_TRUE@@PIE_TRUE@LIBS     += $(top_builddir)/../src/@PIE_PREPEND@chaos.@PIE_LIBEXT@
 @SSL_TRUE@CFLAGS   += $(SSL_CFLAGS)
 @SSL_TRUE@@SSL_STATIC_FALSE@LIBS     += $(SSL_LIBS)
 @SSL_TRUE@@SSL_STATIC_TRUE@LDADD     += $(SSL_LIBS)
