@@ -76,14 +76,14 @@ int net_get_log() { return net_log; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(char) tohex(char hexdigit)
+CHAOS_INLINE_FN(char) tohex(char hexdigit)
 {
   return hexdigit > 9 ? hexdigit + 'a' - 10 : hexdigit + '0';
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(unsigned int) i2a(char *dest, unsigned int x)
+CHAOS_INLINE_FN(unsigned int) i2a(char *dest, unsigned int x)
 {
   register unsigned int tmp = x;
   register unsigned int len = 0;
