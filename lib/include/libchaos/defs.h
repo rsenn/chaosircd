@@ -101,7 +101,7 @@ typedef int ssize_t;
 #  if __GNUC__ > 4
 #warning GNUC > 4
 #define CHAOS_INLINE(proto) 
-#define CHAOS_INLINE_API(proto) 
+#define CHAOS_INLINE_API(proto) static  
 #define CHAOS_INLINE_FN(x...)  static __inline__ x
 #  else
 #define CHAOS_INLINE(proto) 
@@ -110,7 +110,7 @@ typedef int ssize_t;
 #  endif
 # else
 #define CHAOS_INLINE(x...) /*extern inline x*/
-#define CHAOS_INLINE_API(proto) 
+#define CHAOS_INLINE_API(proto) static
 #define CHAOS_INLINE_FN(x...) static inline x
 # endif
 #endif
