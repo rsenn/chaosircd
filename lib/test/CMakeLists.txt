@@ -17,13 +17,13 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/SubstituteProjectIncludes.cmake")
 include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
                          "${LIBCHAOS_BINARY_DIR}")
 
-link_directories("${LIBCHAOS_BINARY_DIR}")
+link_directories("${LIBCHAOS_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/../..")
 
 set(TESTS cfgtest dbtest giftest graphtest imagetest ttftest)
 
 foreach(TEST ${TESTS})
 
   add_executable("${TEST}" "${TEST}.c")
-  target_link_libraries("${TEST}" chaos ${MYSQL_LIBS} ${OPENSSL_LIBS})
+  target_link_libraries("${TEST}" chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS})
 
 endforeach()
