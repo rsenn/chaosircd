@@ -95,14 +95,14 @@ typedef int ssize_t;
 #ifndef CHAOS_INLINE
 # ifdef __clang__
 #define CHAOS_INLINE(x...) x
-#define CHAOS_INLINE_FN(x...) static __inline__ x
+#define CHAOS_INLINE_FN(x...) //static __inline__ x
 # elif defined __GNUC__
 //#define CHAOS_INLINE(x...)  static __inline__ x
 #  if __GNUC__ > 4
 #warning GNUC > 4
 #define CHAOS_INLINE(proto) 
 #define CHAOS_INLINE_API(proto)  proto;
-#define CHAOS_INLINE_FN(x...)  static __inline__ x
+#define CHAOS_INLINE_FN(x...)  //static __inline__ x
 #  else
 #define CHAOS_INLINE(proto) 
 #define CHAOS_INLINE_API(proto) proto;
@@ -111,7 +111,7 @@ typedef int ssize_t;
 # else
 #define CHAOS_INLINE(x...) /*extern inline x*/
 #define CHAOS_INLINE_API(proto) proto;
-#define CHAOS_INLINE_FN(x...) static inline x
+#define CHAOS_INLINE_FN(x...) //static inline x
 # endif
 #endif
 #ifdef CHAOS_INLINE_API
