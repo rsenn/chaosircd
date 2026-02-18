@@ -43,7 +43,7 @@
 #include "ircd/client.h"
 #include "ircd/numeric.h"
 
-#include "stralloc.h"
+#include "libowfat/stralloc.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *

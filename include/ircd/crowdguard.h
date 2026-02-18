@@ -23,8 +23,8 @@
 #define channel_is_persistent(chptr) \
   ((chptr)->modes & CHFLG(P))
 
-CHAOS_INLINE_FN(int
-client_is_participant(struct client *cptr))
+static inline int
+client_is_participant(struct client *cptr)
 {
   struct chanuser *cuptr;
 

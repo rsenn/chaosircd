@@ -36,6 +36,8 @@
 #include "libchaos/mem.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
+#include "libowfat/uint32.h"
+#include "libowfat/uint16.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -76,14 +78,14 @@ int net_get_log() { return net_log; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(char) tohex(char hexdigit)
+char tohex(char hexdigit)
 {
   return hexdigit > 9 ? hexdigit + 'a' - 10 : hexdigit + '0';
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_FN(unsigned int) i2a(char *dest, unsigned int x)
+unsigned int i2a(char *dest, unsigned int x)
 {
   register unsigned int tmp = x;
   register unsigned int len = 0;
@@ -203,7 +205,8 @@ int net_aton(const char *cp, net_addr_t *inp)
     return 0;
   }
 
-  *inp = net_htonl(ip);
+  //*inp = net_htonl(ip);
+  uint32_pack_big(inp, ip);
 
   return 1;
 }
@@ -435,7 +438,9 @@ int net_bind(int fd, net_addr_t addr, uint16_t port)
 
   local.sin_family = AF_INET;
   local.sin_addr.s_addr = addr;
-  local.sin_port = net_htons(port);
+  ///local.sin_port = net_htons(port);
+
+  uint16_pack_big(&local.sin_port, port);
 
   if(syscall_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)))
   {
@@ -504,7 +509,8 @@ int net_vconnect(int   fd,    net_addr_t addr,  uint16_t port,
 
   sina.sin_family = AF_INET;
   sina.sin_addr.s_addr = addr;
-  sina.sin_port = net_htons(port);
+  //sina.sin_port = net_htons(port);
+  uint16_pack_big(&sina.sin_port, port);
 
   if(syscall_connect(fd, (struct sockaddr *)&sina, sizeof(struct sockaddr_in)))
   {

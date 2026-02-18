@@ -43,6 +43,7 @@
 #include "ircd/lclient.h"
 #include "ircd/server.h"
 #include "ircd/numeric.h"
+#include <arpa/inet.h>
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
@@ -274,7 +275,7 @@ static void m_kline_mask(const char *host, net_addr_t *addr,
     mbc = 32 - mbc;
 
     for(i = 0; i < mbc; i++)
-      *mask &= ~net_htonl(1 << i);
+      *mask &= ~htonl(1 << i);
 
     *addr &= *mask;
   }

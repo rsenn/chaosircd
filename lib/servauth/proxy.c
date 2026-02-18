@@ -28,6 +28,7 @@
 #include "libchaos/str.h"
 
 #include "servauth/proxy.h"
+#include <arpa/inet.h>
 
 extern uint32_t servauth_log;
 
@@ -288,12 +289,12 @@ static void proxy_event_wr(int fd, struct proxy_check *proxy)
     case PROXY_TP_SOCKS4:
       buf[0] = 0x04;
       buf[1] = 0x01;
-      buf[2] = net_htons(proxy->testport) & 0xff;
-      buf[3] = net_htons(proxy->testport) >> 8;
-      buf[4] = (net_htonl(proxy->testaddr) >> 24) & 0xff;
-      buf[5] = (net_htonl(proxy->testaddr) >> 16) & 0xff;
-      buf[6] = (net_htonl(proxy->testaddr) >> 8) & 0xff;
-      buf[7] = net_htonl(proxy->testaddr) & 0xff;
+      buf[2] = htons(proxy->testport) & 0xff;
+      buf[3] = htons(proxy->testport) >> 8;
+      buf[4] = (htonl(proxy->testaddr) >> 24) & 0xff;
+      buf[5] = (htonl(proxy->testaddr) >> 16) & 0xff;
+      buf[6] = (htonl(proxy->testaddr) >> 8) & 0xff;
+      buf[7] = htonl(proxy->testaddr) & 0xff;
       buf[8] = 0;
 
       io_write(fd, buf, 9);
@@ -306,12 +307,12 @@ static void proxy_event_wr(int fd, struct proxy_check *proxy)
       buf[1] = 0x01;
       buf[2] = 0x00;
       buf[3] = 0x01;
-      buf[4] = (net_htonl(proxy->testaddr) >> 24) & 0xff;
-      buf[5] = (net_htonl(proxy->testaddr) >> 16) & 0xff;
-      buf[6] = (net_htonl(proxy->testaddr) >> 8) & 0xff;
-      buf[7] = net_htonl(proxy->testaddr) & 0xff;
-      buf[8] = net_htons(proxy->testport) >> 8;
-      buf[9] = net_htons(proxy->testport) & 0xff;
+      buf[4] = (htonl(proxy->testaddr) >> 24) & 0xff;
+      buf[5] = (htonl(proxy->testaddr) >> 16) & 0xff;
+      buf[6] = (htonl(proxy->testaddr) >> 8) & 0xff;
+      buf[7] = htonl(proxy->testaddr) & 0xff;
+      buf[8] = htons(proxy->testport) >> 8;
+      buf[9] = htons(proxy->testport) & 0xff;
 
       io_write(fd, buf, 10);
 
