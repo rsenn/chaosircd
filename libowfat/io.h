@@ -1,8 +1,8 @@
-/* this header file comes from libowfat, http:/*www.fefe.de/libowfat/ */*/
+/* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
 #ifndef IO_H
 #define IO_H
 
-/* http:/*cr.yp.to/lib/io.html */*/
+/* http:/*cr.yp.to/lib/io.html */
 
 #include "uint64.h"
 #include "taia.h"

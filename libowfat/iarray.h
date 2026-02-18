@@ -1,4 +1,4 @@
-/* this header file comes from libowfat, http:/*www.fefe.de/libowfat/ */*/
+/* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
 #ifndef IARRAY_H
 #define IARRAY_H
 

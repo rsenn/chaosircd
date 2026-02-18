@@ -1,4 +1,4 @@
-/* this header file comes from libowfat, http:/*www.fefe.de/libowfat/ */*/
+/* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
 #ifndef _SAFEMULT_H
 #define _SAFEMULT_H
 

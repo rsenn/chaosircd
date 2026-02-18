@@ -1,4 +1,4 @@
-/* this header file comes from libowfat, http:/*www.fefe.de/libowfat/ */*/
+/* this header file comes from libowfat, http://www.fefe.de/libowfat/ */
 #ifndef TAI_H
 #define TAI_H
 
@@ -20,7 +20,7 @@ extern "C" {
  *
  * A struct tai variable may also be used to store the numerical
  * difference between two TAI64 labels.
- * See http:/*cr.yp.to/libtai/tai64.html */*/
+ * See http:/*cr.yp.to/libtai/tai64.html */
 
 typedef struct tai {
   uint64 x;
