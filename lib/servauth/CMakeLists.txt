@@ -26,7 +26,7 @@ add_executable(servauth ${SERVAUTH_SOURCES})
 
 link_directories("${LIBCHAOS_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/../..")
 
-target_link_libraries(servauth chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS}
+target_link_libraries(servauth chaos "${CMAKE_CURRENT_BINARY_DIR}/../../libowfat.a" ${MYSQL_LIBS} ${OPENSSL_LIBS}
                       ${SOCKET_LIBRARIES})
 
 include_directories(

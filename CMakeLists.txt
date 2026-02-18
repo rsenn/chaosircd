@@ -34,7 +34,11 @@ include_directories(
   "${CMAKE_CURRENT_BINARY_DIR}" # "${CMAKE_CURRENT_BINARY_DIR}/lib"
 )
 
-file(GLOB LIBOWFAT_SOURCES libowfat/*/*.c libowfat/*.h)
+file(GLOB LIBOWFAT_SOURCES 
+  libowfat/byte/*.c 
+  libowfat/str/*.c 
+  libowfat/stralloc/*.c
+  libowfat/*.h)
 add_library(owfat STATIC ${LIBOWFAT_SOURCES})
 target_include_directories(owfat PRIVATE libowfat)
 
