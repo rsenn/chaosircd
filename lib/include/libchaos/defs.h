@@ -123,7 +123,7 @@ typedef int ssize_t;
 #ifdef __clang__
 #define CHAOS_INLINE(x...) x
 #define CHAOS_INLINE_FN(x...) // static __inline__ x
-#elif defined __GNUC__
+#elif defined __GNUC__ && !defined(__TINYC__)
 // #define CHAOS_INLINE(x...)  static __inline__ x
 #if __GNUC__ > 4
 #warning GNUC > 4

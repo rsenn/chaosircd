@@ -384,7 +384,8 @@ CHAOS_API(int str_vsnprintf(char *str, size_t n, const char *format,
 /* ------------------------------------------------------------------------ *
  * Formatted print to string                                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(int str_snprintf(char *str, size_t n, const char *format, ...))
+CHAOS_INLINE_API(int str_snprintf(char *str, size_t n, const char *format,
+                                  ...));
 
 CHAOS_INLINE_FN(int str_snprintf(char *str, size_t n, const char *format, ...) {
   int ret;
@@ -403,7 +404,7 @@ CHAOS_INLINE_FN(int str_snprintf(char *str, size_t n, const char *format, ...) {
 /* ------------------------------------------------------------------------ *
  * Converts a string to a signed int.                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(int str_toi(const char *s))
+CHAOS_INLINE_API(int str_toi(const char *s));
 
 #define ISNUM(c) ((c) >= '0' && (c) <= '9')
 CHAOS_INLINE_FN(int str_toi(const char *s) {
@@ -455,7 +456,7 @@ CHAOS_INLINE_FN(int str_toi(const char *s) {
  *                                                                            *
  * return value will not be bigger than maxtok                                *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(size_t str_tokenize(char *s, char **v, size_t maxtok))
+CHAOS_INLINE_API(size_t str_tokenize(char *s, char **v, size_t maxtok));
 
 CHAOS_INLINE_FN(size_t str_tokenize(char *s, char **v, size_t maxtok) {
   size_t c = 0;
@@ -502,14 +503,14 @@ CHAOS_INLINE_FN(size_t str_tokenize(char *s, char **v, size_t maxtok) {
  * Like the one above but allows to specify delimiters.                       *
  * ------------------------------------------------------------------------ */
 CHAOS_API(size_t str_tokenize_d(char *s, char **v, size_t maxtok,
-                                const char *delim))
+                                const char *delim));
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                               *
  *                                                                            *
  * Like the one above but allows to specify one delimiter.                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim))
+CHAOS_API(size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim));
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
@@ -528,7 +529,7 @@ CHAOS_INLINE_FN(char *str_dup(const char *s) {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(hash_t str_hash(const char *s))
+CHAOS_INLINE_API(hash_t str_hash(const char *s));
 
 #define ROR(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
@@ -536,15 +537,14 @@ CHAOS_INLINE_API(hash_t str_hash(const char *s))
 #define ROL(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
+
 CHAOS_INLINE_FN(hash_t str_hash(const char *s) {
   hash_t ret = 0xdefaced;
   hash_t temp;
   hash_t i;
 
-#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
-#endif
 
   if (s == NULL)
     return ret;
@@ -564,8 +564,8 @@ CHAOS_INLINE_FN(hash_t str_hash(const char *s) {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(hash_t str_ihash(const char *s))
-
+extern hash_t str_ihash(const char *s);
+/*
 #define ROR(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
@@ -596,31 +596,32 @@ CHAOS_INLINE_FN(hash_t str_ihash(const char *s) {
   return ret;
 })
 #undef ROL
-#undef ROR
+#undef ROR*/
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                      *
  * ------------------------------------------------------------------------ */
-CHAOS_API(unsigned long int str_toul(const char *nptr, char **endptr, int base))
+CHAOS_API(unsigned long int str_toul(const char *nptr, char **endptr,
+                                     int base));
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to a long.                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(long int str_tol(const char *nptr, char **endptr, int base))
+CHAOS_API(long int str_tol(const char *nptr, char **endptr, int base));
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to a unsigned long long.                                  *
  * ------------------------------------------------------------------------ */
 CHAOS_API(unsigned long long int str_toull(const char *nptr, char **endptr,
-                                           int base))
+                                           int base));
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int str_match(const char *str, const char *mask))
+CHAOS_API(int str_match(const char *str, const char *mask));
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int str_imatch(const char *str, const char *mask))
+CHAOS_API(int str_imatch(const char *str, const char *mask));
 
 /*
 extern void *memcpy(void *dest, const void *src, size_t n);
@@ -629,6 +630,6 @@ extern void *memmove(void *dest, const void *src, size_t n);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void str_trim(char *s))
+CHAOS_API(void str_trim(char *s));
 
 #endif
