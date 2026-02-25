@@ -40,6 +40,9 @@
 #include "ircd/chanmode.h"
 #include "ircd/chanuser.h"
 
+#  define ULONG_MAX     ((unsigned long) ~(unsigned long) 0)
+#  define LONG_MAX      ((long int) (ULONG_MAX >> 1))                      
+#  define LONG_MIN      ((long int) (-LONG_MAX - 1L))
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #define CM_LIMIT_CHAR 'l'

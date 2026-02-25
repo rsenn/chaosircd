@@ -194,7 +194,7 @@ CHAOS_API(void                 dlink_collect     (void))
  * Allocate a new dlink node                                                  *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(struct node *        dlink_node_new    (void))
-
+;
 CHAOS_INLINE_FN( struct node    * dlink_node_new    (void)
 {
   struct node *nptr;
@@ -215,7 +215,7 @@ CHAOS_INLINE_FN( struct node    * dlink_node_new    (void)
  * Frees a dlink node                                                         *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                 dlink_node_free   (struct node *nptr))
-
+;
 CHAOS_INLINE_FN( void             dlink_node_free   (struct node *nptr)
 {
   /* Free node block */
@@ -237,7 +237,7 @@ CHAOS_INLINE_FN( void             dlink_node_free   (struct node *nptr)
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                 dlink_add_head    (struct list *lptr,
                                                   struct node *nptr,
-                                                  void        *ptr))
+                                                  void        *ptr));
 #ifndef DARWIN
 CHAOS_INLINE_FN( void             dlink_add_head    (struct list *lptr,
                                                   struct node *nptr,
@@ -276,7 +276,7 @@ CHAOS_INLINE_FN( void             dlink_add_head    (struct list *lptr,
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                 dlink_add_tail    (struct list *lptr,
                                                   struct node *nptr,
-                                                  void        *ptr))
+                                                  void        *ptr));
 
 CHAOS_INLINE_FN( void             dlink_add_tail    (struct list *lptr,
                                                   struct node *nptr,
@@ -316,7 +316,7 @@ CHAOS_INLINE_FN( void             dlink_add_tail    (struct list *lptr,
 CHAOS_INLINE_API(void                dlink_add_before  (struct list *lptr,
                                                   struct node *nptr,
                                                   struct node *before,
-                                                  void        *ptr))
+                                                  void        *ptr));
 
 CHAOS_INLINE_FN( void             dlink_add_before  (struct list *lptr,
                                                   struct node *nptr,
@@ -358,7 +358,7 @@ CHAOS_INLINE_FN( void             dlink_add_before  (struct list *lptr,
 CHAOS_INLINE_API(void                dlink_add_after   (struct list *lptr,
                                                   struct node *nptr,
                                                   struct node *after,
-                                                  void        *ptr))
+                                                  void        *ptr));
 
 CHAOS_INLINE_FN( void             dlink_add_after   (struct list *lptr,
                                                   struct node *nptr,
@@ -396,7 +396,7 @@ CHAOS_INLINE_FN( void             dlink_add_after   (struct list *lptr,
  * <node>                   - the node to delete                              *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                dlink_delete      (struct list *lptr,
-                                                  struct node *nptr))
+                                                  struct node *nptr));
 
 CHAOS_INLINE_FN( void             dlink_delete      (struct list *lptr,
                                                   struct node *nptr)
@@ -432,7 +432,7 @@ CHAOS_INLINE_FN( void             dlink_delete      (struct list *lptr,
  * Returns a node when found, NULL otherwise.                                 *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(struct node *       dlink_find        (struct list *lptr,
-                                                  void        *ptr))
+                                                  void        *ptr));
 #ifndef DARWIN
 CHAOS_INLINE_FN( struct node     *dlink_find        (struct list *lptr,
                                                   void        *ptr)
@@ -459,9 +459,9 @@ CHAOS_INLINE_FN( struct node     *dlink_find        (struct list *lptr,
  *                                                                            *
  * Returns a node when found and deleted, NULL otherwise.                     *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(struct node *       dlink_find_delete (struct list *lptr, void *ptr))
+CHAOS_INLINE_API(struct node *       dlink_find_delete (struct list *lptr, void *ptr));
 
-CHAOS_INLINE_FN( struct node    * dlink_find_delete (struct list *lptr, void *ptr)
+CHAOS_INLINE_FN( struct node    * dlink_find_delete (struct list *lptr, void *ptr);
 {
   struct node *nptr;
 
@@ -507,7 +507,7 @@ CHAOS_INLINE_FN( struct node    * dlink_find_delete (struct list *lptr, void *pt
  * Returns a node when the index was valid, NULL otherwise.                   *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(struct node *       dlink_index       (struct list *lptr,
-                                                  size_t       index))
+                                                  size_t       index));
 
 CHAOS_INLINE_FN( struct node    * dlink_index       (struct list *lptr,
                                                   size_t       index)
@@ -537,7 +537,7 @@ CHAOS_INLINE_FN( struct node    * dlink_index       (struct list *lptr,
  *                                                                            *
  * <list>                   - list to destroy                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                dlink_destroy     (struct list *lptr))
+CHAOS_INLINE_API(void                dlink_destroy     (struct list *lptr));
 
 CHAOS_INLINE_FN( void             dlink_destroy     (struct list *lptr)
 {
@@ -559,7 +559,7 @@ CHAOS_INLINE_FN( void             dlink_destroy     (struct list *lptr)
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                 dlink_swap        (struct list *lptr,
                                                   struct node *nptr1,
-                                                  struct node *nptr2))
+                                                  struct node *nptr2));
 
 #if 0
 CHAOS_INLINE_FN( void             dlink_swap        (struct list *lptr,
@@ -612,7 +612,7 @@ CHAOS_INLINE_FN( void             dlink_swap        (struct list *lptr,
  * <to>                     - list to move nodes to                           *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void               dlink_move_head     (struct list *from,
-                                                  struct list *to))
+                                                  struct list *to));
 
 CHAOS_INLINE_FN( void           dlink_move_head     (struct list *from,
                                                   struct list *to)
@@ -653,7 +653,7 @@ CHAOS_INLINE_FN( void           dlink_move_head     (struct list *from,
  * <to>                     - list to move nodes to                           *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                 dlink_move_tail   (struct list *from,
-                                                  struct list *to))
+                                                  struct list *to));
 
 CHAOS_INLINE_FN( void             dlink_move_tail   (struct list *from,
                                                   struct list *to)
@@ -686,7 +686,7 @@ CHAOS_INLINE_FN( void             dlink_move_tail   (struct list *from,
  * Copy a list while overwriting destination and allocating new nodes         *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE_API(void                 dlink_copy        (struct list *from,
-                                                  struct list *to))
+                                                  struct list *to));
 
 CHAOS_INLINE_FN( void             dlink_copy        (struct list *from,
                                                   struct list *to)
@@ -728,11 +728,11 @@ CHAOS_INLINE_FN( void             dlink_copy        (struct list *from,
 
 /* ------------------------------------------------------------------------ *
   * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(uint32_t             dlink_count_nodes (struct list *lptr))
+CHAOS_INLINE_API(uint32_t             dlink_count_nodes (struct list *lptr));
 
 /* ------------------------------------------------------------------------ *
  * Dump dlink statistics.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_dump        (void))
+CHAOS_INLINE_API(void                 dlink_dump        (void));
 
 #endif

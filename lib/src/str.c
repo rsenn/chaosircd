@@ -39,10 +39,13 @@
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
 #include <limits.h>
+#  define ULONG_MAX     ((unsigned long) ~(unsigned long) 0)
+#  define LONG_MAX      ((long int) (ULONG_MAX >> 1))                      
+#  define LONG_MIN      ((long int) (-LONG_MAX - 1L))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char     str_hexchars[] = "0123456789abcdef";
+const char     str_hexchar[17] = "0123456789abcdef";
 str_format_cb *str_table[64];
 
 /* ------------------------------------------------------------------------ *
@@ -204,14 +207,14 @@ static  unsigned int str_ptoa(char *buf, void *i)
   } else {
     p[n++] = '0';
     p[n++] = 'x';
-    p[n++] = str_hexchars[(v & 0xf0000000) >> 0x1c];
-    p[n++] = str_hexchars[(v & 0x0f000000) >> 0x18];
-    p[n++] = str_hexchars[(v & 0x00f00000) >> 0x14];
-    p[n++] = str_hexchars[(v & 0x000f0000) >> 0x10];
-    p[n++] = str_hexchars[(v & 0x0000f000) >> 0x0c];
-    p[n++] = str_hexchars[(v & 0x00000f00) >> 0x08];
-    p[n++] = str_hexchars[(v & 0x000000f0) >> 0x04];
-    p[n++] = str_hexchars[(v & 0x0000000f)];
+    p[n++] = str_hexchar[(v & 0xf0000000) >> 0x1c];
+    p[n++] = str_hexchar[(v & 0x0f000000) >> 0x18];
+    p[n++] = str_hexchar[(v & 0x00f00000) >> 0x14];
+    p[n++] = str_hexchar[(v & 0x000f0000) >> 0x10];
+    p[n++] = str_hexchar[(v & 0x0000f000) >> 0x0c];
+    p[n++] = str_hexchar[(v & 0x00000f00) >> 0x08];
+    p[n++] = str_hexchar[(v & 0x000000f0) >> 0x04];
+    p[n++] = str_hexchar[(v & 0x0000000f)];
     p[n] = '\0';
   }
 

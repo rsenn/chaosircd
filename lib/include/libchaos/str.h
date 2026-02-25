@@ -50,7 +50,7 @@ typedef void (str_format_cb)(char   **pptr, size_t  *bptr,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA(const char)      str_hexchars[16];
+//extern const char      str_hexchars[17];
 CHAOS_DATA(str_format_cb *)str_table[64];
 
 /* ------------------------------------------------------------------------ *
@@ -72,7 +72,8 @@ CHAOS_API(void  str_unregister (char           c))
  * ------------------------------------------------------------------------ */
 #if 1
 /*def USE_IA32_LINUX_INLINE*/
-CHAOS_API(size_t  str_len(const char *s))
+#define str_len strlen
+  //CHAOS_API(size_t  str_len(const char *s))
 
 /*CHAOS_INLINE  size_t str_len(const char *s)
 {
