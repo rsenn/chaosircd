@@ -7,16 +7,20 @@
 #include <sys/mman.h>
 #endif
 
-void buffer_close(buffer* b) {
-  if (b->fd != -1) close(b->fd);
+void buffer_close(buffer *b) {
+  if (b->fd != -1)
+    close(b->fd);
   switch (b->todo) {
-  case FREE: free(b->x); break;
+  case FREE:
+    free(b->x);
+    break;
   case MUNMAP:
 #ifdef __MINGW32__
     UnmapViewOfFile(b->x);
 #else
-    munmap(b->x,b->a); break;
+    munmap(b->x, b->a);
+    break;
 #endif
-  default: ;
+  default:;
   }
 }

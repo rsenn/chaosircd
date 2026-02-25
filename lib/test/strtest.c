@@ -4,16 +4,15 @@
 #include <unistd.h>
 #endif
 
+#include "libchaos/io.h"
+#include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
-#include "libchaos/io.h"
 #include "libchaos/timer.h"
-#include "libchaos/log.h"
 
 #include <time.h>
 
-int main()
-{
+int main() {
   char buffer[2048];
 
   str_init();
@@ -22,10 +21,9 @@ int main()
   mem_init();
   timer_init();
 
-    int strtest_log = log_source_register("strtest");
+  int strtest_log = log_source_register("strtest");
 
-
- uint64_t t = time(NULL)  * 1000llu;
+  uint64_t t = time(NULL) * 1000llu;
   str_snprintf(buffer, sizeof(buffer), "%i %T", 1337, &t);
 
   log(strtest_log, L_status, "str_nprintf() result: %s", buffer);
@@ -35,7 +33,6 @@ int main()
   int r2 = str_cmp("test", "blah");
   log(strtest_log, L_status, "str_cmp(test,blah) result: %i", r2);
 
-
   timer_shutdown();
   mem_shutdown();
   log_shutdown();
@@ -44,4 +41,3 @@ int main()
 
   return 0;
 }
-

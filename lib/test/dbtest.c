@@ -4,11 +4,10 @@
 
 #include <unistd.h>
 
-#include "libchaos/io.h"
-#include "libchaos/mem.h"
-#include "libchaos/log.h"
 #include "libchaos/db.h"
-
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
 
 int dbtest_type = DB_TYPE_MYSQL;
 char *dbtest_host = "127.0.0.1";
@@ -25,23 +24,22 @@ int dbtest_log;
 
 #if (defined HAVE_PGSQL) || (defined HAVE_MYSQL)
 
-void dbtest()
-{
+void dbtest() {
   struct db *db;
   struct db_result *result;
   char **row;
 
   db = db_new(dbtest_type);
 
-  if(!db_connect(db, dbtest_host, dbtest_user, dbtest_pass, dbtest_dbname))
-    log(dbtest_log, L_status, "Database connection OK (Type = %s)", (db->type == DB_TYPE_PGSQL ? "PostgreSQL" : "MySQL"));
+  if (!db_connect(db, dbtest_host, dbtest_user, dbtest_pass, dbtest_dbname))
+    log(dbtest_log, L_status, "Database connection OK (Type = %s)",
+        (db->type == DB_TYPE_PGSQL ? "PostgreSQL" : "MySQL"));
   else
     return;
 
   result = db_query(db, "SELECT * FROM chaosircd.users ORDER BY uid;");
 
-  while((row = db_fetch_row(result)))
-  {
+  while ((row = db_fetch_row(result))) {
     log(dbtest_log, L_status, " %-10s %-10s %-10s", row[0], row[1], row[2]);
   }
 
@@ -51,14 +49,13 @@ void dbtest()
 }
 #endif
 
-int main()
-{
+int main() {
   log_init(STDOUT_FILENO, LOG_ALL, L_status);
   dbtest_log = log_source_register("dbtest");
   io_init_except(STDOUT_FILENO, STDOUT_FILENO, STDOUT_FILENO);
   mem_init();
   dlink_init();
-  
+
 #if (defined HAVE_PGSQL) || (defined HAVE_MYSQL)
 
   db_init();
@@ -74,4 +71,3 @@ int main()
 
   return 0;
 }
-

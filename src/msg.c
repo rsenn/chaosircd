@@ -29,16 +29,16 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "ircd/numeric.h"
-#include "ircd/lclient.h"
 #include "ircd/client.h"
 #include "ircd/ircd.h"
+#include "ircd/lclient.h"
 #include "ircd/msg.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int         msg_log;
-uint32_t    msg_id;
+int msg_log;
+uint32_t msg_id;
 struct list msg_table[MSG_HASH_SIZE];
 
 /* ------------------------------------------------------------------------ */
@@ -47,8 +47,7 @@ int msg_get_log() { return msg_log; }
 /* -------------------------------------------------------------------------- *
  * Initialize message heap.                                                   *
  * -------------------------------------------------------------------------- */
-void msg_init(void)
-{
+void msg_init(void) {
   msg_log = log_source_register("msg");
   msg_id = 0;
 
@@ -60,18 +59,16 @@ void msg_init(void)
 /* -------------------------------------------------------------------------- *
  * Destroy message heap.                                                      *
  * -------------------------------------------------------------------------- */
-void msg_shutdown(void)
-{
+void msg_shutdown(void) {
   struct node *next;
-  struct msg  *mptr;
-  size_t       i;
+  struct msg *mptr;
+  size_t i;
 
   log(msg_log, L_status, "Shutting down [msg] module...");
 
-  for(i = 0; i < MSG_HASH_SIZE; i++)
-  {
+  for (i = 0; i < MSG_HASH_SIZE; i++) {
     dlink_foreach_safe(&msg_table[i], mptr, next)
-      dlink_delete(&msg_table[i], &mptr->node);
+        dlink_delete(&msg_table[i], &mptr->node);
   }
 
   log_source_unregister(msg_log);
@@ -80,19 +77,17 @@ void msg_shutdown(void)
 /* -------------------------------------------------------------------------- *
  * Find a message.                                                            *
  * -------------------------------------------------------------------------- */
-struct msg *msg_find(const char *name)
-{
+struct msg *msg_find(const char *name) {
   struct node *node;
-  struct msg  *m;
-  hash_t       hash;
-  
+  struct msg *m;
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&msg_table[hash % MSG_HASH_SIZE], node)
-  {
+  dlink_foreach(&msg_table[hash % MSG_HASH_SIZE], node) {
     m = node->data;
 
-    if(m->hash == hash && !str_icmp(m->cmd, name))
+    if (m->hash == hash && !str_icmp(m->cmd, name))
       return m;
   }
 
@@ -101,17 +96,13 @@ struct msg *msg_find(const char *name)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct msg *msg_find_id(uint32_t id)
-{
+struct msg *msg_find_id(uint32_t id) {
   struct node *nptr;
-  struct msg  *m = NULL;
-  uint32_t     i;
+  struct msg *m = NULL;
+  uint32_t i;
 
-  for(i = 0; i < MSG_HASH_SIZE; i++)
-  {
-    dlink_foreach_data(&msg_table[i], nptr, m)
-      if(m->id == id)
-        return m;
+  for (i = 0; i < MSG_HASH_SIZE; i++) {
+    dlink_foreach_data(&msg_table[i], nptr, m) if (m->id == id) return m;
   }
 
   return NULL;
@@ -120,10 +111,8 @@ struct msg *msg_find_id(uint32_t id)
 /* -------------------------------------------------------------------------- *
  * Register a message.                                                        *
  * -------------------------------------------------------------------------- */
-struct msg *msg_register(struct msg *msg)
-{
-  if(msg_find(msg->cmd))
-  {
+struct msg *msg_register(struct msg *msg) {
+  if (msg_find(msg->cmd)) {
     log(msg_log, L_warning, "Message %s was already registered.", msg->cmd);
     return NULL;
   }
@@ -139,71 +128,57 @@ struct msg *msg_register(struct msg *msg)
 /* -------------------------------------------------------------------------- *
  * Unregister a message.                                                      *
  * -------------------------------------------------------------------------- */
-void msg_unregister(struct msg *msg)
-{
+void msg_unregister(struct msg *msg) {
   dlink_delete(&msg_table[msg->hash % MSG_HASH_SIZE], &msg->node);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_unregistered(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
-  lclient_send(lcptr, numeric_format(ERR_NOTREGISTERED),
-               client_me->name, lcptr->name);
+void m_unregistered(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
+  lclient_send(lcptr, numeric_format(ERR_NOTREGISTERED), client_me->name,
+               lcptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_registered(struct lclient *lcptr, struct client *cptr,
-                  int             argc,  char         **argv)
-{
-  lclient_send(lcptr, numeric_format(ERR_ALREADYREGISTRED),
-               client_me->name, cptr->name);
+void m_registered(struct lclient *lcptr, struct client *cptr, int argc,
+                  char **argv) {
+  lclient_send(lcptr, numeric_format(ERR_ALREADYREGISTRED), client_me->name,
+               cptr->name);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_ignore(struct lclient *lcptr, struct client *cptr,
-              int             argc,  char         **argv)
-{
+void m_ignore(struct lclient *lcptr, struct client *cptr, int argc,
+              char **argv) {}
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+void m_not_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                char **argv) {
+  lclient_send(lcptr, numeric_format(ERR_NOPRIVILEGES), client_me->name,
+               argv[0] ? argv[0] : "*");
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void m_not_oper(struct lclient *lcptr, struct client *cptr,
-                int             argc,  char         **argv)
-{
-  lclient_send(lcptr, numeric_format(ERR_NOPRIVILEGES),
-               client_me->name, argv[0] ? argv[0] : "*");
-}
-
-/* -------------------------------------------------------------------------- *
- * -------------------------------------------------------------------------- */
-void msg_dump(struct msg *mptr)
-{
+void msg_dump(struct msg *mptr) {
   struct node *nptr;
-  uint32_t     i;
+  uint32_t i;
 
-  if(mptr == NULL)
-  {
+  if (mptr == NULL) {
     dump(msg_log, "[================ msg summary ================]");
 
-    for(i = 0; i < MSG_HASH_SIZE; i++)
-    {
+    for (i = 0; i < MSG_HASH_SIZE; i++) {
       dlink_foreach_data(&msg_table[i], nptr, mptr)
-        dump(msg_log, " #%03u: %-12s (%3u/%3u/%3u/%3u)",
-             mptr->id, mptr->cmd,
-             mptr->counts[MSG_UNREGISTERED],
-             mptr->counts[MSG_CLIENT],
-             mptr->counts[MSG_SERVER],
-             mptr->counts[MSG_OPER]);
+          dump(msg_log, " #%03u: %-12s (%3u/%3u/%3u/%3u)", mptr->id, mptr->cmd,
+               mptr->counts[MSG_UNREGISTERED], mptr->counts[MSG_CLIENT],
+               mptr->counts[MSG_SERVER], mptr->counts[MSG_OPER]);
     }
 
     dump(msg_log, "[============= end of msg summary ============]");
-  }
-  else
-  {
+  } else {
     dump(msg_log, "[================= msg dump =================]");
 
     dump(msg_log, "        cmd: #%u", mptr->cmd);
@@ -215,16 +190,12 @@ void msg_dump(struct msg *mptr)
          (mptr->flags & MFLG_OPER ? " MFLG_OPER" : ""),
          (mptr->flags & MFLG_SERVER ? " MFLG_SERVER" : ""));
     dump(msg_log, "   handlers: %p, %p, %p, %p",
-         mptr->handlers[MSG_UNREGISTERED],
-         mptr->handlers[MSG_CLIENT],
-         mptr->handlers[MSG_SERVER],
-         mptr->handlers[MSG_OPER]);
+         mptr->handlers[MSG_UNREGISTERED], mptr->handlers[MSG_CLIENT],
+         mptr->handlers[MSG_SERVER], mptr->handlers[MSG_OPER]);
     dump(msg_log, "       help: %p", mptr->help);
     dump(msg_log, "       hash: %p", mptr->hash);
-    dump(msg_log, "     counts: %u, %u, %u, %u",
-         mptr->counts[MSG_UNREGISTERED],
-         mptr->counts[MSG_CLIENT],
-         mptr->counts[MSG_SERVER],
+    dump(msg_log, "     counts: %u, %u, %u, %u", mptr->counts[MSG_UNREGISTERED],
+         mptr->counts[MSG_CLIENT], mptr->counts[MSG_SERVER],
          mptr->counts[MSG_OPER]);
     dump(msg_log, "      bytes: %u", mptr->bytes);
     dump(msg_log, "         id: %u", mptr->id);

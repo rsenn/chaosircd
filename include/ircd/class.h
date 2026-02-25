@@ -22,6 +22,10 @@
 #ifndef SRC_CLASS_H
 #define SRC_CLASS_H
 
+#include <stdint.h>
+#include "libchaos/mem.h"
+#include "ircd.h"
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 struct class {

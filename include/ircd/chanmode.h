@@ -22,6 +22,8 @@
 #ifndef SRC_CHANMODE_H
 #define SRC_CHANMODE_H
 
+#include "ircd.h"
+
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #define CHANMODE_PER_LINE 16       /* max. 16 modes per line (for server-server) */

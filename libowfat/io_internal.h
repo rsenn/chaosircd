@@ -2,15 +2,15 @@
 #define my_extern extern
 #endif
 
-#include "io.h"
 #include "array.h"
+#include "io.h"
 #ifdef __MINGW32__
 #include "socket.h"
 my_extern HANDLE io_comport;
 #else
+#include "havedevpoll.h"
 #include "haveepoll.h"
 #include "havekqueue.h"
-#include "havedevpoll.h"
 #include "havesigio.h"
 #ifdef HAVE_SIGIO
 #define _GNU_SOURCE
@@ -36,33 +36,35 @@ my_extern HANDLE io_comport;
 
 typedef struct {
   tai6464 timeout;
-  unsigned int wantread:1;	/* does the app want to read/write? */
-  unsigned int wantwrite:1;
-  unsigned int canread:1;	/* do we know we can read/write? */
-  unsigned int canwrite:1;
-  unsigned int nonblock:1;	/* is this socket non-blocking? */
-  unsigned int inuse:1;		/* internal consistency checking */
-  unsigned int kernelwantread:1;	/* did we tell the kernel we want to read/write? */
-  unsigned int kernelwantwrite:1;
+  unsigned int wantread : 1; /* does the app want to read/write? */
+  unsigned int wantwrite : 1;
+  unsigned int canread : 1; /* do we know we can read/write? */
+  unsigned int canwrite : 1;
+  unsigned int nonblock : 1; /* is this socket non-blocking? */
+  unsigned int inuse : 1;    /* internal consistency checking */
+  unsigned int
+      kernelwantread : 1; /* did we tell the kernel we want to read/write? */
+  unsigned int kernelwantwrite : 1;
 #ifdef __MINGW32__
-  unsigned int readqueued:2;
-  unsigned int writequeued:2;
-  unsigned int acceptqueued:2;
-  unsigned int connectqueued:2;
-  unsigned int sendfilequeued:2;
-  unsigned int listened:1;
+  unsigned int readqueued : 2;
+  unsigned int writequeued : 2;
+  unsigned int acceptqueued : 2;
+  unsigned int connectqueued : 2;
+  unsigned int sendfilequeued : 2;
+  unsigned int listened : 1;
 #endif
   long next_read;
   long next_write;
-  void* cookie;
-  void* mmapped;
+  void *cookie;
+  void *mmapped;
   long maplen;
   uint64 mapofs;
 #ifdef __MINGW32__
-  OVERLAPPED or,ow,os;	/* overlapped for read+accept, write+connect, sendfile */
+  OVERLAPPED or, ow,
+      os; /* overlapped for read+accept, write+connect, sendfile */
   HANDLE /* fd, */ mh;
   char inbuf[8192];
-  int bytes_read,bytes_written;
+  int bytes_read, bytes_written;
   DWORD errorcode;
   SOCKET next_accept;
 #endif
@@ -82,19 +84,24 @@ my_extern enum __io_waitmode {
   UNDECIDED,
   POLL
 #ifdef HAVE_KQUEUE
-  ,KQUEUE
+  ,
+  KQUEUE
 #endif
 #ifdef HAVE_EPOLL
-  ,EPOLL
+  ,
+  EPOLL
 #endif
 #ifdef HAVE_SIGIO
-  ,_SIGIO
+  ,
+  _SIGIO
 #endif
 #ifdef HAVE_DEVPOLL
-  ,DEVPOLL
+  ,
+  DEVPOLL
 #endif
 #ifdef __MINGW32__
-  ,COMPLETIONPORT
+  ,
+  COMPLETIONPORT
 #endif
 } io_waitmode;
 

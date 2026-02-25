@@ -21,15 +21,15 @@
 
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/syscall.h"
-#include "libchaos/queue.h"
 #include "libchaos/log.h"
 #include "libchaos/net.h"
+#include "libchaos/queue.h"
 #include "libchaos/str.h"
+#include "libchaos/syscall.h"
 
-#include "servauth/servauth.h"
-#include "servauth/control.h"
 #include "servauth/commands.h"
+#include "servauth/control.h"
+#include "servauth/servauth.h"
 
 #define MAXPARA 64
 
@@ -44,16 +44,15 @@
  * ac      - argument count                                                   *
  * av      - argument vector                                                  *
  * -------------------------------------------------------------------------- */
-static int control_exec(control_t *cptr, int ac, char **av)
-{
+static int control_exec(control_t *cptr, int ac, char **av) {
   struct cmd_table *cmdptr;
 
-  if(ac < 1)
+  if (ac < 1)
     return -1;
 
   cmdptr = command_get(cmds, av[0]);
 
-  if(cmdptr != NULL)
+  if (cmdptr != NULL)
     return cmdptr->func(cptr, ac, av);
 
   return -1;
@@ -62,14 +61,13 @@ static int control_exec(control_t *cptr, int ac, char **av)
 /* -------------------------------------------------------------------------- *
  * parse a line                                                               *
  * -------------------------------------------------------------------------- */
-static int control_parse(control_t *cptr, char *line)
-{
+static int control_parse(control_t *cptr, char *line) {
   int ac;
   char *av[16];
 
   ac = str_tokenize(line, av, 16);
 
-  if(ac == 0)
+  if (ac == 0)
     return 0;
 
   return control_exec(cptr, ac, av);
@@ -78,19 +76,15 @@ static int control_parse(control_t *cptr, char *line)
 /* -------------------------------------------------------------------------- *
  * control fd got readable, handle data                                       *
  * -------------------------------------------------------------------------- */
-static void control_readable(int fd, void *ptr)
-{
+static void control_readable(int fd, void *ptr) {
   char buf[1024];
 
-  if(io_list[fd].status.closed || io_list[fd].status.err)
+  if (io_list[fd].status.closed || io_list[fd].status.err)
     servauth_shutdown();
 
-  if(io_list[fd].recvq.lines)
-  {
-    while(io_gets(fd, buf, 1024) > 0)
-    {
-      if(control_parse(ptr, buf) == -1)
-      {
+  if (io_list[fd].recvq.lines) {
+    while (io_gets(fd, buf, 1024) > 0) {
+      if (control_parse(ptr, buf) == -1) {
         servauth_shutdown();
         return;
       }
@@ -103,20 +97,16 @@ static void control_readable(int fd, void *ptr)
 /* -------------------------------------------------------------------------- *
  * set control connection fd.                                                 *
  * -------------------------------------------------------------------------- */
-void control_init(control_t *cptr, int recvfd, int sendfd)
-{
+void control_init(control_t *cptr, int recvfd, int sendfd) {
   memset(cptr, 0, sizeof(control_t));
 
   cptr->recvfd = recvfd;
   cptr->sendfd = sendfd;
 
-  if(sendfd != recvfd)
-  {
+  if (sendfd != recvfd) {
     io_queue_control(recvfd, ON, OFF, ON);
     io_queue_control(sendfd, OFF, ON, ON);
-  }
-  else
-  {
+  } else {
     io_queue_control(recvfd, ON, ON, ON);
   }
 
@@ -125,8 +115,7 @@ void control_init(control_t *cptr, int recvfd, int sendfd)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int control_send(control_t *cptr, const char *format, ...)
-{
+int control_send(control_t *cptr, const char *format, ...) {
   va_list args;
   int ret;
 
@@ -138,4 +127,3 @@ int control_send(control_t *cptr, const char *format, ...)
 
   return ret;
 }
-

@@ -5,8 +5,6 @@ set(PACKAGEVERSION 2.2.1)
 set(PACKAGERELEASE "peace, love & hippie edition")
 set(PACKAGETARNAME ${PACKAGENAME}-${PACKAGEVERSION})
 
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
 execute_process(
   COMMAND date -R
   OUTPUT_VARIABLE CREATION
@@ -39,7 +37,9 @@ file(GLOB LIBOWFAT_SOURCES
   libowfat/byte/*.c 
   libowfat/str/*.c 
   libowfat/stralloc/*.c
+  libowfat/uint/*.c
   libowfat/*.h)
+
 add_library(owfat STATIC ${LIBOWFAT_SOURCES})
 target_include_directories(owfat PRIVATE libowfat)
 

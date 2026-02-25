@@ -26,12 +26,12 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/syscall.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
+#include "libchaos/syscall.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * System headers                                                             *
@@ -45,21 +45,21 @@
 #endif
 
 #ifdef WIN32
-#include <windows.h>
 #include <windns.h>
+#include <windows.h>
 #endif
 
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "servauth/dns.h"
 #include "servauth/control.h"
+#include "servauth/dns.h"
 #include "servauth/servauth.h"
 
 #ifdef WIN32
 #define EPROTONOSUPPORT WSAEPROTONOSUPPORT
-#define EAFNOSUPPORT    WSAEAFNOSUPPORT
-#define EWOULDBLOCK     WSAEWOULDBLOCK
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
+#define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
 
 #ifndef EPROTO
@@ -68,13 +68,14 @@
 
 #define DNS_LINEBUF_SIZE 256
 
-#define DNS_ST_ERROR     -1
-#define DNS_ST_IDLE       0
-#define DNS_ST_START      1      /* not yet connecting
+#define DNS_ST_ERROR -1
+#define DNS_ST_IDLE 0
+#define DNS_ST_START                                                           \
+  1                         /* not yet connecting                              \
 (connect on pre_poll/pre_select) */
-#define DNS_ST_CONNECTING 2      /* waiting for connection */
-#define DNS_ST_SENT       3      /* query sent, waiting for response */
-#define DNS_ST_DONE       4
+#define DNS_ST_CONNECTING 2 /* waiting for connection */
+#define DNS_ST_SENT 3       /* query sent, waiting for response */
+#define DNS_ST_DONE 4
 
 /* Prototypes for private functions */
 
@@ -85,15 +86,15 @@ static int dns_error(int error);
 #ifdef HAVE_IPV6
 static void dns_fallback(struct dns_resolver *res);
 #endif
-static int  dns_socket(struct dns_resolver *res, int type);
-static int  dns_bind(struct dns_resolver *res);
-static int  dns_connect(struct dns_resolver *res);
-static int  dns_send(struct dns_resolver *res);
+static int dns_socket(struct dns_resolver *res, int type);
+static int dns_bind(struct dns_resolver *res);
+static int dns_connect(struct dns_resolver *res);
+static int dns_send(struct dns_resolver *res);
 static void dns_event_rd(int fd, void *ptr);
 static void dns_event_cn(int fd, void *ptr);
-static int  dns_start(struct dns_resolver *res, int type);
-static int  dns_transmit_start(struct dns_resolver *res, const uint8_t *domain,
-                               size_t len, const char *type);
+static int dns_start(struct dns_resolver *res, int type);
+static int dns_transmit_start(struct dns_resolver *res, const uint8_t *domain,
+                              size_t len, const char *type);
 
 /* -------------------------------------------------------------------------
    Used when converting IPv6 addresses to PTRs
@@ -104,81 +105,74 @@ static const uint8_t dns_hexchars[] = "0123456789abcdef";
 /* -------------------------------------------------------------------------
    Error messages
    ------------------------------------------------------------------------- */
-static const char *dns_errstrs[] =
-{
-  "Success",
-  "No domain name servers available",
-  "Underlying syscall error",
-  "Timed out",
-  "Server failed",
-  "Insufficient memory",
-  "Fallback to IPv4 sockets",
-  "Receive error",
-  "Send error",
-  "Could not connect"
-};
+static const char *dns_errstrs[] = {"Success",
+                                    "No domain name servers available",
+                                    "Underlying syscall error",
+                                    "Timed out",
+                                    "Server failed",
+                                    "Insufficient memory",
+                                    "Fallback to IPv4 sockets",
+                                    "Receive error",
+                                    "Send error",
+                                    "Could not connect"};
 
 /* -------------------------------------------------------------------------
    Used for global respective per-instance and per-server statistics
    ------------------------------------------------------------------------- */
-struct dns_stat
-{
-  uint32_t errors;           /* socket errors */
-  uint32_t queries;          /* queries sent */
-  uint32_t responses;        /* responses received */
-  uint32_t sendb;            /* bytes sent */
-  uint32_t recvb;            /* bytes received */
+struct dns_stat {
+  uint32_t errors;    /* socket errors */
+  uint32_t queries;   /* queries sent */
+  uint32_t responses; /* responses received */
+  uint32_t sendb;     /* bytes sent */
+  uint32_t recvb;     /* bytes received */
 };
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-struct dns_server
-{
-  int             at;
-  net_addr_t      addr;       /* Will contain IPv4 address when af = NET_ADDRESS_IPV4
-                                 or af = NET_ADDRESS_IPV6 and it is a mapped address */
+struct dns_server {
+  int at;
+  net_addr_t addr; /* Will contain IPv4 address when af = NET_ADDRESS_IPV4
+                      or af = NET_ADDRESS_IPV6 and it is a mapped address */
 #ifdef HAVE_IPV6
-  struct in6_addr addr6;      /* Will contain IPv4 mapped address
-                                 when af = NET_ADDRESS_IPV4 */
+  struct in6_addr addr6; /* Will contain IPv4 mapped address
+                            when af = NET_ADDRESS_IPV4 */
 #endif
-  time_t          reactivate; /* When this is set, the server has been
-                                 deactivated because requests timed out.
-                                 Will contain the time of reactivation. */
-  struct dns_stat stat;       /* Per server statistics */
+  time_t reactivate;    /* When this is set, the server has been
+                           deactivated because requests timed out.
+                           Will contain the time of reactivation. */
+  struct dns_stat stat; /* Per server statistics */
 };
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-struct dns_options
-{
-  int         ipv6_support;
-  int         ipv6_sock;
+struct dns_options {
+  int ipv6_support;
+  int ipv6_sock;
   const char *config;
   const char *env;
-  int         connect;
-  int         timeout;
-  int         retries;
-  int         paranoid;
-  int         rr_time;
-  int         rr_uses;        /* Times this instance was used */
-  int         bind_high;      /* Upper border of source port range */
-  int         bind_low;       /* Lower border of source port range */
+  int connect;
+  int timeout;
+  int retries;
+  int paranoid;
+  int rr_time;
+  int rr_uses;   /* Times this instance was used */
+  int bind_high; /* Upper border of source port range */
+  int bind_low;  /* Lower border of source port range */
 };
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-struct dns_instance
-{
-  struct dns_server    servers[MAX_SERVERS];
-  uint32_t             server_count;
-  struct dns_stat      stats;
-  struct dns_options   options;
-  struct dns_server   *ns;
+struct dns_instance {
+  struct dns_server servers[MAX_SERVERS];
+  uint32_t server_count;
+  struct dns_stat stats;
+  struct dns_options options;
+  struct dns_server *ns;
   struct dns_resolver *res;
   struct dns_resolver *cur;
-  uint64_t             deadline;
-  int                  __dns__errno__;
-  int                  error;
+  uint64_t deadline;
+  int __dns__errno__;
+  int error;
 };
 
 /* -------------------------------------------------------------------------
@@ -192,55 +186,46 @@ struct dns_instance dns;
 /*****************************************************************************/
 
 #ifdef HAVE_IPV6
-static void dns_fallback(struct dns_resolver *res)
-{
-}
+static void dns_fallback(struct dns_resolver *res) {}
 #endif
 
 /* -------------------------------------------------------------------------
    This multi-purpose function can generate 2 types of domain name pointers
    ------------------------------------------------------------------------- */
 
-static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
-{
-/* -------------------------------------------------------------------------
-   Convert IPv4 address to domain style
+static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip) {
+  /* -------------------------------------------------------------------------
+     Convert IPv4 address to domain style
 
-   192.168.100.1 -> 1.100.168.192.in-addr.arpa
+     192.168.100.1 -> 1.100.168.192.in-addr.arpa
 
-   Returns number of bytes written to *dst.
-   ------------------------------------------------------------------------- */
+     Returns number of bytes written to *dst.
+     -------------------------------------------------------------------------
+   */
 
-  if(at == NET_ADDRESS_IPV4)
-  {
+  if (at == NET_ADDRESS_IPV4) {
     int i;
     uint8_t *p = dst;
     uint8_t *addrp = (uint8_t *)(net_addr_t *)ip;
     uint8_t tmp;
 
     /* Somewhat optimized (but still sucking divisions :P) */
-    for(i = 3; i >= 0; i--)
-    {
+    for (i = 3; i >= 0; i--) {
       tmp = addrp[i];
 
       /* 3 Chars */
-      if(tmp > 99)
-      {
+      if (tmp > 99) {
         *p++ = 3;
         *p++ = '0' + (tmp / 100);
         *p++ = '0' + (tmp % 100 / 10);
         *p++ = '0' + (tmp % 10);
         /* 2 Chars */
-      }
-      else if(tmp > 9)
-      {
+      } else if (tmp > 9) {
         *p++ = 2;
         *p++ = '0' + (tmp % 100 / 10);
         *p++ = '0' + (tmp % 10);
         /* 1 Char */
-      }
-      else
-      {
+      } else {
         *p++ = 1;
         *p++ = '0' + (tmp % 10);
       }
@@ -251,45 +236,60 @@ static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
     return p - dst + 14;
   }
 
-/* -------------------------------------------------------------------------
-   Convert IPv6 address to domain style
+  /* -------------------------------------------------------------------------
+     Convert IPv6 address to domain style
 
-                        4321:0:1:2:3:4:567:89ab
-                                  ->
-   b.a.9.8.7.6.5.0.4.0.0.0.3.0.0.0.2.0.0.0.1.0.0.0.0.0.0.0.1.2.3.4.ip6.int.
+                          4321:0:1:2:3:4:567:89ab
+                                    ->
+     b.a.9.8.7.6.5.0.4.0.0.0.3.0.0.0.2.0.0.0.1.0.0.0.0.0.0.0.1.2.3.4.ip6.int.
 
-   Returns number of bytes written to *dst.
-   ------------------------------------------------------------------------- */
+     Returns number of bytes written to *dst.
+     -------------------------------------------------------------------------
+   */
 
 #ifdef HAVE_IPV6
-  else if(af == NET_ADDRESS_IPV6)
-  {
+  else if (af == NET_ADDRESS_IPV6) {
     int i;
     struct in6_addr *addr = ip;
     uint8_t *addrp;
 
-    for(i = 3; i >= 0; i--)
-    {
+    for (i = 3; i >= 0; i--) {
       addrp = (uint8_t *)&addr->s6_addr32[i];
 
 #ifdef _BIG_ENDIAN
-      *dst++ = 1; *dst++ = dns_hexchars[ addr->s6_addr32[i]        & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 4)  & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 8)  & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 12) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 16) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 20) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 24) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 28) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[addr->s6_addr32[i] & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 4) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 8) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 12) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 16) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 20) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 24) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 28) & 0x0f];
 #else
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 24) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 28) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 16) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 20) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 8)  & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 12) & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[ addr->s6_addr32[i]        & 0x0f];
-      *dst++ = 1; *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 4)  & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 24) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 28) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 16) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 20) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 8) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 12) & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[addr->s6_addr32[i] & 0x0f];
+      *dst++ = 1;
+      *dst++ = dns_hexchars[(addr->s6_addr32[i] >> 4) & 0x0f];
 #endif
     }
 
@@ -308,13 +308,11 @@ static size_t dns_dn_ptr(uint8_t *dst, int at, void *ip)
    on systems where network byte order == host byte order.
    ------------------------------------------------------------------------- */
 
-void dns_uint16_unpack(const uint8_t *in, uint16_t *out)
-{
+void dns_uint16_unpack(const uint8_t *in, uint16_t *out) {
   *out = ((uint16_t)(in[0] << 8)) | in[1];
 }
 
-void dns_uint16_pack(uint8_t *out, uint16_t in)
-{
+void dns_uint16_pack(uint8_t *out, uint16_t in) {
   out[0] = in >> 8;
   out[1] = in & 255;
 }
@@ -322,12 +320,11 @@ void dns_uint16_pack(uint8_t *out, uint16_t in)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-static size_t dns_packet_copy(const uint8_t *buf, size_t len,
-                              size_t pos, uint8_t *out, size_t outlen)
-{
-  while(outlen--)
-  {
-    if(pos >= len) return 0;
+static size_t dns_packet_copy(const uint8_t *buf, size_t len, size_t pos,
+                              uint8_t *out, size_t outlen) {
+  while (outlen--) {
+    if (pos >= len)
+      return 0;
 
     *out++ = buf[pos++];
   }
@@ -340,21 +337,19 @@ static size_t dns_packet_copy(const uint8_t *buf, size_t len,
    [buf + return value] will point to past the name.
    ------------------------------------------------------------------------- */
 
-static size_t dns_packet_skipname(const uint8_t *buf, size_t len, size_t pos)
-{
+static size_t dns_packet_skipname(const uint8_t *buf, size_t len, size_t pos) {
   uint8_t ch;
 
-  while(pos < len)
-  {
+  while (pos < len) {
     ch = buf[pos++];
 
-    if(ch >= 192)
+    if (ch >= 192)
       return pos + 1;
 
-    if(ch >= 64)
+    if (ch >= 64)
       break;
 
-    if(ch == 0)
+    if (ch == 0)
       return pos;
 
     pos += ch;
@@ -367,81 +362,76 @@ static size_t dns_packet_skipname(const uint8_t *buf, size_t len, size_t pos)
    ------------------------------------------------------------------------- */
 
 static size_t dns_packet_getname(const uint8_t *buf, size_t len, size_t pos,
-                                 uint8_t *domain, size_t n)
-{
+                                 uint8_t *domain, size_t n) {
   uint32_t loop = 0;
   uint32_t state = 0;
   uint32_t firstcompress = 0;
   uint32_t where;
-  uint8_t  ch;
-  uint8_t  name[256];
-  size_t   namelen = 0;
+  uint8_t ch;
+  uint8_t name[256];
+  size_t namelen = 0;
 
-  for(;;)
-  {
-    if(pos >= len)
+  for (;;) {
+    if (pos >= len)
       goto proto;
 
     ch = buf[pos++];
 
-    if(++loop >= 1000)
+    if (++loop >= 1000)
       goto proto;
 
-    if(state)
-    {
-      if(namelen > sizeof(name) - 1)
+    if (state) {
+      if (namelen > sizeof(name) - 1)
         goto proto;
 
       name[namelen++] = ch;
       state--;
-    }
-    else
-    {
-      while(ch >= 192)
-      {
+    } else {
+      while (ch >= 192) {
         where = ch;
         where -= 192;
         where <<= 8;
 
-        if(pos >= len)
+        if (pos >= len)
           goto proto;
 
         ch = buf[pos++];
 
-        if(!firstcompress) firstcompress = pos;
+        if (!firstcompress)
+          firstcompress = pos;
 
         pos = where + ch;
 
-        if(pos >= len)
+        if (pos >= len)
           goto proto;
 
         ch = buf[pos++];
 
-        if(++loop >= 1000)
+        if (++loop >= 1000)
           goto proto;
       }
 
-      if(ch >= 64)
+      if (ch >= 64)
         goto proto;
 
-      if(namelen > sizeof(name) - 1)
+      if (namelen > sizeof(name) - 1)
         goto proto;
 
       name[namelen++] = ch;
 
-      if(!ch)
+      if (!ch)
         break;
 
       state = ch;
     }
   }
 
-  if(n)
+  if (n)
     strlcpy((char *)domain, (char *)name, n - 1);
   else
     *domain = 0;
 
-  if(firstcompress)
+  if (firstcompress)
     return firstcompress;
 
   return pos;
@@ -454,14 +444,13 @@ proto:
 /* -------------------------------------------------------------------------
    Gets the length of a domain in DNS style format
    ------------------------------------------------------------------------- */
- size_t dns_dn_len(const uint8_t *domain)
-{
+size_t dns_dn_len(const uint8_t *domain) {
   const uint8_t *p;
   uint8_t c;
 
   p = domain;
 
-  while((c = *p++))
+  while ((c = *p++))
     p += c;
 
   return p - domain;
@@ -471,20 +460,20 @@ proto:
    Similar to memcmp() but case insensitive
    ------------------------------------------------------------------------- */
 
-static int dns_cmp(const uint8_t *s1, const uint8_t *s2, size_t len)
-{
+static int dns_cmp(const uint8_t *s1, const uint8_t *s2, size_t len) {
   register uint8_t c1;
   register uint8_t c2;
 
-  while(len--)
-  {
+  while (len--) {
     c1 = *s1++;
     c2 = *s2++;
 
-    if(c1 >= 'A' && c1 <= 'Z') c1 += 'a' - 'A';
-    if(c2 >= 'A' && c2 <= 'Z') c2 += 'a' - 'A';
+    if (c1 >= 'A' && c1 <= 'Z')
+      c1 += 'a' - 'A';
+    if (c2 >= 'A' && c2 <= 'Z')
+      c2 += 'a' - 'A';
 
-    if(c1 != c2)
+    if (c1 != c2)
       return 1;
   }
 
@@ -495,16 +484,15 @@ static int dns_cmp(const uint8_t *s1, const uint8_t *s2, size_t len)
    Compares two names in domain style
    ------------------------------------------------------------------------- */
 
-static int dns_dn_cmp(const uint8_t *domain1, const uint8_t *domain2)
-{
+static int dns_dn_cmp(const uint8_t *domain1, const uint8_t *domain2) {
   uint32_t len;
 
   len = dns_dn_len(domain1);
 
-  if(len != dns_dn_len(domain2))
+  if (len != dns_dn_len(domain2))
     return 0;
 
-  if(dns_cmp(domain1, domain2, len))
+  if (dns_cmp(domain1, domain2, len))
     return 0;
 
   return 1;
@@ -514,42 +502,37 @@ static int dns_dn_cmp(const uint8_t *domain1, const uint8_t *domain2)
    Convert domain style to dotted.
    ------------------------------------------------------------------------- */
 
-static size_t
-dns_dn_to_dot(char *out, const uint8_t *d, size_t n) {
+static size_t dns_dn_to_dot(char *out, const uint8_t *d, size_t n) {
   char ch, ch2;
   size_t idx = 0;
 
-  if(!n)
+  if (!n)
     return 0;
 
-  if(!*d)
-  {
+  if (!*d) {
     *out = '\0';
     return 0;
   }
 
-  for(; idx < n;) {
+  for (; idx < n;) {
     ch = *d++;
 
-    while(ch--)
-    {
+    while (ch--) {
       ch2 = *d++;
 
-      if((ch2 >= 'A') && (ch2 <= 'Z'))
+      if ((ch2 >= 'A') && (ch2 <= 'Z'))
         ch2 += 0x20;
 
-      if(((ch2 >= 'a') && (ch2 <= 'z')) ||
-         ((ch2 >= '0') && (ch2 <= '9')) ||
-          (ch2 == '-') || (ch2 == '_'))
-      {
+      if (((ch2 >= 'a') && (ch2 <= 'z')) || ((ch2 >= '0') && (ch2 <= '9')) ||
+          (ch2 == '-') || (ch2 == '_')) {
         out[idx++] = ch2;
 
-        if(idx == n)
+        if (idx == n)
           break;
       }
     }
 
-    if(!*d || idx == n)
+    if (!*d || idx == n)
       break;
 
     out[idx++] = '.';
@@ -564,23 +547,19 @@ dns_dn_to_dot(char *out, const uint8_t *d, size_t n) {
    Convert dotted style to domain.
    ------------------------------------------------------------------------- */
 
-static size_t dns_dot_to_dn(uint8_t *out, const char *d, size_t n)
-{
-  char     label[63];
+static size_t dns_dot_to_dn(uint8_t *out, const char *d, size_t n) {
+  char label[63];
   uint32_t labellen = 0; /* <= sizeof label */
-  char     name[255];
+  char name[255];
   uint32_t namelen = 0; /* <= sizeof name */
-  char     ch;
+  char ch;
 
-  while(*d)
-  {
+  while (*d) {
     ch = *d++;
 
-    if(ch == '.')
-    {
-      if(labellen)
-      {
-        if(namelen + labellen + 1 > sizeof(name))
+    if (ch == '.') {
+      if (labellen) {
+        if (namelen + labellen + 1 > sizeof(name))
           return 0;
 
         name[namelen++] = labellen;
@@ -593,52 +572,51 @@ static size_t dns_dot_to_dn(uint8_t *out, const char *d, size_t n)
     }
 
     /* convert octal shit */
-    if(ch == '\\')
-    {
-      if(!n--)
+    if (ch == '\\') {
+      if (!n--)
         break;
 
       ch = *d++;
 
-      if((ch >= '0') && (ch <= '7'))
-      {
+      if ((ch >= '0') && (ch <= '7')) {
         ch -= '0';
 
-        if(n && (*d >= '0') && (*d <= '7'))
-        {
+        if (n && (*d >= '0') && (*d <= '7')) {
           ch <<= 3;
           ch += *d - '0';
-          d++; n--;
+          d++;
+          n--;
 
-          if(n && (*d >= '0') && (*d <= '7'))
-          {
+          if (n && (*d >= '0') && (*d <= '7')) {
             ch <<= 3;
             ch += *d - '0';
-            d++; n--;
+            d++;
+            n--;
           }
         }
       }
     }
 
-    if(labellen >= sizeof(label))
+    if (labellen >= sizeof(label))
       return 0;
 
-    if(namelen > n)
+    if (namelen > n)
       break;
 
     label[labellen++] = ch;
   }
 
-  if(labellen)
-  {
-    if(namelen + labellen + 1 > sizeof(name)) return 0;
+  if (labellen) {
+    if (namelen + labellen + 1 > sizeof(name))
+      return 0;
     name[namelen++] = labellen;
     memcpy(&name[namelen], label, labellen);
     namelen += labellen;
     labellen = 0;
   }
 
-  if(namelen + 1 > sizeof(name)) return 0;
+  if (namelen + 1 > sizeof(name))
+    return 0;
   name[namelen++] = '\0';
 
   memcpy(out, name, n);
@@ -675,8 +653,7 @@ static size_t dns_dot_to_dn(uint8_t *out, const char *d, size_t n)
    If the nameserver already exists a pointer to it will be returned.
    ------------------------------------------------------------------------- */
 
-static struct dns_server *dns_add_ns(const char *name)
-{
+static struct dns_server *dns_add_ns(const char *name) {
   int i, at = 0;
   net_addr_t addr;
   struct dns_server *ret = NULL;
@@ -688,97 +665,86 @@ static struct dns_server *dns_add_ns(const char *name)
   /*#ifdef HAVE_INET_PTON
     if(inet_pton(at_INET, name, &addr) > 0)
   #else*/
-  if(net_aton(name, &addr) > 0)
+  if (net_aton(name, &addr) > 0)
     /*#endif*/
     at = NET_ADDRESS_IPV4;
   else
     addr = net_addr_any;
 
 #ifdef HAVE_IPV6
-  if(net_pton(NET_ADDRESS_IPV6, name, &addr6) > 0)
-  {
+  if (net_pton(NET_ADDRESS_IPV6, name, &addr6) > 0) {
     /* When we don't support ipv6 sockets only
        accept it when its mapped or localhost. */
-    if(!inst->options.ipv6_sock)
-    {
+    if (!inst->options.ipv6_sock) {
       af = NET_ADDRESS_IPV4;
 
-      if(IN6_IS_ADDR_V4MAPPED(&addr6))
+      if (IN6_IS_ADDR_V4MAPPED(&addr6))
         IN6_MAPV4(&addr6, &addr);
-      else if(!memcmp(&addr6, &in6addr_loopback, sizeof(struct in6_addr)))
+      else if (!memcmp(&addr6, &in6addr_loopback, sizeof(struct in6_addr)))
         addr.s_addr = htonl(INADDR_LOOPBACK);
       else
         /* Ahwww!! Not mapped or localhost, we have an error */
         return NULL;
-    }
-    else
+    } else
       af = NET_ADDRESS_IPV6;
-  }
-  else
+  } else
     memcpy(&addr6, &in6addr_any, sizeof(struct in6_addr));
 #endif
 
-  if(at == -1)
+  if (at == -1)
     return NULL;
 
   log(servauth_log, L_verbose, "nameserver: %s", name);
 
   /* Find a free dns_server struct */
-  for(i = 0; i < MAX_SERVERS; i++)
-  {
+  for (i = 0; i < MAX_SERVERS; i++) {
     /* If not yet found a free place, look for one */
-    if(ret == NULL && inst->servers[i].at == 0)
-    {
+    if (ret == NULL && inst->servers[i].at == 0) {
       ret = &inst->servers[i];
       break;
     }
 
     /* Does this nameserver already exist? */
-    if(at == NET_ADDRESS_IPV4 && inst->servers[i].addr == addr)
+    if (at == NET_ADDRESS_IPV4 && inst->servers[i].addr == addr)
       return NULL;
 
 #ifdef HAVE_IPV6
-    if(at == NET_ADDRESS_IPV6 &&
+    if (at == NET_ADDRESS_IPV6 &&
         !memcmp(&inst->servers[i].addr6, &addr6, sizeof(struct in6_addr)))
       return NULL;
 #endif
-
   }
 
-  if(!ret)
+  if (!ret)
     return NULL;
 
   /* Found a free one, fill it */
-  if(at == NET_ADDRESS_IPV4)
-  {
+  if (at == NET_ADDRESS_IPV4) {
     ret->addr = addr;
 
 #ifdef HAVE_IPV6
     /* If its loopback, then copy IPv6 loopback address */
-    if(ntohl(addr) == INADDR_LOOPBACK)
+    if (ntohl(addr) == INADDR_LOOPBACK)
       memcpy(&ret->addr6, &in6addr_loopback, sizeof(struct in6_addr));
     /* Otherwise just map it to IPv6 */
     else
       IN4_MAPV6(&addr, &ret->addr6);
   }
 
-  if(at == NET_ADDRESS_IPV6)
-  {
+  if (at == NET_ADDRESS_IPV6) {
     /* Copy IPv6 to the DNS server struct */
     memcpy(&ret->addr6, &addr6, sizeof(struct in6_addr));
 
     /* If its a mapped address, then copy it to IPv4 address */
-    if(IN6_IS_ADDR_V4MAPPED(&addr6))
-    {
+    if (IN6_IS_ADDR_V4MAPPED(&addr6)) {
       at = NET_ADDRESS_IPV4;
       IN6_MAPV4(&addr6, &ret->addr);
     }
 
     /* If its loopback, then copy it to IPv4 address */
-    if(!memcmp(&ret->addr6, &in6addr_loopback, sizeof(struct in6_addr)))
+    if (!memcmp(&ret->addr6, &in6addr_loopback, sizeof(struct in6_addr)))
       ret->addr = htonl(INADDR_LOOPBACK);
 #endif
-
   }
 
   /* Copy address family to the DNS server struct */
@@ -792,8 +758,7 @@ static struct dns_server *dns_add_ns(const char *name)
    Clears a nameserver by setting it to INADDR_ANY respective in6addr_any
    ------------------------------------------------------------------------- */
 
-void dns_clear_ns(struct dns_server *ns)
-{
+void dns_clear_ns(struct dns_server *ns) {
   ns->at = 0;
   ns->addr = net_addr_any;
 
@@ -812,15 +777,12 @@ void dns_clear_ns(struct dns_server *ns)
    When ns is NULL then the first valid DNS server will be returned.
    ------------------------------------------------------------------------- */
 
-static struct dns_server *dns_get_ns(int at)
-{
+static struct dns_server *dns_get_ns(int at) {
   struct dns_server *ret = NULL;
   int i;
 
-  for(i = 0; i < MAX_SERVERS; i++)
-  {
-    if(at == NET_ADDRESS_IPV4 && inst->servers[i].addr != net_addr_any)
-    {
+  for (i = 0; i < MAX_SERVERS; i++) {
+    if (at == NET_ADDRESS_IPV4 && inst->servers[i].addr != net_addr_any) {
       ret = &inst->servers[i];
       break;
     }
@@ -833,15 +795,13 @@ static struct dns_server *dns_get_ns(int at)
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-static int dns_timeout(void *arg)
-{
+static int dns_timeout(void *arg) {
   struct dns_resolver *res = arg;
 
-  if(res->callback)
+  if (res->callback)
     res->callback(arg);
 
-  if(res->timer)
-  {
+  if (res->timer) {
     timer_remove(res->timer);
     res->timer = NULL;
   }
@@ -857,36 +817,33 @@ static int dns_timeout(void *arg)
    Returns number of nameservers added.
    ------------------------------------------------------------------------- */
 #ifndef WIN32
-static void dns_read_line(int fd, void *arg)
-{
+static void dns_read_line(int fd, void *arg) {
   char buf[DNS_LINEBUF_SIZE];
   int ret;
   char *p;
   size_t i = 0;
 
-  for(EVER)
-  {
+  for (EVER) {
     ret = io_gets(fd, buf, DNS_LINEBUF_SIZE);
 
-    if(ret <= 0)
+    if (ret <= 0)
       break;
 
-    while(str_isspace(buf[i]))
+    while (str_isspace(buf[i]))
       i++;
 
-    if(!str_ncmp("nameserver", &buf[i], 10))
-    {
+    if (!str_ncmp("nameserver", &buf[i], 10)) {
       i += 10;
 
-      while(str_isspace(buf[i]))
+      while (str_isspace(buf[i]))
         i++;
 
-      if(!str_isdigit(buf[i]))
+      if (!str_isdigit(buf[i]))
         return;
 
       p = strchr(&buf[i], '\n');
 
-      if(p)
+      if (p)
         *p = '\0';
 
       dns_add_ns(&buf[i]);
@@ -896,13 +853,12 @@ static void dns_read_line(int fd, void *arg)
   io_destroy(fd);
 }
 
-static int dns_read_conf(const char *filename)
-{
+static int dns_read_conf(const char *filename) {
   int fd;
 
   fd = io_open(filename, IO_OPEN_READ);
 
-  if(fd == -1)
+  if (fd == -1)
     return -1;
 
   io_queue_control(fd, ON, OFF, ON);
@@ -920,54 +876,54 @@ static int dns_read_conf(const char *filename)
    Returns positive value if DB was updated (number of servers in DB)
    otherwise 0.
    ------------------------------------------------------------------------- */
-int
-dns_updatedb(void){
+int dns_updatedb(void) {
   int ret = 0;
 
   inst->server_count = 0;
 #ifdef WIN32
-/*	   long srvlist[256];
-  int ret = sizeof(srvlist);
+  /*	   long srvlist[256];
+    int ret = sizeof(srvlist);
 
-  memset(srvlist, 0, sizeof(srvlist));
-  int error;
-  error = DnsQueryConfig(DnsConfigDnsServerList, FALSE, NULL, NULL,
-                 srvlist, &ret);
+    memset(srvlist, 0, sizeof(srvlist));
+    int error;
+    error = DnsQueryConfig(DnsConfigDnsServerList, FALSE, NULL, NULL,
+                   srvlist, &ret);
 
-  if(error)
-  {
-    log(servauth_log, L_status, "DnsQueryConfig erroror: %i", error);
-  }
-  else
-  {
-    ret /= sizeof(IP4_ADDRESS);
-    int i;
-
-    for(i = 0; i < ret; i++)
+    if(error)
     {
-      /* Skip network addresses (those with last octet set to 0) */
-      if(srvlist[i] && (net_ntohl(srvlist[i]) & 0xff) != 0)
-        dns_add_ns(net_ntoa(srvlist[i]));
+      log(servauth_log, L_status, "DnsQueryConfig erroror: %i", error);
     }
-  }*/
+    else
+    {
+      ret /= sizeof(IP4_ADDRESS);
+      int i;
+
+      for(i = 0; i < ret; i++)
+      {
+        /* Skip network addresses (those with last octet set to 0) */
+  if (srvlist[i] && (net_ntohl(srvlist[i]) & 0xff) != 0)
+    dns_add_ns(net_ntoa(srvlist[i]));
+}
+}
+* /
 
 #else
 
   /* Config file was supplied, read it */
-  if(inst->options.config)
+  if (inst->options.config)
     ret += dns_read_conf(inst->options.config);
 #endif
 
-  /* Add localhost if there's no valid server */
-  if(!ret)
+    /* Add localhost if there's no valid server */
+    if (!ret)
 #ifdef HAVE_IPV6
-    if(dns_add_ns("::1"))
+        if (dns_add_ns("::1"))
 #else
-    if(dns_add_ns("127.0.0.1"))
+    if (dns_add_ns("127.0.0.1"))
 #endif
-      ret++;
+            ret++;
 
-  return ret;
+return ret;
 }
 
 /*****************************************************************************/
@@ -982,36 +938,34 @@ dns_updatedb(void){
    Initializes options to their defaults.
    ------------------------------------------------------------------------- */
 
-void dns_init()
-{
+void dns_init() {
   int i;
 
   /* Clear the DNS instance */
   memset(inst, 0, sizeof(struct dns_instance));
 
   /* Set all dns_server structs to INADDR_ANY */
-  for(i = 0; i < MAX_SERVERS; i++)
+  for (i = 0; i < MAX_SERVERS; i++)
     dns_clear_ns(&inst->servers[i]);
 
   /* Set options to a sane default */
   inst->options.ipv6_support = DNS_DEFAULT_IPV6_SUPPORT;
-  inst->options.ipv6_sock    = DNS_DEFAULT_IPV6_SOCK;
-  inst->options.config       = DNS_DEFAULT_CONFIG;
-  inst->options.env          = DNS_DEFAULT_ENV;
-  inst->options.timeout      = DNS_DEFAULT_TIMEOUT;
-  inst->options.retries      = DNS_DEFAULT_RETRIES;
-  inst->options.paranoid     = DNS_DEFAULT_PARANOID;
-  inst->options.rr_time      = DNS_DEFAULT_RR_TIME;
-  inst->options.rr_uses      = DNS_DEFAULT_RR_USES;
-  inst->options.bind_low     = DNS_DEFAULT_BIND_LOW;
-  inst->options.bind_high    = DNS_DEFAULT_BIND_HIGH;
+  inst->options.ipv6_sock = DNS_DEFAULT_IPV6_SOCK;
+  inst->options.config = DNS_DEFAULT_CONFIG;
+  inst->options.env = DNS_DEFAULT_ENV;
+  inst->options.timeout = DNS_DEFAULT_TIMEOUT;
+  inst->options.retries = DNS_DEFAULT_RETRIES;
+  inst->options.paranoid = DNS_DEFAULT_PARANOID;
+  inst->options.rr_time = DNS_DEFAULT_RR_TIME;
+  inst->options.rr_uses = DNS_DEFAULT_RR_USES;
+  inst->options.bind_low = DNS_DEFAULT_BIND_LOW;
+  inst->options.bind_high = DNS_DEFAULT_BIND_HIGH;
 }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-static void dns_set_syscall_errno()
-{
+static void dns_set_syscall_errno() {
   dns.stats.errors++;
   dns.__dns__errno__ = syscall_errno;
   syscall_errno = 0;
@@ -1020,25 +974,18 @@ static void dns_set_syscall_errno()
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-int dns_syscall_errno()
-{
-  return inst->__dns__errno__;
-}
+int dns_syscall_errno() { return inst->__dns__errno__; }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-const char *dns_errstr()
-{
-  return dns_errstrs[0 - inst->error];
-}
+const char *dns_errstr() { return dns_errstrs[0 - inst->error]; }
 
 /* -------------------------------------------------------------------------
    -1 = error has been set, 0 = retry
    ------------------------------------------------------------------------- */
 
-static int dns_error(int error)
-{
+static int dns_error(int error) {
   dns_set_syscall_errno();
 
   inst->error = error;
@@ -1049,39 +996,46 @@ static int dns_error(int error)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-void dns_vset_option(int opt, va_list arg)
-{
-  switch(opt)
-  {
-      case DNS_IPV6_SOCK:
-      if(va_arg(arg, int) == 0)
-        inst->options.ipv6_sock = 0;
-      break;
-      case DNS_CONFIG:
-      inst->options.config    = va_arg(arg, const char *); break;
-      case DNS_ENV:
-      inst->options.env       = va_arg(arg, const char *); break;
-      case DNS_CONNECT:
-      inst->options.connect   = va_arg(arg, int); break;
-      case DNS_TIMEOUT:
-      inst->options.timeout   = va_arg(arg, int); break;
-      case DNS_RETRIES:
-      inst->options.retries   = va_arg(arg, int); break;
-      case DNS_PARANOID:
-      inst->options.paranoid  = va_arg(arg, int); break;
-      case DNS_RR_TIME:
-      inst->options.rr_time   = va_arg(arg, int); break;
-      case DNS_RR_USES:
-      inst->options.rr_uses   = va_arg(arg, int); break;
-      case DNS_BIND_LOW:
-      inst->options.bind_low  = va_arg(arg, int); break;
-      case DNS_BIND_HIGH:
-      inst->options.bind_high = va_arg(arg, int); break;
+void dns_vset_option(int opt, va_list arg) {
+  switch (opt) {
+  case DNS_IPV6_SOCK:
+    if (va_arg(arg, int) == 0)
+      inst->options.ipv6_sock = 0;
+    break;
+  case DNS_CONFIG:
+    inst->options.config = va_arg(arg, const char *);
+    break;
+  case DNS_ENV:
+    inst->options.env = va_arg(arg, const char *);
+    break;
+  case DNS_CONNECT:
+    inst->options.connect = va_arg(arg, int);
+    break;
+  case DNS_TIMEOUT:
+    inst->options.timeout = va_arg(arg, int);
+    break;
+  case DNS_RETRIES:
+    inst->options.retries = va_arg(arg, int);
+    break;
+  case DNS_PARANOID:
+    inst->options.paranoid = va_arg(arg, int);
+    break;
+  case DNS_RR_TIME:
+    inst->options.rr_time = va_arg(arg, int);
+    break;
+  case DNS_RR_USES:
+    inst->options.rr_uses = va_arg(arg, int);
+    break;
+  case DNS_BIND_LOW:
+    inst->options.bind_low = va_arg(arg, int);
+    break;
+  case DNS_BIND_HIGH:
+    inst->options.bind_high = va_arg(arg, int);
+    break;
   }
 }
 
-void dns_set_option(int opt, ...)
-{
+void dns_set_option(int opt, ...) {
   va_list arg;
 
   va_start(arg, opt);
@@ -1094,62 +1048,70 @@ void dns_set_option(int opt, ...)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-void dns_vget_option(int opt, va_list arg)
-{
+void dns_vget_option(int opt, va_list arg) {
   const char **cp;
   int *ip;
 
-  switch(opt)
-  {
-      case DNS_IPV6_SOCK:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.ipv6_sock;
-      break;
-      case DNS_CONFIG:
-      cp = va_arg(arg, const char **);
-      if(cp) *cp = inst->options.config;
-      break;
-      case DNS_ENV:
-      cp = va_arg(arg, const char **);
-      if(cp) *cp = inst->options.env;
-      break;
-      case DNS_CONNECT:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.connect;
-      break;
-      case DNS_TIMEOUT:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.timeout;
-      break;
-      case DNS_RETRIES:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.retries;
-      break;
-      case DNS_PARANOID:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.paranoid;
-      break;
-      case DNS_RR_TIME:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.rr_time;
-      break;
-      case DNS_RR_USES:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.rr_uses;
-      break;
-      case DNS_BIND_HIGH:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.bind_high;
-      break;
-      case DNS_BIND_LOW:
-      ip = va_arg(arg, int *);
-      if(ip) *ip = inst->options.bind_low;
-      break;
+  switch (opt) {
+  case DNS_IPV6_SOCK:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.ipv6_sock;
+    break;
+  case DNS_CONFIG:
+    cp = va_arg(arg, const char **);
+    if (cp)
+      *cp = inst->options.config;
+    break;
+  case DNS_ENV:
+    cp = va_arg(arg, const char **);
+    if (cp)
+      *cp = inst->options.env;
+    break;
+  case DNS_CONNECT:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.connect;
+    break;
+  case DNS_TIMEOUT:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.timeout;
+    break;
+  case DNS_RETRIES:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.retries;
+    break;
+  case DNS_PARANOID:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.paranoid;
+    break;
+  case DNS_RR_TIME:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.rr_time;
+    break;
+  case DNS_RR_USES:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.rr_uses;
+    break;
+  case DNS_BIND_HIGH:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.bind_high;
+    break;
+  case DNS_BIND_LOW:
+    ip = va_arg(arg, int *);
+    if (ip)
+      *ip = inst->options.bind_low;
+    break;
   }
 }
 
-void dns_get_option(int opt, ...)
-{
+void dns_get_option(int opt, ...) {
   va_list arg;
 
   va_start(arg, opt);
@@ -1167,45 +1129,44 @@ void dns_get_option(int opt, ...)
    Checks whether the response matches the query
    ------------------------------------------------------------------------- */
 
-static int dns_irrelevant(struct dns_resolver *res, uint8_t *buf, size_t len)
-{
-  uint8_t  header[12];
-  uint8_t  domain[256];
+static int dns_irrelevant(struct dns_resolver *res, uint8_t *buf, size_t len) {
+  uint8_t header[12];
+  uint8_t domain[256];
   uint32_t pos;
 
   res->addrindex = 0;
 
   pos = dns_packet_copy(buf, len, 0, header, 12);
 
-  if(pos == 0)
+  if (pos == 0)
     return 1;
 
-  if(memcmp(header, &res->query[2], 2))
+  if (memcmp(header, &res->query[2], 2))
     return 1;
 
-  if(header[4] != 0)
+  if (header[4] != 0)
     return 1;
 
-  if(header[5] != 1)
+  if (header[5] != 1)
     return 1;
 
   pos = dns_packet_getname(buf, len, pos, domain, sizeof(domain));
 
-  if(pos == 0)
+  if (pos == 0)
     return 1;
 
-  if(!dns_dn_cmp(domain, &res->query[14]))
+  if (!dns_dn_cmp(domain, &res->query[14]))
     return 1;
 
   pos = dns_packet_copy(buf, len, pos, header, 4);
 
-  if(pos == 0)
+  if (pos == 0)
     return 1;
 
-  if(memcmp(header, res->type, 2))
+  if (memcmp(header, res->type, 2))
     return 1;
 
-  if(memcmp(&header[2], DNS_C_IN, 2))
+  if (memcmp(&header[2], DNS_C_IN, 2))
     return 1;
 
   return 0;
@@ -1215,49 +1176,46 @@ static int dns_irrelevant(struct dns_resolver *res, uint8_t *buf, size_t len)
    Extracts a name from a response packet
    ------------------------------------------------------------------------- */
 
-static int dns_extract_name(struct dns_resolver *res, char *out, size_t len)
-{
+static int dns_extract_name(struct dns_resolver *res, char *out, size_t len) {
   uint32_t pos;
-  uint8_t  header[12];
+  uint8_t header[12];
   uint16_t numans;
   uint16_t datalen;
-  uint8_t  name[256];
+  uint8_t name[256];
 
   pos = dns_packet_copy(res->reply, res->replylen, 0, header, 12);
 
-  if(!pos)
+  if (!pos)
     return -1;
 
   dns_uint16_unpack(&header[6], &numans);
 
   pos = dns_packet_skipname(res->reply, res->replylen, pos);
 
-  if(!pos)
+  if (!pos)
     return -1;
 
   pos += 4;
 
-  while(numans--)
-  {
+  while (numans--) {
     pos = dns_packet_skipname(res->reply, res->replylen, pos);
 
-    if(!pos)
+    if (!pos)
       return -1;
 
     pos = dns_packet_copy(res->reply, res->replylen, pos, header, 10);
 
-    if(!pos)
+    if (!pos)
       return -1;
 
     dns_uint16_unpack(&header[8], &datalen);
 
-    if(!memcmp(&header[0], DNS_T_PTR, 2))
-      if(!memcmp(&header[2], DNS_C_IN, 2))
-      {
-        if(!dns_packet_getname(res->reply, res->replylen, pos, name, 255))
+    if (!memcmp(&header[0], DNS_T_PTR, 2))
+      if (!memcmp(&header[2], DNS_C_IN, 2)) {
+        if (!dns_packet_getname(res->reply, res->replylen, pos, name, 255))
           return -1;
 
-        if(!dns_dn_to_dot(out, name, len))
+        if (!dns_dn_to_dot(out, name, len))
           return -1;
 
         return 1;
@@ -1273,9 +1231,8 @@ static int dns_extract_name(struct dns_resolver *res, char *out, size_t len)
    Extracts n'th address from a response packet
    ------------------------------------------------------------------------- */
 
-static int dns_extract_addr(struct dns_resolver *res,
-                            int at, void *addr, size_t n)
-{
+static int dns_extract_addr(struct dns_resolver *res, int at, void *addr,
+                            size_t n) {
   uint32_t pos;
   uint8_t header[12];
   uint16_t numans;
@@ -1284,46 +1241,42 @@ static int dns_extract_addr(struct dns_resolver *res,
 
   pos = dns_packet_copy(res->reply, res->replylen, 0, header, 12);
 
-  if(!pos)
+  if (!pos)
     return -1;
 
   dns_uint16_unpack(&header[6], &numans);
 
   pos = dns_packet_skipname(res->reply, res->replylen, pos);
 
-  if(!pos)
+  if (!pos)
     return -1;
 
   pos += 4;
 
-  if(n >= numans)
+  if (n >= numans)
     return 0;
 
-  while(numans--)
-  {
+  while (numans--) {
     pos = dns_packet_skipname(res->reply, res->replylen, pos);
 
-    if(!pos)
+    if (!pos)
       return 0;
 
     pos = dns_packet_copy(res->reply, res->replylen, pos, header, 10);
 
-    if(!pos)
+    if (!pos)
       return 0;
 
     dns_uint16_unpack(&header[8], &len);
 
-    if(!memcmp(&header[0], DNS_T_A, 2) &&
-        !memcmp(&header[2], DNS_C_IN, 2) &&
-        len == sizeof(net_addr_t))
-    {
+    if (!memcmp(&header[0], DNS_T_A, 2) && !memcmp(&header[2], DNS_C_IN, 2) &&
+        len == sizeof(net_addr_t)) {
 
-      if(!dns_packet_copy(res->reply, res->replylen, pos, header,
-                          sizeof(net_addr_t)))
+      if (!dns_packet_copy(res->reply, res->replylen, pos, header,
+                           sizeof(net_addr_t)))
         return 0;
 
-      if(count == n)
-      {
+      if (count == n) {
         *(uint32_t *)addr = *(uint32_t *)header;
         return 1;
       }
@@ -1331,15 +1284,13 @@ static int dns_extract_addr(struct dns_resolver *res,
       count++;
     }
 #ifdef HAVE_IPV6
-    if(!memcmp(&header[0], DNS_T_AAAA, 2) && !memcmp(&header[2], DNS_C_IN, 2) &&
-        len == sizeof(struct in6_addr))
-    {
-      if(!dns_packet_copy(res->reply, res->replylen, pos, header,
-                          sizeof(struct in6_addr)))
+    if (!memcmp(&header[0], DNS_T_AAAA, 2) &&
+        !memcmp(&header[2], DNS_C_IN, 2) && len == sizeof(struct in6_addr)) {
+      if (!dns_packet_copy(res->reply, res->replylen, pos, header,
+                           sizeof(struct in6_addr)))
         return 0;
 
-      if(count == n)
-      {
+      if (count == n) {
         *(struct in6_addr *)addr = *(struct in6_addr *)header;
         return 1;
       }
@@ -1362,14 +1313,13 @@ static int dns_extract_addr(struct dns_resolver *res,
    Server wants TCP?
    ------------------------------------------------------------------------- */
 
-static int dns_want_tcp(const uint8_t *buf, size_t len)
-{
+static int dns_want_tcp(const uint8_t *buf, size_t len) {
   uint8_t header[12];
 
-  if(!dns_packet_copy(buf, len, 0, header, 12))
+  if (!dns_packet_copy(buf, len, 0, header, 12))
     return 1;
 
-  if(header[2] & 0x02)
+  if (header[2] & 0x02)
     return 1;
 
   return 0;
@@ -1379,17 +1329,16 @@ static int dns_want_tcp(const uint8_t *buf, size_t len)
    Server failed?
    ------------------------------------------------------------------------- */
 
-static int dns_fail(const uint8_t *buf, size_t len)
-{
-  uint8_t  header[12];
+static int dns_fail(const uint8_t *buf, size_t len) {
+  uint8_t header[12];
   uint32_t rcode;
 
-  if(!dns_packet_copy(buf, len, 0, header, 12))
+  if (!dns_packet_copy(buf, len, 0, header, 12))
     return 1;
 
   rcode = header[3] & 0x0f;
 
-  if(rcode && (rcode != 3))
+  if (rcode && (rcode != 3))
     return 1;
 
   return 0;
@@ -1399,15 +1348,14 @@ static int dns_fail(const uint8_t *buf, size_t len)
    ------------------------------------------------------------------------- */
 
 static int dns_transmit_start(struct dns_resolver *res, const uint8_t *domain,
-                              size_t len, const char *type)
-{
+                              size_t len, const char *type) {
   int stype;
 
   /* Allocate some space for the query */
   res->querylen = len + 18;
   res->query = malloc(res->querylen);
 
-  if(res->query == NULL)
+  if (res->query == NULL)
     return dns_error(DNS_EMEMORY);
 
   /* Set length in header */
@@ -1432,20 +1380,20 @@ static int dns_transmit_start(struct dns_resolver *res, const uint8_t *domain,
 
   /* Get the first server */
 #ifdef HAVE_IPV6
-  if(inst->options.ipv6_sock)
+  if (inst->options.ipv6_sock)
     res->ns = dns_get_ns(NET_ADDRESS_IPV6);
   else
 #else
-    res->ns = dns_get_ns(NET_ADDRESS_IPV4);
+  res->ns = dns_get_ns(NET_ADDRESS_IPV4);
 #endif
 
     /* Error, no nameserver */
-    if(res->ns == NULL)
+    if (res->ns == NULL)
       return DNS_ENOSERVER;
 
   /* If the packet is any bigger than
      512 bytes start a TCP transmission */
-  if(len + 16 > 512)
+  if (len + 16 > 512)
     stype = NET_SOCKET_STREAM;
   else
     stype = NET_SOCKET_DGRAM;
@@ -1459,10 +1407,8 @@ static int dns_transmit_start(struct dns_resolver *res, const uint8_t *domain,
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-static void dns_close(struct dns_resolver *res)
-{
-  if(res->sock)
-  {
+static void dns_close(struct dns_resolver *res) {
+  if (res->sock) {
     io_destroy(res->sock - 1);
     res->sock = 0;
   }
@@ -1472,28 +1418,23 @@ static void dns_close(struct dns_resolver *res)
    Bah, not really I/O
    ------------------------------------------------------------------------- */
 
-static void dns_free_query(struct dns_resolver *res)
-{
-  if(res->query)
-  {
+static void dns_free_query(struct dns_resolver *res) {
+  if (res->query) {
     free(res->query);
     res->query = NULL;
     res->querylen = 0;
   }
 }
 
-static void dns_free_reply(struct dns_resolver *res)
-{
-  if(res->reply)
-  {
+static void dns_free_reply(struct dns_resolver *res) {
+  if (res->reply) {
     free(res->reply);
     res->reply = NULL;
     res->replylen = 0;
   }
 }
 
-void dns_clear(struct dns_resolver *res)
-{
+void dns_clear(struct dns_resolver *res) {
   dns_close(res);
 
   dns_free_query(res);
@@ -1509,18 +1450,16 @@ void dns_clear(struct dns_resolver *res)
    Will do IPv4 fallback on error.
    ------------------------------------------------------------------------- */
 
-static int dns_socket(struct dns_resolver *res, int type)
-{
+static int dns_socket(struct dns_resolver *res, int type) {
   int fd = -1;
 
-  if(res->ns == NULL)
+  if (res->ns == NULL)
     return dns_error(DNS_ENOSERVER);
 
-  if(res->ns->at == NET_ADDRESS_IPV4)
-  {
+  if (res->ns->at == NET_ADDRESS_IPV4) {
     fd = net_socket(NET_ADDRESS_IPV4, type);
 
-    if(fd == -1)
+    if (fd == -1)
       return dns_error(DNS_ESYSCALL);
 
     res->stype = type;
@@ -1530,17 +1469,13 @@ static int dns_socket(struct dns_resolver *res, int type)
 
   }
 #ifdef HAVE_IPV6
-  else if(!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6)
-  {
+  else if (!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6) {
     int flags;
 
     fd = net_socket(PF_INET, type);
 
-    if(fd == -1)
-    {
-      if(syscall_errno == EAFNOSUPPORT ||
-          syscall_errno == EPROTONOSUPPORT)
-      {
+    if (fd == -1) {
+      if (syscall_errno == EAFNOSUPPORT || syscall_errno == EPROTONOSUPPORT) {
         dns_fallback(res);
         return dns_error(DNS_EFALLBACK);
       }
@@ -1569,33 +1504,29 @@ static int dns_socket(struct dns_resolver *res, int type)
    localhost otherwise we'll bind to INADDR_ANY respective in6_addr.
    ------------------------------------------------------------------------- */
 
-static int dns_bind(struct dns_resolver *res)
-{
+static int dns_bind(struct dns_resolver *res) {
   int low;
   int high;
   int port;
 
-  if(res->ns == NULL)
+  if (res->ns == NULL)
     return dns_error(DNS_ESYSCALL);
 
-  if(res->ns->at == NET_ADDRESS_IPV4)
-  {
+  if (res->ns->at == NET_ADDRESS_IPV4) {
     net_addr_t addr;
 
     low = inst->options.bind_low;
     high = inst->options.bind_high;
     port = low + rand() % (high - low);
 
-    if(res->ns->addr == net_addr_loopback)
+    if (res->ns->addr == net_addr_loopback)
       addr = net_addr_loopback;
     else
       addr = net_addr_any;
 
     return net_bind(res->sock - 1, addr, port);
 #ifdef HAVE_IPV6
-  }
-  else if(!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6)
-  {
+  } else if (!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6) {
     struct sockaddr_in6 local;
 
     low = inst->options.bind_low;
@@ -1605,17 +1536,16 @@ static int dns_bind(struct dns_resolver *res)
     local.sin6_family = NET_ADDRESS_IPV6;
     local.sin6_port = htons(port);
 
-    if(!memcmp(&res->ns->addr6, &in6addr_loopback, sizeof(struct in6_addr)))
+    if (!memcmp(&res->ns->addr6, &in6addr_loopback, sizeof(struct in6_addr)))
       memcpy(&local.sin6_addr, &in6addr_loopback, sizeof(struct in6_addr));
     else
       memcpy(&local.sin6_addr, &in6addr_any, sizeof(struct in6_addr));
 
-    if(bind(res->sock - 1, (struct sockaddr *)&local, sizeof(local)) == -1)
+    if (bind(res->sock - 1, (struct sockaddr *)&local, sizeof(local)) == -1)
       return dns_error(DNS_ESYSCALL);
 
     return 0;
 #endif
-
   }
 
   syscall_errno = EAFNOSUPPORT;
@@ -1625,29 +1555,26 @@ static int dns_bind(struct dns_resolver *res)
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-static int dns_connect(struct dns_resolver *res)
-{
-  if(res->ns->at == NET_ADDRESS_IPV4)
-  {
-/*    struct sockaddr_in local;*/
+static int dns_connect(struct dns_resolver *res) {
+  if (res->ns->at == NET_ADDRESS_IPV4) {
+    /*    struct sockaddr_in local;*/
     void *cb;
 
-/*    local.sin_family = NET_ADDRESS_IPV4;*/
+    /*    local.sin_family = NET_ADDRESS_IPV4;*/
 
     cb = (res->stype == NET_SOCKET_STREAM ? &dns_event_cn : NULL);
 
     return net_connect(res->sock - 1, res->ns->addr, 53, cb, cb, res);
   }
 #ifdef HAVE_IPV6
-  else if(!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6)
-  {
+  else if (!inst->options.ipv6_sock && res->ns->at == NET_ADDRESS_IPV6) {
     struct sockaddr_in6 local;
 
     local.sin6_family = NET_ADDRESS_IPV6;
-    local.sin6_port   = htons(53);
+    local.sin6_port = htons(53);
     memcpy(&local.sin6_addr, &res->ns->addr6, sizeof(struct in6_addr));
 
-    if(connect(res->sock-1, (struct sockaddr *)&local, sizeof(local)) == -1)
+    if (connect(res->sock - 1, (struct sockaddr *)&local, sizeof(local)) == -1)
       return dns_error(DNS_ESYSCALL);
 
     return 0;
@@ -1661,15 +1588,12 @@ static int dns_connect(struct dns_resolver *res)
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-static int dns_send(struct dns_resolver *res)
-{
+static int dns_send(struct dns_resolver *res) {
   /* Just in case a send() on an UDP socket would block we treat
      it like a TCP socket waiting for a connection.
      (Shouldn't happen but you never know) */
-  if(io_write(res->sock - 1, &res->query[2], res->querylen - 2) == -1)
-  {
-    if(syscall_errno == EAGAIN || syscall_errno == EWOULDBLOCK)
-    {
+  if (io_write(res->sock - 1, &res->query[2], res->querylen - 2) == -1) {
+    if (syscall_errno == EAGAIN || syscall_errno == EWOULDBLOCK) {
       syscall_errno = 0;
       return 0;
     }
@@ -1686,19 +1610,17 @@ static int dns_send(struct dns_resolver *res)
    When socket gets writeable, send out pending stuff and change status
    to DNS_ST_SENT
    ------------------------------------------------------------------------- */
-static void dns_event_cn(int fd, void *ptr)
-{
+static void dns_event_cn(int fd, void *ptr) {
   struct dns_resolver *res = ptr;
 
-/*  if(!io_list[fd].status.connected)
-  {
-    if(res->callback)
-      res->callback(ptr);
-  }
-  else*/
-  {
-    if(dns_send(res) == -1)
+  /*  if(!io_list[fd].status.connected)
     {
+      if(res->callback)
+        res->callback(ptr);
+    }
+    else*/
+  {
+    if (dns_send(res) == -1) {
       dns_start(res, res->stype);
 
       return;
@@ -1711,50 +1633,44 @@ static void dns_event_cn(int fd, void *ptr)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-static void dns_event_rd(int fd, void *ptr)
-{
+static void dns_event_rd(int fd, void *ptr) {
   struct dns_resolver *res = ptr;
 
-  if(res->stype == NET_SOCKET_DGRAM)
-  {
+  if (res->stype == NET_SOCKET_DGRAM) {
     uint8_t buf[513];
-    ssize_t     ret;
+    ssize_t ret;
 
     ret = io_read(res->sock - 1, buf, sizeof(buf));
 
-    if(ret <= 0)
-    {
+    if (ret <= 0) {
       dns_error(DNS_ERECV);
 
       return;
     }
 
-    if(ret > (ssize_t)(sizeof(buf) - 1) || dns_irrelevant(res, buf, ret))
-    {
+    if (ret > (ssize_t)(sizeof(buf) - 1) || dns_irrelevant(res, buf, ret)) {
       dns_error(DNS_ESERVFAIL);
 
       return;
     }
 
-    if(dns_want_tcp(buf, ret))
-    {
+    if (dns_want_tcp(buf, ret)) {
       dns_start(res, NET_SOCKET_STREAM);
 
       return;
     }
 
-    if(dns_fail(buf, ret))
+    if (dns_fail(buf, ret))
       dns_close(res);
 
     res->replylen = ret;
 
-    if(res->reply)
+    if (res->reply)
       free(res->reply);
 
     res->reply = malloc(ret);
 
-    if(res->reply == NULL)
-    {
+    if (res->reply == NULL) {
       dns_error(DNS_EMEMORY);
 
       return;
@@ -1766,7 +1682,7 @@ static void dns_event_rd(int fd, void *ptr)
 
     res->status = DNS_ST_DONE;
 
-    if(res->callback)
+    if (res->callback)
       res->callback(res);
 
     return;
@@ -1780,8 +1696,7 @@ static void dns_event_rd(int fd, void *ptr)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-static int dns_start(struct dns_resolver *res, int type)
-{
+static int dns_start(struct dns_resolver *res, int type) {
   int i;
   int err;
   int at;
@@ -1797,26 +1712,25 @@ static int dns_start(struct dns_resolver *res, int type)
 
   res->ns = dns_get_ns(at);
 
-  if(res->ns == NULL)
+  if (res->ns == NULL)
     return dns_error(DNS_ENOSERVER);
 again:
   err = dns_socket(res, type);
 
   /* Fallback happened, just get another socket */
-  if(err == DNS_EFALLBACK)
+  if (err == DNS_EFALLBACK)
     goto again;
 
-  if(err != DNS_ESUCCESS)
+  if (err != DNS_ESUCCESS)
     return err;
 
   /* Bind the socket to a random local port (UDP only) */
-  if(type == NET_SOCKET_DGRAM)
-  {
-    for(i = 0; i < 10; i++)
-      if(dns_bind(res) == DNS_ESUCCESS)
+  if (type == NET_SOCKET_DGRAM) {
+    for (i = 0; i < 10; i++)
+      if (dns_bind(res) == DNS_ESUCCESS)
         break;
 
-    if(i == 10)
+    if (i == 10)
       return dns_error(DNS_ESYSCALL);
   }
 
@@ -1824,9 +1738,8 @@ again:
 
   dns_connect(res);
 
-  if(res->stype == NET_SOCKET_DGRAM)
-  {
-    if(res->status != DNS_ST_SENT)
+  if (res->stype == NET_SOCKET_DGRAM) {
+    if (res->status != DNS_ST_SENT)
       dns_send(res);
 
     io_register(res->sock - 1, IO_CB_READ, dns_event_rd, res);
@@ -1841,37 +1754,28 @@ again:
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-void dns_zero(struct dns_resolver *res)
-{
+void dns_zero(struct dns_resolver *res) {
   memset(res, 0, sizeof(struct dns_resolver));
 }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-int dns_get_status(struct dns_resolver *res)
-{
-  return res->status;
-}
+int dns_get_status(struct dns_resolver *res) { return res->status; }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-void *dns_get_userarg(struct dns_resolver *res)
-{
-  return res->userarg;
-}
+void *dns_get_userarg(struct dns_resolver *res) { return res->userarg; }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
-void dns_set_userarg(struct dns_resolver *res, void *userarg)
-{
+void dns_set_userarg(struct dns_resolver *res, void *userarg) {
   res->userarg = userarg;
 }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 void dns_set_callback(struct dns_resolver *res, dns_callback_t *callback,
-                      uint64_t timeout)
-{
+                      uint64_t timeout) {
   res->timeout = timeout;
   res->callback = callback;
   res->timer = timer_start(dns_timeout, timeout, res);
@@ -1880,28 +1784,25 @@ void dns_set_callback(struct dns_resolver *res, dns_callback_t *callback,
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-struct dns_resolver *dns_new()
-{
+struct dns_resolver *dns_new() {
   struct dns_resolver *res;
   struct dns_resolver *r;
 
   res = malloc(sizeof(struct dns_resolver));
 
-  if(res == NULL)
+  if (res == NULL)
     return NULL;
 
   dns_zero(res);
 
   res->next = NULL;
 
-  if(inst->res == NULL)
-  {
+  if (inst->res == NULL) {
     inst->res = res;
     res->prev = NULL;
-  }
-  else
-  {
-    for(r = inst->res; r->next; r = r->next);
+  } else {
+    for (r = inst->res; r->next; r = r->next)
+      ;
 
     r->next = res;
     res->prev = r;
@@ -1915,21 +1816,17 @@ struct dns_resolver *dns_new()
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-void dns_free(struct dns_resolver *res)
-{
-  if(res->prev == NULL)
-  {
+void dns_free(struct dns_resolver *res) {
+  if (res->prev == NULL) {
     inst->res = res->next;
 
-    if(inst->res != NULL)
+    if (inst->res != NULL)
       inst->res->prev = NULL;
 
-  }
-  else
-  {
+  } else {
     res->prev->next = res->next;
 
-    if(res->next != NULL)
+    if (res->next != NULL)
       res->next->prev = res->prev;
   }
 
@@ -1940,21 +1837,17 @@ void dns_free(struct dns_resolver *res)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-void dns_forall_begin()
-{
-  inst->cur = inst->res;
-}
+void dns_forall_begin() { inst->cur = inst->res; }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-struct dns_resolver *dns_forall_next()
-{
+struct dns_resolver *dns_forall_next() {
   struct dns_resolver *ret;
 
   ret = inst->cur;
 
-  if(ret != NULL)
+  if (ret != NULL)
     inst->cur = ret->next;
 
   return ret;
@@ -2060,10 +1953,9 @@ struct dns_resolver *dns_forall_next()
             -1 on error
    ------------------------------------------------------------------------- */
 
-int dns_ptr_lookup(struct dns_resolver *res, int at, void *ip, uint64_t t)
-{
+int dns_ptr_lookup(struct dns_resolver *res, int at, void *ip, uint64_t t) {
   uint8_t ptr[256];
-  size_t  len;
+  size_t len;
 
   inst->stats.queries++;
 
@@ -2086,9 +1978,8 @@ int dns_ptr_lookup(struct dns_resolver *res, int at, void *ip, uint64_t t)
             -1 on error
    ------------------------------------------------------------------------- */
 
-int dns_name_lookup(struct dns_resolver *res, int at,
-                    const char *name, uint64_t t)
-{
+int dns_name_lookup(struct dns_resolver *res, int at, const char *name,
+                    uint64_t t) {
   uint8_t domain[256];
   size_t len;
   const char *type;
@@ -2112,20 +2003,18 @@ int dns_name_lookup(struct dns_resolver *res, int at,
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-int dns_get_name(struct dns_resolver *res, char *buf, size_t n)
-{
+int dns_get_name(struct dns_resolver *res, char *buf, size_t n) {
   return dns_extract_name(res, buf, n);
 }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-char *dns_dup_name(struct dns_resolver *res)
-{
+char *dns_dup_name(struct dns_resolver *res) {
   char name[256];
   char *ret = NULL;
 
-  if(dns_extract_name(res, name, 256) == 1)
+  if (dns_extract_name(res, name, 256) == 1)
     ret = str_dup(name);
 
   return ret;
@@ -2134,24 +2023,20 @@ char *dns_dup_name(struct dns_resolver *res)
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-int dns_get_addr(struct dns_resolver *res, int at, void *addr)
-{
+int dns_get_addr(struct dns_resolver *res, int at, void *addr) {
   return dns_extract_addr(res, at, addr, res->addrindex++);
 }
 
 /* -------------------------------------------------------------------------
    ------------------------------------------------------------------------- */
 
-int dns_get_addr_x(struct dns_resolver *res, int at, void *addr, size_t nelem)
-{
+int dns_get_addr_x(struct dns_resolver *res, int at, void *addr, size_t nelem) {
   size_t n;
 
-  for(n = 0; n < nelem; n++)
-  {
-    if(dns_extract_addr(res, at, addr, res->addrindex++) <= 0)
+  for (n = 0; n < nelem; n++) {
+    if (dns_extract_addr(res, at, addr, res->addrindex++) <= 0)
       return n;
   }
 
   return 0;
 }
-

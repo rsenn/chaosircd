@@ -1,13 +1,13 @@
 #ifdef __MINGW32__
-#include <winsock2.h>
+#include "socket.h"
 #include <errno.h>
 #include <stdio.h>
-#include "socket.h"
+#include <winsock2.h>
 
 int winsock2errno(long l) {
   long x;
-  if (l==-1)
-    switch ((x=WSAGetLastError())) {
+  if (l == -1)
+    switch ((x = WSAGetLastError())) {
     case WSANOTINITIALISED:
       printf("WSANOTINITIALISED!\n");
       exit(111);
@@ -15,25 +15,34 @@ int winsock2errno(long l) {
       printf("WSAENETDOWN!\n");
       exit(111);
     case WSAEINTR:
-      errno=EINTR; break;
+      errno = EINTR;
+      break;
     case WSAEBADF:
-      errno=EBADF; break;
+      errno = EBADF;
+      break;
     case WSAEACCES:
-      errno=EACCES; break;
+      errno = EACCES;
+      break;
     case WSAEFAULT:
-      errno=EFAULT; break;
+      errno = EFAULT;
+      break;
     case WSAEINVAL:
-      errno=EINVAL; break;
+      errno = EINVAL;
+      break;
     case WSAEMFILE:
-      errno=EMFILE; break;
+      errno = EMFILE;
+      break;
     case WSAENAMETOOLONG:
-      errno=ENAMETOOLONG; break;
+      errno = ENAMETOOLONG;
+      break;
     case WSAENOTEMPTY:
-      errno=ENOTEMPTY; break;
+      errno = ENOTEMPTY;
+      break;
     case WSAEPROTONOSUPPORT:
-      errno=EPROTONOSUPPORT; break;
+      errno = EPROTONOSUPPORT;
+      break;
     default:
-      errno=x;
+      errno = x;
       break;
     }
   return l;

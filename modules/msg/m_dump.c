@@ -37,6 +37,7 @@
 #include "libchaos/module.h"
 #include "libchaos/listen.h"
 #include "libchaos/connect.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *

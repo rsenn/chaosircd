@@ -27,13 +27,12 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
 #include "libchaos/connect.h"
-#include "libchaos/sauth.h"
 #include "libchaos/defs.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/net.h"
+#include "libchaos/sauth.h"
 #include "libchaos/str.h"
 
 /* ------------------------------------------------------------------------ *
@@ -44,7 +43,7 @@
 #ifdef WIN32
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
-#else 
+#else
 #include <winsock.h>
 #endif
 #include <windows.h>
@@ -71,22 +70,19 @@
  * Prototypes                                                               *
  * ------------------------------------------------------------------------ */
 
-static int  connect_timeout (struct connect *cnptr);
-static void connect_read    (int             fd,
-                             struct connect *cnptr);
-static void connect_write   (int             fd,
-                             struct connect *cnptr);
-static void connect_sauth   (struct sauth   *saptr,
-                             struct connect *cnptr);
+static int connect_timeout(struct connect *cnptr);
+static void connect_read(int fd, struct connect *cnptr);
+static void connect_write(int fd, struct connect *cnptr);
+static void connect_sauth(struct sauth *saptr, struct connect *cnptr);
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int           connect_log;          /* Log source */
-struct sheap  connect_heap;         /* Heap containing connect blocks */
-struct list   connect_list;         /* List linking connect blocks */
-uint32_t      connect_id;           /* Next id number */
-int           connect_dirty;
+int connect_log;           /* Log source */
+struct sheap connect_heap; /* Heap containing connect blocks */
+struct list connect_list;  /* List linking connect blocks */
+uint32_t connect_id;       /* Next id number */
+int connect_dirty;
 
 /* ------------------------------------------------------------------------ */
 int connect_get_log() { return connect_log; }
@@ -94,8 +90,7 @@ int connect_get_log() { return connect_log; }
 /* ------------------------------------------------------------------------ *
  * Initialize the connect module.                                           *
  * ------------------------------------------------------------------------ */
-void connect_init(void)
-{
+void connect_init(void) {
   /* Get a log source */
   connect_log = log_source_register("connect");
 
@@ -112,15 +107,13 @@ void connect_init(void)
 /* ------------------------------------------------------------------------ *
  * Shut down the connect module.                                            *
  * ------------------------------------------------------------------------ */
-void connect_shutdown(void)
-{
+void connect_shutdown(void) {
   struct connect *cnptr;
   struct connect *next;
 
   /* Remove all connect blocks */
-  dlink_foreach_safe(&connect_list, cnptr, next)
-  {
-    if(cnptr->refcount)
+  dlink_foreach_safe(&connect_list, cnptr, next) {
+    if (cnptr->refcount)
       cnptr->refcount--;
 
     connect_delete(cnptr);
@@ -136,22 +129,18 @@ void connect_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Collect connect block garbage.                                           *
  * ------------------------------------------------------------------------ */
-int connect_collect(void)
-{
+int connect_collect(void) {
   struct connect *cnptr;
   struct connect *next;
-  size_t          n = 0;
+  size_t n = 0;
 
-  if(connect_dirty)
-  {
+  if (connect_dirty) {
     /* Report verbose */
     log(connect_log, L_verbose, "Doing garbage collect for [connect] module.");
 
     /* Free all connect blocks with a zero refcount */
-    dlink_foreach_safe(&connect_list, cnptr, next)
-    {
-      if(!cnptr->refcount)
-      {
+    dlink_foreach_safe(&connect_list, cnptr, next) {
+      if (!cnptr->refcount) {
         connect_delete(cnptr);
 
         n++;
@@ -172,8 +161,7 @@ int connect_collect(void)
  *                                                                          *
  * <cnptr>           pointer to connect block                               *
  * ------------------------------------------------------------------------ */
-void connect_default(struct connect *cnptr)
-{
+void connect_default(struct connect *cnptr) {
   dlink_node_zero(&cnptr->node);
 
   /* Initialise block info */
@@ -223,16 +211,14 @@ void connect_default(struct connect *cnptr)
  *                                                                          *
  * Will return a pointer to the connect block or NULL on failure.           *
  * ------------------------------------------------------------------------ */
-struct connect *connect_add(const char      *address,  uint16_t    port,
-                            struct protocol *pptr,     uint64_t    timeout,
-                            uint64_t         interval, int         autoconn,
-                            int              ssl,      const char *context)
-{
+struct connect *connect_add(const char *address, uint16_t port,
+                            struct protocol *pptr, uint64_t timeout,
+                            uint64_t interval, int autoconn, int ssl,
+                            const char *context) {
   struct connect *cnptr;
 
   /* Check if we got a protocol */
-  if(pptr == NULL)
-  {
+  if (pptr == NULL) {
     log(connect_log, L_warning, "No protocol");
     return NULL;
   }
@@ -243,13 +229,10 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
   strlcpy(cnptr->address, address, sizeof(cnptr->address));
 
   /* Externally initialised stuff */
-  if(!net_aton(address, &cnptr->addr_remote))
-  {
+  if (!net_aton(address, &cnptr->addr_remote)) {
     cnptr->addr_remote = NET_ADDR_ANY;
     cnptr->resolve = 1;
-  }
-  else
-  {
+  } else {
     cnptr->resolve = 0;
   }
 
@@ -264,11 +247,10 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
 
   cnptr->ssl = 0;
 
-  if(context)
-  {
+  if (context) {
     strlcpy(cnptr->context, context, sizeof(cnptr->context));
 #ifdef HAVE_SSL
-    if((cnptr->ctxt = ssl_find_name(cnptr->context)))
+    if ((cnptr->ctxt = ssl_find_name(cnptr->context)))
       cnptr->ssl = ssl;
     else
       log(connect_log, L_warning, "Could not find SSL context '%s'.",
@@ -283,25 +265,25 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
   cnptr->refcount = 1;
   cnptr->addr_local = NET_ADDR_ANY;
   cnptr->port_local = 0;
-  
-  str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);  
-  
+
+  str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);
+
   /* Add to connect list */
   dlink_add_tail(&connect_list, &cnptr->node, cnptr);
 
   log(connect_log, L_debug, "Added connect block: %s", cnptr->name);
 
   /* If we're auto-connecting then initiate it now */
-  if(cnptr->autoconn && cnptr->interval)
-  {
+  if (cnptr->autoconn && cnptr->interval) {
     /* Add timer for the retry */
     cnptr->timer = timer_start(connect_start, cnptr->interval, cnptr);
 
     timer_note(cnptr->timer, "connect timer for %s", cnptr->name);
 
     /* Inform about the retry */
-    log(connect_log, CONNECT_LOGLEVEL, "Initiating connect to %s in %llu msecs.",
-        cnptr->name, cnptr->interval);
+    log(connect_log, CONNECT_LOGLEVEL,
+        "Initiating connect to %s in %llu msecs.", cnptr->name,
+        cnptr->interval);
   }
 
   return cnptr;
@@ -319,18 +301,13 @@ struct connect *connect_add(const char      *address,  uint16_t    port,
  * <autoconn>          Flag for autoconnect                                 *
  * <ssl>               SSL connection?                                      *
  * ------------------------------------------------------------------------ */
-int connect_update(struct connect *cnptr,    const char      *address,
-                   uint16_t        port,     struct protocol *pptr,
-                   uint64_t        timeout,  uint64_t         interval,
-                   int             autoconn, int              ssl,
-                   const char     *context)
-{
+int connect_update(struct connect *cnptr, const char *address, uint16_t port,
+                   struct protocol *pptr, uint64_t timeout, uint64_t interval,
+                   int autoconn, int ssl, const char *context) {
   /* Check if we got a protocol */
-  if(pptr == NULL)
-  {
+  if (pptr == NULL) {
     /* Maybe protocol changed */
-    if(cnptr->proto != pptr)
-    {
+    if (cnptr->proto != pptr) {
       net_push(&cnptr->proto);
       cnptr->proto = net_pop(pptr);
     }
@@ -341,15 +318,11 @@ int connect_update(struct connect *cnptr,    const char      *address,
   }
 
   /* Only update the following two if they're valid */
-  if(address)
-  {
-    if(!net_aton(address, &cnptr->addr_remote))
-    {
+  if (address) {
+    if (!net_aton(address, &cnptr->addr_remote)) {
       cnptr->addr_remote = NET_ADDR_ANY;
       cnptr->resolve = 1;
-    }
-    else
-    {
+    } else {
       cnptr->resolve = 0;
     }
 
@@ -362,11 +335,10 @@ int connect_update(struct connect *cnptr,    const char      *address,
   cnptr->timeout = timeout;
   cnptr->ssl = 0;
 
-  if(context)
-  {
+  if (context) {
     strlcpy(cnptr->context, context, sizeof(cnptr->context));
 #ifdef HAVE_SSL
-    if((cnptr->ctxt = ssl_find_name(cnptr->context)))
+    if ((cnptr->ctxt = ssl_find_name(cnptr->context)))
       cnptr->ssl = ssl;
     else
       log(connect_log, L_warning, "Could not find SSL context '%s'.",
@@ -375,9 +347,9 @@ int connect_update(struct connect *cnptr,    const char      *address,
   }
 
   /* Update the name if none has been set */
-  if(cnptr->name[0] == '\0')
-	  str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);    
-  
+  if (cnptr->name[0] == '\0')
+    str_snprintf(cnptr->name, sizeof(cnptr->name), "%s:%u", address, port);
+
   log(connect_log, L_status, "Updated connect block: %s", cnptr->name);
 
   return 0;
@@ -386,11 +358,10 @@ int connect_update(struct connect *cnptr,    const char      *address,
 /* ------------------------------------------------------------------------ *
  * Remove and free a connect block.                                         *
  * ------------------------------------------------------------------------ */
-void connect_delete(struct connect *cnptr)
-{
+void connect_delete(struct connect *cnptr) {
   log(connect_log, L_status, "Deleting connect block: %s", cnptr->name);
 
-  if(cnptr->args)
+  if (cnptr->args)
     free(cnptr->args);
 
   /* Cancels timers, shuts down sockets and stuff */
@@ -402,16 +373,14 @@ void connect_delete(struct connect *cnptr)
   mem_static_free(&connect_heap, cnptr);
 }
 
- /* ------------------------------------------------------------------------ *
-  * Loose all references                                                     *
-  * ------------------------------------------------------------------------ */
-void connect_release(struct connect *cnptr)
-{
+/* ------------------------------------------------------------------------ *
+ * Loose all references                                                     *
+ * ------------------------------------------------------------------------ */
+void connect_release(struct connect *cnptr) {
   io_push(&cnptr->fd);
   net_push(&cnptr->proto);
 
-  if(cnptr->timer)
-  {
+  if (cnptr->timer) {
     timer_remove(cnptr->timer);
     cnptr->timer = NULL;
   }
@@ -421,13 +390,10 @@ void connect_release(struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct connect *connect_pop(struct connect *cnptr)
-{
-  if(cnptr)
-  {
-    if(!cnptr->refcount)
-      log(connect_log, L_warning, "Poping deprecated connect: %s",
-          cnptr->name);
+struct connect *connect_pop(struct connect *cnptr) {
+  if (cnptr) {
+    if (!cnptr->refcount)
+      log(connect_log, L_warning, "Poping deprecated connect: %s", cnptr->name);
 
     cnptr->refcount++;
   }
@@ -437,18 +403,13 @@ struct connect *connect_pop(struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct connect *connect_push(struct connect **cnptrptr)
-{
-  if(*cnptrptr)
-  {
-    if(!(*cnptrptr)->refcount)
-    {
+struct connect *connect_push(struct connect **cnptrptr) {
+  if (*cnptrptr) {
+    if (!(*cnptrptr)->refcount) {
       log(connect_log, L_warning, "Trying to push deprecated connect %s",
           (*cnptrptr)->name);
-    }
-    else
-    {
-      if(--(*cnptrptr)->refcount == 0)
+    } else {
+      if (--(*cnptrptr)->refcount == 0)
         connect_release(*cnptrptr);
     }
 
@@ -460,19 +421,16 @@ struct connect *connect_push(struct connect **cnptrptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int connect_start(struct connect *cnptr)
-{
-  if(cnptr->status == CONNECT_IDLE)
-  {
+int connect_start(struct connect *cnptr) {
+  if (cnptr->status == CONNECT_IDLE) {
     cnptr->active = 1;
 
-    if(cnptr->timer)
-    {
+    if (cnptr->timer) {
       timer_remove(cnptr->timer);
       cnptr->timer = NULL;
     }
 
-    if(cnptr->resolve)
+    if (cnptr->resolve)
       return connect_resolve(cnptr);
     else
       return connect_initiate(cnptr);
@@ -483,20 +441,17 @@ int connect_start(struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int connect_resolve(struct connect *cnptr)
-{
+int connect_resolve(struct connect *cnptr) {
   log(connect_log, CONNECT_LOGLEVEL, "Looking up %s...", cnptr->address);
 
   cnptr->sauth = sauth_dns_forward(cnptr->address, connect_sauth, cnptr);
 
   cnptr->status = CONNECT_RESOLVING;
 
-  if(cnptr->timeout && cnptr->timer == NULL)
-  {
+  if (cnptr->timeout && cnptr->timer == NULL) {
     cnptr->timer = timer_start(connect_timeout, cnptr->timeout, cnptr);
 
-    timer_note(cnptr->timer, "Connect timeout for %s",
-               cnptr->name);
+    timer_note(cnptr->timer, "Connect timeout for %s", cnptr->name);
   }
 
   return 0;
@@ -504,32 +459,28 @@ int connect_resolve(struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int connect_initiate(struct connect *cnptr)
-{
-  if(cnptr->fd != -1)
+int connect_initiate(struct connect *cnptr) {
+  if (cnptr->fd != -1)
     return -1;
 
   cnptr->fd = net_socket(NET_ADDRESS_IPV4, NET_SOCKET_STREAM);
   cnptr->start = timer_mtime;
 
-  if(net_connect(cnptr->fd, cnptr->addr_remote,
-                 cnptr->port_remote, connect_read, connect_write, cnptr))
-  {
+  if (net_connect(cnptr->fd, cnptr->addr_remote, cnptr->port_remote,
+                  connect_read, connect_write, cnptr)) {
     io_shutup(cnptr->fd);
 
     cnptr->proto->handler(cnptr->fd, cnptr, cnptr->args);
     cnptr->fd = -1;
     cnptr->status = CONNECT_ERROR;
 
-    log(connect_log, CONNECT_LOGLEVEL, "Connect to %s failed: %s",
-        cnptr->name, syscall_strerror(syscall_errno));
+    log(connect_log, CONNECT_LOGLEVEL, "Connect to %s failed: %s", cnptr->name,
+        syscall_strerror(syscall_errno));
 
     connect_retry(cnptr);
 
     return -1;
-  }
-  else
-  {
+  } else {
     log(connect_log, CONNECT_LOGLEVEL, "Initiated connect to %s [%s:%u]",
         cnptr->name, cnptr->address, (uint32_t)cnptr->port_remote);
 
@@ -537,12 +488,10 @@ int connect_initiate(struct connect *cnptr)
 
     io_queue_control(cnptr->fd, ON, ON, ON);
 
-    if(cnptr->timeout && cnptr->timer == NULL)
-    {
+    if (cnptr->timeout && cnptr->timer == NULL) {
       cnptr->timer = timer_start(connect_timeout, cnptr->timeout, cnptr);
 
-      timer_note(cnptr->timer, "Connect timeout for %s",
-                 cnptr->name);
+      timer_note(cnptr->timer, "Connect timeout for %s", cnptr->name);
     }
   }
 
@@ -551,22 +500,18 @@ int connect_initiate(struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void connect_cancel(struct connect *cnptr)
-{
-  if(cnptr->fd > -1)
-  {
+void connect_cancel(struct connect *cnptr) {
+  if (cnptr->fd > -1) {
     io_shutup(cnptr->fd);
     cnptr->fd = -1;
   }
 
-  if(cnptr->timer)
-  {
+  if (cnptr->timer) {
     timer_remove(cnptr->timer);
     cnptr->timer = NULL;
   }
 
-  if(cnptr->sauth)
-  {
+  if (cnptr->sauth) {
     sauth_delete(cnptr->sauth);
     cnptr->sauth = NULL;
   }
@@ -582,18 +527,17 @@ void connect_cancel(struct connect *cnptr)
  * initiation (cnptr->start) 'til next interval (cnptr->start + interval)   *
  * Returns 0 if a retry was scheduled.                                      *
  * ------------------------------------------------------------------------ */
-int connect_retry(struct connect *cnptr)
-{
+int connect_retry(struct connect *cnptr) {
   int64_t delta;
 
-  if(cnptr->interval && cnptr->fd == -1 && cnptr->timer == NULL && cnptr->active)
-  {
+  if (cnptr->interval && cnptr->fd == -1 && cnptr->timer == NULL &&
+      cnptr->active) {
     cnptr->status = 0;
 
     /* Calculate remaining time */
     delta = cnptr->interval - (timer_mtime - cnptr->start);
 
-    if(delta < 0LL)
+    if (delta < 0LL)
       delta = 0LL;
 
     /* Add timer for the retry */
@@ -602,9 +546,9 @@ int connect_retry(struct connect *cnptr)
     timer_note(cnptr->timer, "connect retry for %s", cnptr->name);
 
     /* Inform about the retry */
-    if(delta)
-      log(connect_log, CONNECT_LOGLEVEL, "Retrying connect to %s in %llu msecs.", 
-          cnptr->name, delta);
+    if (delta)
+      log(connect_log, CONNECT_LOGLEVEL,
+          "Retrying connect to %s in %llu msecs.", cnptr->name, delta);
 
     return 0;
   }
@@ -615,16 +559,12 @@ int connect_retry(struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void connect_set_arg(struct connect *cnptr, void *arg)
-{
-  cnptr->args = arg;
-}
+void connect_set_arg(struct connect *cnptr, void *arg) { cnptr->args = arg; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void connect_set_args(struct connect *cnptr, const void *argbuf, size_t n)
-{
-  if(!cnptr->args)
+void connect_set_args(struct connect *cnptr, const void *argbuf, size_t n) {
+  if (!cnptr->args)
     cnptr->args = malloc(n);
 
   memcpy(cnptr->args, argbuf, n);
@@ -632,15 +572,11 @@ void connect_set_args(struct connect *cnptr, const void *argbuf, size_t n)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void *connect_get_args(struct connect *cnptr)
-{
-  return cnptr->args;
-}
+void *connect_get_args(struct connect *cnptr) { return cnptr->args; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void connect_set_name(struct connect *cnptr, const char *name)
-{
+void connect_set_name(struct connect *cnptr, const char *name) {
   strlcpy(cnptr->name, name, sizeof(cnptr->name));
 
   cnptr->nhash = str_ihash(cnptr->name);
@@ -648,25 +584,19 @@ void connect_set_name(struct connect *cnptr, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *connect_get_name(struct connect *cnptr)
-{
-  return cnptr->name;
-}
+const char *connect_get_name(struct connect *cnptr) { return cnptr->name; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct connect *connect_find_name(const char *name)
-{
+struct connect *connect_find_name(const char *name) {
   struct connect *cnptr;
-  hash_t          nhash;
-  
+  hash_t nhash;
+
   nhash = str_ihash(name);
 
-  dlink_foreach(&connect_list, cnptr)
-  {
-    if(cnptr->nhash == nhash)
-    {
-      if(!str_icmp(cnptr->name, name))
+  dlink_foreach(&connect_list, cnptr) {
+    if (cnptr->nhash == nhash) {
+      if (!str_icmp(cnptr->name, name))
         return cnptr;
     }
   }
@@ -676,13 +606,11 @@ struct connect *connect_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct connect *connect_find_id(uint32_t id)
-{
+struct connect *connect_find_id(uint32_t id) {
   struct connect *cnptr;
 
-  dlink_foreach(&connect_list, cnptr)
-  {
-    if(cnptr->id == id)
+  dlink_foreach(&connect_list, cnptr) {
+    if (cnptr->id == id)
       return cnptr;
   }
 
@@ -698,30 +626,26 @@ struct connect *connect_find_id(uint32_t id)
  *                                                                          *
  * Always returns 1 due to timer cancellation.                              *
  * ------------------------------------------------------------------------ */
-static int connect_timeout(struct connect *cnptr)
-{
+static int connect_timeout(struct connect *cnptr) {
   log(connect_log, L_warning, "Connection to %s timed out.", cnptr->name);
 
   /* Connect callback */
-  if(cnptr->proto)
+  if (cnptr->proto)
     cnptr->proto->handler(cnptr->fd, cnptr, cnptr->args);
 
   /* Close underlying socket */
-  if(cnptr->fd != -1)
-  {
+  if (cnptr->fd != -1) {
     io_shutup(cnptr->fd);
 
     cnptr->fd = -1;
   }
 
-  if(cnptr->sauth)
-  {
+  if (cnptr->sauth) {
     sauth_delete(cnptr->sauth);
     cnptr->sauth = NULL;
   }
 
-  if(cnptr->timer)
-  {
+  if (cnptr->timer) {
     timer_remove(cnptr->timer);
     cnptr->timer = NULL;
   }
@@ -739,20 +663,18 @@ static int connect_timeout(struct connect *cnptr)
  * warning, call the connect callback, close underlying socket, cancel the  *
  * timeout timer and finally schedule a retry.                              *
  * ------------------------------------------------------------------------ */
-static void connect_read(int fd, struct connect *cnptr)
-{
+static void connect_read(int fd, struct connect *cnptr) {
   /* Uh, something went wrong *sigh* */
-  if(cnptr->fd < 0)
+  if (cnptr->fd < 0)
     return;
 
   /* Socket has been closed by I/O code */
-  if(io_list[fd].status.closed || io_list[fd].status.err)
-  {
-    log(connect_log, L_warning, "Failed connecting to %s: %s",
-        cnptr->name, syscall_strerror(io_list[fd].error));
+  if (io_list[fd].status.closed || io_list[fd].status.err) {
+    log(connect_log, L_warning, "Failed connecting to %s: %s", cnptr->name,
+        syscall_strerror(io_list[fd].error));
 
     /* Connect callback */
-    if(cnptr->proto)
+    if (cnptr->proto)
       cnptr->proto->handler(cnptr->fd, cnptr, cnptr->args);
 
     /* Close underlying socket */
@@ -763,8 +685,7 @@ static void connect_read(int fd, struct connect *cnptr)
     cnptr->status = CONNECT_ERROR;
 
     /* Cancel the timeout timer */
-    if(cnptr->timer)
-    {
+    if (cnptr->timer) {
       timer_remove(cnptr->timer);
       cnptr->timer = NULL;
     }
@@ -781,34 +702,29 @@ static void connect_read(int fd, struct connect *cnptr)
  * Else cancel the timeout timer, report success and call the connection    *
  * callback.                                                                *
  * ------------------------------------------------------------------------ */
-static void connect_write(int fd, struct connect *cnptr)
-{
+static void connect_write(int fd, struct connect *cnptr) {
   /* Uh, something went wrong */
-  if(cnptr->fd < 0)
+  if (cnptr->fd < 0)
     return;
 
-  if(cnptr->status == CONNECT_CONNECTING)
-  {
+  if (cnptr->status == CONNECT_CONNECTING) {
     /* Socket has been closed by I/O code, call the readable handler */
-    if(io_list[fd].status.closed)
-    {
+    if (io_list[fd].status.closed) {
       connect_read(fd, cnptr);
       return;
     }
 
 #ifdef HAVE_SSL
-    if(cnptr->ssl && io_list[fd].callbacks[IO_CB_READ] == (void *)connect_read)
-    {
-      if(ssl_new(fd, cnptr->ctxt))
-      {
+    if (cnptr->ssl &&
+        io_list[fd].callbacks[IO_CB_READ] == (void *)connect_read) {
+      if (ssl_new(fd, cnptr->ctxt)) {
         cnptr->status = CONNECT_ERROR;
         io_destroy(fd);
         connect_retry(cnptr);
         return;
       }
 
-      if(ssl_connect(fd))
-      {
+      if (ssl_connect(fd)) {
         log(connect_log, L_warning, "SSL handshake error on %s: %s",
             cnptr->name, ssl_strerror(fd));
 
@@ -818,31 +734,28 @@ static void connect_write(int fd, struct connect *cnptr)
         return;
       }
 
-      if(io_list[fd].sslstate)
-      {
+      if (io_list[fd].sslstate) {
         io_list[fd].callbacks[IO_CB_READ] = io_list[fd].callbacks[IO_CB_WRITE];
         return;
       }
     }
 #endif
 
-/*    io_list[fd].status.connecting = 0;*/
+    /*    io_list[fd].status.connecting = 0;*/
 
     /* Cancel the timeout timer */
-    if(cnptr->timer)
-    {
+    if (cnptr->timer) {
       timer_remove(cnptr->timer);
       cnptr->timer = NULL;
     }
 
     /* Report success */
-    log(connect_log, L_warning, "Connection to %s succeeded",
-        cnptr->name);
+    log(connect_log, L_warning, "Connection to %s succeeded", cnptr->name);
 
     cnptr->status = CONNECT_DONE;
 
     /* Call the connection callback */
-    if(cnptr->proto)
+    if (cnptr->proto)
       cnptr->proto->handler(cnptr->fd, cnptr, cnptr->args);
 
     cnptr->fd = -1;
@@ -851,10 +764,8 @@ static void connect_write(int fd, struct connect *cnptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void connect_sauth(struct sauth *saptr, struct connect *cnptr)
-{
-  if(saptr->status == SAUTH_DONE)
-  {
+static void connect_sauth(struct sauth *saptr, struct connect *cnptr) {
+  if (saptr->status == SAUTH_DONE) {
     cnptr->addr_remote = saptr->addr;
 
     log(connect_log, CONNECT_LOGLEVEL, "DNS lookup for %s done: %s",
@@ -865,57 +776,50 @@ static void connect_sauth(struct sauth *saptr, struct connect *cnptr)
     return;
   }
 
-  if(saptr->status == SAUTH_ERROR)
-  {
+  if (saptr->status == SAUTH_ERROR) {
     log(connect_log, L_warning, "Failed resolving %s.", cnptr->address);
-  }
-  else if(saptr->status == SAUTH_TIMEDOUT)
-  {
-    log(connect_log, L_warning, "Timed out while resolving %s.", cnptr->address);
+  } else if (saptr->status == SAUTH_TIMEDOUT) {
+    log(connect_log, L_warning, "Timed out while resolving %s.",
+        cnptr->address);
   }
 }
 
 /* ------------------------------------------------------------------------ *
  * Dump connects and connect heap.                                          *
  * ------------------------------------------------------------------------ */
-void connect_dump(struct connect *cnptr)
-{
-  if(cnptr == NULL)
-  {
+void connect_dump(struct connect *cnptr) {
+  if (cnptr == NULL) {
     dump(connect_log, "[============== connect summary ===============]");
 
-    dlink_foreach(&connect_list, cnptr)
-    {
-      dump(connect_log, " #%u: [%u] %-20s {%s:%u}",
-            cnptr->id, cnptr->refcount, cnptr->name,
-            net_ntoa(cnptr->addr_remote), cnptr->port_remote);
+    dlink_foreach(&connect_list, cnptr) {
+      dump(connect_log, " #%u: [%u] %-20s {%s:%u}", cnptr->id, cnptr->refcount,
+           cnptr->name, net_ntoa(cnptr->addr_remote), cnptr->port_remote);
     }
 
     dump(connect_log, "[=========== end of connect summary ===========]");
-  }
-  else
-  {
+  } else {
     dump(connect_log, "[============== connect dump ===============]");
     dump(connect_log, "         id: #%u", cnptr->id);
     dump(connect_log, "   refcount: %u", cnptr->refcount);
     dump(connect_log, "      chash: %p", cnptr->chash);
     dump(connect_log, "      nhash: %p", cnptr->nhash);
     dump(connect_log, "     status: %u",
-         cnptr->status == CONNECT_DONE ? "done" :
-         cnptr->status == CONNECT_ERROR ? "error" :
-         cnptr->status == CONNECT_TIMEOUT ? "timeout" :
-         cnptr->status == CONNECT_CONNECTING ? "connecting" :
-         cnptr->status == CONNECT_RESOLVING ? "resolving" : "idle");
+         cnptr->status == CONNECT_DONE         ? "done"
+         : cnptr->status == CONNECT_ERROR      ? "error"
+         : cnptr->status == CONNECT_TIMEOUT    ? "timeout"
+         : cnptr->status == CONNECT_CONNECTING ? "connecting"
+         : cnptr->status == CONNECT_RESOLVING  ? "resolving"
+                                               : "idle");
     dump(connect_log, "      timer: %i", cnptr->timer ? cnptr->timer->id : -1);
     dump(connect_log, "      proto: %s",
-          cnptr->proto ? cnptr->proto->name : "(null)");
+         cnptr->proto ? cnptr->proto->name : "(null)");
     dump(connect_log, "         fd: %i", cnptr->fd);
     dump(connect_log, "     active: %i", cnptr->active);
     dump(connect_log, "     silent: %i", cnptr->silent);
-    dump(connect_log, "     remote: %s:%u",
-          net_ntoa(cnptr->addr_remote), cnptr->port_remote);
-    dump(connect_log, "      local: %s:%u",
-          net_ntoa(cnptr->addr_local), cnptr->port_local);
+    dump(connect_log, "     remote: %s:%u", net_ntoa(cnptr->addr_remote),
+         cnptr->port_remote);
+    dump(connect_log, "      local: %s:%u", net_ntoa(cnptr->addr_local),
+         cnptr->port_local);
     dump(connect_log, "      start: %llu", cnptr->start);
     dump(connect_log, "    timeout: %llu", cnptr->timeout);
     dump(connect_log, "   interval: %llu", cnptr->interval);

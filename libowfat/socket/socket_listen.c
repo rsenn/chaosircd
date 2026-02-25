@@ -8,21 +8,22 @@
 #include "socket.h"
 #include "windoze.h"
 
-int socket_listen(int s,unsigned int backlog) {
+int socket_listen(int s, unsigned int backlog) {
 #ifdef __MINGW32__
-  io_entry* e;
+  io_entry *e;
   int r = listen(s, backlog);
-  if (r==-1) return winsock2errno(-1);
-  e=array_get(&io_fds,sizeof(io_entry),s);
+  if (r == -1)
+    return winsock2errno(-1);
+  e = array_get(&io_fds, sizeof(io_entry), s);
   if (e && e->inuse) {
-    e->listened=1;
+    e->listened = 1;
     if (e->wantread) {
       /* queue a non-blocking accept */
       DWORD received;
-      e->next_accept=socket(AF_INET,SOCK_STREAM,0);
-      if (e->next_accept!=-1) {
-        AcceptEx(s,e->next_accept,e->inbuf,0,200,200,&received,&e->or);
-	e->acceptqueued=1;
+      e->next_accept = socket(AF_INET, SOCK_STREAM, 0);
+      if (e->next_accept != -1) {
+        AcceptEx(s, e->next_accept, e->inbuf, 0, 200, 200, &received, &e->or);
+        e->acceptqueued = 1;
       }
     }
   }

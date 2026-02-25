@@ -27,21 +27,21 @@
 
 /* timeouts in miliseconds */
 #define AUTH_TIMEOUT 10000
-#define DNS_TIMEOUT  20000
+#define DNS_TIMEOUT 20000
 
-#define CACHE_AUTH_SIZE  512
-#define CACHE_DNS_SIZE   256
+#define CACHE_AUTH_SIZE 512
+#define CACHE_DNS_SIZE 256
 #define CACHE_PROXY_SIZE 256
 
 #include "servauth/control.h"
 #include "servauth/query.h"
 
 extern struct servauth_query servauth_queries[MAX_QUERIES];
-extern control_t             servauth_control;
-extern struct cache_auth     servauth_authcache;
-extern struct cache_dns      servauth_dnscache;
-extern struct cache_proxy    servauth_proxycache;
-extern int                   servauth_log;
+extern control_t servauth_control;
+extern struct cache_auth servauth_authcache;
+extern struct cache_dns servauth_dnscache;
+extern struct cache_proxy servauth_proxycache;
+extern int servauth_log;
 
 /* -------------------------------------------------------------------------- *
  * Clean things up.                                                           *

@@ -27,15 +27,15 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/io.h"
-#include "libchaos/syscall.h"
 #include "libchaos/module.h"
-#include "libchaos/timer.h"
+#include "libchaos/defs.h"
 #include "libchaos/dlink.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
+#include "libchaos/syscall.h"
+#include "libchaos/timer.h"
 
 #include "config.h"
 
@@ -70,22 +70,17 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int           module_log;
-struct sheap  module_heap;
-struct list   module_list;
+int module_log;
+struct sheap module_heap;
+struct list module_list;
 struct timer *module_timer;
-uint32_t      module_id;
-const char   *module_path = PLUGINDIR;
+uint32_t module_id;
+const char *module_path = PLUGINDIR;
 /* DAMN this shouldn't be here :/ */
-const char   *module_table[][2] = {
-  { "m",  "msg"      },
-  { "um", "usermode" },
-  { "cm", "chanmode" },
-  { "lc", "lclient"  },
-  { "sv", "service"  },
-  { "st", "stats"    },
-  { NULL, NULL       }
-};
+const char *module_table[][2] = {{"m", "msg"},       {"um", "usermode"},
+                                 {"cm", "chanmode"}, {"lc", "lclient"},
+                                 {"sv", "service"},  {"st", "stats"},
+                                 {NULL, NULL}};
 
 int module_dlopen(struct module *mptr);
 
@@ -95,17 +90,16 @@ int module_get_log() { return module_log; }
 /* ------------------------------------------------------------------------ *
  * Load a module.                                                           *
  * ------------------------------------------------------------------------ */
-static struct module *module_new(const char *path)
-{
-  char           name[128];
-  char          *p;
-  void          *handle;
-  int          (*load)(struct module *);
-  void         (*unload)(struct module *);
+static struct module *module_new(const char *path) {
+  char name[128];
+  char *p;
+  void *handle;
+  int (*load)(struct module *);
+  void (*unload)(struct module *);
   struct module *ret = NULL;
-  char           fn[64];
+  char fn[64];
 #ifndef USE_DSO
-  uint32_t       i;
+  uint32_t i;
 #endif
 
   /* cut path in front of module.so */
@@ -116,19 +110,18 @@ static struct module *module_new(const char *path)
   /* cut the .so */
   p = strchr(name, '.');
 
-  if(p)
+  if (p)
     *p = '\0';
 
-  /* now open the DSO */
+    /* now open the DSO */
 #ifndef USE_DSO
   handle = NULL;
 
-  load = NULL; unload = NULL;
+  load = NULL;
+  unload = NULL;
 
-  for(i = 0; i < sizeof(module_imports) / sizeof(module_imports[0]); i++)
-  {
-    if(!str_cmp(module_imports[i].name, name))
-    {
+  for (i = 0; i < sizeof(module_imports) / sizeof(module_imports[0]); i++) {
+    if (!str_cmp(module_imports[i].name, name)) {
       load = module_imports[i].load;
       unload = module_imports[i].unload;
     }
@@ -145,8 +138,7 @@ static struct module *module_new(const char *path)
 
 #endif
 
-  if(handle == NULL)
-  {
+  if (handle == NULL) {
 #ifdef USE_DSO
     log(module_log, L_warning, "DL error in %s: %s", path, dlerror());
 #endif
@@ -159,8 +151,7 @@ static struct module *module_new(const char *path)
   unload = dlsym(handle, fn);
 
 #endif
-  if(load == NULL || unload == NULL)
-  {
+  if (load == NULL || unload == NULL) {
 #ifdef USE_DSO
     log(module_log, L_warning, "DL error: %s", dlerror());
     dlclose(handle);
@@ -182,8 +173,7 @@ static struct module *module_new(const char *path)
   ret->id = module_id++;
   ret->refcount = 1;
 
-  if(ret->load(ret))
-  {
+  if (ret->load(ret)) {
     log(module_log, L_warning, "module load() failed.");
 
 #ifdef USE_DSO
@@ -197,16 +187,12 @@ static struct module *module_new(const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void module_setpath(const char *path)
-{
-  module_path = path;
-}
+void module_setpath(const char *path) { module_path = path; }
 
 /* ------------------------------------------------------------------------ *
  * Reload a module.                                                         *
  * ------------------------------------------------------------------------ */
-int module_reload(struct module *mptr)
-{
+int module_reload(struct module *mptr) {
   char fn[64];
 
   /* Unload old module */
@@ -217,8 +203,7 @@ int module_reload(struct module *mptr)
   /* now open the DSO */
   mptr->handle = dlopen(mptr->path, RTLD_NOW);
 
-  if(mptr->handle == NULL)
-  {
+  if (mptr->handle == NULL) {
     log(module_log, L_warning, "DL error: %s", dlerror());
     module_delete(mptr);
     return -1;
@@ -229,20 +214,18 @@ int module_reload(struct module *mptr)
   str_snprintf(fn, sizeof(fn), "%s_unload", mptr->name);
   mptr->unload = dlsym(mptr->handle, fn);
 
-  if(mptr->load == NULL || mptr->unload == NULL)
-  {
+  if (mptr->load == NULL || mptr->unload == NULL) {
     log(module_log, L_warning, "DL error: %s", dlerror());
     dlclose(mptr->handle);
     module_delete(mptr);
     return -1;
   }
 #endif
-  if(mptr->load(mptr))
-  {
+  if (mptr->load(mptr)) {
     log(module_log, L_warning, "module load() failed.");
 
 #ifdef USE_DSO
-    if(mptr->handle)
+    if (mptr->handle)
       dlclose(mptr->handle);
 #endif
 
@@ -254,35 +237,34 @@ int module_reload(struct module *mptr)
 }
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *module_expand(const char *name)
-{
+const char *module_expand(const char *name) {
   static char ret[256];
   static char lala[32];
-  uint32_t    i;
-  char       *p = NULL;
+  uint32_t i;
+  char *p = NULL;
 
   strlcpy(ret, name, sizeof(ret));
 
-  if(strchr(ret, '/') == NULL && (p = strchr(ret, '_'))) {
+  if (strchr(ret, '/') == NULL && (p = strchr(ret, '_'))) {
 
-    for(i = 0; module_table[i][0]; i++) {
+    for (i = 0; module_table[i][0]; i++) {
 
-      if(!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret)) {
+      if (!str_ncmp(ret, module_table[i][0], (size_t)p - (size_t)ret)) {
         *p++ = '\0';
 
         strlcpy(lala, p, sizeof(lala));
 
-        if((p = strchr(lala, '.')))
+        if ((p = strchr(lala, '.')))
           *p = '\0';
 
         strlcpy(ret, module_path, sizeof(lala));
         strlcat(ret, "/", sizeof(ret));
-/*        strlcat(ret, module_table[i][1], sizeof(ret));
-        strlcat(ret, "/", sizeof(ret));*/
+        /*        strlcat(ret, module_table[i][1], sizeof(ret));
+                strlcat(ret, "/", sizeof(ret));*/
         strlcat(ret, module_table[i][0], sizeof(ret));
         strlcat(ret, "_", sizeof(ret));
         strlcat(ret, lala, sizeof(ret));
-        if(DLLEXT[0] != '.')
+        if (DLLEXT[0] != '.')
           strlcat(ret, ".", sizeof(ret));
         strlcat(ret, DLLEXT, sizeof(ret));
 
@@ -297,8 +279,7 @@ const char *module_expand(const char *name)
 /* ------------------------------------------------------------------------ *
  * Initialize module heap.                                                  *
  * ------------------------------------------------------------------------ */
-void module_init(void)
-{
+void module_init(void) {
   module_log = log_source_register("module");
 
   dlink_list_zero(&module_list);
@@ -312,13 +293,11 @@ void module_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy module heap.                                                     *
  * ------------------------------------------------------------------------ */
-void module_shutdown(void)
-{
+void module_shutdown(void) {
   struct module *module;
   struct module *next;
 
-  dlink_foreach_safe(&module_list, module, next)
-    module_delete(module);
+  dlink_foreach_safe(&module_list, module, next) module_delete(module);
 
   mem_static_destroy(&module_heap);
 
@@ -328,21 +307,20 @@ void module_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Add a module.                                                            *
  * ------------------------------------------------------------------------ */
-struct module *module_add(const char *path)
-{
+struct module *module_add(const char *path) {
   struct module *module;
 
   /* Already loaded? */
-  if(module_find_name(path))
+  if (module_find_name(path))
     return NULL;
 
   /* Already loaded? */
-  if(module_find_path(module_expand(path)))
+  if (module_find_path(module_expand(path)))
     return NULL;
 
   module = module_new(module_expand(path));
 
-  if(module == NULL)
+  if (module == NULL)
     return NULL;
 
   dlink_add_head(&module_list, &module->node, module);
@@ -354,23 +332,19 @@ struct module *module_add(const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int module_update(struct module *mptr)
-{
-  return 0;
-}
+int module_update(struct module *mptr) { return 0; }
 
 /* ------------------------------------------------------------------------ *
  * Remove a module.                                                         *
  * ------------------------------------------------------------------------ */
-void module_delete(struct module *module)
-{
+void module_delete(struct module *module) {
   log(module_log, L_status, "Unloading module: %s", module->path);
 
-  if(module->unload)
+  if (module->unload)
     module->unload(module);
 
 #ifdef USE_DSO
-  if(module->handle)
+  if (module->handle)
     dlclose(module->handle);
 #endif
 
@@ -381,18 +355,15 @@ void module_delete(struct module *module)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct module *module_find_path(const char *path)
-{
+struct module *module_find_path(const char *path) {
   struct module *module;
-  hash_t         hash;
-    
+  hash_t hash;
+
   hash = str_hash(path);
 
-  dlink_foreach(&module_list, module)
-  {
-    if(module->phash == hash)
-    {
-      if(!str_cmp(module->path, path))
+  dlink_foreach(&module_list, module) {
+    if (module->phash == hash) {
+      if (!str_cmp(module->path, path))
         return module;
     }
   }
@@ -402,18 +373,15 @@ struct module *module_find_path(const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct module *module_find_name(const char *name)
-{
+struct module *module_find_name(const char *name) {
   struct module *module;
-  hash_t         hash;
-    
+  hash_t hash;
+
   hash = str_hash(name);
 
-  dlink_foreach(&module_list, module)
-  {
-    if(module->nhash == hash)
-    {
-      if(!str_cmp(module->name, name))
+  dlink_foreach(&module_list, module) {
+    if (module->nhash == hash) {
+      if (!str_cmp(module->name, name))
         return module;
     }
   }
@@ -423,13 +391,11 @@ struct module *module_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct module *module_find_id(uint32_t id)
-{
+struct module *module_find_id(uint32_t id) {
   struct module *module;
 
-  dlink_foreach(&module_list, module)
-  {
-    if(module->id == id)
+  dlink_foreach(&module_list, module) {
+    if (module->id == id)
       return module;
   }
 
@@ -438,13 +404,10 @@ struct module *module_find_id(uint32_t id)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct module *module_pop(struct module *module)
-{
-  if(module)
-  {
-    if(!module->refcount)
-      log(module_log, L_warning, "Poping deprecated module: %s",
-          module->name);
+struct module *module_pop(struct module *module) {
+  if (module) {
+    if (!module->refcount)
+      log(module_log, L_warning, "Poping deprecated module: %s", module->name);
 
     module->refcount++;
   }
@@ -454,18 +417,13 @@ struct module *module_pop(struct module *module)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct module *module_push(struct module **moduleptr)
-{
-  if(*moduleptr)
-  {
-    if((*moduleptr)->refcount == 0)
-    {
+struct module *module_push(struct module **moduleptr) {
+  if (*moduleptr) {
+    if ((*moduleptr)->refcount == 0) {
       log(module_log, L_warning, "Trying to push deprecated user: %s",
           (*moduleptr)->name);
-    }
-    else
-    {
-      if(--(*moduleptr)->refcount == 0)
+    } else {
+      if (--(*moduleptr)->refcount == 0)
         module_delete(*moduleptr);
 
       (*moduleptr) = NULL;
@@ -478,22 +436,17 @@ struct module *module_push(struct module **moduleptr)
 /* ------------------------------------------------------------------------ *
  * Dump module list and heap.                                               *
  * ------------------------------------------------------------------------ */
-void module_dump(struct module *mptr)
-{
-  if(mptr == NULL)
-  {
+void module_dump(struct module *mptr) {
+  if (mptr == NULL) {
     dump(module_log, "[================ module summary ================]");
 
-    dlink_foreach_up(&module_list, mptr)
-    {
-      dump(module_log, " #%u: [%u] %-20s (%p)",
-           mptr->id, mptr->refcount, mptr->name, mptr->handle);
+    dlink_foreach_up(&module_list, mptr) {
+      dump(module_log, " #%u: [%u] %-20s (%p)", mptr->id, mptr->refcount,
+           mptr->name, mptr->handle);
     }
 
     dump(module_log, "[============= end of module summary ============]");
-  }
-  else
-  {
+  } else {
     dump(module_log, "[================= module dump ==================]");
 
     dump(module_log, "         id: #%u", mptr->id);

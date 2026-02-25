@@ -27,23 +27,18 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/syscall.h"
 #include "libchaos/timer.h"
+#include "libchaos/defs.h"
 #include "libchaos/dlink.h"
-#include "libchaos/mem.h"
 #include "libchaos/log.h"
+#include "libchaos/mem.h"
 #include "libchaos/str.h"
+#include "libchaos/syscall.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
 #include "config.h"
-
-#include <limits.h>
-#  define ULONG_MAX     ((unsigned long) ~(unsigned long) 0)
-#  define LONG_MAX      ((long int) (ULONG_MAX >> 1))                      
-#  define LONG_MIN      ((long int) (-LONG_MAX - 1L))
 
 #ifdef WIN32
 #ifdef HAVE_WINSOCK2_H
@@ -67,20 +62,22 @@
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA_DECL(int)            timer_log;
-CHAOS_DATA_DECL(struct sheap)   timer_heap;
-CHAOS_DATA_DECL(struct timer*)  timer_timer;
-CHAOS_DATA_DECL(struct list)    timer_list;
-CHAOS_DATA_DECL(int)           timer_dirty;
-CHAOS_DATA_DECL(uint32_t)       timer_id;
-CHAOS_DATA_DECL(uint32_t)       timer_systime = 0;        /* real unixtime */
-CHAOS_DATA_DECL(uint32_t)       timer_loctime = 0;        /* system time after timezone conversion */
-CHAOS_DATA_DECL(uint64_t)       timer_otime   = 0ull;     /* old unixtime in miliseconds */
-CHAOS_DATA_DECL(uint64_t)       timer_mtime   = 0ull;     /* unixtime in miliseconds */
-CHAOS_DATA_DECL(int64_t)        timer_offset  = 0ll;
-CHAOS_DATA_DECL(struct timeval) timer_utime   = { 0, 0 }; /* unixtime in microseconds */
-CHAOS_DATA_DECL(struct tm)      timer_dtime;              /* daytime */
-CHAOS_DATA_DECL(struct list)    timer_shifts;
+CHAOS_DATA_DECL(int) timer_log;
+CHAOS_DATA_DECL(struct sheap) timer_heap;
+CHAOS_DATA_DECL(struct timer *) timer_timer;
+CHAOS_DATA_DECL(struct list) timer_list;
+CHAOS_DATA_DECL(int) timer_dirty;
+CHAOS_DATA_DECL(uint32_t) timer_id;
+CHAOS_DATA_DECL(uint32_t) timer_systime = 0; /* real unixtime */
+CHAOS_DATA_DECL(uint32_t)
+timer_loctime = 0; /* system time after timezone conversion */
+CHAOS_DATA_DECL(uint64_t) timer_otime = 0ull; /* old unixtime in miliseconds */
+CHAOS_DATA_DECL(uint64_t) timer_mtime = 0ull; /* unixtime in miliseconds */
+CHAOS_DATA_DECL(int64_t) timer_offset = 0ll;
+CHAOS_DATA_DECL(struct timeval)
+timer_utime = {0, 0};                   /* unixtime in microseconds */
+CHAOS_DATA_DECL(struct tm) timer_dtime; /* daytime */
+CHAOS_DATA_DECL(struct list) timer_shifts;
 
 /* ------------------------------------------------------------------------ */
 int timer_get_log() { return timer_log; }
@@ -91,7 +88,7 @@ static uint64_t timer_freq;
 
 /* isleap(year) evaluates to true if its a year that has 366 days */
 #undef isleap
-#define isleap(year)  (!(year % 4) && ((year % 100) || !(year % 400)))
+#define isleap(year) (!(year % 4) && ((year % 100) || !(year % 400)))
 
 /* Seconds per day */
 #define SPD (24 * 60 * 60)
@@ -101,33 +98,31 @@ static uint64_t timer_freq;
 
 /* Days per month -- nonleap! */
 static const unsigned dpm[12] = {
-  0,
-  (31),
-  (31 + 28),
-  (31 + 28 + 31),
-  (31 + 28 + 31 + 30),
-  (31 + 28 + 31 + 30 + 31),
-  (31 + 28 + 31 + 30 + 31 + 30),
-  (31 + 28 + 31 + 30 + 31 + 30 + 31),
-  (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31),
-  (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30),
-  (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31),
-  (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30)
-};
+    0,
+    (31),
+    (31 + 28),
+    (31 + 28 + 31),
+    (31 + 28 + 31 + 30),
+    (31 + 28 + 31 + 30 + 31),
+    (31 + 28 + 31 + 30 + 31 + 30),
+    (31 + 28 + 31 + 30 + 31 + 30 + 31),
+    (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31),
+    (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30),
+    (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31),
+    (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30)};
 
-static const char *timer_weekdays[] = {
-  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-};
+static const char *timer_weekdays[] = {"Sunday",    "Monday",   "Tuesday",
+                                       "Wednesday", "Thursday", "Friday",
+                                       "Saturday"};
 
 static const char *timer_months[] = {
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "November", "October", "December"
-};
+    "January", "February", "March",     "April",    "May",     "June",
+    "July",    "August",   "September", "November", "October", "December"};
 
 /* ------------------------------------------------------------------------ *
  * Convert unixtime in miliseconds to a struct tm                           *
  * ------------------------------------------------------------------------ */
-struct tm *timer_gmtime(uint64_t mtime)
-{
+struct tm *timer_gmtime(uint64_t mtime) {
   uint32_t i;
   register uint32_t work = (mtime / 1000ull) % SPD;
   static struct tm ret;
@@ -149,11 +144,10 @@ struct tm *timer_gmtime(uint64_t mtime)
   ret.tm_wday = (4 + work) % 7;
 
   /* Now count up the years since epoch */
-  for(i = EPOCH;; i++)
-  {
+  for (i = EPOCH;; i++) {
     register uint32_t k = isleap(i) ? 366 : 365;
 
-    if(work >= k)
+    if (work >= k)
       work -= k;
     else
       break;
@@ -167,17 +161,16 @@ struct tm *timer_gmtime(uint64_t mtime)
    * If we're in a leap and we're beyond 28. february
    * we need to adjust everything by a offset of -1
    */
-  if(isleap(i) && (work > 58))
-  {
+  if (isleap(i) && (work > 58)) {
     /* 29. february is a special case */
-    if(work == 59)
+    if (work == 59)
       ret.tm_mday = 2;
 
     work -= 1;
   }
 
   /* Find the month */
-  for(i = 11; i && (dpm[i] > work); i--) {
+  for (i = 11; i && (dpm[i] > work); i--) {
   }
 
   ret.tm_mon = i;
@@ -191,169 +184,143 @@ struct tm *timer_gmtime(uint64_t mtime)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 size_t timer_strftime(char *s, size_t max, const char *format,
-                      const struct tm *tm)
-{
-  char   c;
+                      const struct tm *tm) {
+  char c;
   size_t i = 0;
 
-  while((c = *format++) && i < max)
-  {
-    if(c != '%')
-    {
+  while ((c = *format++) && i < max) {
+    if (c != '%') {
       s[i++] = c;
       continue;
     }
 
     c = *format++;
 
-    switch(c)
-    {
-      case '%':
-      {
-        s[i++] = '%';
-        break;
+    switch (c) {
+    case '%': {
+      s[i++] = '%';
+      break;
+    }
+    /* Day Sun - Mon */
+    case 'a': {
+      if (i + 3 < max)
+        i += strlcpy(&s[i], timer_weekdays[tm->tm_wday], 4);
+
+      break;
+    }
+    /* Day Sunday - Monday */
+    case 'A': {
+      size_t len = str_len(timer_weekdays[tm->tm_wday]);
+
+      if (i + len < max)
+        i += strlcpy(&s[i], timer_weekdays[tm->tm_wday], len + 1);
+
+      break;
+    }
+    /* Month Jan - Dec */
+    case 'b': {
+      if (i + 3 < max) {
+        s[i++] = timer_months[tm->tm_mon % 12][0];
+        s[i++] = timer_months[tm->tm_mon % 12][1];
+        s[i++] = timer_months[tm->tm_mon % 12][2];
+        s[i++] = 0;
       }
-      /* Day Sun - Mon */
-      case 'a':
-      {
-        if(i + 3 < max)
-          i += strlcpy(&s[i], timer_weekdays[tm->tm_wday], 4);
 
-        break;
+      break;
+    }
+    /* Month January - December */
+    case 'B': {
+      size_t len = str_len(timer_months[tm->tm_mon]);
+
+      if (i + len < max)
+        i += strlcpy(&s[i], timer_months[tm->tm_mon], len + 1);
+
+      break;
+    }
+    /* Month 01 - 12 */
+    case 'm': {
+      if (i + 2 < max) {
+        s[i++] = ((tm->tm_mon + 1) / 10) + '0';
+        s[i++] = ((tm->tm_mon + 1) % 10) + '0';
       }
-      /* Day Sunday - Monday */
-      case 'A':
-      {
-        size_t len = str_len(timer_weekdays[tm->tm_wday]);
 
-        if(i + len < max)
-          i += strlcpy(&s[i], timer_weekdays[tm->tm_wday], len + 1);
-
-        break;
+      break;
+    }
+    /* Month 01 - 12 */
+    case 'H': {
+      if (i + 2 < max) {
+        s[i++] = (tm->tm_hour / 10) + '0';
+        s[i++] = (tm->tm_hour % 10) + '0';
       }
-      /* Month Jan - Dec */
-      case 'b':
-      {
-        if(i + 3 < max)
-        {
-          s[i++] = timer_months[tm->tm_mon % 12][0];
-          s[i++] = timer_months[tm->tm_mon % 12][1];
-          s[i++] = timer_months[tm->tm_mon % 12][2];
-          s[i++] = 0;
-        }
 
-        break;
+      break;
+    }
+    /* Day 01 - 31 */
+    case 'd': {
+      if (i + 2 < max) {
+        s[i++] = (tm->tm_mday / 10) + '0';
+        s[i++] = (tm->tm_mday % 10) + '0';
       }
-      /* Month January - December */
-      case 'B':
-      {
-        size_t len = str_len(timer_months[tm->tm_mon]);
 
-        if(i + len < max)
-          i += strlcpy(&s[i], timer_months[tm->tm_mon], len + 1);
-
-        break;
-      }
-      /* Month 01 - 12 */
-      case 'm':
-      {
-        if(i + 2 < max)
-        {
-          s[i++] = ((tm->tm_mon + 1) / 10) + '0';
-          s[i++] = ((tm->tm_mon + 1) % 10) + '0';
-        }
-
-        break;
-      }
-      /* Month 01 - 12 */
-      case 'H':
-      {
-        if(i + 2 < max)
-        {
-          s[i++] = (tm->tm_hour / 10) + '0';
-          s[i++] = (tm->tm_hour % 10) + '0';
-        }
-
-        break;
-      }
-      /* Day 01 - 31 */
-      case 'd':
-      {
-        if(i + 2 < max)
-        {
+      break;
+    }
+    /* Day 1 - 31 */
+    case 'D': {
+      if (i + 2 < max) {
+        if (tm->tm_mday / 10)
           s[i++] = (tm->tm_mday / 10) + '0';
-          s[i++] = (tm->tm_mday % 10) + '0';
-        }
 
-        break;
+        s[i++] = (tm->tm_mday % 10) + '0';
       }
-      /* Day 1 - 31 */
-      case 'D':
-      {
-        if(i + 2 < max)
-        {
-          if(tm->tm_mday / 10)
-            s[i++] = (tm->tm_mday / 10) + '0';
 
-          s[i++] = (tm->tm_mday % 10) + '0';
-        }
-
-        break;
+      break;
+    }
+    /* Minute 00 - 59 */
+    case 'M': {
+      if (i + 2 < max) {
+        s[i++] = (tm->tm_min / 10) + '0';
+        s[i++] = (tm->tm_min % 10) + '0';
       }
-      /* Minute 00 - 59 */
-      case 'M':
-      {
-        if(i + 2 < max)
-        {
-          s[i++] = (tm->tm_min / 10) + '0';
-          s[i++] = (tm->tm_min % 10) + '0';
-        }
 
-        break;
+      break;
+    }
+    /* Second 00 - 59 */
+    case 'S': {
+      if (i + 2 < max) {
+        s[i++] = (tm->tm_sec / 10) + '0';
+        s[i++] = (tm->tm_sec % 10) + '0';
       }
-      /* Second 00 - 59 */
-      case 'S':
-      {
-        if(i + 2 < max)
-        {
-          s[i++] = (tm->tm_sec / 10) + '0';
-          s[i++] = (tm->tm_sec % 10) + '0';
-        }
 
-        break;
+      break;
+    }
+    /* Year 00 - 99 */
+    case 'y': {
+      uint32_t year = tm->tm_year % 100;
+
+      if (i + 2 < max) {
+        s[i++] = (year / 10) + '0';
+        s[i++] = (year % 10) + '0';
       }
-      /* Year 00 - 99 */
-      case 'y':
-      {
-        uint32_t year = tm->tm_year % 100;
 
-        if(i + 2 < max)
-        {
-          s[i++] = (year / 10) + '0';
-          s[i++] = (year % 10) + '0';
-        }
+      break;
+    }
+    /* Year 1900 - ... */
+    case 'Y': {
+      uint32_t year = tm->tm_year + 1900;
 
-        break;
+      if (i + 4 < max) {
+        s[i++] = (year / 1000) + '0';
+        s[i++] = (year % 1000 / 100) + '0';
+        s[i++] = (year % 100 / 10) + '0';
+        s[i++] = (year % 10) + '0';
       }
-      /* Year 1900 - ... */
-      case 'Y':
-      {
-        uint32_t year = tm->tm_year + 1900;
 
-        if(i + 4 < max)
-        {
-          s[i++] = (year / 1000) + '0';
-          s[i++] = (year % 1000 / 100) + '0';
-          s[i++] = (year % 100 / 10) + '0';
-          s[i++] = (year % 10) + '0';
-        }
-
-        break;
-      }
+      break;
+    }
     }
   }
 
-  if(i >= max)
+  if (i >= max)
     i = max - 1;
 
   s[i++] = '\0';
@@ -364,57 +331,55 @@ size_t timer_strftime(char *s, size_t max, const char *format,
 /* ------------------------------------------------------------------------ *
  * Convert a struct tm to unixtime in miliseconds                           *
  * ------------------------------------------------------------------------ */
-uint64_t timer_mktime(struct tm *tm)
-{
-  register time_t  day;
-  register time_t  i;
+uint64_t timer_mktime(struct tm *tm) {
+  register time_t day;
+  register time_t i;
 
-  if(tm->tm_year < 70)
+  if (tm->tm_year < 70)
     return (uint64_t)-1LL;
 
   day = tm->tm_yday = dpm[tm->tm_mon] + tm->tm_mday - 1 +
-        (isleap(tm->tm_year + 1900) & (tm->tm_mon > 1));
+                      (isleap(tm->tm_year + 1900) & (tm->tm_mon > 1));
 
-  for(i = 70; i < tm->tm_year; i++)
+  for (i = 70; i < tm->tm_year; i++)
     day += 365 + isleap(i + 1900);
 
   tm->tm_wday = (day + 4) % 7;
 
   day *= 24;
 
-/*  return (uint64_t)(((day + tm->tm_hour) * 3600) + (tm->tm_min * 60) + tm->tm_sec) * 1000LLU;*/
+  /*  return (uint64_t)(((day + tm->tm_hour) * 3600) + (tm->tm_min * 60) +
+   * tm->tm_sec) * 1000LLU;*/
   return (uint64_t)mktime(tm) * 1000ULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * Parse a time in HH:MM([.:]SS) format                                     *
  * ------------------------------------------------------------------------ */
-uint64_t timer_parse_time(const char *t)
-{
-  struct tm     ret;
+uint64_t timer_parse_time(const char *t) {
+  struct tm ret;
   unsigned long hour;
   unsigned long minute;
   unsigned long second;
-  char         *p;
+  char *p;
 
-  if((hour = str_toul(t, &p, 10)) == ULONG_MAX)
+  if ((hour = str_toul(t, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
 
-  if(*p++ != ':')
+  if (*p++ != ':')
     return (uint64_t)-1LL;
 
-  if((minute = str_toul(p, &p, 10)) == ULONG_MAX)
+  if ((minute = str_toul(p, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
 
   ret.tm_hour = hour % 24;
   ret.tm_min = minute % 60;
   ret.tm_sec = 0;
 
-  if(*p == ':' || *p == '.')
-  {
+  if (*p == ':' || *p == '.') {
     p++;
 
-    if((second = str_toul(p, NULL, 10)) != ULONG_MAX)
+    if ((second = str_toul(p, NULL, 10)) != ULONG_MAX)
       ret.tm_sec = second % 60;
   }
   return ((ret.tm_hour * 3600) + (ret.tm_min * 60) + ret.tm_sec) * 1000ULL;
@@ -423,34 +388,31 @@ uint64_t timer_parse_time(const char *t)
 /* ------------------------------------------------------------------------ *
  * Parse a date in DD.MM(.YY(YY)) format                                     *
  * ------------------------------------------------------------------------ */
-uint64_t timer_parse_date(const char *d)
-{
-  char         *p;
-  struct tm     ret;
+uint64_t timer_parse_date(const char *d) {
+  char *p;
+  struct tm ret;
   unsigned long day;
   unsigned long month;
   unsigned long year;
 
-  if((day = str_toul(d, &p, 10)) == ULONG_MAX)
+  if ((day = str_toul(d, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
 
-  if(*p++ != '.' || day == 0)
+  if (*p++ != '.' || day == 0)
     return (uint64_t)-1LL;
 
-  if((month = str_toul(p, &p, 10)) == ULONG_MAX)
+  if ((month = str_toul(p, &p, 10)) == ULONG_MAX)
     return (uint64_t)-1LL;
 
   ret.tm_mday = ((day) % 32);
   ret.tm_mon = (month - 1) % 12;
   ret.tm_year = timer_thisyear;
 
-  if(*p == '.')
-  {
+  if (*p == '.') {
     p++;
 
-    if((year = str_toul(p, NULL, 10)) != ULONG_MAX)
-    {
-      if(year < 1000)
+    if ((year = str_toul(p, NULL, 10)) != ULONG_MAX) {
+      if (year < 1000)
         ret.tm_year = year + 100;
       else
         ret.tm_year = year - 1900;
@@ -469,11 +431,10 @@ uint64_t timer_parse_date(const char *d)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void timer_format_time(char **pptr, size_t *bptr, size_t n,
-                              int padding, int left, void *arg)
-{
-  char      *p;
-  char       buf[9];
+static void timer_format_time(char **pptr, size_t *bptr, size_t n, int padding,
+                              int left, void *arg) {
+  char *p;
+  char buf[9];
   struct tm *tm;
 
   tm = timer_gmtime(*(uint64_t *)arg);
@@ -490,8 +451,7 @@ static void timer_format_time(char **pptr, size_t *bptr, size_t n,
 
   p = buf;
 
-  while(*p && *bptr < n)
-  {
+  while (*p && *bptr < n) {
     *(*pptr)++ = *p++;
     (*bptr)++;
   }
@@ -500,22 +460,18 @@ static void timer_format_time(char **pptr, size_t *bptr, size_t n,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 static void timer_format_time_short(char **pptr, size_t *bptr, size_t n,
-                                    int padding, int left, void *arg)
-{
-  char      *p;
-  char       buf[6];
+                                    int padding, int left, void *arg) {
+  char *p;
+  char buf[6];
   struct tm *tm;
 
-  if(*(int64_t *)arg == -1LL)
-  {
+  if (*(int64_t *)arg == -1LL) {
     buf[0] = ' ';
     buf[1] = ' ';
     buf[2] = ' ';
     buf[3] = ' ';
     buf[4] = ' ';
-  }
-  else
-  {
+  } else {
     tm = timer_gmtime(*(uint64_t *)arg);
 
     buf[0] = ((tm->tm_hour / 10) % 10) + '0';
@@ -529,8 +485,7 @@ static void timer_format_time_short(char **pptr, size_t *bptr, size_t n,
 
   p = buf;
 
-  while(*p && *bptr < n)
-  {
+  while (*p && *bptr < n) {
     *(*pptr)++ = *p++;
     (*bptr)++;
   }
@@ -538,25 +493,23 @@ static void timer_format_time_short(char **pptr, size_t *bptr, size_t n,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void timer_format_date(char **pptr, size_t *bptr, size_t n,
-                              int padding, int left, void *arg)
-{
-  char      *p;
-  char       buf[11];
+static void timer_format_date(char **pptr, size_t *bptr, size_t n, int padding,
+                              int left, void *arg) {
+  char *p;
+  char buf[11];
   struct tm *tm;
-  uint32_t   i = 0;
+  uint32_t i = 0;
 
-  if(*(int64_t *)arg != -1LL)
-  {
+  if (*(int64_t *)arg != -1LL) {
     tm = timer_gmtime(*(uint64_t *)arg);
 
-    if((tm->tm_mday + 1) / 10)
+    if ((tm->tm_mday + 1) / 10)
       buf[i++] = (((tm->tm_mday + 1) / 10) % 10) + '0';
 
     buf[i++] = ((tm->tm_mday + 1) % 10) + '0';
     buf[i++] = '.';
 
-    if((tm->tm_mon + 1) / 10)
+    if ((tm->tm_mon + 1) / 10)
       buf[i++] = (((tm->tm_mon + 1) / 10) % 10) + '0';
 
     buf[i++] = ((tm->tm_mon + 1) % 10) + '0';
@@ -573,26 +526,21 @@ static void timer_format_date(char **pptr, size_t *bptr, size_t n,
 
   p = buf;
 
-  if(left && padding)
-  {
-    while(*bptr < n && padding > 0)
-    {
+  if (left && padding) {
+    while (*bptr < n && padding > 0) {
       *(*pptr)++ = ' ';
       (*bptr)++;
       padding--;
     }
   }
 
-  while(*p && *bptr < n)
-  {
+  while (*p && *bptr < n) {
     *(*pptr)++ = *p++;
     (*bptr)++;
   }
 
-  if(padding > 0)
-  {
-    while(*bptr < n && padding)
-    {
+  if (padding > 0) {
+    while (*bptr < n && padding) {
       *(*pptr)++ = ' ';
       (*bptr)++;
       padding--;
@@ -604,16 +552,15 @@ static void timer_format_date(char **pptr, size_t *bptr, size_t n,
  * Get the current time and scale it to milliseconds                        *
  * ------------------------------------------------------------------------ */
 #ifdef WIN32
-static uint64_t timer_read_counter(void)
-{
+static uint64_t timer_read_counter(void) {
   LARGE_INTEGER counter;
 
   QueryPerformanceCounter(&counter);
 
-  log(timer_log, L_status, "Timer performance counter: %lld", (((uint64_t)counter.HighPart << 32) + counter.LowPart) / timer_freq);
+  log(timer_log, L_status, "Timer performance counter: %lld",
+      (((uint64_t)counter.HighPart << 32) + counter.LowPart) / timer_freq);
 
-  return (((uint64_t)counter.HighPart << 32) + counter.LowPart) /
-    timer_freq;
+  return (((uint64_t)counter.HighPart << 32) + counter.LowPart) / timer_freq;
 }
 #endif
 
@@ -622,8 +569,7 @@ static uint64_t timer_read_counter(void)
  * the offset to the performance counter                                    *
  * ------------------------------------------------------------------------ */
 #ifdef WIN32
-static void timer_calc_offset(void)
-{
+static void timer_calc_offset(void) {
   uint64_t ft;
   struct _timeb tb;
 
@@ -640,8 +586,7 @@ static void timer_calc_offset(void)
 /* ------------------------------------------------------------------------ *
  * Initialize the timer code.                                               *
  * ------------------------------------------------------------------------ */
-void timer_init(void)
-{
+void timer_init(void) {
 #ifdef WIN32
   LARGE_INTEGER freq;
 #endif
@@ -679,11 +624,10 @@ void timer_init(void)
 /* ------------------------------------------------------------------------ *
  * Shutdown the timer code.                                                 *
  * ------------------------------------------------------------------------ */
-void timer_shutdown(void)
-{
+void timer_shutdown(void) {
   struct timer *tptr;
-  struct node  *next;
-  struct node  *nptr;
+  struct node *next;
+  struct node *nptr;
 
   timer_dirty = 1;
 
@@ -694,11 +638,9 @@ void timer_shutdown(void)
   str_unregister('D');
 
   /* Cancel all timers */
-  dlink_foreach_safe(&timer_list, tptr, next)
-    timer_remove(tptr);
+  dlink_foreach_safe(&timer_list, tptr, next) timer_remove(tptr);
 
-  dlink_foreach_safe(&timer_shifts, nptr, next)
-    dlink_node_free(nptr);
+  dlink_foreach_safe(&timer_shifts, nptr, next) dlink_node_free(nptr);
 
   mem_static_destroy(&timer_heap);
 
@@ -708,14 +650,12 @@ void timer_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                          *
  * ------------------------------------------------------------------------ */
-int timer_collect(void)
-{
+int timer_collect(void) {
   struct timer *tptr;
   struct timer *next;
 
   /* Free all timer blocks with a zero refcount */
-  dlink_foreach_safe(&timer_list, tptr, next)
-    if(tptr->refcount == 0)
+  dlink_foreach_safe(&timer_list, tptr, next) if (tptr->refcount == 0)
       timer_remove(tptr);
 
   /* Collect garbage on timer_heap */
@@ -730,10 +670,8 @@ int timer_collect(void)
  * <src>            - pointer to timeval to convert                         *
  * <dst>            - pointer to 64bit integer to store result              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void timer_to_msec(uint64_t *dst, struct timeval *src)
-{
-  *dst = ((uint64_t)src->tv_sec * 1000ULL) +
-         ((uint32_t)src->tv_usec / 1000ULL);
+CHAOS_API(void timer_to_msec(uint64_t *dst, struct timeval *src) {
+  *dst = ((uint64_t)src->tv_sec * 1000ULL) + ((uint32_t)src->tv_usec / 1000ULL);
 })
 
 /* ------------------------------------------------------------------------ *
@@ -742,8 +680,7 @@ CHAOS_API(void timer_to_msec(uint64_t *dst, struct timeval *src)
  * <src>            - pointer to 64bit integer to convert                   *
  * <dst>            - pointer to timeval to store result                    *
  * ------------------------------------------------------------------------ */
-void timer_to_timeval(struct timeval *dst, uint64_t *src)
-{
+void timer_to_timeval(struct timeval *dst, uint64_t *src) {
   dst->tv_sec = (long)((*src) / 1000);
   dst->tv_usec = (long)(((*src) % 1000) * 1000);
 }
@@ -752,8 +689,7 @@ void timer_to_timeval(struct timeval *dst, uint64_t *src)
  * Update the system time.                                                  *
  * Returns -1 if the underlying systemcall fails and 0 on success.          *
  * ------------------------------------------------------------------------ */
-int timer_update(void)
-{
+int timer_update(void) {
   int64_t zone_offset = 0LL;
 
 #ifdef WIN32
@@ -761,11 +697,11 @@ int timer_update(void)
 
   timer_mtime = timer_read_counter();
 #else
-  struct timeval  tv;
+  struct timeval tv;
   struct timezone tz;
 
   /* This system call gives us usecs since epoch */
-  if(syscall_gettimeofday(&tv, &tz) == -1)
+  if (syscall_gettimeofday(&tv, &tz) == -1)
     return -1;
 
   /* Set old time */
@@ -790,8 +726,7 @@ int timer_update(void)
 /* ------------------------------------------------------------------------ *
  * Add a timer shifting callback                                            *
  * ------------------------------------------------------------------------ */
-void timer_shift_register(timer_shift_cb *shift_cb)
-{
+void timer_shift_register(timer_shift_cb *shift_cb) {
   struct node *nptr;
 
   nptr = dlink_node_new();
@@ -802,8 +737,7 @@ void timer_shift_register(timer_shift_cb *shift_cb)
 /* ------------------------------------------------------------------------ *
  * Remove a timer shifting callback                                         *
  * ------------------------------------------------------------------------ */
-void timer_shift_unregister(timer_shift_cb *shift_cb)
-{
+void timer_shift_unregister(timer_shift_cb *shift_cb) {
   struct node *nptr;
 
   nptr = dlink_find_delete(&timer_shifts, shift_cb);
@@ -816,27 +750,23 @@ void timer_shift_unregister(timer_shift_cb *shift_cb)
  *                                                                          *
  * <delta>          - offset to be added to deadlines in milliseconds       *
  * ------------------------------------------------------------------------ */
-void timer_shift(int64_t delta)
-{
+void timer_shift(int64_t delta) {
   struct timer *timer;
-  struct node  *node;
+  struct node *node;
 
   /* Nothing left to say :P */
-  dlink_foreach(&timer_list, node)
-  {
+  dlink_foreach(&timer_list, node) {
     timer = (struct timer *)node;
 
     timer->deadline += delta;
   }
 
-  dlink_foreach(&timer_shifts, node)
-  {
-    if(node->data)
+  dlink_foreach(&timer_shifts, node) {
+    if (node->data)
       ((timer_shift_cb *)node->data)(delta);
   }
 
-  log(timer_log, L_verbose, "Shifting timers by %lld milliseconds...",
-      delta);
+  log(timer_log, L_verbose, "Shifting timers by %lld milliseconds...", delta);
 }
 
 /* ------------------------------------------------------------------------ *
@@ -844,13 +774,11 @@ void timer_shift(int64_t delta)
  *                                                                          *
  * <waited>         - how long the select()/poll() lasted.                  *
  * ------------------------------------------------------------------------ */
-void timer_drift(int64_t waited)
-{
+void timer_drift(int64_t waited) {
   uint64_t expected;
   int64_t drift;
 
-  if(timer_otime)
-  {
+  if (timer_otime) {
     /*
      * We expect the mtime to be
      * timer_otime + time spent at poll/select
@@ -866,8 +794,7 @@ void timer_drift(int64_t waited)
      * If the drift exceeded the limit we warn about it
      * and we shift all the timers by the drift delta.
      */
-    if(drift < -TIMER_MAX_DRIFT || drift > TIMER_MAX_DRIFT)
-    {
+    if (drift < -TIMER_MAX_DRIFT || drift > TIMER_MAX_DRIFT) {
       log(timer_log, L_warning,
           "Timer drifted %lldmsecs, recalcing deadlines...", drift);
 
@@ -886,15 +813,14 @@ void timer_drift(int64_t waited)
  *                                                                          *
  * Returns NULL on failure and a pointer to the timer on success.           *
  * ------------------------------------------------------------------------ */
-struct timer *timer_start(void *callback, uint64_t interval, ...)
-{
+struct timer *timer_start(void *callback, uint64_t interval, ...) {
   va_list args;
   struct timer *timer;
 
   /* Allocate timer block and add it to the list */
   timer = mem_static_alloc(&timer_heap);
 
-  if(timer == NULL)
+  if (timer == NULL)
     return NULL;
 
   dlink_add_tail(&timer_list, &timer->node, timer);
@@ -920,8 +846,8 @@ struct timer *timer_start(void *callback, uint64_t interval, ...)
   timer->refcount = 1;
 
   /* Be verbose */
-  debug(timer_log, "New timer #%u: interval = %lld",
-        timer->id, timer->interval);
+  debug(timer_log, "New timer #%u: interval = %lld", timer->id,
+        timer->interval);
 
   return timer;
 }
@@ -932,11 +858,10 @@ struct timer *timer_start(void *callback, uint64_t interval, ...)
  * <timer>           - pointer to a timer structure returned by timer_start() *
  *                     or timer_find()                                      *
  * ------------------------------------------------------------------------ */
-void timer_remove(struct timer *timer)
-{
+void timer_remove(struct timer *timer) {
   /* Be verbose */
-/*  debug(timer_log, "Cancelled timer #%u: interval = %llu",
-        timer->id, timer->interval);*/
+  /*  debug(timer_log, "Cancelled timer #%u: interval = %llu",
+          timer->id, timer->interval);*/
 
   /* Remove from timer list */
   dlink_delete(&timer_list, &timer->node);
@@ -953,10 +878,9 @@ void timer_remove(struct timer *timer)
  *                                                                          *
  * Returns NULL if not found.                                               *
  * ------------------------------------------------------------------------ */
-struct timer *timer_find(void *callback, ...)
-{
-  va_list       args;
-  void         *arg;
+struct timer *timer_find(void *callback, ...) {
+  va_list args;
+  void *arg;
   struct timer *timer;
 
   /* Get userarg */
@@ -965,15 +889,14 @@ struct timer *timer_find(void *callback, ...)
   va_end(args);
 
   /* Loop through timer list */
-  dlink_foreach(&timer_list, timer)
-  {
+  dlink_foreach(&timer_list, timer) {
     /* Compare callback and userarg pointer */
-    if(timer->callback == callback && timer->args[0] == arg)
-    {
+    if (timer->callback == callback && timer->args[0] == arg) {
       /* Be verbose */
-      debug(timer_log, "Found timer: id = #%u, callback = %p, "
-                       "interval = %llu, deadline = %llu, "
-                       "args = [ %p, %p, %p, %p ]",
+      debug(timer_log,
+            "Found timer: id = #%u, callback = %p, "
+            "interval = %llu, deadline = %llu, "
+            "args = [ %p, %p, %p, %p ]",
             timer->id, timer->callback, timer->interval, timer->deadline,
             timer->args[0], timer->args[1], timer->args[2], timer->args[3]);
 
@@ -981,8 +904,8 @@ struct timer *timer_find(void *callback, ...)
     }
   }
 
-  debug(timer_log, "Did not find timer: callback = %p, arg = %p",
-        callback, arg);
+  debug(timer_log, "Did not find timer: callback = %p, arg = %p", callback,
+        arg);
 
   return NULL;
 }
@@ -990,14 +913,12 @@ struct timer *timer_find(void *callback, ...)
 /* ------------------------------------------------------------------------ *
  * Find a timer by id                                                       *
  * ------------------------------------------------------------------------ */
-struct timer *timer_find_id(int id)
-{
+struct timer *timer_find_id(int id) {
   struct timer *timer;
 
   /* Loop through timer list */
-  dlink_foreach(&timer_list, timer)
-  {
-    if(timer->id == id)
+  dlink_foreach(&timer_list, timer) {
+    if (timer->id == id)
       return timer;
   }
 
@@ -1012,25 +933,20 @@ struct timer *timer_find_id(int id)
  * <format>          - format string                                        *
  *                   - your args                                            *
  * ------------------------------------------------------------------------ */
-void timer_vnote(struct timer *timer, const char *format, va_list args)
-{
+void timer_vnote(struct timer *timer, const char *format, va_list args) {
   /* Write the note */
-  if(timer)
-  {
+  if (timer) {
     str_vsnprintf(timer->note, sizeof(timer->note), format, args);
 
-    debug(timer_log, "Denoting timer #%u: %s",
-          timer->id, timer->note);
+    debug(timer_log, "Denoting timer #%u: %s", timer->id, timer->note);
   }
 }
 
-void timer_note(struct timer *timer, const char *format, ...)
-{
+void timer_note(struct timer *timer, const char *format, ...) {
   va_list args;
 
   /* Write the note */
-  if(timer)
-  {
+  if (timer) {
     va_start(args, format);
     timer_vnote(timer, format, args);
     va_end(args);
@@ -1039,13 +955,10 @@ void timer_note(struct timer *timer, const char *format, ...)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct timer *timer_pop(struct timer *tptr)
-{
-  if(tptr)
-  {
-    if(!tptr->refcount)
-      debug(timer_log, "Poping deprecated timer #%u",
-          tptr->id);
+struct timer *timer_pop(struct timer *tptr) {
+  if (tptr) {
+    if (!tptr->refcount)
+      debug(timer_log, "Poping deprecated timer #%u", tptr->id);
 
     tptr->refcount++;
   }
@@ -1055,10 +968,8 @@ struct timer *timer_pop(struct timer *tptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void timer_cancel(struct timer **tptrptr)
-{
-  if(*tptrptr)
-  {
+void timer_cancel(struct timer **tptrptr) {
+  if (*tptrptr) {
     (*tptrptr)->refcount = 0;
 
     timer_remove(*tptrptr);
@@ -1069,17 +980,11 @@ void timer_cancel(struct timer **tptrptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct timer *timer_push(struct timer **tptrptr)
-{
-  if(*tptrptr)
-  {
-    if(!(*tptrptr)->refcount)
-    {
-      debug(timer_log, "Trying to push deprecated timer #%u",
-          (*tptrptr)->id);
-    }
-    else
-    {
+struct timer *timer_push(struct timer **tptrptr) {
+  if (*tptrptr) {
+    if (!(*tptrptr)->refcount) {
+      debug(timer_log, "Trying to push deprecated timer #%u", (*tptrptr)->id);
+    } else {
       --(*tptrptr)->refcount;
     }
 
@@ -1094,42 +999,33 @@ struct timer *timer_push(struct timer **tptrptr)
  *                                                                          *
  * Will return number of timers runned.                                     *
  * ------------------------------------------------------------------------ */
-int timer_run(void)
-{
+int timer_run(void) {
   struct timer *timer;
   struct timer *next;
-  int64_t       delta;
-  int           ret = 0;
+  int64_t delta;
+  int ret = 0;
 
   /* Safely walk through timer list as we may remove some timer */
-  dlink_foreach_safe(&timer_list, timer, next)
-  {
-    if(!timer->refcount)
-    {
+  dlink_foreach_safe(&timer_list, timer, next) {
+    if (!timer->refcount) {
       timer_remove(timer);
       continue;
     }
 
     /* Has this timer expired? */
-    if(timer->deadline <= timer_mtime)
-    {
+    if (timer->deadline <= timer_mtime) {
       delta = timer_mtime - timer->deadline;
 
       /* Warn about timer deltas */
-      if(delta >= TIMER_WARN_DELTA && delta <= -TIMER_WARN_DELTA)
-      {
-        debug(timer_log,
-              "Timer delta for timer #%u exceeded by %lldmsecs",
+      if (delta >= TIMER_WARN_DELTA && delta <= -TIMER_WARN_DELTA) {
+        debug(timer_log, "Timer delta for timer #%u exceeded by %lldmsecs",
               timer->id, delta);
       }
 
-      if(timer->callback(timer->args[0], timer->args[1],
-                         timer->args[2], timer->args[3]))
-      {
+      if (timer->callback(timer->args[0], timer->args[1], timer->args[2],
+                          timer->args[3])) {
         timer->refcount = 0;
-      }
-      else
-      {
+      } else {
         /* Else schedule it again */
         timer->deadline += timer->interval;
       }
@@ -1146,22 +1042,19 @@ int timer_run(void)
  * Get the time at which the next timer will expire.                        *
  * Return 0ull when there is no timer.                                      *
  * ------------------------------------------------------------------------ */
-uint64_t timer_deadline(void)
-{
+uint64_t timer_deadline(void) {
   struct timer *timer;
-  struct node  *next;
-  uint64_t      deadline = 0ull;
+  struct node *next;
+  uint64_t deadline = 0ull;
 
-  dlink_foreach_safe(&timer_list, timer, next)
-  {
-    if(!timer->refcount)
-    {
+  dlink_foreach_safe(&timer_list, timer, next) {
+    if (!timer->refcount) {
       timer_remove(timer);
       continue;
     }
 
     /* First or lower deadline, update final deadline */
-    if(deadline == 0ull || timer->deadline < deadline)
+    if (deadline == 0ull || timer->deadline < deadline)
       deadline = timer->deadline;
   }
 
@@ -1172,20 +1065,18 @@ uint64_t timer_deadline(void)
  * Get the optimal timeout for select()/poll()                              *
  * (The time until the lowest deadline)                                     *
  * ------------------------------------------------------------------------ */
-int64_t *timer_timeout(void)
-{
-  uint64_t       deadline;
+int64_t *timer_timeout(void) {
+  uint64_t deadline;
   static int64_t timeout;
 
   deadline = timer_deadline();
 
-  if(deadline == 0)
+  if (deadline == 0)
     return NULL;
 
   timeout = deadline - timer_mtime;
 
-  if(timeout < 0LL)
-  {
+  if (timeout < 0LL) {
     debug(timer_log, "Negative timeout value, setting to 0msecs...");
     timeout = 0LL;
   }
@@ -1196,32 +1087,28 @@ int64_t *timer_timeout(void)
 /* ------------------------------------------------------------------------ *
  * Dump timers.                                                             *
  * ------------------------------------------------------------------------ */
-void timer_dump(struct timer *tptr)
-{
-  if(tptr == NULL)
-  {
+void timer_dump(struct timer *tptr) {
+  if (tptr == NULL) {
     dump(timer_log, "[============== timer summary ===============]");
 
     dlink_foreach(&timer_list, tptr)
-      dump(timer_log, " #%03u: [%u] %10llu %s",
-           tptr->id, tptr->refcount,
-           tptr->interval, tptr->note);
+        dump(timer_log, " #%03u: [%u] %10llu %s", tptr->id, tptr->refcount,
+             tptr->interval, tptr->note);
 
     dump(timer_log, "[=========== end of timer summary ===========]");
-  }
-  else
-  {
+  } else {
     dump(timer_log, "[============== timer dump ===============]");
 
     dump(timer_log, "         id: #%u", tptr->id);
     dump(timer_log, "   refcount: %u", tptr->refcount);
     dump(timer_log, "       note: %s", tptr->note);
     dump(timer_log, "   callback: %p", tptr->callback);
-    dump(timer_log, "       args: %p, %p, %p, %p",
-         tptr->args[0], tptr->args[1], tptr->args[2], tptr->args[3]);
+    dump(timer_log, "       args: %p, %p, %p, %p", tptr->args[0], tptr->args[1],
+         tptr->args[2], tptr->args[3]);
     dump(timer_log, "   interval: %llu", tptr->interval);
-    dump(timer_log, "   deadline: %llu (%lld remaining)", tptr->deadline, tptr->deadline - timer_mtime);
-    
+    dump(timer_log, "   deadline: %llu (%lld remaining)", tptr->deadline,
+         tptr->deadline - timer_mtime);
+
     dump(timer_log, "[=========== end of timer dump ===========]");
   }
 }

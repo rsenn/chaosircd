@@ -27,15 +27,15 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
+#include "libchaos/child.h"
 #include "libchaos/defs.h"
+#include "libchaos/dlink.h"
 #include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
-#include "libchaos/child.h"
-#include "libchaos/dlink.h"
-#include "libchaos/timer.h"
 #include "libchaos/syscall.h"
+#include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -61,11 +61,11 @@
 /* ------------------------------------------------------------------------ *
  * Local variables                                                          *
  * ------------------------------------------------------------------------ */
-int           child_log;          /* Log source */
-struct sheap  child_heap;         /* Heap containing child blocks */
-struct list   child_list;         /* List linking child blocks */
-int           child_dirty;        /* we need a garbage collect */
-uint32_t      child_id;           /* Next serial number */
+int child_log;           /* Log source */
+struct sheap child_heap; /* Heap containing child blocks */
+struct list child_list;  /* List linking child blocks */
+int child_dirty;         /* we need a garbage collect */
+uint32_t child_id;       /* Next serial number */
 
 /* ------------------------------------------------------------------------ */
 int child_get_log() { return child_log; }
@@ -73,8 +73,7 @@ int child_get_log() { return child_log; }
 /* ------------------------------------------------------------------------ *
  * Initialize child heap and add garbage collect timer.                     *
  * ------------------------------------------------------------------------ */
-void child_init(void)
-{
+void child_init(void) {
   child_log = log_source_register("child");
 
   /* Zero child block list */
@@ -88,15 +87,13 @@ void child_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy child heap and cancel timer.                                     *
  * ------------------------------------------------------------------------ */
-void child_shutdown(void)
-{
+void child_shutdown(void) {
   struct child *ciptr;
   struct child *next;
 
   /* Remove all child blocks */
-  dlink_foreach_safe(&child_list, ciptr, next)
-  {
-    if(ciptr->refcount)
+  dlink_foreach_safe(&child_list, ciptr, next) {
+    if (ciptr->refcount)
       ciptr->refcount--;
 
     child_delete(ciptr);
@@ -112,19 +109,15 @@ void child_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Garbage collect child blocks                                             *
  * ------------------------------------------------------------------------ */
-void child_collect(void)
-{
+void child_collect(void) {
   struct child *ciptr;
   struct child *next;
-  size_t        n = 0;
+  size_t n = 0;
 
   /* Only collect if we pushed out some block */
-  if(child_dirty)
-  {
-    dlink_foreach_safe(&child_list, ciptr, next)
-    {
-      if(!ciptr->refcount)
-      {
+  if (child_dirty) {
+    dlink_foreach_safe(&child_list, ciptr, next) {
+      if (!ciptr->refcount) {
         child_delete(ciptr);
 
         n++;
@@ -142,12 +135,10 @@ void child_collect(void)
 /* ------------------------------------------------------------------------ *
  * Create a new child block                                                 *
  * ------------------------------------------------------------------------ */
-struct child *child_new(const char *path, uint32_t channels,
-                        const char *argv, uint64_t interval,
-                        int         autostart)
-{
+struct child *child_new(const char *path, uint32_t channels, const char *argv,
+                        uint64_t interval, int autostart) {
   struct child *child;
-  char         *p;
+  char *p;
 
   /* Allocate child block */
   child = mem_static_alloc(&child_heap);
@@ -171,20 +162,19 @@ struct child *child_new(const char *path, uint32_t channels,
 
   p = strrchr(child->path, '/');
 
-  if(p)
-  {
-    if(p[1])
+  if (p) {
+    if (p[1])
       strlcpy(child->name, &p[1], sizeof(child->path));
   }
 
-  if(!child->name[0])
+  if (!child->name[0])
     strlcpy(child->name, child->path, sizeof(child->name));
 
   /* Add to child list */
   dlink_add_tail(&child_list, &child->node, child);
 
   /* If we're auto-childing then initiate it now */
-  if(child->autostart)
+  if (child->autostart)
     child_launch(child);
 
   log(child_log, L_status, "Added child block: %s", child->name);
@@ -195,9 +185,8 @@ struct child *child_new(const char *path, uint32_t channels,
 /* ------------------------------------------------------------------------ *
  * Update the externally initialised stuff of a child block.                *
  * ------------------------------------------------------------------------ */
-int child_update(struct child *child,    uint32_t channels, const char *argv,
-                 uint64_t      interval, int      autostart)
-{
+int child_update(struct child *child, uint32_t channels, const char *argv,
+                 uint64_t interval, int autostart) {
   char *p;
 
   child->chans = channels;
@@ -207,17 +196,15 @@ int child_update(struct child *child,    uint32_t channels, const char *argv,
   strlcpy(child->argv, argv, sizeof(child->argv));
 
   /* Update name if we haven't got one */
-  if(!child->name[0])
-  {
+  if (!child->name[0]) {
     p = strrchr(child->path, '/');
 
-    if(p)
-    {
-      if(p[1])
+    if (p) {
+      if (p[1])
         strlcpy(child->name, &p[1], sizeof(child->path));
     }
 
-    if(!child->name[0])
+    if (!child->name[0])
       strlcpy(child->name, child->path, sizeof(child->name));
   }
 
@@ -229,8 +216,7 @@ int child_update(struct child *child,    uint32_t channels, const char *argv,
 /* ------------------------------------------------------------------------ *
  * Remove and free a child block.                                           *
  * ------------------------------------------------------------------------ */
-void child_delete(struct child *child)
-{
+void child_delete(struct child *child) {
   log(child_log, L_status, "Deleting child block: %s", child->name);
 
   /* Cancels timers, shuts down sockets and stuff */
@@ -244,21 +230,18 @@ void child_delete(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct child *child_find(const char *path)
-{
-  hash_t        chash;
-  struct node   *node;
+struct child *child_find(const char *path) {
+  hash_t chash;
+  struct node *node;
   struct child *child;
 
   chash = str_hash(path);
 
-  dlink_foreach(&child_list, node)
-  {
+  dlink_foreach(&child_list, node) {
     child = node->data;
 
-    if(chash == child->chash)
-    {
-      if(!str_cmp(child->path, path))
+    if (chash == child->chash) {
+      if (!str_cmp(child->path, path))
         return child;
     }
   }
@@ -268,13 +251,10 @@ struct child *child_find(const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct child *child_pop(struct child *ciptr)
-{
-  if(ciptr)
-  {
-    if(!ciptr->refcount)
-      log(child_log, L_warning, "Poping deprecated child: %s",
-          ciptr->name);
+struct child *child_pop(struct child *ciptr) {
+  if (ciptr) {
+    if (!ciptr->refcount)
+      log(child_log, L_warning, "Poping deprecated child: %s", ciptr->name);
 
     ciptr->refcount++;
   }
@@ -284,17 +264,15 @@ struct child *child_pop(struct child *ciptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct child *child_push(struct child **ciptrptr)
-{
-  if(*ciptrptr)
-  {
-    if(!(*ciptrptr)->refcount)
+struct child *child_push(struct child **ciptrptr) {
+  if (*ciptrptr) {
+    if (!(*ciptrptr)->refcount)
       log(child_log, L_warning, "Trying to push deprecated child: %s",
           (*ciptrptr)->name);
     else
       (*ciptrptr)->refcount--;
 
-    if(!(*ciptrptr)->refcount)
+    if (!(*ciptrptr)->refcount)
       child_dirty = 1;
 
     (*ciptrptr) = NULL;
@@ -309,54 +287,45 @@ void child_callback(struct child *child, int type) {
 #ifndef WIN32
   int status = WEXITSTATUS(child->exitcode);
 
-  if(child->status == type)
+  if (child->status == type)
     return;
 
-  switch(type)
-  {
-    case CHILD_DEAD:
-    {
-      if(WIFEXITED(child->exitcode))
-        log(child_log, L_status, "Child %s [%i] exited with code %i.",
-	    child->name, child->pid, status);
-      else
-	log(child_log, L_status, "Child %s [%i] crashed.",
-	    child->name, child->pid);
-      break;
-    }
-    case CHILD_RUNNING:
-    {
-      log(child_log, L_status, "Child %s started [%i].",
-	  child->name, child->pid);
-      break;
-    }
+  switch (type) {
+  case CHILD_DEAD: {
+    if (WIFEXITED(child->exitcode))
+      log(child_log, L_status, "Child %s [%i] exited with code %i.",
+          child->name, child->pid, status);
+    else
+      log(child_log, L_status, "Child %s [%i] crashed.", child->name,
+          child->pid);
+    break;
+  }
+  case CHILD_RUNNING: {
+    log(child_log, L_status, "Child %s started [%i].", child->name, child->pid);
+    break;
+  }
   }
 #endif
   child->status = type;
 
-  if(child->callback)
-    child->callback(child,
-		    child->args[0], child->args[1],
-		    child->args[2], child->args[3]);
+  if (child->callback)
+    child->callback(child, child->args[0], child->args[1], child->args[2],
+                    child->args[3]);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifndef WIN32
-static int child_check(struct child *child)
-{
+static int child_check(struct child *child) {
   int status = 0;
   int ret;
 
-  if((ret = syscall_waitpid(child->pid, &status, WNOHANG)) == child->pid ||
-     ret == -1)
-  {
+  if ((ret = syscall_waitpid(child->pid, &status, WNOHANG)) == child->pid ||
+      ret == -1) {
     child->exitcode = status;
 
     child_cancel(child);
-  }
-  else if(child->status != CHILD_RUNNING)
-  {
+  } else if (child->status != CHILD_RUNNING) {
     child_callback(child, CHILD_RUNNING);
   }
 
@@ -367,35 +336,29 @@ static int child_check(struct child *child)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifndef WIN32
-static int child_format(struct child *child)
-{
-  size_t   n;
+static int child_format(struct child *child) {
+  size_t n;
   uint32_t i;
-  char    *argv[CHILD_MAX_CHANNEL * 4 + 1];
-  int      chan;
-  char     args[1024];
+  char *argv[CHILD_MAX_CHANNEL * 4 + 1];
+  int chan;
+  char args[1024];
 
   strlcpy(args, child->argv, sizeof(args));
 
   n = str_tokenize(args, argv, CHILD_MAX_CHANNEL * 4);
 
-  for(i = 0; i < n; i++)
-  {
-    if(argv[i][0] == '%')
-    {
+  for (i = 0; i < n; i++) {
+    if (argv[i][0] == '%') {
       chan = str_toi(&argv[i][2]);
 
-      if(argv[i][1] == 'r')
-      {
-        str_snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_READ]);
+      if (argv[i][1] == 'r') {
+        str_snprintf(child->arguments[i], 6, "%u",
+                     child->channels[chan][CHILD_CHILD][CHILD_READ]);
+      } else if (argv[i][1] == 'w') {
+        str_snprintf(child->arguments[i], 6, "%u",
+                     child->channels[chan][CHILD_CHILD][CHILD_WRITE]);
       }
-      else if(argv[i][1] == 'w')
-      {
-        str_snprintf(child->arguments[i], 6, "%u", child->channels[chan][CHILD_CHILD][CHILD_WRITE]);
-      }
-    }
-    else
-    {
+    } else {
       strlcpy(child->arguments[i], argv[i], sizeof(child->arguments[i]));
     }
   }
@@ -407,28 +370,26 @@ static int child_format(struct child *child)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifndef WIN32
-static int child_prepare(struct child *child)
-{
+static int child_prepare(struct child *child) {
   uint32_t i;
   int sp[2];
 
-  for(i = 0; i < child->chans; i++)
-  {
+  for (i = 0; i < child->chans; i++) {
 #ifdef HAVE_SOCKETPAIR
-    if(syscall_socketpair(PF_UNIX, SOCK_STREAM, 0, sp) == -1)
+    if (syscall_socketpair(PF_UNIX, SOCK_STREAM, 0, sp) == -1)
       return -1;
 
     child->channels[i][CHILD_PARENT][CHILD_READ] =
-    child->channels[i][CHILD_PARENT][CHILD_WRITE] = sp[CHILD_PARENT];
+        child->channels[i][CHILD_PARENT][CHILD_WRITE] = sp[CHILD_PARENT];
     child->channels[i][CHILD_CHILD][CHILD_READ] =
-    child->channels[i][CHILD_CHILD][CHILD_WRITE] = sp[CHILD_CHILD];
+        child->channels[i][CHILD_CHILD][CHILD_WRITE] = sp[CHILD_CHILD];
 
     io_new(child->channels[i][CHILD_PARENT][CHILD_READ], FD_SOCKET);
 
     io_note(child->channels[i][CHILD_PARENT][CHILD_READ],
             "channel %u to child %s", i, child->name);
 #else
-    if(syscall_pipe(sp) == -1)
+    if (syscall_pipe(sp) == -1)
       return -1;
 
     child->channels[i][CHILD_PARENT][CHILD_READ] = sp[CHILD_READ];
@@ -439,7 +400,7 @@ static int child_prepare(struct child *child)
     io_note(child->channels[i][CHILD_PARENT][CHILD_READ],
             "channel %u to child %s (read)", i, child->name);
 
-    if(syscall_pipe(sp) == -1)
+    if (syscall_pipe(sp) == -1)
       return -1;
 
     child->channels[i][CHILD_CHILD][CHILD_READ] = sp[CHILD_READ];
@@ -452,9 +413,8 @@ static int child_prepare(struct child *child)
 #endif
 
     log(child_log, L_verbose,
-        "Child %s channel #%u: PR = %i, PW = %i, CR = %i, CW = %i",
-        child->name, i,
-        child->channels[i][CHILD_PARENT][CHILD_READ],
+        "Child %s channel #%u: PR = %i, PW = %i, CR = %i, CW = %i", child->name,
+        i, child->channels[i][CHILD_PARENT][CHILD_READ],
         child->channels[i][CHILD_PARENT][CHILD_WRITE],
         child->channels[i][CHILD_CHILD][CHILD_READ],
         child->channels[i][CHILD_CHILD][CHILD_WRITE]);
@@ -465,8 +425,7 @@ static int child_prepare(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int child_launch(struct child *child)
-{
+int child_launch(struct child *child) {
 #ifndef WIN32
   uint32_t i;
 
@@ -474,24 +433,21 @@ int child_launch(struct child *child)
 
   child->pid = syscall_fork();
 
-  if(child->pid == -1)
+  if (child->pid == -1)
     return -1;
 
-  if(child->pid == 0)
-  {
+  if (child->pid == 0) {
     struct dlog *drain;
     struct node *next;
-    char        *argv[CHILD_MAX_CHANNEL * 4 + 2];
+    char *argv[CHILD_MAX_CHANNEL * 4 + 2];
 
-    dlink_foreach_safe(&log_list, drain, next)
-      log_drain_delete(drain);
+    dlink_foreach_safe(&log_list, drain, next) log_drain_delete(drain);
 
-    for(i = 0; i < CHILD_MAX_CHANNEL; i++)
-    {
-      if(child->channels[i][CHILD_PARENT][CHILD_READ] > -1)
+    for (i = 0; i < CHILD_MAX_CHANNEL; i++) {
+      if (child->channels[i][CHILD_PARENT][CHILD_READ] > -1)
         syscall_close(child->channels[i][CHILD_PARENT][CHILD_READ]);
 #ifndef HAVE_SOCKETPAIR
-      if(child->channels[i][CHILD_PARENT][CHILD_WRITE] > -1)
+      if (child->channels[i][CHILD_PARENT][CHILD_WRITE] > -1)
         syscall_close(child->channels[i][CHILD_PARENT][CHILD_WRITE]);
 #endif
       child->channels[i][CHILD_PARENT][CHILD_READ] = -1;
@@ -502,8 +458,7 @@ int child_launch(struct child *child)
 
     argv[0] = child->name;
 
-    for(i = 0; child->arguments[i][0] && i < CHILD_MAX_CHANNEL * 4; i++)
-    {
+    for (i = 0; child->arguments[i][0] && i < CHILD_MAX_CHANNEL * 4; i++) {
       argv[i + 1] = child->arguments[i];
     }
 
@@ -512,15 +467,12 @@ int child_launch(struct child *child)
     syscall_execve(child->path, argv, NULL);
 
     syscall_exit(1);
-  }
-  else
-  {
-    for(i = 0; i < CHILD_MAX_CHANNEL; i++)
-    {
-      if(child->channels[i][CHILD_CHILD][CHILD_READ] > -1)
+  } else {
+    for (i = 0; i < CHILD_MAX_CHANNEL; i++) {
+      if (child->channels[i][CHILD_CHILD][CHILD_READ] > -1)
         syscall_close(child->channels[i][CHILD_CHILD][CHILD_READ]);
 #ifndef HAVE_SOCKETPAIR
-      if(child->channels[i][CHILD_CHILD][CHILD_WRITE] > -1)
+      if (child->channels[i][CHILD_CHILD][CHILD_WRITE] > -1)
         syscall_close(child->channels[i][CHILD_CHILD][CHILD_WRITE]);
 #endif
       child->channels[i][CHILD_CHILD][CHILD_READ] = -1;
@@ -539,8 +491,7 @@ int child_launch(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_default(struct child *child)
-{
+void child_default(struct child *child) {
   uint32_t i;
 
   dlink_node_zero(&child->node);
@@ -558,8 +509,7 @@ void child_default(struct child *child)
   child->refcount = 1;
   child->timer = NULL;
 
-  for(i = 0; i < CHILD_MAX_CHANNEL; i++)
-  {
+  for (i = 0; i < CHILD_MAX_CHANNEL; i++) {
     child->channels[i][CHILD_PARENT][CHILD_READ] = -1;
     child->channels[i][CHILD_PARENT][CHILD_WRITE] = -1;
     child->channels[i][CHILD_CHILD][CHILD_READ] = -1;
@@ -572,19 +522,16 @@ void child_default(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_set_callback(struct child *child, void *callback)
-{
+void child_set_callback(struct child *child, void *callback) {
   child->callback = callback;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_kill(struct child *child)
-{
+void child_kill(struct child *child) {
 #ifndef WIN32
-  if(child->pid > 0)
-  {
-    if(syscall_kill(child->pid, SIGTERM) > -1)
+  if (child->pid > 0) {
+    if (syscall_kill(child->pid, SIGTERM) > -1)
       log(child_log, L_status, "Killed child %s [%i]", child->name, child->pid);
   }
 #endif
@@ -592,30 +539,26 @@ void child_kill(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_cancel(struct child *child)
-{
+void child_cancel(struct child *child) {
 #ifndef WIN32
   uint32_t i;
 
-  log(child_log, L_status, "Cancelling child %s [%i]",
-      child->name, child->pid);
+  log(child_log, L_status, "Cancelling child %s [%i]", child->name, child->pid);
 
   child_callback(child, CHILD_DEAD);
 
-  for(i = 0; i < CHILD_MAX_CHANNEL; i++)
-  {
-    if(child->channels[i][CHILD_PARENT][CHILD_READ] > -1)
+  for (i = 0; i < CHILD_MAX_CHANNEL; i++) {
+    if (child->channels[i][CHILD_PARENT][CHILD_READ] > -1)
       io_shutup(child->channels[i][CHILD_PARENT][CHILD_READ]);
 #ifndef HAVE_SOCKETPAIR
-    if(child->channels[i][CHILD_PARENT][CHILD_WRITE] > -1)
+    if (child->channels[i][CHILD_PARENT][CHILD_WRITE] > -1)
       io_shutup(child->channels[i][CHILD_PARENT][CHILD_WRITE]);
 #endif
     child->channels[i][CHILD_PARENT][CHILD_READ] = -1;
     child->channels[i][CHILD_PARENT][CHILD_WRITE] = -1;
   }
 
-  if(child->pid > 0)
-  {
+  if (child->pid > 0) {
     int status;
 
     child_kill(child);
@@ -623,8 +566,7 @@ void child_cancel(struct child *child)
     syscall_waitpid(child->pid, &status, WNOHANG);
   }
 
-  if(child->timer)
-  {
+  if (child->timer) {
     timer_remove(child->timer);
     child->timer = NULL;
   }
@@ -633,16 +575,14 @@ void child_cancel(struct child *child)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_vset_args(struct child *child, va_list args)
-{
+void child_vset_args(struct child *child, va_list args) {
   child->args[0] = va_arg(args, void *);
   child->args[1] = va_arg(args, void *);
   child->args[2] = va_arg(args, void *);
   child->args[3] = va_arg(args, void *);
 }
 
-void child_set_args(struct child *child, ...)
-{
+void child_set_args(struct child *child, ...) {
   va_list args;
 
   va_start(args, child);
@@ -652,8 +592,7 @@ void child_set_args(struct child *child, ...)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void child_set_name(struct child *child, const char *name)
-{
+void child_set_name(struct child *child, const char *name) {
   strlcpy(child->name, name, sizeof(child->name));
 
   child->nhash = str_ihash(child->name);
@@ -661,28 +600,22 @@ void child_set_name(struct child *child, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *child_get_name(struct child *child)
-{
-  return child->name;
-}
+const char *child_get_name(struct child *child) { return child->name; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct child *child_find_name(const char *name)
-{
+struct child *child_find_name(const char *name) {
   struct child *child;
-  struct node  *node;
-  hash_t        nhash;
-  
+  struct node *node;
+  hash_t nhash;
+
   nhash = str_ihash(name);
 
-  dlink_foreach(&child_list, node)
-  {
+  dlink_foreach(&child_list, node) {
     child = node->data;
 
-    if(child->nhash == nhash)
-    {
-      if(!str_icmp(child->name, name))
+    if (child->nhash == nhash) {
+      if (!str_icmp(child->name, name))
         return child;
     }
   }
@@ -692,16 +625,14 @@ struct child *child_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct child *child_find_id(uint32_t id)
-{
+struct child *child_find_id(uint32_t id) {
   struct child *child;
-  struct node  *node;
+  struct node *node;
 
-  dlink_foreach(&child_list, node)
-  {
+  dlink_foreach(&child_list, node) {
     child = node->data;
 
-    if(child->id == id)
+    if (child->id == id)
       return child;
   }
 
@@ -711,22 +642,17 @@ struct child *child_find_id(uint32_t id)
 /* ------------------------------------------------------------------------ *
  * Dump childs and child heap.                                              *
  * ------------------------------------------------------------------------ */
-void child_dump(struct child *cdptr)
-{
-  if(cdptr == NULL)
-  {
+void child_dump(struct child *cdptr) {
+  if (cdptr == NULL) {
     dump(child_log, "[============== child summary ===============]");
 
-    dlink_foreach(&child_list, cdptr)
-    {
-      dump(child_log, " #%u: [%u] %-20s (%i)",
-           cdptr->id, cdptr->refcount, cdptr->name, cdptr->pid);
+    dlink_foreach(&child_list, cdptr) {
+      dump(child_log, " #%u: [%u] %-20s (%i)", cdptr->id, cdptr->refcount,
+           cdptr->name, cdptr->pid);
     }
 
     dump(child_log, "[=========== end of child summary ===========]");
-  }
-  else
-  {
+  } else {
     dump(child_log, "[=============== child dump ================]");
     dump(child_log, "         id: #%u", cdptr->id);
     dump(child_log, "   refcount: %u", cdptr->refcount);
@@ -737,10 +663,14 @@ void child_dump(struct child *cdptr)
     dump(child_log, "      timer: %i", cdptr->timer ? cdptr->timer->id : -1);
     dump(child_log, "      chans: %u", cdptr->chans);
     dump(child_log, "   channels: [%i:%i] [%i:%i] [%i:%i] [%i:%i]",
-         cdptr->channels[0][CHILD_PARENT][0], cdptr->channels[0][CHILD_PARENT][1],
-         cdptr->channels[1][CHILD_PARENT][0], cdptr->channels[1][CHILD_PARENT][1],
-         cdptr->channels[2][CHILD_PARENT][0], cdptr->channels[2][CHILD_PARENT][1],
-         cdptr->channels[3][CHILD_PARENT][0], cdptr->channels[3][CHILD_PARENT][1]);
+         cdptr->channels[0][CHILD_PARENT][0],
+         cdptr->channels[0][CHILD_PARENT][1],
+         cdptr->channels[1][CHILD_PARENT][0],
+         cdptr->channels[1][CHILD_PARENT][1],
+         cdptr->channels[2][CHILD_PARENT][0],
+         cdptr->channels[2][CHILD_PARENT][1],
+         cdptr->channels[3][CHILD_PARENT][0],
+         cdptr->channels[3][CHILD_PARENT][1]);
     dump(child_log, "  autostart: %s", cdptr->autostart ? "on" : "off");
     dump(child_log, "   exitcode: %i", cdptr->exitcode);
     dump(child_log, "   interval: %llu", cdptr->interval);
@@ -748,11 +678,13 @@ void child_dump(struct child *cdptr)
     dump(child_log, "       name: %s", cdptr->name);
     dump(child_log, "       path: %s", cdptr->path);
     dump(child_log, "       argv: %s", cdptr->argv);
-    dump(child_log, "  arguments: [ '%s' , '%s' , '%s', '%s', '%s', '%s', '%s', '%s' ]",
-         cdptr->arguments[0], cdptr->arguments[1], cdptr->arguments[2], cdptr->arguments[3],
-         cdptr->arguments[4], cdptr->arguments[5], cdptr->arguments[6], cdptr->arguments[7]);
-    dump(child_log, "       args: %p, %p, %p, %p",
-         cdptr->args[0], cdptr->args[1], cdptr->args[2], cdptr->args[3]);
+    dump(child_log,
+         "  arguments: [ '%s' , '%s' , '%s', '%s', '%s', '%s', '%s', '%s' ]",
+         cdptr->arguments[0], cdptr->arguments[1], cdptr->arguments[2],
+         cdptr->arguments[3], cdptr->arguments[4], cdptr->arguments[5],
+         cdptr->arguments[6], cdptr->arguments[7]);
+    dump(child_log, "       args: %p, %p, %p, %p", cdptr->args[0],
+         cdptr->args[1], cdptr->args[2], cdptr->args[3]);
     dump(child_log, "[============ end of child dump ============]");
   }
 }

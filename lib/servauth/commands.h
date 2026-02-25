@@ -25,14 +25,13 @@
 
 struct control;
 
-typedef int (cmd_t)(struct control *, int, char **);
+typedef int(cmd_t)(struct control *, int, char **);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct cmd_table
-{
-  char    *name; /* name of command */
-  cmd_t   *func; /* function to call */
+struct cmd_table {
+  char *name;  /* name of command */
+  cmd_t *func; /* function to call */
 };
 
 extern struct cmd_table cmds[];
@@ -44,7 +43,7 @@ extern struct cmd_table dns_cmds[];
  * cmd_table  - the command table                                             *
  * name       - name of the command to find                                   *
  * -------------------------------------------------------------------------- */
-extern struct cmd_table *command_get (struct cmd_table *cmd_table,
-                                      const char       *name);
+extern struct cmd_table *command_get(struct cmd_table *cmd_table,
+                                     const char *name);
 
 #endif

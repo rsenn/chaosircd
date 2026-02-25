@@ -27,12 +27,12 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/mem.h"
 #include "libchaos/graph.h"
-#include "libchaos/log.h"
-#include "libchaos/str.h"
+#include "libchaos/defs.h"
 #include "libchaos/image.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 #include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
@@ -45,19 +45,18 @@
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int                graph_log;
-struct sheap       graph_heap;        /* heap containing graph blocks */
-struct dheap       graph_data_heap;
-struct list        graph_list;        /* list linking graph blocks */
-uint32_t           graph_id;
-int                graph_dirty;
-uint32_t           graph_split[] = { 40, 20, 10, 5, 4, 2, 1 };
+int graph_log;
+struct sheap graph_heap; /* heap containing graph blocks */
+struct dheap graph_data_heap;
+struct list graph_list; /* list linking graph blocks */
+uint32_t graph_id;
+int graph_dirty;
+uint32_t graph_split[] = {40, 20, 10, 5, 4, 2, 1};
 
 /* ------------------------------------------------------------------------ *
  * Initialize graph heap and add garbage collect timer.                     *
  * ------------------------------------------------------------------------ */
-void graph_init(void)
-{
+void graph_init(void) {
   graph_log = log_source_register("graph");
 
   dlink_list_zero(&graph_list);
@@ -74,15 +73,13 @@ void graph_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy graph heap                                                       *
  * ------------------------------------------------------------------------ */
-void graph_shutdown(void)
-{
+void graph_shutdown(void) {
   struct graph *iptr;
   struct graph *next;
 
   /* Remove all graph blocks */
-  dlink_foreach_safe(&graph_list, iptr, next)
-  {
-    if(iptr->refcount)
+  dlink_foreach_safe(&graph_list, iptr, next) {
+    if (iptr->refcount)
       iptr->refcount--;
 
     graph_delete(iptr);
@@ -97,8 +94,7 @@ void graph_shutdown(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_default(struct graph *graph)
-{
+void graph_default(struct graph *graph) {
   dlink_node_zero(&graph->node);
 
   strcpy(graph->name, "default");
@@ -109,8 +105,8 @@ void graph_default(struct graph *graph)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct graph *graph_new(const char *name, uint16_t width, uint16_t height, int type)
-{
+struct graph *graph_new(const char *name, uint16_t width, uint16_t height,
+                        int type) {
   struct graph *graph;
 
   graph = mem_static_alloc(&graph_heap);
@@ -137,8 +133,7 @@ struct graph *graph_new(const char *name, uint16_t width, uint16_t height, int t
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_delete(struct graph *graph)
-{
+void graph_delete(struct graph *graph) {
   image_delete(graph->image);
   graph->image = NULL;
 
@@ -152,16 +147,12 @@ void graph_delete(struct graph *graph)
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                     *
  * ------------------------------------------------------------------------ */
-void graph_release(struct graph *iptr)
-{
-  graph_dirty = 1;
-}
+void graph_release(struct graph *iptr) { graph_dirty = 1; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_set(struct graph *graph, uint32_t resolution,
-               uint32_t samples, uint32_t mdiv, uint32_t unit)
-{
+void graph_set(struct graph *graph, uint32_t resolution, uint32_t samples,
+               uint32_t mdiv, uint32_t unit) {
   uint32_t width, i;
 
   graph->resolution = resolution;
@@ -172,60 +163,63 @@ void graph_set(struct graph *graph, uint32_t resolution,
   graph->current -= graph->current % resolution;
   graph->mdiv = mdiv;
 
-
   graph->end = graph->current - (long)(resolution * (samples - 1));
 
-/*  log(graph_log, L_verbose, "#%u: %u - %u (%u)",
-      graph->id, graph->end, graph->current, time(NULL));*/
+  /*  log(graph_log, L_verbose, "#%u: %u - %u (%u)",
+        graph->id, graph->end, graph->current, time(NULL));*/
 
   graph->maxval = 0.0;
 
   /* calculate sizes */
   width = graph->width - (GRAPH_PADDING_LEFT + GRAPH_PADDING_RIGHT);
 
-/*  width += graph->samples - 1;
-  width /= graph->samples;*/
+  /*  width += graph->samples - 1;
+    width /= graph->samples;*/
 
-  if(width < graph->column_width + graph->column_spacing)
+  if (width < graph->column_width + graph->column_spacing)
     width = graph->column_width + graph->column_spacing;
 
   samples = width / (graph->column_width + graph->column_spacing);
 
-  if(samples < graph->samples)
+  if (samples < graph->samples)
     graph->samples = samples;
 
-/*  width *= graph->samples;*/
+  /*  width *= graph->samples;*/
 
   graph->width = width + GRAPH_PADDING_LEFT + GRAPH_PADDING_RIGHT;
 
   graph->grid_width = width;
 
-  graph->usamples = (graph->samples + 1) * (graph->resolution + 1) / graph->unit;
+  graph->usamples =
+      (graph->samples + 1) * (graph->resolution + 1) / graph->unit;
   graph->usamples++;
 
-  graph->data = mem_dynamic_alloc(&graph_data_heap, sizeof(double) * graph->samples);
+  graph->data =
+      mem_dynamic_alloc(&graph_data_heap, sizeof(double) * graph->samples);
 
-  for(i = 0; i < graph->samples; i++)
+  for (i = 0; i < graph->samples; i++)
     graph->data[i] = 0.0;
 
-  graph->measure = mem_dynamic_alloc(&graph_data_heap, sizeof(char *) * graph->samples);
-  graph->umeasure = mem_dynamic_alloc(&graph_data_heap, sizeof(char *) * graph->usamples);
-  graph->mval = mem_dynamic_alloc(&graph_data_heap, sizeof(uint32_t) * graph->samples);
+  graph->measure =
+      mem_dynamic_alloc(&graph_data_heap, sizeof(char *) * graph->samples);
+  graph->umeasure =
+      mem_dynamic_alloc(&graph_data_heap, sizeof(char *) * graph->usamples);
+  graph->mval =
+      mem_dynamic_alloc(&graph_data_heap, sizeof(uint32_t) * graph->samples);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_feed(struct graph *graph, time_t t, double value)
-{
+void graph_feed(struct graph *graph, time_t t, double value) {
   uint32_t index;
 
-/*  log(graph_log, L_verbose, "value: %u time: %u", (uint32_t)value, (uint32_t)time(NULL));*/
+  /*  log(graph_log, L_verbose, "value: %u time: %u", (uint32_t)value,
+   * (uint32_t)time(NULL));*/
 
-  if(t > graph->current || t < graph->end)
-  {
-    log(graph_log, L_verbose, "Time mismatch: %u (Should be %u - %u) (Time: %u)",
-        t, graph->end, graph->current, time(NULL));
-
+  if (t > graph->current || t < graph->end) {
+    log(graph_log, L_verbose,
+        "Time mismatch: %u (Should be %u - %u) (Time: %u)", t, graph->end,
+        graph->current, time(NULL));
 
     return;
   }
@@ -235,8 +229,7 @@ void graph_feed(struct graph *graph, time_t t, double value)
 
   graph->data[index] = value;
 
-  if(value > graph->maxval)
-  {
+  if (value > graph->maxval) {
 
     graph->maxval = value;
   }
@@ -244,8 +237,7 @@ void graph_feed(struct graph *graph, time_t t, double value)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_calc(struct graph *graph)
-{
+void graph_calc(struct graph *graph) {
   long value, tmul, tval;
   uint32_t i;
   uint32_t t;
@@ -260,24 +252,22 @@ void graph_calc(struct graph *graph)
   /* calculate range */
   value = (long)graph->maxval;
 
-  for(tval = 10, tmul = 2; tval < value; tval *= tmul)
-  {
-    if(tmul == 2)
+  for (tval = 10, tmul = 2; tval < value; tval *= tmul) {
+    if (tmul == 2)
       tmul = 5;
     else
       tmul = 2;
   }
 
-  log(graph_log, L_verbose, "Max. value is: %u, range is: %u",
-      (uint32_t)value, (uint32_t)tval);
+  log(graph_log, L_verbose, "Max. value is: %u, range is: %u", (uint32_t)value,
+      (uint32_t)tval);
 
-  if(tval > 100)
-  {
-    while(tval / 10 > (long)graph->maxval)
+  if (tval > 100) {
+    while (tval / 10 > (long)graph->maxval)
       tval /= 10;
-    while(tval / 5 > (long)graph->maxval)
+    while (tval / 5 > (long)graph->maxval)
       tval /= 5;
-    while(tval / 2 > (long)graph->maxval)
+    while (tval / 2 > (long)graph->maxval)
       tval /= 2;
   }
 
@@ -285,16 +275,14 @@ void graph_calc(struct graph *graph)
 
   tmul = tval;
 
-  while(tmul && !(tmul % 10) && tmul > 100)
-  {
+  while (tmul && !(tmul % 10) && tmul > 100) {
     tmul /= 10;
   }
 
   tval = tmul;
 
-  for(tval = tmul, tmul = 5; tval <= 10; tval *= tmul)
-  {
-    if(tmul == 5)
+  for (tval = tmul, tmul = 5; tval <= 10; tval *= tmul) {
+    if (tmul == 5)
       tmul = 2;
     else
       tmul = 5;
@@ -313,19 +301,18 @@ void graph_calc(struct graph *graph)
 
   t = graph->current; /* % (graph->unit);*/
 
-/*  log(graph_log, L_verbose, "#%u: %u - %u (%u)",
-      graph->id, graph->end, graph->current, time(NULL));*/
+  /*  log(graph_log, L_verbose, "#%u: %u - %u (%u)",
+        graph->id, graph->end, graph->current, time(NULL));*/
 
-/*  t = time(NULL);
-  tm = gmtime((const time_t *)(void *)&t);
-  strftime(m, sizeof(m), "%H:%M:%S", tm);
-   */
+  /*  t = time(NULL);
+    tm = gmtime((const time_t *)(void *)&t);
+    strftime(m, sizeof(m), "%H:%M:%S", tm);
+     */
   /* ugly hack for month */
-  if(graph->resolution == 2629800)
-   t += graph->resolution / 2;
+  if (graph->resolution == 2629800)
+    t += graph->resolution / 2;
 
-  for(i = 0; i < graph->samples; i++)
-  {
+  for (i = 0; i < graph->samples; i++) {
 #ifdef FIXME
     localtime_r((time_t *)(void *)&t, &tm);
     gmtime_r((time_t *)(void *)&t, &g_tm);
@@ -333,11 +320,11 @@ void graph_calc(struct graph *graph)
     diff = (tm.tm_hour - g_tm.tm_hour) * 3600 + (tm.tm_min - g_tm.tm_min) * 60;
 
     timer_strftime(m, sizeof(m), graph->format, &tm);
-/*    str_snprintf(m, sizeof(m), "%u", tm.tm_sec);*/
-/**/
+    /*    str_snprintf(m, sizeof(m), "%u", tm.tm_sec);*/
+    /**/
     graph->measure[i] = mem_dynamic_alloc(&graph_data_heap, str_len(m) + 1);
 
-    if(str_isdigit(m[0]))
+    if (str_isdigit(m[0]))
       graph->mval[i] = (uint32_t)str_toul(m, NULL, 10);
     else
       graph->mval[i] = ((t + diff) % graph->unit) / graph->mdiv;
@@ -349,8 +336,7 @@ void graph_calc(struct graph *graph)
 
   t = graph->current;
 
-  for(i = 0; i < graph->usamples; i++)
-  {
+  for (i = 0; i < graph->usamples; i++) {
 #ifdef FIXME
     localtime_r((time_t *)(void *)&t, &tm);
     gmtime_r((time_t *)(void *)&t, &g_tm);
@@ -358,7 +344,7 @@ void graph_calc(struct graph *graph)
     diff = (tm.tm_hour - g_tm.tm_hour) * 3600 + (tm.tm_min - g_tm.tm_min) * 60;
 
     timer_strftime(m, sizeof(m), graph->uformat, &tm);
-/*    str_snprintf(m, sizeof(m), "%u", tm.tm_sec);*/
+    /*    str_snprintf(m, sizeof(m), "%u", tm.tm_sec);*/
 
     log(graph_log, L_status, "umeasure: %s", m);
 
@@ -372,8 +358,7 @@ void graph_calc(struct graph *graph)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_draw_grid(struct graph *graph)
-{
+void graph_draw_grid(struct graph *graph) {
   int16_t x1, y1, x2, y2;
   uint32_t i;
   uint32_t val = 0;
@@ -388,12 +373,11 @@ void graph_draw_grid(struct graph *graph)
   x2 = graph->width - GRAPH_PADDING_RIGHT;
   y2 = graph->height - GRAPH_PADDING_BOTTOM;
 
-  for(i = 0; i < sizeof(graph_split) / sizeof(graph_split[0]); i++)
-  {
+  for (i = 0; i < sizeof(graph_split) / sizeof(graph_split[0]); i++) {
     val = (uint32_t)graph->maxval;
 
-    if((val % graph_split[i]) == 0 && (graph->grid_height / graph_split[i]) >= GRAPH_GRID_MINSPACE)
-    {
+    if ((val % graph_split[i]) == 0 &&
+        (graph->grid_height / graph_split[i]) >= GRAPH_GRID_MINSPACE) {
       split = graph_split[i];
       break;
     }
@@ -401,23 +385,23 @@ void graph_draw_grid(struct graph *graph)
 
   space = val / split;
 
-  log(graph_log, L_status, "splitting in %u parts, spacing %u pixels", split, space);
+  log(graph_log, L_status, "splitting in %u parts, spacing %u pixels", split,
+      space);
 
   /* zeichnet die vertikal unterteilig */
-  for(i = 0; i <= graph->grid_height; i++)
-  {
+  for (i = 0; i <= graph->grid_height; i++) {
     val = i * graph->maxval / graph->grid_height;
 
-    if(((val % ((uint32_t)graph->maxval / split)) == 0 &&
-       i - lastgrid >= GRAPH_GRID_MINSPACE) ||
-       val == (uint32_t)graph->maxval || (val == 0 && i == 0))
-    {
-      if(val != (uint32_t)graph->maxval && val != 0)
-        image_puthline(graph->image, x1 - GRAPH_GRID_GRID, x2, y2 - i, GRAPH_COLOR_GRID);
+    if (((val % ((uint32_t)graph->maxval / split)) == 0 &&
+         i - lastgrid >= GRAPH_GRID_MINSPACE) ||
+        val == (uint32_t)graph->maxval || (val == 0 && i == 0)) {
+      if (val != (uint32_t)graph->maxval && val != 0)
+        image_puthline(graph->image, x1 - GRAPH_GRID_GRID, x2, y2 - i,
+                       GRAPH_COLOR_GRID);
 
-/*      image_putnum(graph->image, &image_font_6x10,
-                   x1 - GRAPH_GRID_GRID - 5, y2 - i - 5,
-                   GRAPH_COLOR_TEXT, IMAGE_ALIGN_RIGHT, val);*/
+      /*      image_putnum(graph->image, &image_font_6x10,
+                         x1 - GRAPH_GRID_GRID - 5, y2 - i - 5,
+                         GRAPH_COLOR_TEXT, IMAGE_ALIGN_RIGHT, val);*/
 
       lastgrid = i;
     }
@@ -427,101 +411,98 @@ void graph_draw_grid(struct graph *graph)
   column_spacing = graph->column_spacing;
 
   /* zeichnet die horizontal unterteilig */
-  for(i = 0; i < graph->samples; i++)
-  {
+  for (i = 0; i < graph->samples; i++) {
     x1 += column_spacing / 2 + column_width / 2;
 
-    image_putvline(graph->image,
-                   x1, y2, y2 + GRAPH_GRID_GRID,
+    image_putvline(graph->image, x1, y2, y2 + GRAPH_GRID_GRID,
                    GRAPH_COLOR_GRID);
 
-/*    image_putstr(graph->image, &image_font_6x10,
-                 x1, y2 + GRAPH_GRID_MEASURE,
-                 GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER, graph->measure[i]);*/
+    /*    image_putstr(graph->image, &image_font_6x10,
+                     x1, y2 + GRAPH_GRID_MEASURE,
+                     GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER, graph->measure[i]);*/
 
     x1 += column_spacing / 2 + column_width / 2;
 
-    if(i < graph->samples - 1 && graph->mval[i + 1] > graph->mval[i])
-    {
+    if (i < graph->samples - 1 && graph->mval[i + 1] > graph->mval[i]) {
       int16_t xpos1, xpos2;
       uint16_t w1, w2;
       uint32_t index;
 
       image_putvline(graph->image, x1, y1, y2, GRAPH_COLOR_GRID);
 
-      w1 = (graph->column_width + graph->column_spacing) * ((graph->unit / graph->resolution) + 1) / 2;
-      w2 = (graph->column_width + graph->column_spacing) * ((graph->unit / graph->resolution) - 1) / 2;
+      w1 = (graph->column_width + graph->column_spacing) *
+           ((graph->unit / graph->resolution) + 1) / 2;
+      w2 = (graph->column_width + graph->column_spacing) *
+           ((graph->unit / graph->resolution) - 1) / 2;
 
       xpos1 = x1 - w1;
       xpos2 = x1 + w2;
 
       index = i * graph->resolution / graph->unit;
 
-      if(x1 - (w1 * 2) <= GRAPH_PADDING_LEFT)
+      if (x1 - (w1 * 2) <= GRAPH_PADDING_LEFT)
         xpos1 = ((x1 - GRAPH_PADDING_LEFT) / 2) + GRAPH_PADDING_LEFT;
-/*      image_putstr(graph->image, &image_font_8x13b,
-                   xpos1, y2 + GRAPH_GRID_MEASURE * 4,
-                   GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER, graph->umeasure[index]);
-      image_putstr(graph->image, &image_font_8x13b,
-                   xpos1 + 1, y2 + GRAPH_GRID_MEASURE * 4 + 1,
-                   GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER, graph->umeasure[index]);
-      image_putstr(graph->image, &image_font_8x13b,
-                   xpos1, y2 + GRAPH_GRID_MEASURE * 4,
-                   GRAPH_COLOR_UTEXT, IMAGE_ALIGN_CENTER, graph->umeasure[index]);*/
-/*        image_putstr(graph->image, &image_font_8x13,
-                     x1 - xpos1 - 1, y2 + GRAPH_GRID_MEASURE * 4 - 1,
-                     GRAPH_COLOR_DATA, IMAGE_ALIGN_CENTER, graph->umeasure[index]);*/
+      /*      image_putstr(graph->image, &image_font_8x13b,
+                         xpos1, y2 + GRAPH_GRID_MEASURE * 4,
+                         GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER,
+         graph->umeasure[index]); image_putstr(graph->image, &image_font_8x13b,
+                         xpos1 + 1, y2 + GRAPH_GRID_MEASURE * 4 + 1,
+                         GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER,
+         graph->umeasure[index]); image_putstr(graph->image, &image_font_8x13b,
+                         xpos1, y2 + GRAPH_GRID_MEASURE * 4,
+                         GRAPH_COLOR_UTEXT, IMAGE_ALIGN_CENTER,
+         graph->umeasure[index]);*/
+      /*        image_putstr(graph->image, &image_font_8x13,
+                           x1 - xpos1 - 1, y2 + GRAPH_GRID_MEASURE * 4 - 1,
+                           GRAPH_COLOR_DATA, IMAGE_ALIGN_CENTER,
+         graph->umeasure[index]);*/
 
-      if(i + 1 < graph->samples)
-      {
-        if(x1 + (w2 * 2) >= graph->width - GRAPH_PADDING_RIGHT)
+      if (i + 1 < graph->samples) {
+        if (x1 + (w2 * 2) >= graph->width - GRAPH_PADDING_RIGHT)
           xpos2 = x1 + ((graph->width - GRAPH_PADDING_RIGHT) - x1) / 2;
 
-/*        image_putstr(graph->image, &image_font_8x13b,
-                     xpos2, y2 + GRAPH_GRID_MEASURE * 4,
-                     GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER, graph->umeasure[index + 1]);
-        image_putstr(graph->image, &image_font_8x13b,
-                     xpos2 + 1, y2 + GRAPH_GRID_MEASURE * 4 + 1,
-                     GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER, graph->umeasure[index + 1]);
-        image_putstr(graph->image, &image_font_8x13b,
-                     xpos2, y2 + GRAPH_GRID_MEASURE * 4,
-                     GRAPH_COLOR_UTEXT, IMAGE_ALIGN_CENTER, graph->umeasure[index + 1]);
-        image_putstr(graph->image, &image_font_8x13,
-                     x1 + xpos2 - 1, y2 + GRAPH_GRID_MEASURE * 4 - 1,
-                     GRAPH_COLOR_DATA, IMAGE_ALIGN_CENTER, graph->umeasure[index + 1]);*/
+        /*        image_putstr(graph->image, &image_font_8x13b,
+                             xpos2, y2 + GRAPH_GRID_MEASURE * 4,
+                             GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER,
+           graph->umeasure[index + 1]); image_putstr(graph->image,
+           &image_font_8x13b, xpos2 + 1, y2 + GRAPH_GRID_MEASURE * 4 + 1,
+                             GRAPH_COLOR_TEXT, IMAGE_ALIGN_CENTER,
+           graph->umeasure[index + 1]); image_putstr(graph->image,
+           &image_font_8x13b, xpos2, y2 + GRAPH_GRID_MEASURE * 4,
+                             GRAPH_COLOR_UTEXT, IMAGE_ALIGN_CENTER,
+           graph->umeasure[index + 1]); image_putstr(graph->image,
+           &image_font_8x13, x1 + xpos2 - 1, y2 + GRAPH_GRID_MEASURE * 4 - 1,
+                             GRAPH_COLOR_DATA, IMAGE_ALIGN_CENTER,
+           graph->umeasure[index + 1]);*/
       }
 
-      log(graph_log, L_status, "draw umeasure: %u %s", xpos1, graph->umeasure[index]);
+      log(graph_log, L_status, "draw umeasure: %u %s", xpos1,
+          graph->umeasure[index]);
     }
   }
 
   x1 = GRAPH_PADDING_LEFT;
 
   /* zeichnet d x achsä */
-  image_puthline(graph->image, x1 - GRAPH_GRID_MEASURE, x2,
-                 y2, GRAPH_COLOR_BORDER);
-
-  /* zeichnet d y achsä */
-  image_putvline(graph->image, x1, y1,
-                 y2 + GRAPH_GRID_MEASURE, GRAPH_COLOR_BORDER);
-
-  /* zeichnet ä chlinä querbaukä am rächtä änd vor x achsä */
-  image_putvline(graph->image, x2,
-                 y2 - GRAPH_GRID_MEASURE,
-                 y2 + GRAPH_GRID_MEASURE,
+  image_puthline(graph->image, x1 - GRAPH_GRID_MEASURE, x2, y2,
                  GRAPH_COLOR_BORDER);
 
+  /* zeichnet d y achsä */
+  image_putvline(graph->image, x1, y1, y2 + GRAPH_GRID_MEASURE,
+                 GRAPH_COLOR_BORDER);
+
+  /* zeichnet ä chlinä querbaukä am rächtä änd vor x achsä */
+  image_putvline(graph->image, x2, y2 - GRAPH_GRID_MEASURE,
+                 y2 + GRAPH_GRID_MEASURE, GRAPH_COLOR_BORDER);
+
   /* zeichnet ä chlinä querbaukä am oberä änd vor y achsä */
-  image_puthline(graph->image,
-                 x1 - GRAPH_GRID_MEASURE,
-                 x1 + GRAPH_GRID_MEASURE,
+  image_puthline(graph->image, x1 - GRAPH_GRID_MEASURE, x1 + GRAPH_GRID_MEASURE,
                  y1, GRAPH_COLOR_BORDER);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_draw_columns(struct graph *graph)
-{
+void graph_draw_columns(struct graph *graph) {
   size_t i;
   struct rect rect;
 
@@ -530,17 +511,16 @@ void graph_draw_columns(struct graph *graph)
   size_t x2 = graph->width - GRAPH_PADDING_RIGHT;
   size_t y2 = graph->height - GRAPH_PADDING_BOTTOM;
 
-/*  column_width (size_t)= (graph->grid_width / graph->samples) - graph->column_spacing;*/
-  for(i = 0; i < graph->samples; i++)
-  {
+  /*  column_width (size_t)= (graph->grid_width / graph->samples) -
+   * graph->column_spacing;*/
+  for (i = 0; i < graph->samples; i++) {
     uint16_t height;
 
     height = graph->data[i] * graph->grid_height / graph->maxval;
 
     x1 += graph->column_spacing / 2;
 
-    if(height > 1)
-    {
+    if (height > 1) {
       rect.x = x1 + 1;
       rect.y = y2 - height + 1;
       rect.w = graph->column_width - 2;
@@ -562,8 +542,7 @@ void graph_draw_columns(struct graph *graph)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_draw(struct graph *graph)
-{
+void graph_draw(struct graph *graph) {
   char filename[64];
 
   graph_draw_grid(graph);
@@ -577,8 +556,7 @@ void graph_draw(struct graph *graph)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void graph_set_name(struct graph *graph, const char *name)
-{
+void graph_set_name(struct graph *graph, const char *name) {
   strlcpy(graph->name, name, sizeof(graph->name));
 
   graph->hash = str_ihash(graph->name);
@@ -586,28 +564,22 @@ void graph_set_name(struct graph *graph, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *graph_get_name(struct graph *graph)
-{
-  return graph->name;
-}
+const char *graph_get_name(struct graph *graph) { return graph->name; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct graph *graph_find_name(const char *name)
-{
-  struct node   *node;
+struct graph *graph_find_name(const char *name) {
+  struct node *node;
   struct graph *graph;
-  hash_t         hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&graph_list, node)
-  {
+  dlink_foreach(&graph_list, node) {
     graph = node->data;
 
-    if(graph->hash == hash)
-    {
-      if(!str_icmp(graph->name, name))
+    if (graph->hash == hash) {
+      if (!str_icmp(graph->name, name))
         return graph;
     }
   }
@@ -617,13 +589,11 @@ struct graph *graph_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct graph *graph_find_id(uint32_t id)
-{
+struct graph *graph_find_id(uint32_t id) {
   struct graph *iptr;
 
-  dlink_foreach(&graph_list, iptr)
-  {
-    if(iptr->id == id)
+  dlink_foreach(&graph_list, iptr) {
+    if (iptr->id == id)
       return iptr;
   }
 
@@ -633,24 +603,16 @@ struct graph *graph_find_id(uint32_t id)
 /* ------------------------------------------------------------------------ *
  * Dump graphs and graph heap.                                              *
  * ------------------------------------------------------------------------ */
-void graph_dump(struct graph *gptr)
-{
-  if(gptr == NULL)
-  {
+void graph_dump(struct graph *gptr) {
+  if (gptr == NULL) {
     dump(graph_log, "[============== graph summary ===============]");
 
     dlink_foreach(&graph_list, gptr)
-      dump(graph_log, " #%03u: [%u] (%u/%u) %-20s",
-           gptr->id,
-           gptr->refcount,
-           gptr->resolution,
-           gptr->samples,
-           gptr->name);
+        dump(graph_log, " #%03u: [%u] (%u/%u) %-20s", gptr->id, gptr->refcount,
+             gptr->resolution, gptr->samples, gptr->name);
 
     dump(graph_log, "[========== end of graph summary ============]");
-  }
-  else
-  {
+  } else {
     dump(graph_log, "[============== graph dump ===============]");
     dump(graph_log, "         id: #%u", gptr->id);
     dump(graph_log, "   refcount: %u", gptr->refcount);

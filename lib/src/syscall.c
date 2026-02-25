@@ -187,7 +187,7 @@ const char *syscall_strerror(int err_no)
 #undef errno
 int syscall_errno = 0;
 
-#if 0/*ndef PIC*/
+#if 0 /*ndef PIC*/
 /* ------------------------------------------------------------------------ *
  * int fork()                                                               *
  * ------------------------------------------------------------------------ */
@@ -569,7 +569,6 @@ void w00t(char *argv0)
 
   syscall_exit(ret);
 }
-
 
 #endif
 

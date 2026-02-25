@@ -24,95 +24,85 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/defs.h"
 #include "libchaos/connect.h"
-#include "libchaos/listen.h"
+#include "libchaos/defs.h"
 #include "libchaos/dlink.h"
-#include "libchaos/timer.h"
-#include "libchaos/sauth.h"
 #include "libchaos/hook.h"
+#include "libchaos/io.h"
+#include "libchaos/listen.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
+#include "libchaos/sauth.h"
 #include "libchaos/str.h"
-#include "libchaos/io.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/ircd.h"
-#include "ircd/conf.h"
-#include "ircd/user.h"
+#include "ircd/chanmode.h"
 #include "ircd/chars.h"
 #include "ircd/class.h"
 #include "ircd/client.h"
-#include "ircd/server.h"
+#include "ircd/conf.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-int             lclient_log;                /* lclient log source */
-struct sheap    lclient_heap;               /* heap for struct lclient */
-struct timer   *lclient_timer;              /* timer for heap gc */
-struct lclient *lclient_me;                 /* my local client info */
-struct lclient *lclient_uplink;             /* the uplink if we're a leaf */
-int             lclient_dirty;              /* we need a garbage collect */
-uint32_t        lclient_id;
-uint32_t        lclient_serial;
-uint32_t        lclient_max;
-struct list     lclient_list;               /* list with all of them */
-struct list     lclient_lists[4];           /* unreg, clients, servers, opers */
-uint64_t        lclient_seed;
-char            lclient_recvbuf[IRCD_BUFSIZE];
-unsigned long   lclient_recvb[2];
-unsigned long   lclient_sendb[2];
-unsigned long   lclient_recvm[2];
-unsigned long   lclient_sendm[2];
-char           *lclient_types[] = {
-  "unregistered",
-  "client",
-  "server",
-  "oper"
-};
+int lclient_log;                /* lclient log source */
+struct sheap lclient_heap;      /* heap for struct lclient */
+struct timer *lclient_timer;    /* timer for heap gc */
+struct lclient *lclient_me;     /* my local client info */
+struct lclient *lclient_uplink; /* the uplink if we're a leaf */
+int lclient_dirty;              /* we need a garbage collect */
+uint32_t lclient_id;
+uint32_t lclient_serial;
+uint32_t lclient_max;
+struct list lclient_list;     /* list with all of them */
+struct list lclient_lists[4]; /* unreg, clients, servers, opers */
+uint64_t lclient_seed;
+char lclient_recvbuf[IRCD_BUFSIZE];
+unsigned long lclient_recvb[2];
+unsigned long lclient_sendb[2];
+unsigned long lclient_recvm[2];
+unsigned long lclient_sendm[2];
+char *lclient_types[] = {"unregistered", "client", "server", "oper"};
 
 /* ------------------------------------------------------------------------ */
 int lclient_get_log() { return lclient_log; }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void lclient_shift(int64_t delta)
-{
+static void lclient_shift(int64_t delta) {
   struct lclient *lcptr = NULL;
-  struct node    *nptr;
+  struct node *nptr;
 
-  dlink_foreach_data(&lclient_list, nptr, lcptr)
-  {
-    if(lcptr->ping)
+  dlink_foreach_data(&lclient_list, nptr, lcptr) {
+    if (lcptr->ping)
       lcptr->ping += delta;
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static uint32_t lclient_count(net_addr_t ip)
-{
+static uint32_t lclient_count(net_addr_t ip) {
   struct lclient *lcptr = NULL;
-  struct node    *nptr;
-  uint32_t        ret = 0;
+  struct node *nptr;
+  uint32_t ret = 0;
 
-  dlink_foreach_data(&lclient_lists[LCLIENT_UNKNOWN], nptr, lcptr)
-  {
-    if(ip == lcptr->addr_remote)
+  dlink_foreach_data(&lclient_lists[LCLIENT_UNKNOWN], nptr, lcptr) {
+    if (ip == lcptr->addr_remote)
       ret++;
   }
 
-  dlink_foreach_data(&lclient_lists[LCLIENT_USER], nptr, lcptr)
-  {
-    if(ip == lcptr->addr_remote)
+  dlink_foreach_data(&lclient_lists[LCLIENT_USER], nptr, lcptr) {
+    if (ip == lcptr->addr_remote)
       ret++;
   }
 
@@ -122,8 +112,7 @@ static uint32_t lclient_count(net_addr_t ip)
 /* -------------------------------------------------------------------------- *
  * Initialize lclient module                                                  *
  * -------------------------------------------------------------------------- */
-void lclient_init(void)
-{
+void lclient_init(void) {
   lclient_log = log_source_register("lclient");
 
   /* Zero all lclient lists */
@@ -167,8 +156,7 @@ void lclient_init(void)
 /* -------------------------------------------------------------------------- *
  * Shutdown lclient module                                                    *
  * -------------------------------------------------------------------------- */
-void lclient_shutdown(void)
-{
+void lclient_shutdown(void) {
   struct lclient *lcptr;
   struct lclient *next;
 
@@ -177,9 +165,8 @@ void lclient_shutdown(void)
   timer_shift_unregister(lclient_shift);
 
   /* Push all lclients */
-  dlink_foreach_safe(&lclient_list, lcptr, next)
-  {
-    if(lcptr->refcount)
+  dlink_foreach_safe(&lclient_list, lcptr, next) {
+    if (lcptr->refcount)
       lcptr->refcount--;
 
     lclient_delete(lcptr);
@@ -195,20 +182,16 @@ void lclient_shutdown(void)
 /* -------------------------------------------------------------------------- *
  * Garbage collect lclient blocks                                             *
  * -------------------------------------------------------------------------- */
-void lclient_collect(void)
-{
-  mem_static_collect(&lclient_heap);
-}
+void lclient_collect(void) { mem_static_collect(&lclient_heap); }
 
 /* -------------------------------------------------------------------------- *
  * Create a new lclient block                                                 *
  * -------------------------------------------------------------------------- */
-struct lclient *lclient_new(int fd, net_addr_t addr, net_port_t port)
-{
+struct lclient *lclient_new(int fd, net_addr_t addr, net_port_t port) {
   struct lclient *lcptr = NULL;
 
   /* Allocate and zero lclient block */
-  if(!(lcptr = mem_static_alloc(&lclient_heap)))
+  if (!(lcptr = mem_static_alloc(&lclient_heap)))
     return NULL;
 
   memset(lcptr, 0, sizeof(struct lclient));
@@ -237,8 +220,7 @@ struct lclient *lclient_new(int fd, net_addr_t addr, net_port_t port)
   lcptr->addr_remote = addr;
   lcptr->port_remote = port;
 
-  if(fd >= 0 && fd < IO_MAX_FDS)
-  {
+  if (fd >= 0 && fd < IO_MAX_FDS) {
     /* Convert remote address to string for
        temporary client name (until he sends NICK cmd) */
     net_ntoa_r(lcptr->addr_remote, lcptr->hostip);
@@ -248,7 +230,7 @@ struct lclient *lclient_new(int fd, net_addr_t addr, net_port_t port)
     net_getsockname(fd, &lcptr->addr_local, &lcptr->port_local);
   }
 
-  if(lclient_list.size > lclient_max)
+  if (lclient_list.size > lclient_max)
     lclient_max = lclient_list.size;
 
   return lcptr;
@@ -257,8 +239,7 @@ struct lclient *lclient_new(int fd, net_addr_t addr, net_port_t port)
 /* -------------------------------------------------------------------------- *
  * Delete a lclient block                                                     *
  * -------------------------------------------------------------------------- */
-void lclient_delete(struct lclient *lcptr)
-{
+void lclient_delete(struct lclient *lcptr) {
   lclient_release(lcptr);
 
   /* Unlink from main list and typed list */
@@ -275,19 +256,16 @@ void lclient_delete(struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * Loose all references of an lclient block                                   *
  * -------------------------------------------------------------------------- */
-void lclient_release(struct lclient *lcptr)
-{
+void lclient_release(struct lclient *lcptr) {
   hooks_call(lclient_release, HOOK_DEFAULT, lcptr);
 
-  if(io_valid(lcptr->fds[1]))
-  {
+  if (io_valid(lcptr->fds[1])) {
     io_unregister(lcptr->fds[1], IO_CB_READ);
     io_unregister(lcptr->fds[1], IO_CB_WRITE);
     io_destroy(lcptr->fds[1]);
   }
 
-  if(io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
-  {
+  if (io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0]) {
     io_unregister(lcptr->fds[0], IO_CB_READ);
     io_unregister(lcptr->fds[0], IO_CB_WRITE);
     io_destroy(lcptr->fds[0]);
@@ -298,28 +276,25 @@ void lclient_release(struct lclient *lcptr)
 
   class_push(&lcptr->class);
 
-  if(lcptr->user)
-  {
+  if (lcptr->user) {
     user_delete(lcptr->user);
     lcptr->user = NULL;
   }
 
-  if(lcptr->client)
-  {
+  if (lcptr->client) {
     lcptr->client->lclient = NULL;
     lcptr->client = NULL;
   }
 
-  if(lcptr->server)
-  {
+  if (lcptr->server) {
     lcptr->server->lclient = NULL;
     lcptr->server = NULL;
   }
 
   lcptr->listen = NULL;
   lcptr->connect = NULL;
-/*  listen_push(&lcptr->listen);
-  connect_push(&lcptr->connect);*/
+  /*  listen_push(&lcptr->listen);
+    connect_push(&lcptr->connect);*/
   timer_cancel(&lcptr->ptimer);
 
   lcptr->refcount = 0;
@@ -330,11 +305,9 @@ void lclient_release(struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * Get a reference to an lclient block                                        *
  * -------------------------------------------------------------------------- */
-struct lclient *lclient_pop(struct lclient *lcptr)
-{
-  if(lcptr)
-  {
-    if(!lcptr->refcount)
+struct lclient *lclient_pop(struct lclient *lcptr) {
+  if (lcptr) {
+    if (!lcptr->refcount)
       debug(lclient_log, "Poping deprecated lclient %s:%u",
             net_ntoa(lcptr->addr_remote), lcptr->port_remote);
 
@@ -347,13 +320,10 @@ struct lclient *lclient_pop(struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * Push back a reference to an lclient block                                  *
  * -------------------------------------------------------------------------- */
-struct lclient *lclient_push(struct lclient **lcptrptr)
-{
-  if(*lcptrptr)
-  {
-    if((*lcptrptr)->refcount)
-    {
-      if(--(*lcptrptr)->refcount == 0)
+struct lclient *lclient_push(struct lclient **lcptrptr) {
+  if (*lcptrptr) {
+    if ((*lcptrptr)->refcount) {
+      if (--(*lcptrptr)->refcount == 0)
         lclient_release(*lcptrptr);
     }
 
@@ -366,13 +336,11 @@ struct lclient *lclient_push(struct lclient **lcptrptr)
 /* -------------------------------------------------------------------------- *
  * Set the type of an lclient and move it to the appropriate list             *
  * -------------------------------------------------------------------------- */
-void lclient_set_type(struct lclient *lcptr, uint32_t type)
-{
+void lclient_set_type(struct lclient *lcptr, uint32_t type) {
   uint32_t newtype = (type & 0x03);
 
   /* If the type changes, then move to another list */
-  if(newtype != lcptr->type)
-  {
+  if (newtype != lcptr->type) {
     /* Delete from old list */
     dlink_delete(&lclient_lists[lcptr->type & 0x03], &lcptr->tnode);
 
@@ -387,15 +355,14 @@ void lclient_set_type(struct lclient *lcptr, uint32_t type)
 /* -------------------------------------------------------------------------- *
  * Set the name of an lclient block                                           *
  * -------------------------------------------------------------------------- */
-void lclient_set_name(struct lclient *lcptr, const char *name)
-{
+void lclient_set_name(struct lclient *lcptr, const char *name) {
   /* Update lclient->name/hash */
   strlcpy(lcptr->name, name, sizeof(lcptr->name));
 
   lcptr->hash = str_ihash(lcptr->name);
 
-  debug(lclient_log, "Set name for %s:%u to %s",
-        net_ntoa(lcptr->addr_remote), lcptr->port_remote, lcptr->name);
+  debug(lclient_log, "Set name for %s:%u to %s", net_ntoa(lcptr->addr_remote),
+        lcptr->port_remote, lcptr->name);
 
   io_note(lcptr->fds[0], "local client: %s", lcptr->name);
 }
@@ -407,18 +374,15 @@ void lclient_set_name(struct lclient *lcptr, const char *name)
  *                            (may be invalid?)                               *
  * <listen>                 - the corresponding listen{} block                *
  * -------------------------------------------------------------------------- */
-void lclient_accept(int fd, struct listen *listen)
-{
-  struct lclient     *lcptr;
+void lclient_accept(int fd, struct listen *listen) {
+  struct lclient *lcptr;
   struct conf_listen *lconf;
-  struct class       *clptr;
+  struct class *clptr;
 
   /* We're accepting a connection */
-  if(listen->status == LISTEN_CONNECTION)
-  {
+  if (listen->status == LISTEN_CONNECTION) {
     /* We must have a valid fd */
-    if(!io_valid(fd))
-    {
+    if (!io_valid(fd)) {
       log(lclient_log, L_warning,
           "Invalid filedescriptor while accepting local client");
 
@@ -431,25 +395,23 @@ void lclient_accept(int fd, struct listen *listen)
     clptr = class_find_name(lconf->class);
 
     /* Whine if its an invalid class */
-    if(clptr == NULL)
-    {
-      log(lclient_log, L_warning,
-          "Invalid class in listener %s: %s", listen->name, lconf->class);
+    if (clptr == NULL) {
+      log(lclient_log, L_warning, "Invalid class in listener %s: %s",
+          listen->name, lconf->class);
       io_destroy(fd);
       return;
     }
 
-    if(((int)clptr->refcount) - ((int)listen_list.size) -
-       ((int)connect_list.size) > (int)clptr->max_clients)
-    {
+    if (((int)clptr->refcount) - ((int)listen_list.size) -
+            ((int)connect_list.size) >
+        (int)clptr->max_clients) {
       log(lclient_log, L_warning, "Too many connects in class '%s'.",
           clptr->name);
       io_destroy(fd);
       return;
     }
 
-    if(lclient_count(listen->addr_remote) >= clptr->clients_per_ip)
-    {
+    if (lclient_count(listen->addr_remote) >= clptr->clients_per_ip) {
       log(lclient_log, L_warning, "Too many connects from %s.",
           net_ntoa(listen->addr_remote));
       io_destroy(fd);
@@ -457,19 +419,19 @@ void lclient_accept(int fd, struct listen *listen)
     }
 
     /* Add a local client to LCLIENT_UNKNOWN list */
-    if((lcptr = lclient_new(fd, listen->addr_remote, listen->port_remote)) == NULL)
-    {
+    if ((lcptr = lclient_new(fd, listen->addr_remote, listen->port_remote)) ==
+        NULL) {
       log(lclient_log, L_warning,
-          "Could not allocate new lclient struct for listen %s",
-          listen->name);
+          "Could not allocate new lclient struct for listen %s", listen->name);
 
       io_destroy(fd);
       return;
     }
 
     /* Inform about the new lclient */
-    log(lclient_log, L_verbose, "New local client %s:%u on listener %s (class %s)",
-        lcptr->host, lcptr->port_remote, listen->name, clptr->name);
+    log(lclient_log, L_verbose,
+        "New local client %s:%u on listener %s (class %s)", lcptr->host,
+        lcptr->port_remote, listen->name, clptr->name);
 
     /* Get references */
     lcptr->listen = listen_pop(listen);
@@ -478,7 +440,7 @@ void lclient_accept(int fd, struct listen *listen)
     /* Setup ping timeout callback */
     lcptr->ptimer = timer_start(lclient_exit, clptr->ping_freq, lcptr,
                                 "timeout: %llumsecs", clptr->ping_freq);
-    
+
     timer_note(lcptr->ptimer, "ping timer for %s:%u",
                net_ntoa(lcptr->addr_remote), lcptr->port_remote);
 
@@ -489,12 +451,10 @@ void lclient_accept(int fd, struct listen *listen)
     io_register(fd, IO_CB_READ, lclient_recv, lcptr);
 
     io_note(lcptr->fds[0], "unknown client from %s:%u",
-            net_ntoa(lcptr->addr_remote),
-            (uint32_t)lcptr->port_remote);
+            net_ntoa(lcptr->addr_remote), (uint32_t)lcptr->port_remote);
   }
   /* We failed accepting the connection */
-  else
-  {
+  else {
     /* Warn about the pity */
     log(lclient_log, L_warning, "Error accepting local client: %s",
         syscall_strerror(io_list[fd].error));
@@ -511,17 +471,14 @@ void lclient_accept(int fd, struct listen *listen)
  *                            (may be invalid?)                               *
  * <connect>                - the corresponding connect{} block               *
  * -------------------------------------------------------------------------- */
-void lclient_connect(int fd, struct connect *connect)
-{
+void lclient_connect(int fd, struct connect *connect) {
   struct conf_connect *cconf;
-  struct lclient      *lcptr;
-  struct class        *clptr;
+  struct lclient *lcptr;
+  struct class *clptr;
 
-  if(connect->status == CONNECT_DONE)
-  {
+  if (connect->status == CONNECT_DONE) {
     /* We must have a valid fd */
-    if(!io_valid(fd))
-    {
+    if (!io_valid(fd)) {
       log(lclient_log, L_warning,
           "Invalid filedescriptor while connecting to local client");
 
@@ -533,18 +490,17 @@ void lclient_connect(int fd, struct connect *connect)
     clptr = class_find_name(cconf->class);
 
     /* Whine if its an invalid class */
-    if(clptr == NULL)
-    {
-      log(lclient_log, L_warning,
-          "Invalid class in connect %s: %s", connect->name, cconf->class);
+    if (clptr == NULL) {
+      log(lclient_log, L_warning, "Invalid class in connect %s: %s",
+          connect->name, cconf->class);
 
       io_shutup(fd);
       return;
     }
 
     /* Allocate new lclient struct */
-    if((lcptr = lclient_new(fd, connect->addr_remote, connect->port_remote)) == NULL)
-    {
+    if ((lcptr = lclient_new(fd, connect->addr_remote, connect->port_remote)) ==
+        NULL) {
       log(lclient_log, L_warning,
           "Could not allocate new lclient struct for connect %s",
           connect->name);
@@ -565,10 +521,8 @@ void lclient_connect(int fd, struct connect *connect)
     io_register(fd, IO_CB_WRITE, NULL, lcptr);
     io_register(fd, IO_CB_READ, lclient_recv, lcptr);
 
-    io_note(lcptr->fds[0], "unregistered server %s from %s:%u",
-            connect->name,
-            net_ntoa(lcptr->addr_remote),
-            (uint32_t)lcptr->port_remote);
+    io_note(lcptr->fds[0], "unregistered server %s from %s:%u", connect->name,
+            net_ntoa(lcptr->addr_remote), (uint32_t)lcptr->port_remote);
 
     /* Send the handshake stuff */
     server_send_pass(lcptr);
@@ -582,12 +536,11 @@ void lclient_connect(int fd, struct connect *connect)
                net_ntoa(lcptr->addr_remote), lcptr->port_remote);
   }
   /* We failed accepting the connection */
-  else
-  {
+  else {
     /* Warn about the pity */
-/*    log(lclient_log, L_warning, "Error connecting to %s: %s",
-        connect->name,
-        syscall_strerror(io_list[fd].error));*/
+    /*    log(lclient_log, L_warning, "Error connecting to %s: %s",
+            connect->name,
+            syscall_strerror(io_list[fd].error));*/
 
     /* We had a valid fd, shut it! */
     io_push(&fd);
@@ -597,28 +550,19 @@ void lclient_connect(int fd, struct connect *connect)
 /* -------------------------------------------------------------------------- *
  * Read data from a local connection and process it                           *
  * -------------------------------------------------------------------------- */
-void lclient_recv(int fd, struct lclient *lcptr)
-{
-  if(io_list[fd].status.dead)
+void lclient_recv(int fd, struct lclient *lcptr) {
+  if (io_list[fd].status.dead)
     return;
 
   /* Check if the socket was closed */
-  if(io_list[fd].status.closed || io_list[fd].status.err)
-  {
-    if(io_list[fd].error <= 0)
-    {
+  if (io_list[fd].status.closed || io_list[fd].status.err) {
+    if (io_list[fd].error <= 0) {
       lclient_exit(lcptr, "connection closed");
-    }
-    else if(io_list[fd].error > 0 && io_list[fd].error < 125)
-    {
+    } else if (io_list[fd].error > 0 && io_list[fd].error < 125) {
       lclient_exit(lcptr, "%s", syscall_strerror(io_list[fd].error));
-    }
-    else if(io_list[fd].error == 666)
-    {
+    } else if (io_list[fd].error == 666) {
       lclient_exit(lcptr, "%s", ssl_strerror(fd));
-    }
-    else
-    {
+    } else {
       lclient_exit(lcptr, "unknown error: %i", io_list[fd].error);
     }
 
@@ -626,10 +570,8 @@ void lclient_recv(int fd, struct lclient *lcptr)
   }
 
   /* Check if we exceeded receive queue size */
-  if(io_list[fd].recvq.size > lcptr->class->recvq)
-  {
-    lclient_exit(lcptr, "recvq exceeded (%u bytes)",
-                 io_list[fd].recvq.size);
+  if (io_list[fd].recvq.size > lcptr->class->recvq) {
+    lclient_exit(lcptr, "recvq exceeded (%u bytes)", io_list[fd].recvq.size);
     return;
   }
 
@@ -637,15 +579,14 @@ void lclient_recv(int fd, struct lclient *lcptr)
   hooks_call(lclient_recv, HOOK_DEFAULT, fd, lcptr);
 
   /* Get lines from the queue as long as there are */
-  while(io_list[fd].recvq.lines && !lcptr->shut)
+  while (io_list[fd].recvq.lines && !lcptr->shut)
     lclient_process(fd, lcptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * Read a line from queue and process it                                      *
  * -------------------------------------------------------------------------- */
-void lclient_process(int fd, struct lclient *lcptr)
-{
+void lclient_process(int fd, struct lclient *lcptr) {
   int n = 0;
 
 #ifdef DEBUG
@@ -656,14 +597,12 @@ void lclient_process(int fd, struct lclient *lcptr)
   lclient_update_recvb(lcptr, n);
 #ifdef DEBUG
   p = strchr(lclient_recvbuf, '\r');
-  if(p)
-  {
+  if (p) {
     *p = '\0';
-  }
-  else
-  {
+  } else {
     p = strchr(lclient_recvbuf, '\n');
-    if(p) *p = '\0';
+    if (p)
+      *p = '\0';
   }
   debug(ircd_log_in, "From %s: %s", lcptr->name, lclient_recvbuf);
 #endif
@@ -673,49 +612,49 @@ void lclient_process(int fd, struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * Parse the prefix and the command                                           *
  * -------------------------------------------------------------------------- */
-void lclient_parse(struct lclient *lcptr, char *s, size_t n)
-{
+void lclient_parse(struct lclient *lcptr, char *s, size_t n) {
   char *argv[256];
 
-  if(hooks_call(lclient_parse, HOOK_DEFAULT, lcptr, s))
+  if (hooks_call(lclient_parse, HOOK_DEFAULT, lcptr, s))
     return;
 
   /* is the message prefixed? */
-  if(s[0] == ':')
-  {
+  if (s[0] == ':') {
     /* yes, get prefix */
     argv[0] = &s[1];
 
     /* now loop until we read whitespace */
-    while(*s && !chars_isspace(*s)) s++;
+    while (*s && !chars_isspace(*s))
+      s++;
 
     /* null-terminate prefix */
     *s++ = '\0';
-  }
-  else
-  {
+  } else {
     /* no prefix received */
     argv[0] = NULL;
   }
 
   /* skip whitespace */
-  while(*s && chars_isspace(*s)) s++;
+  while (*s && chars_isspace(*s))
+    s++;
 
   /* got the command */
   argv[1] = s;
 
   /* ugh, we're at string end :( */
-  if(*s == '\0')
+  if (*s == '\0')
     return;
 
   /* skip the command */
-  while(*s && !chars_isspace(*s)) s++;
+  while (*s && !chars_isspace(*s))
+    s++;
 
   /* null-terminate the command */
   *s++ = '\0';
 
   /* skip whitespace */
-  while(*s && chars_isspace(*s)) s++;
+  while (*s && chars_isspace(*s))
+    s++;
 
   /* process the command */
   lclient_message(lcptr, argv, s, n);
@@ -725,24 +664,21 @@ void lclient_parse(struct lclient *lcptr, char *s, size_t n)
  * Decide whether a message is numeric or not and call the appropriate        *
  * message handler.                                                           *
  * -------------------------------------------------------------------------- */
-void lclient_message(struct lclient *client, char **argv, char *arg, size_t n)
-{
+void lclient_message(struct lclient *client, char **argv, char *arg, size_t n) {
   size_t i;
   int isnum = 1;
 
   /* loop through argv[1] char by char */
-  for(i = 0; argv[1][i]; i++)
-  {
+  for (i = 0; argv[1][i]; i++) {
     /* if we find a non-digit char, abort and set isnum = 0 */
-    if(!chars_isdigit(argv[1][i]))
-    {
+    if (!chars_isdigit(argv[1][i])) {
       isnum = 0;
       break;
     }
   }
 
   /* call numeric/command handler */
-  if(isnum)
+  if (isnum)
     lclient_numeric(client, argv, arg);
   else
     lclient_command(client, argv, arg, n);
@@ -751,18 +687,16 @@ void lclient_message(struct lclient *client, char **argv, char *arg, size_t n)
 /* -------------------------------------------------------------------------- *
  * Process a numeric message                                                  *
  * -------------------------------------------------------------------------- */
-void lclient_numeric(struct lclient *lcptr, char **argv, char *arg)
-{
+void lclient_numeric(struct lclient *lcptr, char **argv, char *arg) {
   struct client *acptr;
-  char           dest[IRCD_NICKLEN + 1];
-  size_t         i;
+  char dest[IRCD_NICKLEN + 1];
+  size_t i;
 
-  if(!lclient_is_server(lcptr))
+  if (!lclient_is_server(lcptr))
     return;
 
-  for(i = 0; *arg; i++)
-  {
-    if(!chars_isnickchar(*arg) && !chars_isuidchar(*arg))
+  for (i = 0; *arg; i++) {
+    if (!chars_isnickchar(*arg) && !chars_isuidchar(*arg))
       break;
 
     dest[i] = *arg++;
@@ -770,26 +704,22 @@ void lclient_numeric(struct lclient *lcptr, char **argv, char *arg)
 
   dest[i] = '\0';
 
-  while(*arg && (*arg == ' ' || *arg == '\t'))
+  while (*arg && (*arg == ' ' || *arg == '\t'))
     *arg++ = '\0';
 
-  if(lcptr->caps & CAP_UID)
+  if (lcptr->caps & CAP_UID)
     acptr = client_find_uid(dest);
   else
     acptr = client_find_nick(dest);
 
-  if(acptr == NULL)
-  {
+  if (acptr == NULL) {
     log(lclient_log, L_warning,
-        "Dropping numeric %s with unknown destination %s",
-        argv[1], dest);
+        "Dropping numeric %s with unknown destination %s", argv[1], dest);
     return;
   }
 
-  for(i = 0; arg[i]; i++)
-  {
-    if(arg[i] == '\r' || arg[i] == '\n')
-    {
+  for (i = 0; arg[i]; i++) {
+    if (arg[i] == '\r' || arg[i] == '\n') {
       arg[i] = '\0';
       break;
     }
@@ -803,22 +733,20 @@ void lclient_numeric(struct lclient *lcptr, char **argv, char *arg)
 /* -------------------------------------------------------------------------- *
  * Process a command                                                          *
  * -------------------------------------------------------------------------- */
-void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
-{
-  struct msg    *msg;
-  size_t         ac;
+void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n) {
+  struct msg *msg;
+  size_t ac;
   struct client *cptr;
 
   /* find message structure for the command */
   msg = msg_find(argv[1]);
 
   /* did not find the command */
-  if(msg == NULL)
-  {
+  if (msg == NULL) {
     /* send error message & return */
-    if(lclient_is_unknown(lcptr))
+    if (lclient_is_unknown(lcptr))
       lclient_exit(lcptr, "protocol mismatch: %s", argv[1]);
-    else if(lclient_is_server(lcptr))
+    else if (lclient_is_server(lcptr))
       lclient_exit(lcptr, "unknown command: %s", argv[1]);
     else
       numeric_lsend(lcptr, ERR_UNKNOWNCOMMAND, argv[1]);
@@ -826,30 +754,26 @@ void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
     return;
   }
 
-  if(!(lclient_is_unknown(lcptr) && (msg->flags & MFLG_UNREG)))
-  {
-    if((msg->flags & MFLG_SERVER) && !lclient_is_server(lcptr))
-    {
-      if(!lclient_is_unknown(lcptr))
+  if (!(lclient_is_unknown(lcptr) && (msg->flags & MFLG_UNREG))) {
+    if ((msg->flags & MFLG_SERVER) && !lclient_is_server(lcptr)) {
+      if (!lclient_is_unknown(lcptr))
         numeric_lsend(lcptr, ERR_SERVERCOMMAND, msg->cmd);
       return;
     }
 
-    if((msg->flags & MFLG_OPER) &&
-       !lclient_is_oper(lcptr) && !lclient_is_server(lcptr))
-    {
-      if(!lclient_is_unknown(lcptr))
-      numeric_lsend(lcptr, ERR_NOPRIVILEGES, msg->cmd);
+    if ((msg->flags & MFLG_OPER) && !lclient_is_oper(lcptr) &&
+        !lclient_is_server(lcptr)) {
+      if (!lclient_is_unknown(lcptr))
+        numeric_lsend(lcptr, ERR_NOPRIVILEGES, msg->cmd);
       return;
     }
   }
 
-  if(msg->handlers[lcptr->type] == NULL)
-  {
+  if (msg->handlers[lcptr->type] == NULL) {
     /* send error message & return */
-    if(lclient_is_unknown(lcptr))
+    if (lclient_is_unknown(lcptr))
       lclient_exit(lcptr, "protocol mismatch");
-    else if(lclient_is_server(lcptr))
+    else if (lclient_is_server(lcptr))
       lclient_exit(lcptr, "unknown command: %s", argv[1]);
     else
       numeric_lsend(lcptr, ERR_UNKNOWNCOMMAND, argv[1]);
@@ -863,60 +787,51 @@ void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
   ac = str_tokenize(arg, &argv[2], msg->maxargs ? msg->maxargs : 253);
 
   /* check required args */
-  if(msg->args && ac < msg->args)
-  {
-    if(lclient_is_unknown(lcptr))
-      lclient_exit(lcptr, "protocol mismatch: need %u args, got %u",
-                   msg->args, ac);
-    else if(!lclient_is_server(lcptr))
+  if (msg->args && ac < msg->args) {
+    if (lclient_is_unknown(lcptr))
+      lclient_exit(lcptr, "protocol mismatch: need %u args, got %u", msg->args,
+                   ac);
+    else if (!lclient_is_server(lcptr))
       numeric_lsend(lcptr, ERR_NEEDMOREPARAMS, msg->cmd);
     else
-      lclient_exit(lcptr, "need %u args for %s, got %u.",
-                   msg->args, msg->cmd, ac);
+      lclient_exit(lcptr, "need %u args for %s, got %u.", msg->args, msg->cmd,
+                   ac);
     return;
   }
 
   /* catch commands without MFLG_UNREG on unknown clients */
-  if(lcptr->type == LCLIENT_UNKNOWN)
-  {
-    if(!(msg->flags & MFLG_UNREG))
-    {
-      lclient_exit(lcptr, "invalid command for unregistered user: %s",
-                   argv[1]);
+  if (lcptr->type == LCLIENT_UNKNOWN) {
+    if (!(msg->flags & MFLG_UNREG)) {
+      lclient_exit(lcptr, "invalid command for unregistered user: %s", argv[1]);
       return;
     }
   }
 
   /* now parse the prefix */
-  if(lcptr->type == LCLIENT_SERVER)
-  {
-    if(argv[0])
+  if (lcptr->type == LCLIENT_SERVER) {
+    if (argv[0])
       cptr = lclient_prefix(lcptr, argv[0]);
     else
       cptr = lcptr->client;
 
-    if(cptr == NULL)
-    {
+    if (cptr == NULL) {
       log(lclient_log, L_warning, "Invalid prefix from %s: %s (dropped)",
           lcptr->name, argv[0]);
 
       return;
     }
 
-    if(cptr->source != lcptr)
-    {
+    if (cptr->source != lcptr) {
       log(lclient_log, L_warning,
-          "Message (%s %s) for %s from wrong direction: %s, should come from %s.",
+          "Message (%s %s) for %s from wrong direction: %s, should come from "
+          "%s.",
           argv[0], argv[1], cptr->name, lcptr->name, cptr->source->name);
       return;
     }
-  }
-  else
-  {
+  } else {
     cptr = lcptr->client;
 
-    if(argv[0])
-    {
+    if (argv[0]) {
       log(lclient_log, L_warning, "Message with prefix from non-server");
       argv[0] = NULL;
     }
@@ -931,19 +846,17 @@ void lclient_command(struct lclient *lcptr, char **argv, char *arg, size_t n)
 /* -------------------------------------------------------------------------- *
  * Parse the prefix and find the appropriate client                           *
  * -------------------------------------------------------------------------- */
-struct client *lclient_prefix(struct lclient *lcptr, const char *pfx)
-{
+struct client *lclient_prefix(struct lclient *lcptr, const char *pfx) {
   struct server *sptr;
 
-  if(lcptr->caps & CAP_UID)
-  {
+  if (lcptr->caps & CAP_UID) {
     struct user *uptr;
 
-    if((uptr = user_find_uid(pfx)))
+    if ((uptr = user_find_uid(pfx)))
       return uptr->client;
   }
 
-  if((sptr = server_find_name(pfx)))
+  if ((sptr = server_find_name(pfx)))
     return sptr->client;
 
   return client_find_nick(pfx);
@@ -952,8 +865,7 @@ struct client *lclient_prefix(struct lclient *lcptr, const char *pfx)
 /* -------------------------------------------------------------------------- *
  * Exit a local client and leave him an error message if he has registered.   *
  * -------------------------------------------------------------------------- */
-void lclient_vexit(struct lclient *lcptr, char *format, va_list args)
-{
+void lclient_vexit(struct lclient *lcptr, char *format, va_list args) {
   /* Format the exit message */
   char buf[IRCD_TOPICLEN + 1];
 
@@ -962,54 +874,50 @@ void lclient_vexit(struct lclient *lcptr, char *format, va_list args)
   hooks_call(lclient_exit, HOOK_DEFAULT, lcptr, format, args);
 
   /* Leave a log notice */
-  log(lclient_log, L_verbose, "Exiting %s:%u: %s",
-      net_ntoa(lcptr->addr_remote), lcptr->port_remote, buf);
+  log(lclient_log, L_verbose, "Exiting %s:%u: %s", net_ntoa(lcptr->addr_remote),
+      lcptr->port_remote, buf);
 
   /* If he has registered send him an error */
-  if(!lclient_is_unknown(lcptr) && io_valid(lcptr->fds[1]))
+  if (!lclient_is_unknown(lcptr) && io_valid(lcptr->fds[1]))
     lclient_send(lcptr, "ERROR :%s", buf);
 
-  if(lcptr->server)
-  {
+  if (lcptr->server) {
     server_exit(lcptr, NULL, lcptr->server, buf);
 
     lcptr->server = NULL;
 
-    if(lcptr->client)
+    if (lcptr->client)
       lcptr->client->server = NULL;
   }
 
-  if(lcptr->client)
-  {
+  if (lcptr->client) {
     lcptr->client->lclient = NULL;
     client_vexit(lcptr, lcptr->client, buf, args);
     lcptr->client = NULL;
     lcptr->user = NULL;
   }
 
-  if(lcptr->user)
-  {
+  if (lcptr->user) {
     user_delete(lcptr->user);
 
     lcptr->user = NULL;
 
-    if(lcptr->client)
+    if (lcptr->client)
       lcptr->client->user = NULL;
   }
 
   /* Maybe connect retry on servers */
-  if(lcptr->connect)
-  {
+  if (lcptr->connect) {
     connect_cancel(lcptr->connect);
 
-    if(lcptr->connect->autoconn)
+    if (lcptr->connect->autoconn)
       connect_retry(lcptr->connect);
   }
 
-  if(io_valid(lcptr->fds[1]))
+  if (io_valid(lcptr->fds[1]))
     io_destroy(lcptr->fds[1]);
 
-  if(io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
+  if (io_valid(lcptr->fds[0]) && lcptr->fds[1] != lcptr->fds[0])
     io_destroy(lcptr->fds[0]);
 
   lcptr->fds[0] = -1;
@@ -1019,11 +927,10 @@ void lclient_vexit(struct lclient *lcptr, char *format, va_list args)
 
   lclient_delete(lcptr);
 
-/*  lclient_collect();*/
+  /*  lclient_collect();*/
 }
 
-int lclient_exit(struct lclient *lcptr, char *format, ...)
-{
+int lclient_exit(struct lclient *lcptr, char *format, ...) {
   va_list args;
 
   va_start(args, format);
@@ -1036,15 +943,11 @@ int lclient_exit(struct lclient *lcptr, char *format, ...)
 /* -------------------------------------------------------------------------- *
  * Update client message/byte counters                                        *
  * -------------------------------------------------------------------------- */
-void lclient_update_recvb(struct lclient *lcptr, size_t n)
-{
-  if(lclient_is_server(lcptr))
-  {
+void lclient_update_recvb(struct lclient *lcptr, size_t n) {
+  if (lclient_is_server(lcptr)) {
     lclient_recvb[CLIENT_SERVER] += n;
     lclient_recvm[CLIENT_SERVER] += 1;
-  }
-  else
-  {
+  } else {
     lclient_recvb[CLIENT_USER] += n;
     lclient_recvm[CLIENT_USER] += 1;
   }
@@ -1056,22 +959,17 @@ void lclient_update_recvb(struct lclient *lcptr, size_t n)
   lcptr->recvb += n;
 
   /* bytes are beyond 1023, so update kbytes */
-  if(lcptr->recvb >= 0x0400)
-  {
+  if (lcptr->recvb >= 0x0400) {
     lcptr->recvk += (lcptr->recvb >> 10);
     lcptr->recvb &= 0x03ff; /* 2^10 = 1024, 3ff = 1023 */
   }
 }
 
-void lclient_update_sendb(struct lclient *lcptr, size_t n)
-{
-  if(lclient_is_server(lcptr))
-  {
+void lclient_update_sendb(struct lclient *lcptr, size_t n) {
+  if (lclient_is_server(lcptr)) {
     lclient_sendb[CLIENT_SERVER] += n;
     lclient_sendm[CLIENT_SERVER] += 1;
-  }
-  else
-  {
+  } else {
     lclient_sendb[CLIENT_USER] += n;
     lclient_sendm[CLIENT_USER] += 1;
   }
@@ -1083,8 +981,7 @@ void lclient_update_sendb(struct lclient *lcptr, size_t n)
   lcptr->sendb += n;
 
   /* bytes are beyond 1023, so update kbytes */
-  if(lcptr->sendb >= 0x0400)
-  {
+  if (lcptr->sendb >= 0x0400) {
     lcptr->sendk += (lcptr->sendb >> 10);
     lcptr->sendb &= 0x03ff; /* 2^10 = 1024, 3ff = 1023 */
   }
@@ -1093,12 +990,11 @@ void lclient_update_sendb(struct lclient *lcptr, size_t n)
 /* -------------------------------------------------------------------------- *
  * Send a line to a local client                                              *
  * -------------------------------------------------------------------------- */
-void lclient_vsend(struct lclient *lcptr, const char *format, va_list args)
-{
-  char   buf[IRCD_LINELEN + 1];
+void lclient_vsend(struct lclient *lcptr, const char *format, va_list args) {
+  char buf[IRCD_LINELEN + 1];
   size_t n;
 
-  if(lcptr == NULL)
+  if (lcptr == NULL)
     return;
 
   client_source = lcptr;
@@ -1119,8 +1015,7 @@ void lclient_vsend(struct lclient *lcptr, const char *format, va_list args)
   lclient_update_sendb(lcptr, n);
 }
 
-void lclient_send(struct lclient *lcptr, const char *format, ...)
-{
+void lclient_send(struct lclient *lcptr, const char *format, ...) {
   va_list args;
 
   va_start(args, format);
@@ -1133,14 +1028,13 @@ void lclient_send(struct lclient *lcptr, const char *format, ...)
 /* -------------------------------------------------------------------------- *
  * Send a line to a client list but one                                       *
  * -------------------------------------------------------------------------- */
-void lclient_vsend_list(struct lclient *one,    struct list *list,
-                        const char     *format, va_list      args)
-{
+void lclient_vsend_list(struct lclient *one, struct list *list,
+                        const char *format, va_list args) {
   struct lclient *lcptr;
-  struct node    *node;
-  struct fqueue   multi;
-  size_t          n;
-  char            buf[IRCD_LINELEN + 1];
+  struct node *node;
+  struct fqueue multi;
+  size_t n;
+  char buf[IRCD_LINELEN + 1];
 
   /* Formatted print */
   n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
@@ -1153,8 +1047,7 @@ void lclient_vsend_list(struct lclient *one,    struct list *list,
 
   io_multi_write(&multi, buf, n);
 
-  dlink_foreach(list, node)
-  {
+  dlink_foreach(list, node) {
     lcptr = node->data;
 
     /* Update sendbytes */
@@ -1166,9 +1059,8 @@ void lclient_vsend_list(struct lclient *one,    struct list *list,
   io_multi_end(&multi);
 }
 
-void lclient_send_list(struct lclient *one,    struct list  *list,
-                       const char     *format, ...)
-{
+void lclient_send_list(struct lclient *one, struct list *list,
+                       const char *format, ...) {
   va_list args;
 
   va_start(args, format);
@@ -1181,44 +1073,39 @@ void lclient_send_list(struct lclient *one,    struct list  *list,
 /* -------------------------------------------------------------------------- *
  * Start client handshake after valid USER/NICK has been sent.                *
  * -------------------------------------------------------------------------- */
-void lclient_handshake(struct lclient *lcptr)
-{
+void lclient_handshake(struct lclient *lcptr) {
   /* When nickname is invalid then let the user try again */
-  if(!chars_valid_nick(lcptr->name))
-  {
+  if (!chars_valid_nick(lcptr->name)) {
     numeric_lsend(lcptr, ERR_ERRONEUSNICKNAME, lcptr->name);
     return;
   }
 
   /* When the username is invalid then exit the user */
-  if(!chars_valid_user(lcptr->user->name))
-  {
+  if (!chars_valid_user(lcptr->user->name)) {
     lclient_set_type(lcptr, LCLIENT_USER);
     lclient_exit(lcptr, "invalid username [%s]", lcptr->user->name);
     return;
   }
 
   /* If no hooks were called then register the client */
-  if(hooks_call(lclient_handshake, HOOK_DEFAULT, lcptr) == 0)
+  if (hooks_call(lclient_handshake, HOOK_DEFAULT, lcptr) == 0)
     lclient_register(lcptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * Check for valid USER/NICK and start handshake                              *
  * -------------------------------------------------------------------------- */
-int lclient_register(struct lclient *lcptr)
-{
+int lclient_register(struct lclient *lcptr) {
   struct msg *motd;
 
-  if(lcptr->refcount == 0 || lcptr->user == NULL)
+  if (lcptr->refcount == 0 || lcptr->user == NULL)
     return 1;
 
-  if(lcptr->type == LCLIENT_UNKNOWN)
-  {
-    char *usermodearg[2] = { lcptr->user->mode, NULL };
+  if (lcptr->type == LCLIENT_UNKNOWN) {
+    char *usermodearg[2] = {lcptr->user->mode, NULL};
 
     /* Hooks for sauth stuff and k-lines */
-    if(hooks_call(lclient_register, HOOK_DEFAULT, lcptr))
+    if (hooks_call(lclient_register, HOOK_DEFAULT, lcptr))
       return 0;
 
     /* Create a block in global client pool */
@@ -1229,12 +1116,10 @@ int lclient_register(struct lclient *lcptr)
 
     /* Set usermode */
     usermode_make(lcptr->user, usermodearg, NULL,
-                  USERMODE_OPTION_LINKALL |
-                  USERMODE_OPTION_SINGLEARG |
-                  USERMODE_OPTION_PERMISSION);
+                  USERMODE_OPTION_LINKALL | USERMODE_OPTION_SINGLEARG |
+                      USERMODE_OPTION_PERMISSION);
 
-    if(io_list[lcptr->fds[0]].ssl)
-    {
+    if (io_list[lcptr->fds[0]].ssl) {
       lcptr->user->modes |= ((int)'p' - 0x40);
       usermode_assemble(lcptr->user->modes, lcptr->user->mode);
     }
@@ -1244,7 +1129,8 @@ int lclient_register(struct lclient *lcptr)
     client_lusers(lcptr->client);
 
     /* Send the MOTD if available */
-    if((motd = msg_find("MOTD")) == NULL || motd->handlers[lcptr->type] == NULL)
+    if ((motd = msg_find("MOTD")) == NULL ||
+        motd->handlers[lcptr->type] == NULL)
       numeric_send(lcptr->client, ERR_NOMOTD);
     else
       motd->handlers[lcptr->type](lcptr, lcptr->client, 2, NULL);
@@ -1258,18 +1144,14 @@ int lclient_register(struct lclient *lcptr)
     /* Start the ping timeout timer */
     lcptr->ptimer = timer_start(lclient_ping, lcptr->class->ping_freq, lcptr);
 
-    timer_note(lcptr->ptimer, "ping timer for user %s from %s:%u",
-               lcptr->name,
-               net_ntoa(lcptr->addr_remote),
-               (uint32_t)lcptr->port_remote);
+    timer_note(lcptr->ptimer, "ping timer for user %s from %s:%u", lcptr->name,
+               net_ntoa(lcptr->addr_remote), (uint32_t)lcptr->port_remote);
 
     /* Hooks for flood stuff */
     hooks_call(lclient_register, HOOK_2ND, lcptr);
 
-    io_note(lcptr->fds[0], "registered client %s from %s:%u",
-            lcptr->name,
-            net_ntoa(lcptr->addr_remote),
-            (uint32_t)lcptr->port_remote);
+    io_note(lcptr->fds[0], "registered client %s from %s:%u", lcptr->name,
+            net_ntoa(lcptr->addr_remote), (uint32_t)lcptr->port_remote);
   }
 
   lcptr->shut = 0;
@@ -1280,21 +1162,17 @@ int lclient_register(struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * Check if we got a PONG, if not exit the client otherwise send another PING *
  * -------------------------------------------------------------------------- */
-int lclient_ping(struct lclient *lcptr)
-{
+int lclient_ping(struct lclient *lcptr) {
   int saved;
 
-  if(lcptr->lag > -1LL)
-  {
+  if (lcptr->lag > -1LL) {
     /* We got a PONG, send another PING */
     lclient_send(lcptr, "PING :%s", lclient_me->name);
 
     /* Set the time we sent the ping and reset lag */
     lcptr->ping = timer_mtime;
     lcptr->lag = -1LL;
-  }
-  else
-  {
+  } else {
     /* We didn't get a PONG, exit the client */
     saved = lcptr->fds[0];
     client_exit(NULL, lcptr->client, "ping timeout: %u seconds",
@@ -1308,28 +1186,25 @@ int lclient_ping(struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * USER/NICK has been sent but not yet validated                              *
  * -------------------------------------------------------------------------- */
-void lclient_login(struct lclient *lcptr)
-{
+void lclient_login(struct lclient *lcptr) {
   struct client *cptr;
 
   cptr = client_find_nick(lcptr->name);
 
-  if(cptr)
-  {
+  if (cptr) {
     numeric_lsend(lcptr, ERR_NICKNAMEINUSE, lcptr->name);
     lcptr->name[0] = '\0';
     return;
   }
 
-  if(hooks_call(lclient_login, HOOK_DEFAULT, lcptr) == 0)
+  if (hooks_call(lclient_login, HOOK_DEFAULT, lcptr) == 0)
     lclient_handshake(lcptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * Send welcome messages to the client                                        *
  * -------------------------------------------------------------------------- */
-void lclient_welcome(struct lclient *lcptr)
-{
+void lclient_welcome(struct lclient *lcptr) {
   char usermodes[sizeof(uint64_t) * 8 + 1];
   char chanmodes[sizeof(uint64_t) * 8 + 1];
 
@@ -1339,25 +1214,25 @@ void lclient_welcome(struct lclient *lcptr)
   chanmode_flags_build(chanmodes, CHANMODE_TYPE_ALL, CHFLG(ALL));
   usermode_assemble(-1LL, usermodes);
 
-  if(usermodes[0] == '\0')
+  if (usermodes[0] == '\0')
     strcpy(usermodes, "-");
 
-  if(chanmodes[0] == '\0')
+  if (chanmodes[0] == '\0')
     strcpy(chanmodes, "-");
 
   /* 001 */
   numeric_lsend(lcptr, RPL_WELCOME, lcptr->name);
 
   /* 002 */
-  numeric_lsend(lcptr, RPL_YOURHOST, lclient_me->name,
-                ircd_package, ircd_release);
+  numeric_lsend(lcptr, RPL_YOURHOST, lclient_me->name, ircd_package,
+                ircd_release);
 
   /* 003 */
   numeric_lsend(lcptr, RPL_CREATED, ircd_uptime());
 
   /* 004 */
-  numeric_lsend(lcptr, RPL_MYINFO, lclient_me->name, ircd_version,
-                usermodes, chanmodes);
+  numeric_lsend(lcptr, RPL_MYINFO, lclient_me->name, ircd_version, usermodes,
+                chanmodes);
 
   /* 005 */
   ircd_support_show(lcptr->client);
@@ -1366,13 +1241,11 @@ void lclient_welcome(struct lclient *lcptr)
 /* -------------------------------------------------------------------------- *
  * Find a lclient by its id                                                   *
  * -------------------------------------------------------------------------- */
-struct lclient *lclient_find_id(int id)
-{
+struct lclient *lclient_find_id(int id) {
   struct lclient *lcptr;
 
-  dlink_foreach(&lclient_list, lcptr)
-    if(lcptr->id == (uint32_t)id)
-      return lcptr;
+  dlink_foreach(&lclient_list,
+                lcptr) if (lcptr->id == (uint32_t)id) return lcptr;
 
   return NULL;
 }
@@ -1380,18 +1253,15 @@ struct lclient *lclient_find_id(int id)
 /* -------------------------------------------------------------------------- *
  * Find a lclient by its name                                                 *
  * -------------------------------------------------------------------------- */
-struct lclient *lclient_find_name(const char *name)
-{
+struct lclient *lclient_find_name(const char *name) {
   struct lclient *lcptr;
-  hash_t          hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&lclient_list, lcptr)
-  {
-    if(lcptr->hash == hash)
-    {
-      if(!str_icmp(lcptr->name, name))
+  dlink_foreach(&lclient_list, lcptr) {
+    if (lcptr->hash == hash) {
+      if (!str_icmp(lcptr->name, name))
         return lcptr;
     }
   }
@@ -1401,92 +1271,78 @@ struct lclient *lclient_find_name(const char *name)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void lclient_dump(struct lclient *lcptr)
-{
-  if(lcptr == NULL)
-  {
+void lclient_dump(struct lclient *lcptr) {
+  if (lcptr == NULL) {
     struct node *node;
 
     dump(lclient_log, "[============== lclient summary ===============]");
 
-    if(lclient_lists[LCLIENT_UNKNOWN].size)
-    {
+    if (lclient_lists[LCLIENT_UNKNOWN].size) {
       dump(lclient_log, " ---------------- unregistered ----------------");
 
       dlink_foreach_data(&lclient_lists[LCLIENT_UNKNOWN], node, lcptr)
-        dump(lclient_log, " #%03u: [%u] %-20s (%s@%s)",
-              lcptr->id, lcptr->refcount,
-              lcptr->name[0] ? lcptr->name : "<unregistered>",
-              lcptr->user ? lcptr->user->name : "unknown",
-              lcptr->host);
+          dump(lclient_log, " #%03u: [%u] %-20s (%s@%s)", lcptr->id,
+               lcptr->refcount, lcptr->name[0] ? lcptr->name : "<unregistered>",
+               lcptr->user ? lcptr->user->name : "unknown", lcptr->host);
     }
-    if(lclient_lists[LCLIENT_USER].size)
-    {
+    if (lclient_lists[LCLIENT_USER].size) {
       dump(lclient_log, " ------------- registered clients -------------");
 
       dlink_foreach_data(&lclient_lists[LCLIENT_USER], node, lcptr)
-        dump(lclient_log, " #%03u: [%u] %-20s (%s@%s)",
-              lcptr->id, lcptr->refcount, lcptr->name,
-              lcptr->user->name, lcptr->host);
+          dump(lclient_log, " #%03u: [%u] %-20s (%s@%s)", lcptr->id,
+               lcptr->refcount, lcptr->name, lcptr->user->name, lcptr->host);
     }
-    if(lclient_lists[LCLIENT_SERVER].size)
-    {
+    if (lclient_lists[LCLIENT_SERVER].size) {
       dump(lclient_log, " ------------------- servers ------------------");
 
       dlink_foreach_data(&lclient_lists[LCLIENT_SERVER], node, lcptr)
-        dump(lclient_log, " #%03u: [%u] %-20s (%s)",
-              lcptr->id, lcptr->refcount, lcptr->name,
-              lcptr->host);
+          dump(lclient_log, " #%03u: [%u] %-20s (%s)", lcptr->id,
+               lcptr->refcount, lcptr->name, lcptr->host);
     }
-    if(lclient_lists[LCLIENT_OPER].size)
-    {
+    if (lclient_lists[LCLIENT_OPER].size) {
       dump(lclient_log, " ------------------ operators -----------------");
 
       dlink_foreach_data(&lclient_lists[LCLIENT_OPER], node, lcptr)
-        dump(lclient_log, " #%03u: [%u] %-20s (%s@%s)",
-              lcptr->id, lcptr->refcount, lcptr->name,
-              lcptr->user->name, lcptr->host);
+          dump(lclient_log, " #%03u: [%u] %-20s (%s@%s)", lcptr->id,
+               lcptr->refcount, lcptr->name, lcptr->user->name, lcptr->host);
     }
 
     dump(lclient_log, "[=========== end of lclient summary ===========]");
-  }
-  else
-  {
+  } else {
     dump(lclient_log, "[============== lclient dump ===============]");
     dump(lclient_log, "         id: #%u", lcptr->id);
     dump(lclient_log, "   refcount: %u", lcptr->refcount);
     dump(lclient_log, "       type: %s", lclient_types[lcptr->type]);
     dump(lclient_log, "       hash: %p", lcptr->hash);
     dump(lclient_log, "       user: %-27s [%u]",
-          lcptr->user ? lcptr->user->name : "(nil)",
-          lcptr->user ? lcptr->user->refcount : 0);
+         lcptr->user ? lcptr->user->name : "(nil)",
+         lcptr->user ? lcptr->user->refcount : 0);
     dump(lclient_log, "     client: %-27s [%u]",
-          lcptr->client ? lcptr->client->name : "(nil)",
-          lcptr->client ? lcptr->client->refcount : 0);
+         lcptr->client ? lcptr->client->name : "(nil)",
+         lcptr->client ? lcptr->client->refcount : 0);
     dump(lclient_log, "     server: %-27s [%u]",
-          lcptr->server ? lcptr->server->name : "(nil)",
-          lcptr->server ? lcptr->server->refcount : 0);
+         lcptr->server ? lcptr->server->name : "(nil)",
+         lcptr->server ? lcptr->server->refcount : 0);
     dump(lclient_log, "     listen: %-27s [%u]",
-          lcptr->listen ? lcptr->listen->name : "(nil)",
-          lcptr->listen ? lcptr->listen->refcount : 0);
+         lcptr->listen ? lcptr->listen->name : "(nil)",
+         lcptr->listen ? lcptr->listen->refcount : 0);
     dump(lclient_log, "    connect: %-27s [%u]",
-          lcptr->connect ? lcptr->connect->name : "(nil)",
-          lcptr->connect ? lcptr->connect->refcount : 0);
-    dump(lclient_log, "      fds[]: { %i, %i }",
-          lcptr->fds[0], lcptr->fds[1]);
-    dump(lclient_log, "  ctrlfds[]: { %i, %i }",
-          lcptr->ctrlfds[0], lcptr->ctrlfds[1]);
-    dump(lclient_log, "     remote: %s:%u",
-          net_ntoa(lcptr->addr_remote), (uint32_t)lcptr->port_remote);
-    dump(lclient_log, "      local: %s:%u",
-          net_ntoa(lcptr->addr_local), (uint32_t)lcptr->port_local);
+         lcptr->connect ? lcptr->connect->name : "(nil)",
+         lcptr->connect ? lcptr->connect->refcount : 0);
+    dump(lclient_log, "      fds[]: { %i, %i }", lcptr->fds[0], lcptr->fds[1]);
+    dump(lclient_log, "  ctrlfds[]: { %i, %i }", lcptr->ctrlfds[0],
+         lcptr->ctrlfds[1]);
+    dump(lclient_log, "     remote: %s:%u", net_ntoa(lcptr->addr_remote),
+         (uint32_t)lcptr->port_remote);
+    dump(lclient_log, "      local: %s:%u", net_ntoa(lcptr->addr_local),
+         (uint32_t)lcptr->port_local);
     dump(lclient_log, "     ptimer: #%i [%u]",
-          lcptr->ptimer ? lcptr->ptimer->id : -1,
-          lcptr->ptimer ? lcptr->ptimer->refcount : 0);
-    dump(lclient_log, "       recv: %ub %uk %um",
-          lcptr->recvb, lcptr->recvk, lcptr->recvm);
-    dump(lclient_log, "       send: %ub %uk %um",
-          lcptr->sendb, lcptr->sendk, lcptr->sendm);
+         lcptr->ptimer ? lcptr->ptimer->id : -1,
+         lcptr->ptimer ? lcptr->ptimer->refcount : 0);
+    dump(lclient_log, "       recv: %ub %uk %um", lcptr->recvb, lcptr->recvk,
+         lcptr->recvm);
+    dump(lclient_log, "       send: %ub %uk %um", lcptr->sendb, lcptr->sendk,
+         lcptr->sendm);
     dump(lclient_log, "       caps: %llu", lcptr->caps);
     dump(lclient_log, "         ts: %lu", lcptr->ts);
     dump(lclient_log, "     serial: %u", lcptr->serial);

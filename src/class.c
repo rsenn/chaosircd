@@ -25,22 +25,22 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
 #include "ircd/class.h"
+#include "ircd/ircd.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int           class_log;
-struct sheap  class_heap;
-struct list   class_list;
-uint32_t      class_id;
+int class_log;
+struct sheap class_heap;
+struct list class_list;
+uint32_t class_id;
 struct timer *class_timer;
 
 /* ------------------------------------------------------------------------ */
@@ -49,8 +49,7 @@ int class_get_log() { return class_log; }
 /* -------------------------------------------------------------------------- *
  * Initialize channel heaps and add garbage collect timer.                    *
  * -------------------------------------------------------------------------- */
-void class_init(void)
-{
+void class_init(void) {
   class_log = log_source_register("class");
 
   class_id = 0;
@@ -66,15 +65,13 @@ void class_init(void)
 /* -------------------------------------------------------------------------- *
  * Destroy class heap and cancel timer.                                       *
  * -------------------------------------------------------------------------- */
-void class_shutdown(void)
-{
+void class_shutdown(void) {
   struct class *clptr;
   struct class *next;
 
   log(class_log, L_status, "Shutting down [class] module...");
 
-  dlink_foreach_safe(&class_list, clptr, next)
-    class_delete(clptr);
+  dlink_foreach_safe(&class_list, clptr, next) class_delete(clptr);
 
   mem_static_destroy(&class_heap);
 
@@ -83,8 +80,7 @@ void class_shutdown(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void class_default(struct class *clptr)
-{
+void class_default(struct class *clptr) {
   dlink_node_zero(&clptr->node);
 
   strcpy(clptr->name, "default");
@@ -103,12 +99,11 @@ void class_default(struct class *clptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct class *class_add(const char *name,             uint64_t ping_freq,
-                        uint32_t    max_clients,      uint32_t clients_per_ip,
-                        uint32_t    recvq,            uint32_t sendq,
-                        uint32_t    flood_trigger,    uint64_t flood_interval,
-                        uint32_t    throttle_trigger, uint64_t throttle_interval)
-{
+struct class *class_add(const char *name, uint64_t ping_freq,
+                        uint32_t max_clients, uint32_t clients_per_ip,
+                        uint32_t recvq, uint32_t sendq, uint32_t flood_trigger,
+                        uint64_t flood_interval, uint32_t throttle_trigger,
+                        uint64_t throttle_interval) {
   struct class *clptr;
 
   /* allocate, zero and link class struct */
@@ -140,12 +135,10 @@ struct class *class_add(const char *name,             uint64_t ping_freq,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int class_update(struct class *clptr,            uint64_t ping_freq,
-                 uint32_t      max_clients,      uint32_t clients_per_ip,
-                 uint32_t      recvq,            uint32_t sendq,
-                 uint32_t      flood_trigger,    uint64_t flood_interval,
-                 uint32_t      throttle_trigger, uint64_t throttle_interval)
-{
+int class_update(struct class *clptr, uint64_t ping_freq, uint32_t max_clients,
+                 uint32_t clients_per_ip, uint32_t recvq, uint32_t sendq,
+                 uint32_t flood_trigger, uint64_t flood_interval,
+                 uint32_t throttle_trigger, uint64_t throttle_interval) {
   clptr->ping_freq = ping_freq;
   clptr->max_clients = max_clients;
   clptr->clients_per_ip = clients_per_ip;
@@ -163,8 +156,7 @@ int class_update(struct class *clptr,            uint64_t ping_freq,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void class_delete(struct class *clptr)
-{
+void class_delete(struct class *clptr) {
   log(class_log, L_status, "Deleting class block: %s", clptr->name);
 
   dlink_delete(&class_list, &clptr->node);
@@ -174,13 +166,10 @@ void class_delete(struct class *clptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct class *class_pop(struct class *clptr)
-{
-  if(clptr)
-  {
-    if(!clptr->refcount)
-      log(class_log, L_warning, "Poping deprecated class: %s",
-          clptr->name);
+struct class *class_pop(struct class *clptr) {
+  if (clptr) {
+    if (!clptr->refcount)
+      log(class_log, L_warning, "Poping deprecated class: %s", clptr->name);
 
     clptr->refcount++;
   }
@@ -190,17 +179,12 @@ struct class *class_pop(struct class *clptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct class *class_push(struct class **clptrptr)
-{
-  if(*clptrptr)
-  {
-    if(!(*clptrptr)->refcount)
-    {
+struct class *class_push(struct class **clptrptr) {
+  if (*clptrptr) {
+    if (!(*clptrptr)->refcount) {
       log(class_log, L_warning, "Trying to push deprecated class: %s",
           (*clptrptr)->name);
-    }
-    else
-    {
+    } else {
       (*clptrptr)->refcount--;
     }
 
@@ -212,21 +196,18 @@ struct class *class_push(struct class **clptrptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct class *class_find_name(const char *name)
-{
+struct class *class_find_name(const char *name) {
   struct class *clptr;
-  struct node  *node;
-  hash_t        hash;
-  
+  struct node *node;
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&class_list, node)
-  {
+  dlink_foreach(&class_list, node) {
     clptr = (struct class *)node;
 
-    if(hash == clptr->hash)
-    {
-      if(!str_icmp(clptr->name, name))
+    if (hash == clptr->hash) {
+      if (!str_icmp(clptr->name, name))
         return clptr;
     }
   }
@@ -236,13 +217,11 @@ struct class *class_find_name(const char *name)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct class *class_find_id(uint32_t id)
-{
+struct class *class_find_id(uint32_t id) {
   struct class *clptr;
 
-  dlink_foreach(&class_list, clptr)
-  {
-    if(id == clptr->id)
+  dlink_foreach(&class_list, clptr) {
+    if (id == clptr->id)
       return clptr;
   }
 
@@ -251,26 +230,18 @@ struct class *class_find_id(uint32_t id)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void class_dump(struct class *clptr)
-{
-  if(clptr == NULL)
-  {
+void class_dump(struct class *clptr) {
+  if (clptr == NULL) {
     struct node *node;
 
     dump(class_log, "[============== class summary ===============]");
 
     dlink_foreach_data(&class_list, node, clptr)
-      dump(class_log, " #%03u: [%u] %-20s (sendq: %u/recvq: %u)",
-            clptr->id,
-            clptr->refcount,
-            clptr->name,
-            clptr->sendq,
-            clptr->recvq);
+        dump(class_log, " #%03u: [%u] %-20s (sendq: %u/recvq: %u)", clptr->id,
+             clptr->refcount, clptr->name, clptr->sendq, clptr->recvq);
 
     dump(class_log, "[========== end of class summary ============]");
-  }
-  else
-  {
+  } else {
     dump(class_log, "[============== class dump ===============]");
     dump(class_log, "               id: #%u", clptr->id);
     dump(class_log, "         refcount: %u", clptr->refcount);

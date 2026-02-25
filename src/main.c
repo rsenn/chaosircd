@@ -23,8 +23,8 @@
 
 /* -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
-#include "libchaos/syscall.h"
 #include "libchaos/str.h"
+#include "libchaos/syscall.h"
 /* -------------------------------------------------------------------------- */
 
 #include "../config.h"
@@ -48,18 +48,19 @@ extern void ircd_stack_install(void);
 /* -------------------------------------------------------------------------- *
  * Program entry.                                                             *
  * -------------------------------------------------------------------------- */
-int main(int argc, char **argv, char **envp)
-{
-  char          link[64];
-  int           n;
+int main(int argc, char **argv, char **envp) {
+  char link[64];
+  int n;
 
 #ifdef HAVE_SETRLIMIT
-  static struct rlimit 
-# ifdef __CYGWIN__
-   { unsigned long a; unsigned long b; } 
-# endif
-   stack = { 1024, 1024 }
-  ;
+  static struct rlimit
+#ifdef __CYGWIN__
+  {
+    unsigned long a;
+    unsigned long b;
+  }
+#endif
+  stack = {1024, 1024};
   syscall_setrlimit(RLIMIT_STACK, &stack);
 #endif
   ircd_stack_install();
@@ -75,12 +76,9 @@ int main(int argc, char **argv, char **envp)
 #ifndef WIN32
   str_snprintf(link, sizeof(link), "/proc/%u/exe", syscall_getpid());
 
-  if((n = syscall_readlink(link, ircd_path, sizeof(ircd_path) - 1)) > -1)
-  {
+  if ((n = syscall_readlink(link, ircd_path, sizeof(ircd_path) - 1)) > -1) {
     ircd_path[n] = '\0';
-  }
-  else
-  {
+  } else {
     ircd_path[0] = '\0';
   }
 #endif
@@ -95,11 +93,14 @@ int main(int argc, char **argv, char **envp)
 
   /* Always dump core! */
 #ifdef HAVE_SETRLIMIT
-  struct rlimit 
-# ifdef __CYGWIN__
-   { unsigned long a; unsigned long b; } 
-# endif
-  core = { RLIM_INFINITY, RLIM_INFINITY };
+  struct rlimit
+#ifdef __CYGWIN__
+  {
+    unsigned long a;
+    unsigned long b;
+  }
+#endif
+  core = {RLIM_INFINITY, RLIM_INFINITY};
 
   syscall_setrlimit(RLIMIT_CORE, &core);
 #endif

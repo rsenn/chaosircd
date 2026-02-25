@@ -26,23 +26,23 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/io.h"
-#include "libchaos/syscall.h"
 #include "libchaos/mfile.h"
-#include "libchaos/timer.h"
+#include "libchaos/defs.h"
 #include "libchaos/dlink.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
+#include "libchaos/syscall.h"
+#include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int           mfile_log;
-struct sheap  mfile_heap;
-struct dheap  mfile_dheap;
-struct list   mfile_list;
-uint32_t      mfile_id;
+int mfile_log;
+struct sheap mfile_heap;
+struct dheap mfile_dheap;
+struct list mfile_list;
+uint32_t mfile_id;
 
 /* ------------------------------------------------------------------------ */
 int mfile_get_log() { return mfile_log; }
@@ -50,8 +50,7 @@ int mfile_get_log() { return mfile_log; }
 /* ------------------------------------------------------------------------ *
  * Initialize mfile heap.                                                   *
  * ------------------------------------------------------------------------ */
-void mfile_init(void)
-{
+void mfile_init(void) {
   mfile_log = log_source_register("mfile");
 
   dlink_list_zero(&mfile_list);
@@ -67,13 +66,11 @@ void mfile_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy mfile heap.                                                      *
  * ------------------------------------------------------------------------ */
-void mfile_shutdown(void)
-{
+void mfile_shutdown(void) {
   struct mfile *mfptr;
   struct mfile *next;
 
-  dlink_foreach_safe(&mfile_list, mfptr, next)
-    mfile_delete(mfptr);
+  dlink_foreach_safe(&mfile_list, mfptr, next) mfile_delete(mfptr);
 
   mem_dynamic_destroy(&mfile_dheap);
   mem_static_destroy(&mfile_heap);
@@ -83,21 +80,19 @@ void mfile_shutdown(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void mfile_read(int fd, struct mfile *mfptr)
-{
-  char          buf[MFILE_LINELEN];
-  char         *eol = NULL;
-  char         *line;
-/*  struct mline *mlptr;*/
-  struct node  *nptr;
+void mfile_read(int fd, struct mfile *mfptr) {
+  char buf[MFILE_LINELEN];
+  char *eol = NULL;
+  char *line;
+  /*  struct mline *mlptr;*/
+  struct node *nptr;
 
-  while(io_gets(fd, buf, MFILE_LINELEN - 1))
-  {
-    if((eol = strchr(buf, '\r')))
+  while (io_gets(fd, buf, MFILE_LINELEN - 1)) {
+    if ((eol = strchr(buf, '\r')))
       *eol = '\0';
-    if((eol = strchr(buf, '\n')))
+    if ((eol = strchr(buf, '\n')))
       *eol = '\0';
-    if(eol == NULL)
+    if (eol == NULL)
       eol = buf + str_len(buf);
 
     line = mem_dynamic_alloc(&mfile_dheap, eol - buf + 1);
@@ -108,23 +103,20 @@ void mfile_read(int fd, struct mfile *mfptr)
   }
 
   /* Finished reading */
-  if(io_list[fd].status.eof)
-  {
-    log(mfile_log, L_status, "Read %u lines from %s.",
-        mfptr->lines.size, mfptr->path);
+  if (io_list[fd].status.eof) {
+    log(mfile_log, L_status, "Read %u lines from %s.", mfptr->lines.size,
+        mfptr->path);
 
     io_destroy(fd);
     mfptr->fd = -1;
   }
 
-  if(io_list[fd].status.err)
-  {
+  if (io_list[fd].status.err) {
     mfptr->fd = -1;
 
-    if(io_list[fd].error > 0)
-    {
-      log(mfile_log, L_warning, "Cannot read %s: %s",
-          mfptr->path, syscall_strerror(io_list[fd].error));
+    if (io_list[fd].error > 0) {
+      log(mfile_log, L_warning, "Cannot read %s: %s", mfptr->path,
+          syscall_strerror(io_list[fd].error));
       return;
     }
   }
@@ -132,25 +124,22 @@ void mfile_read(int fd, struct mfile *mfptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_load(const char *path)
-{
-  struct stat   st;
+struct mfile *mfile_load(const char *path) {
+  struct stat st;
   struct mfile *mfptr;
-  int           fd;
-  char         *p;
+  int fd;
+  char *p;
 
-  if(stat(path, &st) == -1)
-  {
-    log(mfile_log, L_warning, "Cannot stat %s: %s",
-        path, syscall_strerror(syscall_errno));
+  if (stat(path, &st) == -1) {
+    log(mfile_log, L_warning, "Cannot stat %s: %s", path,
+        syscall_strerror(syscall_errno));
 
     return NULL;
   }
 
-  if((fd = io_open(path, IO_OPEN_READ)) == -1)
-  {
-    log(mfile_log, L_warning, "Cannot open %s: %s",
-        path, syscall_strerror(syscall_errno));
+  if ((fd = io_open(path, IO_OPEN_READ)) == -1) {
+    log(mfile_log, L_warning, "Cannot open %s: %s", path,
+        syscall_strerror(syscall_errno));
 
     return NULL;
   }
@@ -161,7 +150,7 @@ struct mfile *mfile_load(const char *path)
 
   strlcpy(mfptr->path, path, sizeof(mfptr->path));
 
-  if((p = strrchr(path, '/')))
+  if ((p = strrchr(path, '/')))
     strlcpy(mfptr->name, &p[1], sizeof(mfptr->name));
   else
     strlcpy(mfptr->name, path, sizeof(mfptr->name));
@@ -180,13 +169,12 @@ struct mfile *mfile_load(const char *path)
 /* ------------------------------------------------------------------------ *
  * Add a mfile.                                                             *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_add(const char *path)
-{
+struct mfile *mfile_add(const char *path) {
   struct mfile *mfptr;
 
   mfptr = mfile_load(path);
 
-  if(mfptr == NULL)
+  if (mfptr == NULL)
     return NULL;
 
   mfptr->id = mfile_id++;
@@ -196,30 +184,26 @@ struct mfile *mfile_add(const char *path)
 
   dlink_add_head(&mfile_list, &mfptr->node, mfptr);
 
-/*  debug(mfile_log, "Added mfile: %s", mfptr->path);*/
+  /*  debug(mfile_log, "Added mfile: %s", mfptr->path);*/
 
   return mfptr;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int mfile_update(struct mfile *mfptr)
-{
-  return 0;
-}
+int mfile_update(struct mfile *mfptr) { return 0; }
 
 /* ------------------------------------------------------------------------ *
  * Remove a mfile.                                                          *
  * ------------------------------------------------------------------------ */
-void mfile_delete(struct mfile *mfptr)
-{
+void mfile_delete(struct mfile *mfptr) {
   log(mfile_log, L_status, "Unloading mfile: %s", mfptr->path);
 
-/*  if(io_valid(mfptr->fd))
-  {*/
-    io_shutup(mfptr->fd);
-    mfptr->fd = -1;
-/*  }*/
+  /*  if(io_valid(mfptr->fd))
+    {*/
+  io_shutup(mfptr->fd);
+  mfptr->fd = -1;
+  /*  }*/
 
   dlink_delete(&mfile_list, &mfptr->node);
 
@@ -228,18 +212,15 @@ void mfile_delete(struct mfile *mfptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_find_path(const char *path)
-{
+struct mfile *mfile_find_path(const char *path) {
   struct mfile *mfptr;
-  hash_t        hash;
-    
+  hash_t hash;
+
   hash = str_hash(path);
 
-  dlink_foreach(&mfile_list, mfptr)
-  {
-    if(mfptr->phash == hash)
-    {
-      if(!str_cmp(mfptr->path, path))
+  dlink_foreach(&mfile_list, mfptr) {
+    if (mfptr->phash == hash) {
+      if (!str_cmp(mfptr->path, path))
         return mfptr;
     }
   }
@@ -249,18 +230,15 @@ struct mfile *mfile_find_path(const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_find_name(const char *name)
-{
+struct mfile *mfile_find_name(const char *name) {
   struct mfile *mfptr;
-  hash_t         hash;
-    
+  hash_t hash;
+
   hash = str_hash(name);
 
-  dlink_foreach(&mfile_list, mfptr)
-  {
-    if(mfptr->nhash == hash)
-    {
-      if(!str_cmp(mfptr->name, name))
+  dlink_foreach(&mfile_list, mfptr) {
+    if (mfptr->nhash == hash) {
+      if (!str_cmp(mfptr->name, name))
         return mfptr;
     }
   }
@@ -270,13 +248,11 @@ struct mfile *mfile_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_find_id(uint32_t id)
-{
+struct mfile *mfile_find_id(uint32_t id) {
   struct mfile *mfptr;
 
-  dlink_foreach(&mfile_list, mfptr)
-  {
-    if(mfptr->id == id)
+  dlink_foreach(&mfile_list, mfptr) {
+    if (mfptr->id == id)
       return mfptr;
   }
 
@@ -285,13 +261,10 @@ struct mfile *mfile_find_id(uint32_t id)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_pop(struct mfile *mfile)
-{
-  if(mfile)
-  {
-    if(!mfile->refcount)
-      log(mfile_log, L_warning, "Poping deprecated mfile: %s",
-          mfile->name);
+struct mfile *mfile_pop(struct mfile *mfile) {
+  if (mfile) {
+    if (!mfile->refcount)
+      log(mfile_log, L_warning, "Poping deprecated mfile: %s", mfile->name);
 
     mfile->refcount++;
   }
@@ -301,18 +274,13 @@ struct mfile *mfile_pop(struct mfile *mfile)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct mfile *mfile_push(struct mfile **mfileptr)
-{
-  if(*mfileptr)
-  {
-    if((*mfileptr)->refcount == 0)
-    {
+struct mfile *mfile_push(struct mfile **mfileptr) {
+  if (*mfileptr) {
+    if ((*mfileptr)->refcount == 0) {
       log(mfile_log, L_warning, "Trying to push deprecated user: %s",
           (*mfileptr)->name);
-    }
-    else
-    {
-      if(--(*mfileptr)->refcount == 0)
+    } else {
+      if (--(*mfileptr)->refcount == 0)
         mfile_delete(*mfileptr);
 
       (*mfileptr) = NULL;
@@ -325,22 +293,17 @@ struct mfile *mfile_push(struct mfile **mfileptr)
 /* ------------------------------------------------------------------------ *
  * Dump mfile list and heap.                                                *
  * ------------------------------------------------------------------------ */
-void mfile_dump(struct mfile *mfptr)
-{
-  if(mfptr == NULL)
-  {
+void mfile_dump(struct mfile *mfptr) {
+  if (mfptr == NULL) {
     dump(mfile_log, "[================ mfile summary ================]");
 
-    dlink_foreach(&mfile_list, mfptr)
-    {
-      dump(mfile_log, " #%u: [%u] %-20s (%i)",
-           mfptr->id, mfptr->refcount, mfptr->name, mfptr->fd);
+    dlink_foreach(&mfile_list, mfptr) {
+      dump(mfile_log, " #%u: [%u] %-20s (%i)", mfptr->id, mfptr->refcount,
+           mfptr->name, mfptr->fd);
     }
 
     dump(mfile_log, "[============= end of mfile summary ============]");
-  }
-  else
-  {
+  } else {
     struct node *nptr;
 
     dump(mfile_log, "[================= mfile dump =================]");
@@ -357,7 +320,7 @@ void mfile_dump(struct mfile *mfptr)
     dump(mfile_log, "------------------ mfile data ------------------");
 
     dlink_foreach(&mfptr->lines, nptr)
-      dump(mfile_log, "%s", nptr->data ? nptr->data : "");
+        dump(mfile_log, "%s", nptr->data ? nptr->data : "");
 
     dump(mfile_log, "[============== end of mfile dump =============]");
   }

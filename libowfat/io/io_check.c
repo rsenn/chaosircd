@@ -1,5 +1,3 @@
 #include "io_internal.h"
 
-void io_check() {
-  io_waituntil2(0);
-}
+void io_check() { io_waituntil2(0); }

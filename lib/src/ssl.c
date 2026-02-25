@@ -27,8 +27,8 @@
  * ------------------------------------------------------------------------ */
 #include "config.h"
 #include "libchaos/io.h"
-#include "libchaos/ssl.h"
 #include "libchaos/mem.h"
+#include "libchaos/ssl.h"
 #include "libchaos/str.h"
 #include "libchaos/syscall.h"
 
@@ -42,18 +42,18 @@
 #endif
 
 #ifdef HAVE_SSL
-#include <openssl/ssl.h>
-#include <openssl/rand.h>
-#include <openssl/err.h>
 #include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/rand.h>
+#include <openssl/ssl.h>
 #endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int          ssl_log;
+int ssl_log;
 struct sheap ssl_heap;
-struct list  ssl_list;
-uint32_t     ssl_id;
+struct list ssl_list;
+uint32_t ssl_id;
 
 /* ------------------------------------------------------------------------ */
 int ssl_get_log() { return ssl_log; }
@@ -61,21 +61,18 @@ int ssl_get_log() { return ssl_log; }
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SSL
-static int ssl_bio_read(BIO *h, char *buf, int size)
-{
+static int ssl_bio_read(BIO *h, char *buf, int size) {
   int ret = 0;
   int fd;
 
-  if(buf != NULL)
-  {
+  if (buf != NULL) {
     errno = 0;
     BIO_get_fd(h, &fd);
     ret = recv(fd, buf, size, 0);
     BIO_clear_retry_flags(h);
 
-    if(ret <= 0)
-    {
-      if(BIO_fd_should_retry(ret))
+    if (ret <= 0) {
+      if (BIO_fd_should_retry(ret))
         BIO_set_retry_read(h);
     }
   }
@@ -86,8 +83,7 @@ static int ssl_bio_read(BIO *h, char *buf, int size)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SSL
-static int ssl_bio_write(BIO *h, const char *buf, int size)
-{
+static int ssl_bio_write(BIO *h, const char *buf, int size) {
   int ret;
   int fd;
 
@@ -96,9 +92,8 @@ static int ssl_bio_write(BIO *h, const char *buf, int size)
   ret = send(fd, buf, size, 0);
   BIO_clear_retry_flags(h);
 
-  if(ret <= 0)
-  {
-    if(BIO_fd_should_retry(ret))
+  if (ret <= 0) {
+    if (BIO_fd_should_retry(ret))
       BIO_set_retry_write(h);
   }
 
@@ -109,8 +104,7 @@ static int ssl_bio_write(BIO *h, const char *buf, int size)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SSL
-static void ssl_set_sock(SSL *ssl, int fd)
-{
+static void ssl_set_sock(SSL *ssl, int fd) {
   BIO *rbio;
   BIO *wbio;
 
@@ -121,14 +115,13 @@ static void ssl_set_sock(SSL *ssl, int fd)
 
   BIO_meth_set_read(rbio, &ssl_bio_read);
   BIO_meth_set_write(wbio, &ssl_bio_write);*/
-  //rbio->method->bwrite = (void *)&ssl_bio_write;
+  // rbio->method->bwrite = (void *)&ssl_bio_write;
 }
 #endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_init(void)
-{
+void ssl_init(void) {
   ssl_log = log_source_register("ssl");
 
   ssl_id = 0;
@@ -138,8 +131,10 @@ void ssl_init(void)
   mem_static_note(&ssl_heap, "ssl context heap");
 
 #if OPENSSL_API_COMPAT >= 0x10100000L
-  const OPENSSL_INIT_SETTINGS* settings = OPENSSL_INIT_new();
-  OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS | OPENSSL_INIT_ADD_ALL_CIPHERS,
+  const OPENSSL_INIT_SETTINGS *settings = OPENSSL_INIT_new();
+  OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS |
+                       OPENSSL_INIT_LOAD_CRYPTO_STRINGS |
+                       OPENSSL_INIT_ADD_ALL_CIPHERS,
                    settings);
 #else
   SSL_library_init();
@@ -152,13 +147,11 @@ void ssl_init(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_shutdown(void)
-{
+void ssl_shutdown(void) {
   struct ssl_context *scptr;
-  struct node        *next;
+  struct node *next;
 
-  dlink_foreach_safe(&ssl_list, scptr, next)
-    ssl_delete(scptr);
+  dlink_foreach_safe(&ssl_list, scptr, next) ssl_delete(scptr);
 
   mem_static_destroy(&ssl_heap);
 
@@ -167,21 +160,17 @@ void ssl_shutdown(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_seed(void)
-{
+void ssl_seed(void) {
 #ifdef HAVE_SSL
   int readbytes;
 
   readbytes = RAND_load_file(SSL_RANDOM_FILE, SSL_RANDOM_SIZE);
 
-  if(readbytes <= 0)
-  {
+  if (readbytes <= 0) {
     log(ssl_log, L_warning,
-        "Unable to retrieve any random data from "SSL_RANDOM_FILE);
-  }
-  else
-  {
-    log(ssl_log, L_status, "Read %d random bytes from "SSL_RANDOM_FILE,
+        "Unable to retrieve any random data from " SSL_RANDOM_FILE);
+  } else {
+    log(ssl_log, L_status, "Read %d random bytes from " SSL_RANDOM_FILE,
         readbytes);
   }
 #endif
@@ -189,8 +178,7 @@ void ssl_seed(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_default(struct ssl_context *scptr)
-{
+void ssl_default(struct ssl_context *scptr) {
   scptr->name[0] = '\0';
   scptr->context = SSL_CONTEXT_SERVER;
   scptr->cert[0] = '\0';
@@ -198,39 +186,33 @@ void ssl_default(struct ssl_context *scptr)
   strcpy(scptr->ciphers, "RSA+HIGH:RSA+MEDIUM");
 }
 
-int
-ssl_verify(int ok, X509_STORE_CTX* cert) {
- 
-  if(!ok)
+int ssl_verify(int ok, X509_STORE_CTX *cert) {
+
+  if (!ok)
     return 0; // stop immediately
   return 1;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ssl_context *ssl_add(const char *name, int         context,
-                            const char *cert, const char *key,
-                            const char *ciphers)
-{
+struct ssl_context *ssl_add(const char *name, int context, const char *cert,
+                            const char *key, const char *ciphers) {
 #ifdef HAVE_SSL
   struct ssl_context *scptr;
-  SSL_CTX            *ctxt;
-  const SSL_METHOD   *meth;
+  SSL_CTX *ctxt;
+  const SSL_METHOD *meth;
 
   /* Setup SSL method */
   meth = NULL;
 
-  if(context == SSL_CONTEXT_SERVER)
-  {
+  if (context == SSL_CONTEXT_SERVER) {
     meth = TLS_server_method();
   }
-  if(context == SSL_CONTEXT_CLIENT)
-  {
+  if (context == SSL_CONTEXT_CLIENT) {
     meth = TLS_client_method();
   }
 
-  if(meth == NULL)
-  {
+  if (meth == NULL) {
     log(ssl_log, L_warning, "Error getting %s method.",
         context ? "client" : "server");
     return NULL;
@@ -239,44 +221,38 @@ struct ssl_context *ssl_add(const char *name, int         context,
   /* Setup SSL context */
   ctxt = SSL_CTX_new(meth);
 
-  if(ctxt == NULL)
-  {
+  if (ctxt == NULL) {
     log(ssl_log, L_warning, "Error getting %s context.",
         context ? "client" : "server");
     SSL_CTX_free(ctxt);
     return NULL;
   }
 
-  SSL_CTX_set_mode(ctxt,
-                   SSL_MODE_ENABLE_PARTIAL_WRITE |
-                   SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
+  SSL_CTX_set_mode(ctxt, SSL_MODE_ENABLE_PARTIAL_WRITE |
+                             SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 
   SSL_CTX_set_session_cache_mode(ctxt, SSL_SESS_CACHE_BOTH);
   SSL_CTX_set_timeout(ctxt, 360);
 
-  if(!SSL_CTX_use_RSAPrivateKey_file(ctxt, key, SSL_FILETYPE_PEM))
-  {
+  if (!SSL_CTX_use_RSAPrivateKey_file(ctxt, key, SSL_FILETYPE_PEM)) {
     log(ssl_log, L_warning, "Error loading RSA private key %s", key);
     SSL_CTX_free(ctxt);
     return NULL;
   }
 
-  if(!SSL_CTX_use_certificate_file(ctxt, cert, SSL_FILETYPE_PEM))
-  {
+  if (!SSL_CTX_use_certificate_file(ctxt, cert, SSL_FILETYPE_PEM)) {
     log(ssl_log, L_warning, "Error loading x509 certificate %s", cert);
     SSL_CTX_free(ctxt);
     return NULL;
   }
 
-  if(!SSL_CTX_check_private_key(ctxt))
-  {
+  if (!SSL_CTX_check_private_key(ctxt)) {
     log(ssl_log, L_warning, "Certificate and private key do not match");
     SSL_CTX_free(ctxt);
     return NULL;
   }
 
-  if(!SSL_CTX_set_cipher_list(ctxt, ciphers))
-  {
+  if (!SSL_CTX_set_cipher_list(ctxt, ciphers)) {
     log(ssl_log, L_warning, "Error setting cipher list %s.", ciphers);
     SSL_CTX_free(ctxt);
     return NULL;
@@ -311,10 +287,8 @@ struct ssl_context *ssl_add(const char *name, int         context,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_update(struct ssl_context *scptr,   const char *name,
-               int                 context, const char *cert,
-               const char         *key,     const char *ciphers)
-{
+int ssl_update(struct ssl_context *scptr, const char *name, int context,
+               const char *cert, const char *key, const char *ciphers) {
   strlcpy(scptr->name, name, sizeof(scptr->name));
   scptr->context = context;
   strlcpy(scptr->cert, cert, sizeof(scptr->cert));
@@ -328,8 +302,7 @@ int ssl_update(struct ssl_context *scptr,   const char *name,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_delete(struct ssl_context *scptr)
-{
+void ssl_delete(struct ssl_context *scptr) {
 #ifdef HAVE_SSL
   SSL_CTX_free((SSL_CTX *)scptr->ctxt);
 #endif
@@ -340,18 +313,15 @@ void ssl_delete(struct ssl_context *scptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ssl_context *ssl_find_name(const char *name)
-{
+struct ssl_context *ssl_find_name(const char *name) {
   struct ssl_context *scptr;
-  hash_t              hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&ssl_list, scptr)
-  {
-    if(scptr->hash == hash)
-    {
-      if(!str_icmp(scptr->name, name))
+  dlink_foreach(&ssl_list, scptr) {
+    if (scptr->hash == hash) {
+      if (!str_icmp(scptr->name, name))
         return scptr;
     }
   }
@@ -361,13 +331,11 @@ struct ssl_context *ssl_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ssl_context *ssl_find_id(uint32_t id)
-{
+struct ssl_context *ssl_find_id(uint32_t id) {
   struct ssl_context *scptr;
 
-  dlink_foreach(&ssl_list, scptr)
-  {
-    if(scptr->id == id)
+  dlink_foreach(&ssl_list, scptr) {
+    if (scptr->id == id)
       return scptr;
   }
 
@@ -376,12 +344,11 @@ struct ssl_context *ssl_find_id(uint32_t id)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_new(int fd, struct ssl_context *scptr)
-{
+int ssl_new(int fd, struct ssl_context *scptr) {
 #ifdef HAVE_SSL
   io_list[fd].ssl = SSL_new((SSL_CTX *)scptr->ctxt);
 
-  if(io_list[fd].ssl == NULL)
+  if (io_list[fd].ssl == NULL)
     return -1;
 
   ssl_set_sock(io_list[fd].ssl, fd);
@@ -392,8 +359,7 @@ int ssl_new(int fd, struct ssl_context *scptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_accept(int fd)
-{
+int ssl_accept(int fd) {
 #ifdef HAVE_SSL
   int ret;
   int err;
@@ -407,22 +373,19 @@ int ssl_accept(int fd)
   ret = SSL_accept(io_list[fd].ssl);
 
   /* it was not done */
-  if(ret <= 0)
-  {
+  if (ret <= 0) {
     /* get error code */
     err = SSL_get_error(io_list[fd].ssl, ret);
 
     /* call ssl_accept() again when socket gets readable */
-    if(err == SSL_ERROR_WANT_READ)
-    {
+    if (err == SSL_ERROR_WANT_READ) {
       io_unset_events(fd, IO_WRITE);
       io_list[fd].sslstate = SSL_ACCEPT_WANTS_READ;
       return 0;
     }
 
     /* call ssl_accept() again when socket gets writeable */
-    if(err == SSL_ERROR_WANT_WRITE)
-    {
+    if (err == SSL_ERROR_WANT_WRITE) {
       io_set_events(fd, IO_WRITE);
       io_unset_events(fd, IO_READ);
       io_list[fd].sslstate = SSL_ACCEPT_WANTS_WRITE;
@@ -434,13 +397,9 @@ int ssl_accept(int fd)
      * these say the handshake is in progress and needs
      * more events.
      */
-    if(err == SSL_ERROR_SYSCALL)
-    {
+    if (err == SSL_ERROR_SYSCALL) {
       /* ignore these */
-      if(errno == EWOULDBLOCK ||
-         errno == EINTR ||
-         errno == EAGAIN)
-      {
+      if (errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN) {
         io_list[fd].sslstate = SSL_ACCEPT_WANTS_READ;
         return 0;
       }
@@ -462,8 +421,7 @@ int ssl_accept(int fd)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_connect(int fd)
-{
+int ssl_connect(int fd) {
 #ifdef HAVE_SSL
   int ret;
   int err;
@@ -477,22 +435,19 @@ int ssl_connect(int fd)
   ret = SSL_connect(io_list[fd].ssl);
 
   /* it was not done */
-  if(ret <= 0)
-  {
+  if (ret <= 0) {
     /* get error code */
     err = SSL_get_error(io_list[fd].ssl, ret);
 
     /* call ssl_accept() again when socket gets readable */
-    if(err == SSL_ERROR_WANT_READ)
-    {
+    if (err == SSL_ERROR_WANT_READ) {
       io_unset_events(fd, IO_WRITE);
       io_list[fd].sslstate = SSL_CONNECT_WANTS_READ;
       return 0;
     }
 
     /* call ssl_write() again when socket gets readable */
-    if(err == SSL_ERROR_WANT_WRITE)
-    {
+    if (err == SSL_ERROR_WANT_WRITE) {
       io_set_events(fd, IO_WRITE);
       io_unset_events(fd, IO_READ);
       io_list[fd].sslstate = SSL_CONNECT_WANTS_WRITE;
@@ -504,13 +459,9 @@ int ssl_connect(int fd)
      * these say the handshake is in progress and needs
      * more events.
      */
-    if(err == SSL_ERROR_SYSCALL)
-    {
+    if (err == SSL_ERROR_SYSCALL) {
       /* ignore these */
-      if(errno == EWOULDBLOCK ||
-         errno == EINTR ||
-         errno == EAGAIN)
-      {
+      if (errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN) {
         io_list[fd].sslstate = SSL_CONNECT_WANTS_READ;
         return 0;
       }
@@ -532,8 +483,7 @@ int ssl_connect(int fd)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_read(int fd, void *buf, size_t n)
-{
+int ssl_read(int fd, void *buf, size_t n) {
 #ifdef HAVE_SSL
   int ret;
   int err;
@@ -548,14 +498,12 @@ int ssl_read(int fd, void *buf, size_t n)
   ret = SSL_read(io_list[fd].ssl, buf, n);
 
   /* it was not done */
-  if(ret < 0)
-  {
+  if (ret < 0) {
     /* get error code */
     err = SSL_get_error(io_list[fd].ssl, ret);
 
     /* call ssl_read() again when socket gets readable */
-    if(err == SSL_ERROR_WANT_READ)
-    {
+    if (err == SSL_ERROR_WANT_READ) {
       io_unset_events(fd, IO_WRITE);
       io_list[fd].sslstate = 0;
       errno = EAGAIN;
@@ -563,8 +511,7 @@ int ssl_read(int fd, void *buf, size_t n)
     }
 
     /* call ssl_read() again when socket gets writeable */
-    if(err == SSL_ERROR_WANT_WRITE)
-    {
+    if (err == SSL_ERROR_WANT_WRITE) {
       io_set_events(fd, IO_WRITE);
       io_unset_events(fd, IO_READ);
       io_list[fd].sslstate = SSL_READ_WANTS_WRITE;
@@ -577,13 +524,9 @@ int ssl_read(int fd, void *buf, size_t n)
      * these say the handshake is in progress and needs
      * more events.
      */
-    if(err == SSL_ERROR_SYSCALL)
-    {
+    if (err == SSL_ERROR_SYSCALL) {
       /* ignore these */
-      if(errno == EWOULDBLOCK ||
-         errno == EINTR ||
-         errno == EAGAIN)
-      {
+      if (errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN) {
         io_list[fd].sslstate = 0;
         return -1;
       }
@@ -591,7 +534,7 @@ int ssl_read(int fd, void *buf, size_t n)
       return -1;
     }
 
-    if(err == SSL_ERROR_ZERO_RETURN)
+    if (err == SSL_ERROR_ZERO_RETURN)
       return 0;
 
     /* SSL handshake failed, report error! */
@@ -610,8 +553,7 @@ int ssl_read(int fd, void *buf, size_t n)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_write(int fd, const void *buf, size_t n)
-{
+int ssl_write(int fd, const void *buf, size_t n) {
 #ifdef HAVE_SSL
   int ret;
   int err;
@@ -626,22 +568,19 @@ int ssl_write(int fd, const void *buf, size_t n)
   ret = SSL_write(io_list[fd].ssl, buf, n);
 
   /* it was not done */
-  if(ret <= 0)
-  {
+  if (ret <= 0) {
     /* get error code */
     err = SSL_get_error(io_list[fd].ssl, ret);
 
     /* call ssl_write() again when socket gets writeable */
-    if(err == SSL_ERROR_WANT_WRITE)
-    {
+    if (err == SSL_ERROR_WANT_WRITE) {
       io_list[fd].sslstate = 0;
       errno = EWOULDBLOCK;
       return -1;
     }
 
     /* call ssl_write() again when socket gets writeable */
-    if(err == SSL_ERROR_WANT_READ)
-    {
+    if (err == SSL_ERROR_WANT_READ) {
       io_unset_events(fd, IO_WRITE);
       io_list[fd].sslstate = SSL_WRITE_WANTS_READ;
       errno = EWOULDBLOCK;
@@ -653,13 +592,9 @@ int ssl_write(int fd, const void *buf, size_t n)
      * these say the handshake is in progress and needs
      * more events.
      */
-    if(err == SSL_ERROR_SYSCALL)
-    {
+    if (err == SSL_ERROR_SYSCALL) {
       /* ignore these */
-      if(errno == EWOULDBLOCK ||
-         errno == EINTR ||
-         errno == EAGAIN)
-      {
+      if (errno == EWOULDBLOCK || errno == EINTR || errno == EAGAIN) {
         io_list[fd].sslstate = 0;
         return -1;
       }
@@ -667,7 +602,7 @@ int ssl_write(int fd, const void *buf, size_t n)
       return -1;
     }
 
-    if(err == SSL_ERROR_ZERO_RETURN)
+    if (err == SSL_ERROR_ZERO_RETURN)
       return 0;
 
     /* SSL handshake failed, report error! */
@@ -686,57 +621,47 @@ int ssl_write(int fd, const void *buf, size_t n)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *ssl_strerror(int fd)
-{
+const char *ssl_strerror(int fd) {
 #ifdef HAVE_SSL
-  switch(io_list[fd].sslerror)
-  {
-    case SSL_ERROR_NONE:
-    {
-      return "No error";
-    }
-    case SSL_ERROR_SSL:
-    {
-      long        err;
-      const char *s;
+  switch (io_list[fd].sslerror) {
+  case SSL_ERROR_NONE: {
+    return "No error";
+  }
+  case SSL_ERROR_SSL: {
+    long err;
+    const char *s;
 
-      err = ERR_get_error();
+    err = ERR_get_error();
 
-      if(err)
-        while(ERR_get_error());
+    if (err)
+      while (ERR_get_error())
+        ;
 
-      s = ERR_error_string(err, NULL);
+    s = ERR_error_string(err, NULL);
 
-      return s ? s : "Internal OpenSSL error or protocol error";
-    }
-    case SSL_ERROR_WANT_READ:
-    {
-      return "OpenSSL functions requested a read";
-    }
-    case SSL_ERROR_WANT_WRITE:
-    {
-      return "OpenSSL functions requested a write";
-    }
-    case SSL_ERROR_WANT_X509_LOOKUP:
-    {
-      return "OpenSSL requested a X509 lookup which didnt arrive";
-    }
-    case SSL_ERROR_SYSCALL:
-    {
-      return "Underlying syscall error";
-    }
-    case SSL_ERROR_ZERO_RETURN:
-    {
-      return "Underlying socket operation returned zero";
-    }
-    case SSL_ERROR_WANT_CONNECT:
-    {
-      return "OpenSSL functions wanted a connect";
-    }
-    default:
-    {
-      return "Unknown OpenSSL error (huh?)";
-    }
+    return s ? s : "Internal OpenSSL error or protocol error";
+  }
+  case SSL_ERROR_WANT_READ: {
+    return "OpenSSL functions requested a read";
+  }
+  case SSL_ERROR_WANT_WRITE: {
+    return "OpenSSL functions requested a write";
+  }
+  case SSL_ERROR_WANT_X509_LOOKUP: {
+    return "OpenSSL requested a X509 lookup which didnt arrive";
+  }
+  case SSL_ERROR_SYSCALL: {
+    return "Underlying syscall error";
+  }
+  case SSL_ERROR_ZERO_RETURN: {
+    return "Underlying socket operation returned zero";
+  }
+  case SSL_ERROR_WANT_CONNECT: {
+    return "OpenSSL functions wanted a connect";
+  }
+  default: {
+    return "Unknown OpenSSL error (huh?)";
+  }
   }
 #else
   return "OpenSSL not supported";
@@ -745,11 +670,9 @@ const char *ssl_strerror(int fd)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_close(int fd)
-{
+void ssl_close(int fd) {
 #ifdef HAVE_SSL
-  if(io_list[fd].ssl)
-  {
+  if (io_list[fd].ssl) {
     SSL_shutdown(io_list[fd].ssl);
     io_list[fd].ssl = NULL;
   }
@@ -758,45 +681,37 @@ void ssl_close(int fd)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ssl_handshake(int fd, struct io *iofd)
-{
+int ssl_handshake(int fd, struct io *iofd) {
 #ifdef HAVE_SSL
   /* Continue ssl_accept() */
-  if(iofd->sslstate == SSL_ACCEPT_WANTS_READ ||
-     iofd->sslstate == SSL_ACCEPT_WANTS_WRITE)
-  {
-    if(iofd->status.events & IO_READ)
-    {
-      if(iofd->sslstate == SSL_ACCEPT_WANTS_READ)
-      {
-        if(ssl_accept(fd))
-        {
-          log(ssl_log, L_warning, "SSL handshake error on %s: %s",
-              iofd->note, ssl_strerror(fd));
+  if (iofd->sslstate == SSL_ACCEPT_WANTS_READ ||
+      iofd->sslstate == SSL_ACCEPT_WANTS_WRITE) {
+    if (iofd->status.events & IO_READ) {
+      if (iofd->sslstate == SSL_ACCEPT_WANTS_READ) {
+        if (ssl_accept(fd)) {
+          log(ssl_log, L_warning, "SSL handshake error on %s: %s", iofd->note,
+              ssl_strerror(fd));
 
           ssl_close(fd);
           return -1;
         }
 
-        if(iofd->sendq.size)
+        if (iofd->sendq.size)
           io_set_events(fd, IO_WRITE);
       }
     }
 
-    if(iofd->status.events & IO_WRITE)
-    {
-      if(iofd->sslstate == SSL_ACCEPT_WANTS_WRITE)
-      {
-        if(ssl_accept(fd))
-        {
-          log(ssl_log, L_warning, "SSL handshake error on %s: %s",
-              iofd->note, ssl_strerror(fd));
+    if (iofd->status.events & IO_WRITE) {
+      if (iofd->sslstate == SSL_ACCEPT_WANTS_WRITE) {
+        if (ssl_accept(fd)) {
+          log(ssl_log, L_warning, "SSL handshake error on %s: %s", iofd->note,
+              ssl_strerror(fd));
 
           ssl_close(fd);
           return -1;
         }
 
-        if(iofd->sendq.size == 0)
+        if (iofd->sendq.size == 0)
           io_unset_events(fd, IO_WRITE);
         io_set_events(fd, IO_READ);
       }
@@ -806,44 +721,37 @@ int ssl_handshake(int fd, struct io *iofd)
   }
 
   /* Continue ssl_connect() */
-  if(iofd->sslstate == SSL_CONNECT_WANTS_READ ||
-     iofd->sslstate == SSL_CONNECT_WANTS_WRITE)
-  {
-    if(iofd->status.events & IO_READ)
-    {
-      if(iofd->sslstate == SSL_CONNECT_WANTS_READ)
-      {
-        if(ssl_connect(fd))
-        {
-          log(ssl_log, L_warning, "SSL handshake error on %s: %s",
-              iofd->note, ssl_strerror(fd));
+  if (iofd->sslstate == SSL_CONNECT_WANTS_READ ||
+      iofd->sslstate == SSL_CONNECT_WANTS_WRITE) {
+    if (iofd->status.events & IO_READ) {
+      if (iofd->sslstate == SSL_CONNECT_WANTS_READ) {
+        if (ssl_connect(fd)) {
+          log(ssl_log, L_warning, "SSL handshake error on %s: %s", iofd->note,
+              ssl_strerror(fd));
 
           ssl_close(fd);
           return -1;
         }
 
-        if(iofd->sendq.size)
+        if (iofd->sendq.size)
           io_set_events(fd, IO_WRITE);
       }
     }
 
-    if(iofd->status.events & IO_WRITE)
-    {
-      if(iofd->sslstate == SSL_CONNECT_WANTS_WRITE)
-      {
-        if(iofd->sendq.size == 0)
+    if (iofd->status.events & IO_WRITE) {
+      if (iofd->sslstate == SSL_CONNECT_WANTS_WRITE) {
+        if (iofd->sendq.size == 0)
           io_unset_events(fd, IO_WRITE);
 
-        if(ssl_connect(fd))
-        {
-          log(ssl_log, L_warning, "SSL handshake error on %s: %s",
-              iofd->note, ssl_strerror(fd));
+        if (ssl_connect(fd)) {
+          log(ssl_log, L_warning, "SSL handshake error on %s: %s", iofd->note,
+              ssl_strerror(fd));
 
           ssl_close(fd);
           return -1;
         }
 
-        if(iofd->sendq.size == 0)
+        if (iofd->sendq.size == 0)
           io_unset_events(fd, IO_WRITE);
         io_set_events(fd, IO_READ);
       }
@@ -853,14 +761,12 @@ int ssl_handshake(int fd, struct io *iofd)
   }
 
   /* Continue ssl_read() */
-  if(iofd->sslstate == SSL_READ_WANTS_WRITE)
-  {
-    if(iofd->status.events & IO_WRITE)
-    {
+  if (iofd->sslstate == SSL_READ_WANTS_WRITE) {
+    if (iofd->status.events & IO_WRITE) {
       iofd->status.events &= ~IO_WRITE;
       iofd->status.events |= IO_READ;
 
-      if(iofd->sendq.size == 0)
+      if (iofd->sendq.size == 0)
         io_unset_events(fd, IO_WRITE);
       io_set_events(fd, IO_READ);
     }
@@ -869,14 +775,12 @@ int ssl_handshake(int fd, struct io *iofd)
   }
 
   /* Continue ssl_write() */
-  if(iofd->sslstate == SSL_WRITE_WANTS_READ)
-  {
-    if(iofd->status.events & IO_READ)
-    {
+  if (iofd->sslstate == SSL_WRITE_WANTS_READ) {
+    if (iofd->status.events & IO_READ) {
       iofd->status.events &= ~IO_READ;
       iofd->status.events |= IO_WRITE;
 
-      if(iofd->sendq.size)
+      if (iofd->sendq.size)
         io_set_events(fd, IO_WRITE);
     }
 
@@ -891,15 +795,13 @@ int ssl_handshake(int fd, struct io *iofd)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_cipher(int fd, char *ciphbuf, size_t n)
-{
+void ssl_cipher(int fd, char *ciphbuf, size_t n) {
 #ifdef HAVE_SSL
   const SSL_CIPHER *cipher;
-  int               bits;
-  char              ciphername[64];
+  int bits;
+  char ciphername[64];
 
-  if(io_list[fd].ssl == NULL)
-  {
+  if (io_list[fd].ssl == NULL) {
 #endif
     strlcpy(ciphbuf, "NONE", n);
     return;
@@ -912,36 +814,27 @@ void ssl_cipher(int fd, char *ciphbuf, size_t n)
 
   strlcpy(ciphername, SSL_CIPHER_get_name(cipher), sizeof(ciphername));
 
-  if(!str_ncmp(ciphername, "AES", 3))
-  {
+  if (!str_ncmp(ciphername, "AES", 3)) {
     ciphername[3] = '\0';
-  }
-  else if(!str_ncmp(ciphername, "IDEA", 4))
-  {
+  } else if (!str_ncmp(ciphername, "IDEA", 4)) {
     ciphername[4] = '\0';
-  }
-  else if(!str_ncmp(ciphername, "EXP1024", 7))
-  {
+  } else if (!str_ncmp(ciphername, "EXP1024", 7)) {
     char *p;
     strlcpy(ciphername, &SSL_CIPHER_get_name(cipher)[8], sizeof(ciphername));
-    if((p = strchr(ciphername, '-')))
+    if ((p = strchr(ciphername, '-')))
       *p = '\0';
-  }
-  else if(!str_ncmp(ciphername, "EXP", 3))
-  {
+  } else if (!str_ncmp(ciphername, "EXP", 3)) {
     char *p;
     strlcpy(ciphername, &SSL_CIPHER_get_name(cipher)[4], sizeof(ciphername));
-    if((p = strchr(ciphername, '-')))
+    if ((p = strchr(ciphername, '-')))
       *p = '\0';
-  }
-  else
-  {
+  } else {
     char *p;
-    if((p = strchr(ciphername, '-')))
+    if ((p = strchr(ciphername, '-')))
       *p = '\0';
   }
 
-  if(!str_cmp(ciphername, "DES") && bits == 168)
+  if (!str_cmp(ciphername, "DES") && bits == 168)
     strcpy(ciphername, "3DES");
 
   str_snprintf(ciphbuf, n, "%s/%u", ciphername, bits);
@@ -950,13 +843,10 @@ void ssl_cipher(int fd, char *ciphbuf, size_t n)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ssl_context *ssl_pop(struct ssl_context *scptr)
-{
-  if(scptr)
-  {
-    if(!scptr->refcount)
-      log(ssl_log, L_warning, "Poping deprecated ssl context #%u",
-          scptr->id);
+struct ssl_context *ssl_pop(struct ssl_context *scptr) {
+  if (scptr) {
+    if (!scptr->refcount)
+      log(ssl_log, L_warning, "Poping deprecated ssl context #%u", scptr->id);
 
     scptr->refcount++;
   }
@@ -964,21 +854,15 @@ struct ssl_context *ssl_pop(struct ssl_context *scptr)
   return scptr;
 }
 
-
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ssl_context *ssl_push(struct ssl_context **scptr)
-{
-  if(*scptr)
-  {
-    if((*scptr)->refcount == 0)
-    {
+struct ssl_context *ssl_push(struct ssl_context **scptr) {
+  if (*scptr) {
+    if ((*scptr)->refcount == 0) {
       log(ssl_log, L_warning, "Trying to push deprecated ssl context #%u",
           (*scptr)->id);
-    }
-    else
-    {
-      if(--(*scptr)->refcount == 0)
+    } else {
+      if (--(*scptr)->refcount == 0)
         ssl_delete(*scptr);
 
       (*scptr) = NULL;
@@ -990,23 +874,18 @@ struct ssl_context *ssl_push(struct ssl_context **scptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void ssl_dump(struct ssl_context *scptr)
-{
-  if(scptr == NULL)
-  {
+void ssl_dump(struct ssl_context *scptr) {
+  if (scptr == NULL) {
     dump(ssl_log, "[================ ssl summary ================]");
 
-    dlink_foreach(&ssl_list, scptr)
-    {
-      dump(ssl_log, " #%u: [%u] %-20s (%s)",
-           scptr->id, scptr->refcount, scptr->name,
+    dlink_foreach(&ssl_list, scptr) {
+      dump(ssl_log, " #%u: [%u] %-20s (%s)", scptr->id, scptr->refcount,
+           scptr->name,
            scptr->context == SSL_CONTEXT_SERVER ? "server" : "client");
     }
 
     dump(ssl_log, "[============= end of ssl summary ============]");
-  }
-  else
-  {
+  } else {
     dump(ssl_log, "[================= ssl dump ==================]");
 
     dump(ssl_log, "         id: #%u", scptr->id);
@@ -1019,46 +898,45 @@ void ssl_dump(struct ssl_context *scptr)
     dump(ssl_log, "        key: %s", scptr->key);
     dump(ssl_log, "    ciphers: %s", scptr->ciphers);
 
-    if(scptr->ctxt)
-    {
-/*      ASN1_UTCTIME *utc;
-      time_t from, to, current = timer_systime;
-      struct tm *tm;
-      char v_from[32], v_to[32];
-      char buf[256];
-      long serial, version;
-      ASN1_INTEGER *asn1_i;*/
-/*      X509_STORE *cstore;*/
-/*      X509_OBJECT *cobj;*/
+    if (scptr->ctxt) {
+      /*      ASN1_UTCTIME *utc;
+            time_t from, to, current = timer_systime;
+            struct tm *tm;
+            char v_from[32], v_to[32];
+            char buf[256];
+            long serial, version;
+            ASN1_INTEGER *asn1_i;*/
+      /*      X509_STORE *cstore;*/
+      /*      X509_OBJECT *cobj;*/
 
-/*      cstore = SSL_CTX_get_cert_store(scptr->ctxt);*/
+      /*      cstore = SSL_CTX_get_cert_store(scptr->ctxt);*/
       /*      dump(ssl_log, "x509: %u", sk_X509_num(scptr->ctxt->extra_certs));
 
       dump(ssl_log, "--------------- certificate info --------------");*/
 
       /* ugly time string formatting */
-/*      utc = X509_get_notBefore(scptr->crt);
-      from = ASN1_UTCTIME_get(utc);
-      tm = localtime(&from);
-      strftime(v_from, 32, "%Y-%m-%d %H:%M", tm);
-      utc = X509_get_notAfter(scptr->crt);
-      to = ASN1_UTCTIME_get(utc);
-      tm = localtime(&to);
-      strftime(v_to, 32, "%Y-%m-%d %H:%M", tm);
+      /*      utc = X509_get_notBefore(scptr->crt);
+            from = ASN1_UTCTIME_get(utc);
+            tm = localtime(&from);
+            strftime(v_from, 32, "%Y-%m-%d %H:%M", tm);
+            utc = X509_get_notAfter(scptr->crt);
+            to = ASN1_UTCTIME_get(utc);
+            tm = localtime(&to);
+            strftime(v_to, 32, "%Y-%m-%d %H:%M", tm);
 
-      asn1_i = X509_get_serialNumber(cert);
-      serial = ASN1_INTEGER_get(asn1_i);
-      version = X509_get_version(cert);
+            asn1_i = X509_get_serialNumber(cert);
+            serial = ASN1_INTEGER_get(asn1_i);
+            version = X509_get_version(cert);
 
-      dump(ssl_log, "serial #%lu (X509 version %lu)", serial, version);
-      X509_NAME_oneline(X509_get_subject_name(cert), buf, 255);
-      dump(ssl_log, "subject: %s", buf);
-      X509_NAME_oneline(X509_get_issuer_name(cert), buf, 255);
-      dump(ssl_log, "issuer:  %s", buf);
-      dump(ssl_log, "valid from %s to %s (%s)",
-           v_from, v_to,
-           (from <= current && current < to) ? "valid" :
-           (from > current) ? "not yet valid" : "expired");*/
+            dump(ssl_log, "serial #%lu (X509 version %lu)", serial, version);
+            X509_NAME_oneline(X509_get_subject_name(cert), buf, 255);
+            dump(ssl_log, "subject: %s", buf);
+            X509_NAME_oneline(X509_get_issuer_name(cert), buf, 255);
+            dump(ssl_log, "issuer:  %s", buf);
+            dump(ssl_log, "valid from %s to %s (%s)",
+                 v_from, v_to,
+                 (from <= current && current < to) ? "valid" :
+                 (from > current) ? "not yet valid" : "expired");*/
     }
 
     dump(ssl_log, "[============== end of ssl dump ==============]");

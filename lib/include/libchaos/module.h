@@ -32,94 +32,94 @@
  * ------------------------------------------------------------------------ */
 struct module;
 
-typedef int  (module_load_t)(struct module *mptr);
-typedef void (module_unload_t)(struct module *mptr);
+typedef int(module_load_t)(struct module *mptr);
+typedef void(module_unload_t)(struct module *mptr);
 
 struct module {
-  struct node      node;
-  uint32_t         id;
-  uint32_t         refcount;
-  hash_t           nhash;
-  hash_t           phash;
-  int              fd;
-  void            *map;
-  void            *handle;
-  module_load_t   *load;
+  struct node node;
+  uint32_t id;
+  uint32_t refcount;
+  hash_t nhash;
+  hash_t phash;
+  int fd;
+  void *map;
+  void *handle;
+  module_load_t *load;
   module_unload_t *unload;
-  char             name[32];
-  char             path[64];
+  char name[32];
+  char path[64];
 };
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA(int)            module_log;
-CHAOS_DATA(struct sheap)   module_heap;
-CHAOS_DATA(struct list)    module_list;
+CHAOS_DATA(int) module_log;
+CHAOS_DATA(struct sheap) module_heap;
+CHAOS_DATA(struct list) module_list;
 CHAOS_DATA(struct timer *) module_timer;
-CHAOS_DATA(uint32_t)       module_id;
+CHAOS_DATA(uint32_t) module_id;
 
 /* ------------------------------------------------------------------------ */
-CHAOS_API(int  module_get_log(void))
+CHAOS_API(int module_get_log(void))
 
 /* ------------------------------------------------------------------------ *
  * Initialize module heap.                                                    *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void            module_init      (void))
+CHAOS_API(void module_init(void))
 
 /* ------------------------------------------------------------------------ *
  * Destroy module heap.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void            module_shutdown  (void))
+CHAOS_API(void module_shutdown(void))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void            module_setpath   (const char    *path))
+CHAOS_API(void module_setpath(const char *path))
 
-  /* ------------------------------------------------------------------------ *
+/* ------------------------------------------------------------------------ *
  * Add a module.                                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct module * module_add       (const char    *path))
+CHAOS_API(struct module *module_add(const char *path))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int             module_update    (struct module *mptr))
+CHAOS_API(int module_update(struct module *mptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(int             module_reload    (struct module *mptr))
+CHAOS_API(int module_reload(struct module *mptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(const char *    module_expand    (const char    *name))
+CHAOS_API(const char *module_expand(const char *name))
 
 /* ------------------------------------------------------------------------ *
  * Remove a module.                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void            module_delete    (struct module *module))
+CHAOS_API(void module_delete(struct module *module))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct module * module_find_path (const char    *path))
+CHAOS_API(struct module *module_find_path(const char *path))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct module * module_find_name (const char    *name))
+CHAOS_API(struct module *module_find_name(const char *name))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct module * module_find_id   (uint32_t       id))
+CHAOS_API(struct module *module_find_id(uint32_t id))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct module * module_pop       (struct module *mptr))
+CHAOS_API(struct module *module_pop(struct module *mptr))
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_API(struct module * module_push      (struct module **mptrptr))
+CHAOS_API(struct module *module_push(struct module **mptrptr))
 
 /* ------------------------------------------------------------------------ *
  * Dump modules.                                                              *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void            module_dump      (struct module *mptr))
+CHAOS_API(void module_dump(struct module *mptr))
 
 #endif

@@ -22,40 +22,31 @@
 #ifndef SERVAUTH_CONTROL_H
 #define SERVAUTH_CONTROL_H
 
-#include "libchaos/queue.h"
 #include "libchaos/io.h"
 #include "libchaos/net.h"
+#include "libchaos/queue.h"
 
 typedef struct control {
-  int        recvfd;
-  int        sendfd;
-  char      *name;
+  int recvfd;
+  int sendfd;
+  char *name;
 } control_t;
 
 /* -------------------------------------------------------------------------- *
  * set control connection fd.                                                 *
  * -------------------------------------------------------------------------- */
-extern void control_init        (control_t *cptr,
-                                 int        recvfd,
-                                 int        sendfd);
+extern void control_init(control_t *cptr, int recvfd, int sendfd);
 
-extern void control_zero        (control_t *cptr);
+extern void control_zero(control_t *cptr);
 
-extern void control_set_fd      (control_t *cptr,
-                                 int        recvfd,
-                                 int        sendfd);
+extern void control_set_fd(control_t *cptr, int recvfd, int sendfd);
 
-extern int  control_pre_select  (control_t *cptr,
-                                 int       *hsck,
-                                 fd_set    *rfds,
-                                 fd_set    *wfds);
+extern int control_pre_select(control_t *cptr, int *hsck, fd_set *rfds,
+                              fd_set *wfds);
 
-extern int  control_post_select (control_t    *cptr,
-                                 const fd_set *rfds,
-                                 const fd_set *wfds);
+extern int control_post_select(control_t *cptr, const fd_set *rfds,
+                               const fd_set *wfds);
 
-extern int  control_send        (control_t    *cptr,
-                                 const char   *format,
-                                 ...);
+extern int control_send(control_t *cptr, const char *format, ...);
 
 #endif

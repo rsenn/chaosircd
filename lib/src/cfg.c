@@ -29,12 +29,12 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "libchaos/mem.h"
 #include "libchaos/cfg.h"
-#include "libchaos/log.h"
-#include "libchaos/str.h"
+#include "libchaos/defs.h"
 #include "libchaos/gif.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
+#include "libchaos/str.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -52,17 +52,16 @@
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int                cfg_log;
-struct sheap       cfg_heap;       /* heap containing cfg blocks */
-struct list        cfg_list;       /* list linking cfg blocks */
-uint32_t           cfg_id;
-int                cfg_dirty;
+int cfg_log;
+struct sheap cfg_heap; /* heap containing cfg blocks */
+struct list cfg_list;  /* list linking cfg blocks */
+uint32_t cfg_id;
+int cfg_dirty;
 
 /* ------------------------------------------------------------------------ *
  * Initialize cfg heap and add garbage collect timer.                     *
  * ------------------------------------------------------------------------ */
-void cfg_init(void)
-{
+void cfg_init(void) {
   cfg_log = log_source_register("cfg");
 
   dlink_list_zero(&cfg_list);
@@ -74,19 +73,16 @@ void cfg_init(void)
   mem_static_note(&cfg_heap, "cfg block heap");
 }
 
-
 /* ------------------------------------------------------------------------ *
  * Destroy cfg heap                                                       *
  * ------------------------------------------------------------------------ */
-void cfg_shutdown(void)
-{
+void cfg_shutdown(void) {
   struct cfg *cfptr;
   struct cfg *next;
 
   /* Remove all cfg blocks */
-  dlink_foreach_safe(&cfg_list, cfptr, next)
-  {
-    if(cfptr->refcount)
+  dlink_foreach_safe(&cfg_list, cfptr, next) {
+    if (cfptr->refcount)
       cfptr->refcount--;
 
     cfg_delete(cfptr);
@@ -101,23 +97,18 @@ void cfg_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Collect cfg block garbage.                                            *
  * ------------------------------------------------------------------------ */
-int cfg_collect(void)
-{
+int cfg_collect(void) {
   struct cfg *cnptr;
   struct cfg *next;
-  size_t         n = 0;
+  size_t n = 0;
 
-  if(cfg_dirty)
-  {
+  if (cfg_dirty) {
     /* Report verbose */
-    log(cfg_log, L_verbose,
-        "Doing garbage collect for [cfg] module.");
+    log(cfg_log, L_verbose, "Doing garbage collect for [cfg] module.");
 
     /* Free all cfg blocks with a zero refcount */
-    dlink_foreach_safe(&cfg_list, cnptr, next)
-    {
-      if(!cnptr->refcount)
-      {
+    dlink_foreach_safe(&cfg_list, cnptr, next) {
+      if (!cnptr->refcount) {
         cfg_delete(cnptr);
 
         n++;
@@ -135,8 +126,7 @@ int cfg_collect(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void cfg_default(struct cfg *cfptr)
-{
+void cfg_default(struct cfg *cfptr) {
   dlink_node_zero(&cfptr->node);
 
   strcpy(cfptr->name, "default");
@@ -147,8 +137,7 @@ void cfg_default(struct cfg *cfptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct cfg *cfg_new(const char *name)
-{
+struct cfg *cfg_new(const char *name) {
   struct cfg *cfptr;
 
   cfptr = mem_static_alloc(&cfg_heap);
@@ -164,8 +153,7 @@ struct cfg *cfg_new(const char *name)
 
   dlink_list_zero(&cfptr->chain);
 
-  log(cfg_log, L_status, "Added cfg block: %s",
-      cfptr->name);
+  log(cfg_log, L_status, "Added cfg block: %s", cfptr->name);
 
   return cfptr;
 }
@@ -173,8 +161,7 @@ struct cfg *cfg_new(const char *name)
 /* ------------------------------------------------------------------------ *
  * Load config file and all its dependants. Re-read them if necessary.      *
  * ------------------------------------------------------------------------ */
-int cfg_load(struct cfg *cfptr, const char *path)
-{
+int cfg_load(struct cfg *cfptr, const char *path) {
   (void)cfptr;
   (void)path;
   return 0;
@@ -182,8 +169,7 @@ int cfg_load(struct cfg *cfptr, const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void cfg_delete(struct cfg *cfptr)
-{
+void cfg_delete(struct cfg *cfptr) {
   log(cfg_log, L_status, "Deleting cfg block: %s", cfptr->name);
 
   dlink_delete(&cfg_list, &cfptr->node);
@@ -194,8 +180,7 @@ void cfg_delete(struct cfg *cfptr)
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                     *
  * ------------------------------------------------------------------------ */
-void cfg_release(struct cfg *cfptr)
-{
+void cfg_release(struct cfg *cfptr) {
   (void)cfptr;
 
   cfg_dirty = 1;
@@ -203,8 +188,7 @@ void cfg_release(struct cfg *cfptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void cfg_set_name(struct cfg *cfptr, const char *name)
-{
+void cfg_set_name(struct cfg *cfptr, const char *name) {
   strlcpy(cfptr->name, name, sizeof(cfptr->name));
 
   cfptr->hash = str_ihash(cfptr->name);
@@ -212,28 +196,22 @@ void cfg_set_name(struct cfg *cfptr, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *cfg_get_name(struct cfg *cfptr)
-{
-  return cfptr->name;
-}
+const char *cfg_get_name(struct cfg *cfptr) { return cfptr->name; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct cfg *cfg_find_name(const char *name)
-{
-  struct node   *node;
+struct cfg *cfg_find_name(const char *name) {
+  struct node *node;
   struct cfg *cfptr;
-  hash_t         hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&cfg_list, node)
-  {
+  dlink_foreach(&cfg_list, node) {
     cfptr = node->data;
 
-    if(cfptr->hash == hash)
-    {
-      if(!str_icmp(cfptr->name, name))
+    if (cfptr->hash == hash) {
+      if (!str_icmp(cfptr->name, name))
         return cfptr;
     }
   }
@@ -243,13 +221,11 @@ struct cfg *cfg_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct cfg *cfg_find_id(uint32_t id)
-{
+struct cfg *cfg_find_id(uint32_t id) {
   struct cfg *cfptr;
 
-  dlink_foreach(&cfg_list, cfptr)
-  {
-    if(cfptr->id == id)
+  dlink_foreach(&cfg_list, cfptr) {
+    if (cfptr->id == id)
       return cfptr;
   }
 
@@ -259,22 +235,15 @@ struct cfg *cfg_find_id(uint32_t id)
 /* ------------------------------------------------------------------------ *
  * Dump cfgs and cfg heap.                                              *
  * ------------------------------------------------------------------------ */
-void cfg_dump(struct cfg *cfptr)
-{
-  if(cfptr == NULL)
-  {
+void cfg_dump(struct cfg *cfptr) {
+  if (cfptr == NULL) {
     dump(cfg_log, "[============== cfg summary ===============]");
 
-    dlink_foreach(&cfg_list, cfptr)
-      dump(cfg_log, " #%03u: [%u] %-20s",
-           cfptr->id,
-           cfptr->refcount,
-           cfptr->name);
+    dlink_foreach(&cfg_list, cfptr) dump(
+        cfg_log, " #%03u: [%u] %-20s", cfptr->id, cfptr->refcount, cfptr->name);
 
     dump(cfg_log, "[========== end of cfg summary ============]");
-  }
-  else
-  {
+  } else {
     dump(cfg_log, "[============== cfg dump ===============]");
     dump(cfg_log, "         id: #%u", cfptr->id);
     dump(cfg_log, "   refcount: %u", cfptr->refcount);

@@ -26,16 +26,13 @@
 #include <windows.h>
 #endif
 
-
 #ifndef PATH_MAX
-#define PATH_MAX MAX_PATH 
+#define PATH_MAX MAX_PATH
 #endif
 /*#include "dlfcn_win32.h"*/
 
-static void dl_convert_path(char *buf, size_t n, const char *path)
-{
-  while(--n)
-  {
+static void dl_convert_path(char *buf, size_t n, const char *path) {
+  while (--n) {
     *buf++ = (*path == '/' ? '\\' : *path);
     path++;
   }
@@ -43,8 +40,7 @@ static void dl_convert_path(char *buf, size_t n, const char *path)
   *buf = '\0';
 }
 
-void *dlopen(const char *filename, int flag)
-{
+void *dlopen(const char *filename, int flag) {
   void *handle;
   char path[MAX_PATH];
 
@@ -53,28 +49,21 @@ void *dlopen(const char *filename, int flag)
   return LoadLibrary(path);
 }
 
-void *dlsym(void *handle, const char *symbol)
-{
+void *dlsym(void *handle, const char *symbol) {
   return GetProcAddress(handle, symbol);
 }
 
-void dlclose(void *handle)
-{
-  FreeLibrary(handle);
-}
+void dlclose(void *handle) { FreeLibrary(handle); }
 
-const char *dlerror()
-{
+const char *dlerror() {
   static char msg[256];
   DWORD error = GetLastError();
 
-  if(error == 0)
+  if (error == 0)
     return NULL;
 
-  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, error,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                 (LPTSTR)msg, sizeof(msg), NULL);
 
   SetLastError(0);

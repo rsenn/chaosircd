@@ -27,17 +27,17 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
 #include "libchaos/listen.h"
+#include "libchaos/defs.h"
 #include "libchaos/filter.h"
-#include "libchaos/timer.h"
 #include "libchaos/hook.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/net.h"
-#include "libchaos/str.h"
 #include "libchaos/ssl.h"
-#include "libchaos/io.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -47,7 +47,7 @@
 #ifdef WIN32
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
-#else 
+#else
 #include <winsock.h>
 #endif
 #include <windows.h>
@@ -68,11 +68,11 @@
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int           listen_log;
-struct sheap  listen_heap;       /* heap containing listen blocks */
-struct list   listen_list;       /* list linking listen blocks */
-uint32_t      listen_id;
-int           listen_dirty;
+int listen_log;
+struct sheap listen_heap; /* heap containing listen blocks */
+struct list listen_list;  /* list linking listen blocks */
+uint32_t listen_id;
+int listen_dirty;
 
 /* ------------------------------------------------------------------------ */
 int listen_get_log() { return listen_log; }
@@ -80,19 +80,17 @@ int listen_get_log() { return listen_log; }
 /* ------------------------------------------------------------------------ *
  * Accept incoming connection find the listener and call the protocol handler *
  * ------------------------------------------------------------------------ */
-static void listen_accept(int fd, void *ptr)
-{
+static void listen_accept(int fd, void *ptr) {
   struct listen *listen;
-  int            newfd;
-  net_addr_t     addr;
-  net_port_t     port;
+  int newfd;
+  net_addr_t addr;
+  net_port_t port;
 
   listen = ptr;
   newfd = net_accept(fd, &addr, &port);
 
   /* Accept was successful, call protocol handler */
-  if(newfd >= 0)
-  {
+  if (newfd >= 0) {
     listen->status = LISTEN_CONNECTION;
 
     listen->addr_remote = addr;
@@ -100,30 +98,25 @@ static void listen_accept(int fd, void *ptr)
 
     /* If the listener is SSL enabled, then try to create
        a new SSL instance and initiate the SSL handshake. */
-    if(listen->ssl)
-    {
-      if(ssl_new(newfd, listen->ctxt))
-      {
+    if (listen->ssl) {
+      if (ssl_new(newfd, listen->ctxt)) {
         /* Perhaps we don't support SSL or we are out of memory */
         listen->status = LISTEN_ERROR;
         io_destroy(newfd);
         return;
       }
 
-      if(ssl_accept(newfd))
-      {
+      if (ssl_accept(newfd)) {
         log(listen_log, L_warning, "SSL handshake error on %s: %s",
             listen->name, ssl_strerror(newfd));
 
         ssl_close(newfd);
         io_destroy(newfd);
-				return;
+        return;
       }
     }
-  }
-  else
-  {
-    if(syscall_errno == EAGAIN)
+  } else {
+    if (syscall_errno == EAGAIN)
       return;
 
     listen->status = LISTEN_ERROR;
@@ -132,10 +125,8 @@ static void listen_accept(int fd, void *ptr)
     listen->port_remote = 0;
   }
 
-  if(listen->proto)
-  {
-    if(listen->proto->handler)
-    {
+  if (listen->proto) {
+    if (listen->proto->handler) {
       listen->proto->handler(newfd, listen, listen->args);
       return;
     }
@@ -145,8 +136,7 @@ static void listen_accept(int fd, void *ptr)
 /* ------------------------------------------------------------------------ *
  * Initialize listener heap and add garbage collect timer.                  *
  * ------------------------------------------------------------------------ */
-void listen_init(void)
-{
+void listen_init(void) {
   listen_log = log_source_register("listen");
 
   dlink_list_zero(&listen_list);
@@ -161,15 +151,13 @@ void listen_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy listener heap and cancel timer.                                  *
  * ------------------------------------------------------------------------ */
-void listen_shutdown(void)
-{
+void listen_shutdown(void) {
   struct listen *liptr;
   struct listen *next;
 
   /* Remove all listen blocks */
-  dlink_foreach_safe(&listen_list, liptr, next)
-  {
-    if(liptr->refcount)
+  dlink_foreach_safe(&listen_list, liptr, next) {
+    if (liptr->refcount)
       liptr->refcount--;
 
     listen_delete(liptr);
@@ -185,22 +173,18 @@ void listen_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Collect listen block garbage.                                            *
  * ------------------------------------------------------------------------ */
-int listen_collect(void)
-{
+int listen_collect(void) {
   struct listen *cnptr;
   struct listen *next;
-  size_t         n = 0;
+  size_t n = 0;
 
-  if(listen_dirty)
-  {
+  if (listen_dirty) {
     /* Report verbose */
     log(listen_log, L_verbose, "Doing garbage collect for [listen] module.");
 
     /* Free all listen blocks with a zero refcount */
-    dlink_foreach_safe(&listen_list, cnptr, next)
-    {
-      if(!cnptr->refcount)
-      {
+    dlink_foreach_safe(&listen_list, cnptr, next) {
+      if (!cnptr->refcount) {
         listen_delete(cnptr);
 
         n++;
@@ -218,8 +202,7 @@ int listen_collect(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void listen_default(struct listen *listen)
-{
+void listen_default(struct listen *listen) {
   dlink_node_zero(&listen->node);
 
   strcpy(listen->address, "0.0.0.0");
@@ -245,28 +228,25 @@ void listen_default(struct listen *listen)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct listen *listen_add(const char *address, uint16_t    port,
-                          int         backlog, int         ssl,
-                          const char *context, const char *protocol)
-{
+struct listen *listen_add(const char *address, uint16_t port, int backlog,
+                          int ssl, const char *context, const char *protocol) {
   struct protocol *p;
-  net_addr_t       addr;
-  struct listen   *listen;
-  int              fd;
+  net_addr_t addr;
+  struct listen *listen;
+  int fd;
 
-  if(!net_aton(address, &addr))
+  if (!net_aton(address, &addr))
     return NULL;
 
-  if((p = net_find(NET_SERVER, protocol)) == NULL)
+  if ((p = net_find(NET_SERVER, protocol)) == NULL)
     return NULL;
 
   fd = net_socket(NET_ADDRESS_IPV4, NET_SOCKET_STREAM);
 
-  if(fd == -1)
+  if (fd == -1)
     return NULL;
 
-  if(net_bind(fd, addr, port))
-  {
+  if (net_bind(fd, addr, port)) {
     io_destroy(fd);
     hooks_call(listen_add, HOOK_DEFAULT, address, port,
                syscall_strerror(syscall_errno));
@@ -275,8 +255,7 @@ struct listen *listen_add(const char *address, uint16_t    port,
 
   listen = mem_static_alloc(&listen_heap);
 
-  if(net_listen(fd, backlog, listen_accept, listen))
-  {
+  if (net_listen(fd, backlog, listen_accept, listen)) {
     io_destroy(fd);
     mem_static_free(&listen_heap, listen);
     return NULL;
@@ -299,27 +278,23 @@ struct listen *listen_add(const char *address, uint16_t    port,
 
   listen->ssl = 0;
 
-  if(ssl)
-  {
-    if(context == NULL || context[0] == '\0')
-    {
+  if (ssl) {
+    if (context == NULL || context[0] == '\0') {
       log(listen_log, L_warning, "SSL listeners need a context!",
           listen->context);
-    }
-    else
-    {
+    } else {
       strlcpy(listen->context, context, sizeof(listen->context));
 
-      if((listen->ctxt = ssl_find_name(listen->context)))
+      if ((listen->ctxt = ssl_find_name(listen->context)))
         listen->ssl = 1;
       else
         log(listen_log, L_warning, "Could not find SSL context '%s'.",
             listen->context);
     }
   }
-  
+
   str_snprintf(listen->name, sizeof(listen->name), "%s:%u", address, port);
-  
+
   listen->nhash = str_ihash(listen->name);
 
   io_note(fd, "listener on %s", listen->name);
@@ -335,22 +310,20 @@ struct listen *listen_add(const char *address, uint16_t    port,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int listen_update(struct listen *listen,  int         backlog, int ssl,
-                  const char    *context, const char *protocol)
-{
+int listen_update(struct listen *listen, int backlog, int ssl,
+                  const char *context, const char *protocol) {
   struct protocol *p;
 
-  if((p = net_find(NET_SERVER, protocol)) == NULL)
+  if ((p = net_find(NET_SERVER, protocol)) == NULL)
     return -1;
 
   listen->backlog = backlog;
   listen->ssl = ssl;
 
-  if(context)
-  {
+  if (context) {
     strlcpy(listen->context, context, sizeof(listen->context));
 #ifdef HAVE_SSL
-    if((listen->ctxt = ssl_find_name(listen->context)))
+    if ((listen->ctxt = ssl_find_name(listen->context)))
       listen->ssl = ssl;
 #endif
   }
@@ -364,16 +337,15 @@ int listen_update(struct listen *listen,  int         backlog, int ssl,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void listen_delete(struct listen *listen)
-{
+void listen_delete(struct listen *listen) {
   log(listen_log, L_status, "Deleting listen block: %s", listen->name);
 
   net_push(&listen->proto);
 
-  if(listen->fd > -1)
+  if (listen->fd > -1)
     io_destroy(listen->fd);
 
-  if(listen->args)
+  if (listen->args)
     free(listen->args);
 
   dlink_delete(&listen_list, (struct node *)listen);
@@ -381,11 +353,10 @@ void listen_delete(struct listen *listen)
   mem_static_free(&listen_heap, listen);
 }
 
- /* ------------------------------------------------------------------------ *
-  * Loose all references                                                     *
-  * ------------------------------------------------------------------------ */
-void listen_release(struct listen *liptr)
-{
+/* ------------------------------------------------------------------------ *
+ * Loose all references                                                     *
+ * ------------------------------------------------------------------------ */
+void listen_release(struct listen *liptr) {
   io_push(&liptr->fd);
   net_push(&liptr->proto);
 
@@ -394,13 +365,10 @@ void listen_release(struct listen *liptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct listen *listen_pop(struct listen *liptr)
-{
-  if(liptr)
-  {
-    if(!liptr->refcount)
-      log(listen_log, L_warning, "Poping deprecated listen: %s",
-          liptr->name);
+struct listen *listen_pop(struct listen *liptr) {
+  if (liptr) {
+    if (!liptr->refcount)
+      log(listen_log, L_warning, "Poping deprecated listen: %s", liptr->name);
 
     liptr->refcount++;
   }
@@ -408,21 +376,15 @@ struct listen *listen_pop(struct listen *liptr)
   return liptr;
 }
 
-
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct listen *listen_push(struct listen **liptrptr)
-{
-  if(*liptrptr)
-  {
-    if(!(*liptrptr)->refcount)
-    {
+struct listen *listen_push(struct listen **liptrptr) {
+  if (*liptrptr) {
+    if (!(*liptrptr)->refcount) {
       log(listen_log, L_warning, "Trying to push deprecated listen %s",
           (*liptrptr)->name);
-    }
-    else
-    {
-      if(--(*liptrptr)->refcount == 0)
+    } else {
+      if (--(*liptrptr)->refcount == 0)
         listen_release(*liptrptr);
     }
 
@@ -434,18 +396,15 @@ struct listen *listen_push(struct listen **liptrptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct listen *listen_find(const char *address, uint16_t port)
-{
+struct listen *listen_find(const char *address, uint16_t port) {
   struct listen *lptr;
-  hash_t         lhash;
-  
+  hash_t lhash;
+
   lhash = str_ihash(address) ^ port;
 
-  dlink_foreach(&listen_list, lptr)
-  {
-    if(lptr->lhash == lhash)
-    {
-      if(lptr->port == port && !str_icmp(lptr->address, address))
+  dlink_foreach(&listen_list, lptr) {
+    if (lptr->lhash == lhash) {
+      if (lptr->port == port && !str_icmp(lptr->address, address))
         return lptr;
     }
   }
@@ -455,9 +414,8 @@ struct listen *listen_find(const char *address, uint16_t port)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void listen_set_args(struct listen *listen, const void *argbuf, size_t n)
-{
-  if(!listen->args)
+void listen_set_args(struct listen *listen, const void *argbuf, size_t n) {
+  if (!listen->args)
     listen->args = malloc(n);
 
   memcpy(listen->args, argbuf, n);
@@ -465,16 +423,14 @@ void listen_set_args(struct listen *listen, const void *argbuf, size_t n)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void listen_get_args(struct listen *listen, void *argbuf, size_t n)
-{
-  if(listen->args)
+void listen_get_args(struct listen *listen, void *argbuf, size_t n) {
+  if (listen->args)
     memcpy(argbuf, listen->args, n);
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void listen_set_name(struct listen *listen, const char *name)
-{
+void listen_set_name(struct listen *listen, const char *name) {
   strlcpy(listen->name, name, sizeof(listen->name));
 
   listen->nhash = str_ihash(listen->name);
@@ -482,28 +438,22 @@ void listen_set_name(struct listen *listen, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *listen_get_name(struct listen *listen)
-{
-  return listen->name;
-}
+const char *listen_get_name(struct listen *listen) { return listen->name; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct listen *listen_find_name(const char *name)
-{
-  struct node   *node;
+struct listen *listen_find_name(const char *name) {
+  struct node *node;
   struct listen *listen;
-  hash_t         nhash;
-  
+  hash_t nhash;
+
   nhash = str_ihash(name);
 
-  dlink_foreach(&listen_list, node)
-  {
+  dlink_foreach(&listen_list, node) {
     listen = node->data;
 
-    if(listen->nhash == nhash)
-    {
-      if(!str_icmp(listen->name, name))
+    if (listen->nhash == nhash) {
+      if (!str_icmp(listen->name, name))
         return listen;
     }
   }
@@ -513,13 +463,11 @@ struct listen *listen_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct listen *listen_find_id(uint32_t id)
-{
+struct listen *listen_find_id(uint32_t id) {
   struct listen *lptr;
 
-  dlink_foreach(&listen_list, lptr)
-  {
-    if(lptr->id == id)
+  dlink_foreach(&listen_list, lptr) {
+    if (lptr->id == id)
       return lptr;
   }
 
@@ -528,8 +476,7 @@ struct listen *listen_find_id(uint32_t id)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int listen_attach_filter(struct listen *lptr, struct filter *fptr)
-{
+int listen_attach_filter(struct listen *lptr, struct filter *fptr) {
   lptr->filter = fptr;
 
   return filter_attach_socket(fptr, lptr->fd);
@@ -537,12 +484,10 @@ int listen_attach_filter(struct listen *lptr, struct filter *fptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int listen_detach_filter(struct listen *lptr)
-{
+int listen_detach_filter(struct listen *lptr) {
   struct filter *fptr;
 
-  if(lptr->filter)
-  {
+  if (lptr->filter) {
     fptr = lptr->filter;
 
     lptr->filter = NULL;
@@ -556,25 +501,17 @@ int listen_detach_filter(struct listen *lptr)
 /* ------------------------------------------------------------------------ *
  * Dump listeners and listen heap.                                          *
  * ------------------------------------------------------------------------ */
-void listen_dump(struct listen *lptr)
-{
-  if(lptr == NULL)
-  {
+void listen_dump(struct listen *lptr) {
+  if (lptr == NULL) {
     dump(listen_log, "[============== listen summary ===============]");
 
-    dlink_foreach(&listen_list, lptr)
-      dump(listen_log, " #%03u: [%u] %-20s (%s:%u) (%s)",
-            lptr->id,
-            lptr->refcount,
-            lptr->name,
-            net_ntoa(lptr->addr_local),
-            (uint32_t)lptr->port_local,
-            lptr->proto ? lptr->proto->name : "<none>");
+    dlink_foreach(&listen_list, lptr) dump(
+        listen_log, " #%03u: [%u] %-20s (%s:%u) (%s)", lptr->id, lptr->refcount,
+        lptr->name, net_ntoa(lptr->addr_local), (uint32_t)lptr->port_local,
+        lptr->proto ? lptr->proto->name : "<none>");
 
     dump(listen_log, "[========== end of listen summary ============]");
-  }
-  else
-  {
+  } else {
     dump(listen_log, "[============== listen dump ===============]");
     dump(listen_log, "         id: #%u", lptr->id);
     dump(listen_log, "   refcount: %u", lptr->refcount);
@@ -582,17 +519,17 @@ void listen_dump(struct listen *lptr)
     dump(listen_log, "      nhash: %p", lptr->nhash);
     dump(listen_log, "       port: %u", (uint32_t)lptr->port);
     dump(listen_log, "        ssl: %s", lptr->ssl ? "yes" : "no");
-    dump(listen_log, "      proto: %s", lptr->proto ?
-                                         lptr->proto->name : "<none>");
+    dump(listen_log, "      proto: %s",
+         lptr->proto ? lptr->proto->name : "<none>");
     dump(listen_log, "       args: %p", lptr->args);
     dump(listen_log, "       name: %s", lptr->name);
     dump(listen_log, "    address: %s", lptr->address);
     dump(listen_log, "    context: %s", lptr->context);
     dump(listen_log, "         fd: %i", lptr->fd);
     dump(listen_log, "      local: %s:%u", net_ntoa(lptr->addr_local),
-                                            (uint32_t)lptr->port_local);
+         (uint32_t)lptr->port_local);
     dump(listen_log, "     remote: %s:%u", net_ntoa(lptr->addr_remote),
-                                            (uint32_t)lptr->port_remote);
+         (uint32_t)lptr->port_remote);
     dump(listen_log, "     status: %i", lptr->status);
     dump(listen_log, "       ctxt: %p", lptr->ctxt);
 

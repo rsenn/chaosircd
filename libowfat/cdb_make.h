@@ -3,8 +3,8 @@
 #define CDB_MAKE_H
 
 #include "buffer.h"
-#include "uint64.h"
 #include "uint32.h"
+#include "uint64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,13 +12,16 @@ extern "C" {
 
 #define CDB_HPLIST 1000
 
-struct cdb_hp { uint32 h; uint32 p; } ;
+struct cdb_hp {
+  uint32 h;
+  uint32 p;
+};
 
 struct cdb_hplist {
   struct cdb_hp hp[CDB_HPLIST];
   struct cdb_hplist *next;
   int num;
-} ;
+};
 
 struct cdb_make {
   char bspace[8192];
@@ -32,12 +35,16 @@ struct cdb_make {
   buffer b;
   uint32 pos;
   int64 fd;
-} ;
+};
 
-extern int cdb_make_start(struct cdb_make *,int64);
-extern int cdb_make_addbegin(struct cdb_make *,unsigned long int,unsigned long int);
-extern int cdb_make_addend(struct cdb_make *,unsigned long int,unsigned long int,uint32);
-extern int cdb_make_add(struct cdb_make *,const unsigned char *,unsigned long int,const unsigned char *,unsigned long int);
+extern int cdb_make_start(struct cdb_make *, int64);
+extern int cdb_make_addbegin(struct cdb_make *, unsigned long int,
+                             unsigned long int);
+extern int cdb_make_addend(struct cdb_make *, unsigned long int,
+                           unsigned long int, uint32);
+extern int cdb_make_add(struct cdb_make *, const unsigned char *,
+                        unsigned long int, const unsigned char *,
+                        unsigned long int);
 extern int cdb_make_finish(struct cdb_make *);
 
 #ifdef __cplusplus

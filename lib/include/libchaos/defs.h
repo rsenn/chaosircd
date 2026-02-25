@@ -32,8 +32,8 @@
 #define NULL (void *)0
 #endif
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
@@ -52,67 +52,94 @@
 #endif
 
 #include <limits.h>
+
+#ifndef ULONG_MAX
+#define ULONG_MAX 0xfffffffffffffffful
+#endif
+#ifndef ULONG_MIN
+#define ULONG_MIN 0ul
+#endif
+#ifndef LONG_MAX
+#define LONG_MAX 0x7fffffffffffffffl
+#endif
+#ifndef LONG_MIN
+#define LONG_MIN -0x8000000000000000
+#endif
+#ifndef UINT_MAX
+#define UINT_MAX 0xffffffffu
+#endif
+#ifndef UINT_MIN
+#define UINT_MIN 0
+#endif
+#ifndef INT_MAX
+#define INT_MAX 0x7fffffff
+#endif
+#ifndef INT_MIN
+#define INT_MIN -0x80000000
+#endif
+
 #include <time.h>
 
-#define HASH_BIT_SIZE (SIZEOF_UINTPTR_T*8)
+#define HASH_BIT_SIZE (SIZEOF_UINTPTR_T * 8)
 
 typedef uintptr_t hash_t;
 
 #ifdef _MSC_VER
 #include <windows.h>
-# define inline  __forceinline
+#define inline __forceinline
 typedef HANDLE pid_t;
-# ifdef WIN64
+#ifdef WIN64
 typedef __int64 ssize_t;
-# else
+#else
 typedef int ssize_t;
-# endif
+#endif
 #endif
 
-#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
-# ifndef STATIC_LIBCHAOS
-#  ifdef BUILD_LIBCHAOS
-#   define CHAOS_API(type...) __declspec(dllexport) type
-#   define CHAOS_DATA(type...) extern __declspec(dllexport) type
-#  else
-#   define CHAOS_API(type...) type
-#   define CHAOS_DATA(type...) extern __declspec(dllimport) type
-#  endif
-# endif
+#if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER) ||                  \
+    defined(__CYGWIN__) || defined(__MINGW32__)
+#ifndef STATIC_LIBCHAOS
+#ifdef BUILD_LIBCHAOS
+#define CHAOS_API(type...) __declspec(dllexport) type
+#define CHAOS_DATA(type...) extern __declspec(dllexport) type
+#else
+#define CHAOS_API(type...) type
+#define CHAOS_DATA(type...) extern __declspec(dllimport) type
+#endif
+#endif
 #endif
 
 #ifndef CHAOS_API
-# define CHAOS_API(type...) type;
+#define CHAOS_API(type...) type;
 #endif
 #ifndef CHAOS_DATA
-# define CHAOS_DATA(type...) extern type
+#define CHAOS_DATA(type...) extern type
 #endif
 
 #ifndef CHAOS_DATA_DECL
-# define CHAOS_DATA_DECL(type...) type
+#define CHAOS_DATA_DECL(type...) type
 #endif
 
 #ifndef CHAOS_INLINE
-# ifdef __clang__
+#ifdef __clang__
 #define CHAOS_INLINE(x...) x
-#define CHAOS_INLINE_FN(x...) //static __inline__ x
-# elif defined __GNUC__
-//#define CHAOS_INLINE(x...)  static __inline__ x
-#  if __GNUC__ > 4
+#define CHAOS_INLINE_FN(x...) // static __inline__ x
+#elif defined __GNUC__
+// #define CHAOS_INLINE(x...)  static __inline__ x
+#if __GNUC__ > 4
 #warning GNUC > 4
-#define CHAOS_INLINE(proto) 
-#define CHAOS_INLINE_API(proto)  proto;
-#define CHAOS_INLINE_FN(x...)  //static __inline__ x
-#  else
-#define CHAOS_INLINE(proto) 
-#define CHAOS_INLINE_API(proto) proto;
-#define CHAOS_INLINE_FN(x...)  extern __inline__ x
-#  endif
-# else
+#define CHAOS_INLINE(proto) extern inline proto
+#define CHAOS_INLINE_API(proto) // proto;
+#define CHAOS_INLINE_FN(x...) static __inline__ x
+#else
+#define CHAOS_INLINE(proto)
+#define CHAOS_INLINE_API(proto) // proto;
+#define CHAOS_INLINE_FN(x...) extern __inline__ x
+#endif
+#else
 #define CHAOS_INLINE(x...) /*extern inline x*/
 #define CHAOS_INLINE_API(proto) proto;
-#define CHAOS_INLINE_FN(x...) //static inline x
-# endif
+#define CHAOS_INLINE_FN(x...) // static inline x
+#endif
 #endif
 #ifdef CHAOS_INLINE_API
 #warning CHAOS_INLNIE_API defined
@@ -123,13 +150,11 @@ typedef int ssize_t;
 #endif
 #undef CHAOS_INLINE
 #ifndef CHAOS_INLINE
-# define CHAOS_INLINE(proto) 
+#define CHAOS_INLINE(proto)
 #endif
 #ifndef CHAOS_INLINE_API
-# define CHAOS_INLINE_API(proto) proto;
+#define CHAOS_INLINE_API(proto) proto;
 #endif
-
-
 
 #ifdef __clang__
 #undef NO_C99
@@ -137,7 +162,7 @@ typedef int ssize_t;
 #define NO_C99 1
 #endif
 
-#ifdef  __GNUC__
+#ifdef __GNUC__
 #define ALREADY_INLINED 1
 #endif
 
@@ -158,17 +183,19 @@ typedef int ssize_t;
 
 /* hehe, nice hack */
 #ifndef EVER
-#define EVER ;;
+#define EVER                                                                   \
+  ;                                                                            \
+  ;
 #endif
 
 /* max. buf size */
-#define BUFSIZE      1024
+#define BUFSIZE 1024
 
-#define HOSTLEN      64
-#define HOSTIPLEN    15
-#define PROTOLEN     32
-#define USERLEN      32
-#define PATHLEN     256
+#define HOSTLEN 64
+#define HOSTIPLEN 15
+#define PROTOLEN 32
+#define USERLEN 32
+#define PATHLEN 256
 
 /* dynamic heap blocks are 128kb */
 #define DYNAMIC_BLOCK_SIZE (1024 * 128)
@@ -187,7 +214,7 @@ typedef int ssize_t;
 #define DLINK_BLOCK_SIZE 256
 
 /* log entries per heap block */
-#define LOG_BLOCK_SIZE   16
+#define LOG_BLOCK_SIZE 16
 
 /* mfile entries per heap block */
 #define MFILE_BLOCK_SIZE 8
@@ -259,13 +286,13 @@ typedef int ssize_t;
  * Warn if system time differs more than +/-TIMER_WARN_DELTA
  * from expected system time.
  */
-#define TIMER_MAX_DRIFT  10000LL
+#define TIMER_MAX_DRIFT 10000LL
 
 /*
  * Warn if a timer gets executed TIMER_WARN_DELTA
  * miliseconds too early or too late.
  */
-#define TIMER_WARN_DELTA  10LL
+#define TIMER_WARN_DELTA 10LL
 
 /*
  * Warn if expected return from poll() drifts

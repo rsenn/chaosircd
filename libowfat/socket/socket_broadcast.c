@@ -1,15 +1,14 @@
-#include <sys/types.h>
 #include <sys/param.h>
+#include <sys/types.h>
 #ifndef __MINGW32__
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #endif
 #include "socket.h"
 #include "windoze.h"
 
-int socket_broadcast(int s)
-{
+int socket_broadcast(int s) {
   int opt = 1;
-  return winsock2errno(setsockopt(s,SOL_SOCKET,SO_BROADCAST,&opt,sizeof opt));
+  return winsock2errno(
+      setsockopt(s, SOL_SOCKET, SO_BROADCAST, &opt, sizeof opt));
 }
-

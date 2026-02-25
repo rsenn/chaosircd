@@ -22,52 +22,50 @@
 #ifndef SERVAUTH_CACHE_H
 #define SERVAUTH_CACHE_H
 
-#define CACHE_AUTH_NONE    0
-#define CACHE_AUTH_RESET   1
+#define CACHE_AUTH_NONE 0
+#define CACHE_AUTH_RESET 1
 #define CACHE_AUTH_TIMEOUT 2
 
-#define CACHE_DNS_NONE    0
+#define CACHE_DNS_NONE 0
 #define CACHE_DNS_FORWARD 1
 #define CACHE_DNS_REVERSE 2
 
-#define CACHE_PROXY_NONE     0
-#define CACHE_PROXY_TIMEOUT  1
+#define CACHE_PROXY_NONE 0
+#define CACHE_PROXY_TIMEOUT 1
 #define CACHE_PROXY_FILTERED 2
-#define CACHE_PROXY_CLOSED   3
-#define CACHE_PROXY_DENIED   4
-#define CACHE_PROXY_NA       5
-#define CACHE_PROXY_OPEN     6
+#define CACHE_PROXY_CLOSED 3
+#define CACHE_PROXY_DENIED 4
+#define CACHE_PROXY_NA 5
+#define CACHE_PROXY_OPEN 6
 
 /* -------------------------------------------------------------------------- *
  * cache entry for auth replies/timeouts.                                     *
  * -------------------------------------------------------------------------- */
-struct cache_entry_auth
-{
-  int            status;
-  net_addr_t     addr;
-  uint64_t       created;
+struct cache_entry_auth {
+  int status;
+  net_addr_t addr;
+  uint64_t created;
 };
 
 /* -------------------------------------------------------------------------- *
  * cache entry for dns replies/timeouts.                                      *
  * -------------------------------------------------------------------------- */
-struct cache_entry_dns
-{
-  int            status;
-  net_addr_t     addr;
-  uint64_t       created;
-  char           name[HOSTLEN];
+struct cache_entry_dns {
+  int status;
+  net_addr_t addr;
+  uint64_t created;
+  char name[HOSTLEN];
 };
 
 /* -------------------------------------------------------------------------- *
  * cache entry for proxy replies.                                             *
  * -------------------------------------------------------------------------- */
 struct cache_entry_proxy {
-  int            status;
-  net_addr_t     addr;
-  uint64_t       created;
-  uint16_t       port;
-  int            type;
+  int status;
+  net_addr_t addr;
+  uint64_t created;
+  uint16_t port;
+  int type;
 };
 
 /* -------------------------------------------------------------------------- *
@@ -75,8 +73,8 @@ struct cache_entry_proxy {
  * -------------------------------------------------------------------------- */
 struct cache_auth {
   struct cache_entry_auth *entries;
-  uint32_t                 size;
-  uint32_t                 free;
+  uint32_t size;
+  uint32_t free;
 };
 
 /* -------------------------------------------------------------------------- *
@@ -84,8 +82,8 @@ struct cache_auth {
  * -------------------------------------------------------------------------- */
 struct cache_dns {
   struct cache_entry_dns *entries;
-  uint32_t                size;
-  uint32_t                free;
+  uint32_t size;
+  uint32_t free;
 };
 
 /* -------------------------------------------------------------------------- *
@@ -93,83 +91,65 @@ struct cache_dns {
  * -------------------------------------------------------------------------- */
 struct cache_proxy {
   struct cache_entry_proxy *entries;
-  uint32_t                 size;
-  uint32_t                 free;
+  uint32_t size;
+  uint32_t free;
 };
 
 /* -------------------------------------------------------------------------- *
  * generate new cache for timed out and failed auth requests                  *
  * -------------------------------------------------------------------------- */
-extern int            cache_auth_new         (struct cache_auth *cache,
-                                              uint32_t           size);
+extern int cache_auth_new(struct cache_auth *cache, uint32_t size);
 
 /* -------------------------------------------------------------------------- *
  * put a failed auth request into cache.                                      *
  * -------------------------------------------------------------------------- */
-extern void           cache_auth_put         (struct cache_auth *cache,
-                                              int                status,
-                                              net_addr_t         addr,
-                                              uint64_t           t);
+extern void cache_auth_put(struct cache_auth *cache, int status,
+                           net_addr_t addr, uint64_t t);
 
 /* -------------------------------------------------------------------------- *
  * pick a auth query from cache.                                              *
  * -------------------------------------------------------------------------- */
-extern int            cache_auth_pick        (struct cache_auth *cache,
-                                              net_addr_t         addr,
-                                              uint64_t           t);
+extern int cache_auth_pick(struct cache_auth *cache, net_addr_t addr,
+                           uint64_t t);
 
 /* -------------------------------------------------------------------------- *
  * generate new cache for dns requests                                        *
  * -------------------------------------------------------------------------- */
-extern int            cache_dns_new          (struct cache_dns  *cache,
-                                              uint32_t           size);
+extern int cache_dns_new(struct cache_dns *cache, uint32_t size);
 
 /* -------------------------------------------------------------------------- *
  * put a dns request into cache.                                              *
  * -------------------------------------------------------------------------- */
-extern void           cache_dns_put          (struct cache_dns  *cache,
-                                              int                status,
-                                              net_addr_t         addr,
-                                              const char        *name,
-                                              uint64_t           t);
+extern void cache_dns_put(struct cache_dns *cache, int status, net_addr_t addr,
+                          const char *name, uint64_t t);
 
 /* -------------------------------------------------------------------------- *
  * pick a reverse dns query from cache.                                       *
  * -------------------------------------------------------------------------- */
-extern int            cache_dns_pick_reverse (struct cache_dns  *cache,
-                                              net_addr_t         addr,
-                                              const char       **namep,
-                                              uint64_t           t);
+extern int cache_dns_pick_reverse(struct cache_dns *cache, net_addr_t addr,
+                                  const char **namep, uint64_t t);
 
 /* -------------------------------------------------------------------------- *
  * pick a reverse dns query from cache.                                       *
  * -------------------------------------------------------------------------- */
-extern net_addr_t     cache_dns_pick_forward (struct cache_dns  *cache,
-                                              const char        *name,
-                                              uint64_t           t);
+extern net_addr_t cache_dns_pick_forward(struct cache_dns *cache,
+                                         const char *name, uint64_t t);
 /* -------------------------------------------------------------------------- *
  * generate new cache for proxy checks                                        *
  * -------------------------------------------------------------------------- */
-extern int            cache_proxy_new        (struct cache_proxy *cache,
-                                              uint32_t            size);
+extern int cache_proxy_new(struct cache_proxy *cache, uint32_t size);
 
 /* -------------------------------------------------------------------------- *
  * put a proxy request into cache.                                            *
  * -------------------------------------------------------------------------- */
-extern void           cache_proxy_put        (struct cache_proxy *cache,
-                                              int                 status,
-                                              net_addr_t          addr,
-                                              uint16_t            port,
-                                              int                 type,
-                                              uint64_t            t);
+extern void cache_proxy_put(struct cache_proxy *cache, int status,
+                            net_addr_t addr, uint16_t port, int type,
+                            uint64_t t);
 
 /* -------------------------------------------------------------------------- *
  * pick a proxy query from cache.                                             *
  * -------------------------------------------------------------------------- */
-extern int            cache_proxy_pick       (struct cache_proxy *cache,
-                                              net_addr_t          addr,
-                                              uint16_t            port,
-                                              int                 type,
-                                              uint64_t            t);
+extern int cache_proxy_pick(struct cache_proxy *cache, net_addr_t addr,
+                            uint16_t port, int type, uint64_t t);
 
 #endif

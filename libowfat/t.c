@@ -1,39 +1,39 @@
-#include "fmt.h"
-#include "scan.h"
-#include "str.h"
-#include "uint16.h"
-#include "uint32.h"
-#include "stralloc.h"
-#include "socket.h"
 #include "buffer.h"
+#include "byte.h"
+#include "case.h"
+#include "dns.h"
+#include "errmsg.h"
+#include "fmt.h"
+#include "iarray.h"
+#include "iob.h"
 #include "ip4.h"
 #include "ip6.h"
 #include "mmap.h"
 #include "open.h"
-#include "byte.h"
-#include "textcode.h"
-#include "dns.h"
-#include "case.h"
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <assert.h>
-#include "errmsg.h"
-#include "iob.h"
 #include "safemult.h"
-#include "iarray.h"
+#include "scan.h"
+#include "socket.h"
+#include "str.h"
+#include "stralloc.h"
+#include "textcode.h"
+#include "uint16.h"
+#include "uint32.h"
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "CAS.h"
 
 #include "io_internal.h"
 
-#define rdtscl(low) \
-     __asm__ __volatile__ ("rdtsc" : "=a" (low) : : "edx")
+#define rdtscl(low) __asm__ __volatile__("rdtsc" : "=a"(low) : : "edx")
 
-/* #define atomic_add(mem,val) asm volatile ("lock; add%z0 %1, %0": "+m" (mem): "ir" (val))*/
+/* #define atomic_add(mem,val) asm volatile ("lock; add%z0 %1, %0": "+m" (mem):
+ * "ir" (val))*/
 
-int64 writecb(int64 fd,const void* buf,uint64 n) {
+int64 writecb(int64 fd, const void *buf, uint64 n) {
   (void)fd;
   (void)buf;
   (void)n;
@@ -47,14 +47,14 @@ int64 writecb(int64 fd,const void* buf,uint64 n) {
   return -1;
 }
 
-int main(int argc,char* argv[]) {
+int main(int argc, char *argv[]) {
   static size_t x;
-  x=23;
-  atomic_add(&x,3);
-  printf("%u\n",x);
-  printf("%u\n",atomic_add_return(&x,-3));
-  printf("%u\n",compare_and_swap(&x,26,17));
-  printf("%u\n",compare_and_swap(&x,23,17));
+  x = 23;
+  atomic_add(&x, 3);
+  printf("%u\n", x);
+  printf("%u\n", atomic_add_return(&x, -3));
+  printf("%u\n", compare_and_swap(&x, 26, 17));
+  printf("%u\n", compare_and_swap(&x, 23, 17));
 
 #if 0
   atomic_add(&x,3); printf("%u\n",x);
@@ -387,4 +387,3 @@ int main(int argc,char* argv[]) {
 
   return 0;
 }
-

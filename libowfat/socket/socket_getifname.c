@@ -1,10 +1,10 @@
 #include <sys/types.h>
 #ifndef __MINGW32__
-#include <sys/socket.h>
 #include <net/if.h>
+#include <sys/socket.h>
 #endif
-#include "socket.h"
 #include "haven2i.h"
+#include "socket.h"
 
 #ifdef HAVE_N2I
 /* legacy BSD name */
@@ -14,15 +14,13 @@
 
 static char ifname[IF_NAMESIZE];
 
-const char* socket_getifname(uint32 _interface) {
-  char *tmp=if_indextoname(_interface,ifname);
+const char *socket_getifname(uint32 _interface) {
+  char *tmp = if_indextoname(_interface, ifname);
   if (tmp)
     return tmp;
   else
     return "[unknown]";
 }
 #else
-const char* socket_getifname(uint32 _interface) {
-  return "[unknown]";
-}
+const char *socket_getifname(uint32 _interface) { return "[unknown]"; }
 #endif

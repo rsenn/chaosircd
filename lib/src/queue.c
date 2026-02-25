@@ -27,27 +27,26 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
+#include "libchaos/queue.h"
 #include "libchaos/defs.h"
 #include "libchaos/dlink.h"
-#include "libchaos/queue.h"
-#include "libchaos/mem.h"
 #include "libchaos/log.h"
+#include "libchaos/mem.h"
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
 
-int           queue_log;
-struct sheap  queue_heap;
+int queue_log;
+struct sheap queue_heap;
 struct timer *queue_timer;
-uint32_t      queue_serial;
-struct list   queue_blocks;
+uint32_t queue_serial;
+struct list queue_blocks;
 
 /* ------------------------------------------------------------------------ *
  * Initialize heap for queue blocks.                                        *
  * ------------------------------------------------------------------------ */
-void queue_init(void)
-{
+void queue_init(void) {
   queue_log = log_source_register("queue");
 
   queue_serial = 0;
@@ -59,8 +58,7 @@ void queue_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy heap for queue blocks.                                           *
  * ------------------------------------------------------------------------ */
-void queue_shutdown(void)
-{
+void queue_shutdown(void) {
   mem_static_destroy(&queue_heap);
 
   log_source_unregister(queue_log);
@@ -68,8 +66,7 @@ void queue_shutdown(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void queue_zero(struct fqueue *fifoptr)
-{
+void queue_zero(struct fqueue *fifoptr) {
   fifoptr->lines = 0;
   fifoptr->size = 0;
   dlink_list_zero(&fifoptr->blocks);
@@ -86,33 +83,30 @@ void queue_zero(struct fqueue *fifoptr)
 /* ------------------------------------------------------------------------ *
  * Write data to the queue tail.                                            *
  * ------------------------------------------------------------------------ */
-uint32_t queue_write(struct fqueue *fifoptr, const void *buf, uint32_t n)
-{
-  register struct finfo  *infoptr;
+uint32_t queue_write(struct fqueue *fifoptr, const void *buf, uint32_t n) {
+  register struct finfo *infoptr;
   register struct fblock *tailptr;
-  struct fblock          *headptr;
-  struct node            *nptr;
-  uint32_t                i;
+  struct fblock *headptr;
+  struct node *nptr;
+  uint32_t i;
 
   tailptr = dlink_node_data(fifoptr->blocks.tail);
   headptr = dlink_node_data(fifoptr->blocks.head);
   infoptr = &fifoptr->tail;
 
   /* Loop through buffer while queueing data */
-  for(i = 0; i < n; ++i)
-  {
+  for (i = 0; i < n; ++i) {
     /* There's no tail, tail block is full or last fifo block
        was a multicast one, we need to start a new block */
-    if(tailptr == NULL || infoptr->tail == QUEUE_CHUNK_SIZE ||
-       (tailptr && tailptr->refcount > 1))
-    {
+    if (tailptr == NULL || infoptr->tail == QUEUE_CHUNK_SIZE ||
+        (tailptr && tailptr->refcount > 1)) {
       /* Update queue info when there is a tail
          block, but DO NOT touch multicast blocks */
-      if(tailptr && tailptr->refcount == 1)
+      if (tailptr && tailptr->refcount == 1)
         tailptr->info = *infoptr;
 
       /* It was the first block, so we need to update head information */
-      if(headptr == tailptr)
+      if (headptr == tailptr)
         fifoptr->head = *infoptr;
 
       /* Allocate and link new queue block */
@@ -122,7 +116,7 @@ uint32_t queue_write(struct fqueue *fifoptr, const void *buf, uint32_t n)
       tailptr->refcount = 1;
 
       /* We added first block, update headptr */
-      if(nptr->prev == NULL)
+      if (nptr->prev == NULL)
         headptr = tailptr;
 
       /* Clear queue info */
@@ -133,8 +127,7 @@ uint32_t queue_write(struct fqueue *fifoptr, const void *buf, uint32_t n)
     }
 
     /* Copy a byte and update line count if a newline is spotted */
-    if((tailptr->data[infoptr->tail++] = ((char *)buf)[i]) == '\n')
-    {
+    if ((tailptr->data[infoptr->tail++] = ((char *)buf)[i]) == '\n') {
       infoptr->lines++;
       fifoptr->lines++;
     }
@@ -145,10 +138,10 @@ uint32_t queue_write(struct fqueue *fifoptr, const void *buf, uint32_t n)
   }
 
   /* It was the first block, so we need to update head information */
-  if(headptr == tailptr)
+  if (headptr == tailptr)
     fifoptr->head = *infoptr;
 
-  if(tailptr)
+  if (tailptr)
     tailptr->info = *infoptr;
 
   /* Return bytes written */
@@ -158,33 +151,30 @@ uint32_t queue_write(struct fqueue *fifoptr, const void *buf, uint32_t n)
 /* ------------------------------------------------------------------------ *
  * Write a string to queue tail.                                            *
  * ------------------------------------------------------------------------ */
-uint32_t queue_puts(struct fqueue *fifoptr, const char *s)
-{
-  register struct finfo  *infoptr;
+uint32_t queue_puts(struct fqueue *fifoptr, const char *s) {
+  register struct finfo *infoptr;
   register struct fblock *tailptr;
-  struct fblock          *headptr;
-  struct node            *nptr;
-  uint32_t                i;
+  struct fblock *headptr;
+  struct node *nptr;
+  uint32_t i;
 
   tailptr = fifoptr->blocks.tail ? fifoptr->blocks.tail->data : NULL;
   headptr = fifoptr->blocks.head ? fifoptr->blocks.head->data : NULL;
   infoptr = &fifoptr->tail;
 
   /* Loop through buffer while queueing data */
-  for(i = 0; s[i]; i++)
-  {
+  for (i = 0; s[i]; i++) {
     /* There's no tail, tail block is full or last fifo block
        was a multicast one, we need to start a new block */
-    if(tailptr == NULL || infoptr->tail == QUEUE_CHUNK_SIZE ||
-       (tailptr && tailptr->refcount > 1))
-    {
+    if (tailptr == NULL || infoptr->tail == QUEUE_CHUNK_SIZE ||
+        (tailptr && tailptr->refcount > 1)) {
       /* Update queue info when there is a tail
          block, but DO NOT touch multicast blocks */
-      if(tailptr && tailptr->refcount == 1)
+      if (tailptr && tailptr->refcount == 1)
         tailptr->info = *infoptr;
 
       /* It was the first block, so we need to update head information */
-      if(headptr == tailptr)
+      if (headptr == tailptr)
         fifoptr->head = *infoptr;
 
       /* Allocate and link new queue block */
@@ -194,7 +184,7 @@ uint32_t queue_puts(struct fqueue *fifoptr, const char *s)
       tailptr->refcount = 1;
 
       /* We added first block, update headptr */
-      if(nptr->prev == NULL)
+      if (nptr->prev == NULL)
         headptr = tailptr;
 
       /* Clear queue info */
@@ -205,8 +195,7 @@ uint32_t queue_puts(struct fqueue *fifoptr, const char *s)
     }
 
     /* Queue a byte and update line count if a newline is spotted */
-    if((tailptr->data[infoptr->tail++] = s[i]) == '\n')
-    {
+    if ((tailptr->data[infoptr->tail++] = s[i]) == '\n') {
       infoptr->lines++;
       fifoptr->lines++;
     }
@@ -217,10 +206,10 @@ uint32_t queue_puts(struct fqueue *fifoptr, const char *s)
   }
 
   /* We enqueued to head block, so we need to update head information */
-  if(headptr == tailptr)
+  if (headptr == tailptr)
     fifoptr->head = *infoptr;
 
-  if(tailptr)
+  if (tailptr)
     tailptr->info = *infoptr;
 
   /* Return bytes written */
@@ -230,28 +219,25 @@ uint32_t queue_puts(struct fqueue *fifoptr, const char *s)
 /* ------------------------------------------------------------------------ *
  * Read stuff from the queue head and dequeue it.                           *
  * ------------------------------------------------------------------------ */
-uint32_t queue_read(struct fqueue *fifoptr, void *buf, uint32_t n)
-{
-  register struct finfo  *infoptr;
+uint32_t queue_read(struct fqueue *fifoptr, void *buf, uint32_t n) {
+  register struct finfo *infoptr;
   register struct fblock *headptr;
-  struct node            *nptr;
-  struct node            *next;
-  uint32_t                i;
+  struct node *nptr;
+  struct node *next;
+  uint32_t i;
 
   nptr = fifoptr->blocks.head;
   infoptr = &fifoptr->head;
 
-  if(nptr == NULL)
+  if (nptr == NULL)
     return 0;
 
   headptr = nptr->data;
 
   /* Loop through buffer while dequeueing data */
-  for(i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     /* Head reached tail of the head block */
-    if(infoptr->head == infoptr->tail)
-    {
+    if (infoptr->head == infoptr->tail) {
       /* Backup reference to next block */
       next = nptr->next;
 
@@ -260,12 +246,11 @@ uint32_t queue_read(struct fqueue *fifoptr, void *buf, uint32_t n)
       dlink_node_free(nptr);
 
       /* If its not a multicast block we have to free it */
-      if(--headptr->refcount == 0)
+      if (--headptr->refcount == 0)
         mem_static_free(&queue_heap, headptr);
 
       /* Advance to next block */
-      if((nptr = next) == NULL)
-      {
+      if ((nptr = next) == NULL) {
         infoptr->head = 0;
         infoptr->tail = 0;
         infoptr->size = 0;
@@ -279,8 +264,7 @@ uint32_t queue_read(struct fqueue *fifoptr, void *buf, uint32_t n)
     }
 
     /* Dequeue a byte and update line count if a newline is spotted */
-    if((((char *)buf)[i] = headptr->data[infoptr->head++]) == '\n')
-    {
+    if ((((char *)buf)[i] = headptr->data[infoptr->head++]) == '\n') {
       infoptr->lines--;
       fifoptr->lines--;
     }
@@ -290,7 +274,7 @@ uint32_t queue_read(struct fqueue *fifoptr, void *buf, uint32_t n)
   }
 
   /* We dequeued from tail block, so we need to update tail information */
-  if(nptr == fifoptr->blocks.tail)
+  if (nptr == fifoptr->blocks.tail)
     fifoptr->tail = *infoptr;
 
   mem_static_collect(&queue_heap);
@@ -301,28 +285,25 @@ uint32_t queue_read(struct fqueue *fifoptr, void *buf, uint32_t n)
 /* ------------------------------------------------------------------------ *
  * Get a line from queue head and dequeue it.                               *
  * ------------------------------------------------------------------------ */
-uint32_t queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n)
-{
-  register struct finfo  *infoptr;
+uint32_t queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n) {
+  register struct finfo *infoptr;
   register struct fblock *headptr;
-  struct node            *nptr;
-  struct node            *next;
-  uint32_t                i;
+  struct node *nptr;
+  struct node *next;
+  uint32_t i;
 
   nptr = fifoptr->blocks.head;
   infoptr = &fifoptr->head;
 
-  if(fifoptr->lines == 0)
+  if (fifoptr->lines == 0)
     return 0;
 
   headptr = nptr->data;
 
   /* Loop through buffer while dequeueing data */
-  for(i = 0;; i++)
-  {
+  for (i = 0;; i++) {
     /* Head reached tail of the head block */
-    if(infoptr->head == infoptr->tail)
-    {
+    if (infoptr->head == infoptr->tail) {
       /* Backup reference to next block */
       next = nptr->next;
 
@@ -331,12 +312,11 @@ uint32_t queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n)
       dlink_node_free(nptr);
 
       /* If its not a multicast block we have to free it */
-      if(--headptr->refcount == 0)
+      if (--headptr->refcount == 0)
         mem_static_free(&queue_heap, headptr);
 
       /* Advance to next block */
-      if((nptr = next) == NULL)
-      {
+      if ((nptr = next) == NULL) {
         infoptr->head = 0;
         infoptr->tail = 0;
         infoptr->size = 0;
@@ -353,20 +333,15 @@ uint32_t queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n)
     infoptr->size--;
     fifoptr->size--;
 
-    if(i < n)
-    {
-      if((((char *)buf)[i] = headptr->data[infoptr->head++]) == '\n')
-      {
+    if (i < n) {
+      if ((((char *)buf)[i] = headptr->data[infoptr->head++]) == '\n') {
         infoptr->lines--;
         fifoptr->lines--;
 
         break;
       }
-    }
-    else
-    {
-      if(headptr->data[infoptr->head++] == '\n')
-      {
+    } else {
+      if (headptr->data[infoptr->head++] == '\n') {
         infoptr->lines--;
         fifoptr->lines--;
 
@@ -376,10 +351,10 @@ uint32_t queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n)
   }
 
   /* We dequeued from tail block, so we need to update tail information */
-  if(nptr == fifoptr->blocks.tail)
+  if (nptr == fifoptr->blocks.tail)
     fifoptr->tail = *infoptr;
 
-  if(++i < n)
+  if (++i < n)
     ((char *)buf)[i] = '\0';
   else
     ((char *)buf)[n - 1] = '\0';
@@ -392,35 +367,32 @@ uint32_t queue_gets(struct fqueue *fifoptr, void *buf, uint32_t n)
 /* ------------------------------------------------------------------------ *
  * Read stuff from the queue tail but do NOT dequeue it.                    *
  * ------------------------------------------------------------------------ */
-uint32_t queue_map(struct fqueue *fifoptr, void *buf, uint32_t n)
-{
-  register struct finfo  *infoptr;
+uint32_t queue_map(struct fqueue *fifoptr, void *buf, uint32_t n) {
+  register struct finfo *infoptr;
   register struct fblock *headptr;
-  struct finfo            headinfo;
-  struct node            *nptr;
-  struct node            *next;
-  uint32_t                i;
+  struct finfo headinfo;
+  struct node *nptr;
+  struct node *next;
+  uint32_t i;
 
   nptr = fifoptr->blocks.head;
   headinfo = fifoptr->head;
   infoptr = &headinfo;
 
-  if(nptr == NULL)
+  if (nptr == NULL)
     return 0;
 
   headptr = nptr->data;
 
   /* Loop through buffer while mapping data */
-  for(i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     /* Head reached tail of the head block */
-    if(infoptr->head == infoptr->tail)
-    {
+    if (infoptr->head == infoptr->tail) {
       /* Backup reference to next block */
       next = nptr->next;
 
       /* Advance to next block */
-      if((nptr = next) == NULL)
+      if ((nptr = next) == NULL)
         break;
 
       /* Get new head reference and update head info */
@@ -438,25 +410,23 @@ uint32_t queue_map(struct fqueue *fifoptr, void *buf, uint32_t n)
 /* ------------------------------------------------------------------------ *
  * Dequeue n bytes from queue head.                                         *
  * ------------------------------------------------------------------------ */
-uint32_t queue_cut(struct fqueue *fifoptr, uint32_t n)
-{
-  register struct finfo  *infoptr;
+uint32_t queue_cut(struct fqueue *fifoptr, uint32_t n) {
+  register struct finfo *infoptr;
   register struct fblock *headptr;
-  struct node            *nptr;
-  struct node            *next;
-  uint32_t                i;
+  struct node *nptr;
+  struct node *next;
+  uint32_t i;
 
   nptr = fifoptr->blocks.head;
   infoptr = &fifoptr->head;
 
-  if(nptr == NULL)
+  if (nptr == NULL)
     return 0;
 
   headptr = nptr->data;
 
   /* Loop through buffer while dequeueing data */
-  for(i = n; infoptr->size <= i;)
-  {
+  for (i = n; infoptr->size <= i;) {
     i -= infoptr->size;
     fifoptr->size -= infoptr->size;
     fifoptr->lines -= infoptr->lines;
@@ -469,12 +439,11 @@ uint32_t queue_cut(struct fqueue *fifoptr, uint32_t n)
     dlink_node_free(nptr);
 
     /* If its not a multicast block we have to free it */
-    if(--headptr->refcount == 0)
+    if (--headptr->refcount == 0)
       mem_static_free(&queue_heap, headptr);
 
     /* Advance to next block */
-    if((nptr = next) == NULL)
-    {
+    if ((nptr = next) == NULL) {
       infoptr->head = 0;
       infoptr->tail = 0;
       infoptr->size = 0;
@@ -487,24 +456,20 @@ uint32_t queue_cut(struct fqueue *fifoptr, uint32_t n)
     *infoptr = headptr->info;
   }
 
-  if(nptr)
-  {
+  if (nptr) {
     infoptr->size -= i;
     fifoptr->size -= i;
 
-    while(i--)
-    {
-      if(headptr->data[infoptr->head++] == '\n')
-      {
+    while (i--) {
+      if (headptr->data[infoptr->head++] == '\n') {
         infoptr->lines--;
         fifoptr->lines--;
       }
-
     }
   }
 
   /* We dequeued from tail block, so we need to update tail information */
-  if(nptr == fifoptr->blocks.tail)
+  if (nptr == fifoptr->blocks.tail)
     fifoptr->tail = *infoptr;
 
   mem_static_collect(&queue_heap);
@@ -515,15 +480,13 @@ uint32_t queue_cut(struct fqueue *fifoptr, uint32_t n)
 /* ------------------------------------------------------------------------ *
  * Link a queue to the tail of another.                                     *
  * ------------------------------------------------------------------------ */
-void queue_link(struct fqueue *from, struct fqueue *to)
-{
+void queue_link(struct fqueue *from, struct fqueue *to) {
   struct fblock *fbcptr = NULL;
-  struct list    newlist;
-  struct node   *nptr;
+  struct list newlist;
+  struct node *nptr;
 
-  if(from->size)
-  {
-    if(to->blocks.head == NULL)
+  if (from->size) {
+    if (to->blocks.head == NULL)
       to->head = from->head;
 
     to->tail = from->tail;
@@ -531,8 +494,7 @@ void queue_link(struct fqueue *from, struct fqueue *to)
     to->size += from->size;
     to->lines += from->lines;
 
-    dlink_foreach_data(&from->blocks, nptr, fbcptr)
-      fbcptr->refcount++;
+    dlink_foreach_data(&from->blocks, nptr, fbcptr) fbcptr->refcount++;
 
     dlink_copy(&from->blocks, &newlist);
 
@@ -543,15 +505,13 @@ void queue_link(struct fqueue *from, struct fqueue *to)
 /* ------------------------------------------------------------------------ *
  * Release a multicast list.                                                *
  * ------------------------------------------------------------------------ */
-void queue_destroy(struct fqueue *fifoptr)
-{
+void queue_destroy(struct fqueue *fifoptr) {
   struct fblock *fbptr = NULL;
-  struct node   *next;
-  struct node   *node;
+  struct node *next;
+  struct node *node;
 
-  dlink_foreach_safe_data(&fifoptr->blocks, node, next, fbptr)
-  {
-    if(--fbptr->refcount == 0)
+  dlink_foreach_safe_data(&fifoptr->blocks, node, next, fbptr) {
+    if (--fbptr->refcount == 0)
       mem_static_free(&queue_heap, fbptr);
 
     dlink_node_free(node);
@@ -566,7 +526,5 @@ void queue_destroy(struct fqueue *fifoptr)
  * Dump a queue.                                                            *
  * ------------------------------------------------------------------------ */
 #ifdef DEBUG
-void queue_dump(struct fqueue *fifoptr)
-{
-}
+void queue_dump(struct fqueue *fifoptr) {}
 #endif

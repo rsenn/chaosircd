@@ -27,17 +27,17 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
+#include "libchaos/net.h"
 #include "libchaos/defs.h"
-#include "libchaos/io.h"
-#include "libchaos/syscall.h"
 #include "libchaos/dlink.h"
-#include "libchaos/timer.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
-#include "libchaos/net.h"
 #include "libchaos/str.h"
-#include "libowfat/uint32.h"
+#include "libchaos/syscall.h"
+#include "libchaos/timer.h"
 #include "libowfat/uint16.h"
+#include "libowfat/uint32.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -64,41 +64,37 @@
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int           net_log;
-struct sheap  net_heap;
+int net_log;
+struct sheap net_heap;
 struct timer *net_timer;
-struct list   net_list;
-uint32_t      net_id;
+struct list net_list;
+uint32_t net_id;
 
-net_addr_t    net_addr_any = NET_ADDR_ANY;
-net_addr_t    net_addr_loopback = NET_ADDR_ANY;
+net_addr_t net_addr_any = NET_ADDR_ANY;
+net_addr_t net_addr_loopback = NET_ADDR_ANY;
 
 /* ------------------------------------------------------------------------ */
 int net_get_log() { return net_log; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-char tohex(char hexdigit)
-{
+char tohex(char hexdigit) {
   return hexdigit > 9 ? hexdigit + 'a' - 10 : hexdigit + '0';
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-unsigned int i2a(char *dest, unsigned int x)
-{
+unsigned int i2a(char *dest, unsigned int x) {
   register unsigned int tmp = x;
   register unsigned int len = 0;
 
-  if(x >= 100)
-  {
+  if (x >= 100) {
     *dest++ = tmp / 100 + '0';
     tmp = tmp % 100;
     len++;
   }
 
-  if(x >= 10)
-  {
+  if (x >= 10) {
     *dest++ = tmp / 10 + '0';
     tmp = tmp % 10;
     len++;
@@ -128,17 +124,16 @@ unsigned int i2a(char *dest, unsigned int x)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-char *net_ntoa_r(net_addr_t in, char *buf)
-{
+char *net_ntoa_r(net_addr_t in, char *buf) {
   unsigned int len;
-  unsigned char *ip = (unsigned char*)&in;
+  unsigned char *ip = (unsigned char *)&in;
 
   len = i2a(buf, ip[0]);
   buf[len++] = '.';
   len += i2a(&buf[len], ip[1]);
-  buf[len++]='.';
+  buf[len++] = '.';
   len += i2a(&buf[len], ip[2]);
-  buf[len++]='.';
+  buf[len++] = '.';
   len += i2a(&buf[len], ip[3]);
   buf[len] = 0;
 
@@ -147,8 +142,7 @@ char *net_ntoa_r(net_addr_t in, char *buf)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-char *net_ntoa(net_addr_t in)
-{
+char *net_ntoa(net_addr_t in) {
   static char buf[16];
   return net_ntoa_r(in, buf);
 }
@@ -169,33 +163,29 @@ char *net_ntoa(net_addr_t in)
  *                                                                          *
  * I hereby disclaim that I wrote this                                      *
  * ------------------------------------------------------------------------ */
-int net_aton(const char *cp, net_addr_t *inp)
-{
+int net_aton(const char *cp, net_addr_t *inp) {
   int i;
   unsigned int ip = 0;
 
   char *tmp = (char *)cp;
 
-  for(i=24; ;)
-  {
+  for (i = 24;;) {
     long j;
 
     j = str_toul(tmp, &tmp, 0);
 
-    if(*tmp == 0)
-    {
+    if (*tmp == 0) {
       ip |= j;
       break;
     }
 
-    if(*tmp == '.')
-    {
-      if(j > 255)
+    if (*tmp == '.') {
+      if (j > 255)
         return 0;
 
       ip |= (j << i);
 
-      if(i > 0)
+      if (i > 0)
         i -= 8;
 
       tmp++;
@@ -206,7 +196,7 @@ int net_aton(const char *cp, net_addr_t *inp)
   }
 
   //*inp = net_htonl(ip);
-  uint32_pack_big(inp, ip);
+  uint32_pack_big((void *)inp, ip);
 
   return 1;
 }
@@ -214,8 +204,7 @@ int net_aton(const char *cp, net_addr_t *inp)
 /* ------------------------------------------------------------------------ *
  * Initialize protocol heap.                                                *
  * ------------------------------------------------------------------------ */
-void net_init(void)
-{
+void net_init(void) {
   net_log = log_source_register("net");
 
   mem_static_create(&net_heap, sizeof(struct protocol), NET_BLOCK_SIZE);
@@ -235,13 +224,11 @@ void net_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy protocol heap.                                                   *
  * ------------------------------------------------------------------------ */
-void net_shutdown(void)
-{
+void net_shutdown(void) {
   struct node *node;
   struct node *next;
 
-  dlink_foreach_safe(&net_list, node, next)
-  {
+  dlink_foreach_safe(&net_list, node, next) {
     dlink_delete(&net_list, node);
     mem_static_free(&net_heap, node);
   }
@@ -254,32 +241,28 @@ void net_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Find a protocol.                                                         *
  * ------------------------------------------------------------------------ */
-struct protocol *net_find(int type, const char *name)
-{
+struct protocol *net_find(int type, const char *name) {
   struct protocol *p;
-  struct node     *node;
-  hash_t           hash;
-  
+  struct node *node;
+  hash_t hash;
+
   hash = str_hash(name);
 
-  dlink_foreach(&net_list, node)
-  {
+  dlink_foreach(&net_list, node) {
     p = (struct protocol *)node;
 
-    if(p->hash == hash && p->type == type)
+    if (p->hash == hash && p->type == type)
       return p;
   }
 
   return NULL;
 }
 
-struct protocol *net_find_id(uint32_t id)
-{
+struct protocol *net_find_id(uint32_t id) {
   struct protocol *p;
 
-  dlink_foreach(&net_list, p)
-  {
-    if(p->id == id)
+  dlink_foreach(&net_list, p) {
+    if (p->id == id)
       return p;
   }
 
@@ -289,13 +272,10 @@ struct protocol *net_find_id(uint32_t id)
 /* ------------------------------------------------------------------------ *
  * Register a protocol.                                                     *
  * ------------------------------------------------------------------------ */
-struct protocol *net_register(int type, const char *name,
-                              void *handler)
-{
+struct protocol *net_register(int type, const char *name, void *handler) {
   struct protocol *p;
 
-  if(net_find(type, name))
-  {
+  if (net_find(type, name)) {
     log(net_log, L_warning, "Protocol %s was already registered.", name);
     return NULL;
   }
@@ -322,15 +302,13 @@ struct protocol *net_register(int type, const char *name,
 /* ------------------------------------------------------------------------ *
  * Unregister a protocol.                                                   *
  * ------------------------------------------------------------------------ */
-void *net_unregister(int type, const char *name)
-{
+void *net_unregister(int type, const char *name) {
   void *ret = NULL;
   struct protocol *p;
 
   p = net_find(type, name);
 
-  if(p)
-  {
+  if (p) {
     log(net_log, L_status, "Unregistered %s protocol %s.",
         (type == NET_CLIENT ? "client" : "server"), name);
 
@@ -346,11 +324,9 @@ void *net_unregister(int type, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct protocol *net_pop(struct protocol *pptr)
-{
-  if(pptr)
-  {
-    if(!pptr->refcount)
+struct protocol *net_pop(struct protocol *pptr) {
+  if (pptr) {
+    if (!pptr->refcount)
       log(net_log, L_warning, "Poping deprecated %s proto: %s",
           (pptr->type == NET_CLIENT ? "client" : "server"), pptr->name);
 
@@ -362,11 +338,9 @@ struct protocol *net_pop(struct protocol *pptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct protocol *net_push(struct protocol **pptrptr)
-{
-  if(*pptrptr)
-  {
-    if(!(*pptrptr)->refcount)
+struct protocol *net_push(struct protocol **pptrptr) {
+  if (*pptrptr) {
+    if (!(*pptrptr)->refcount)
       log(net_log, L_warning, "Trying to push deprecated %s proto: %s",
           ((*pptrptr)->type == NET_CLIENT ? "client" : "server"),
           (*pptrptr)->name);
@@ -383,43 +357,49 @@ struct protocol *net_push(struct protocol **pptrptr)
  * Create a streaming socket with desired protocol family and type          *
  * (SOCK_DGRAM or SOCK_STREAM)                                              *
  * ------------------------------------------------------------------------ */
-int net_socket(net_address_t at, net_socket_t st)
-{
+int net_socket(net_address_t at, net_socket_t st) {
   int fd;
   int pf = 0;
   int type = 0;
   int proto = 0;
 
-  switch(at)
-  {
-    case NET_ADDRESS_IPV4: pf = AF_INET; break;
+  switch (at) {
+  case NET_ADDRESS_IPV4:
+    pf = AF_INET;
+    break;
 #ifdef AF_INET6
-    case NET_ADDRESS_IPV6: pf = AF_INET6; break;
+  case NET_ADDRESS_IPV6:
+    pf = AF_INET6;
+    break;
 #else
-    default: return -1;
+  default:
+    return -1;
 #endif
   }
 
-  switch(st)
-  {
-    case NET_SOCKET_DGRAM: type = SOCK_DGRAM; break;
-    case NET_SOCKET_STREAM: type = SOCK_STREAM; break;
+  switch (st) {
+  case NET_SOCKET_DGRAM:
+    type = SOCK_DGRAM;
+    break;
+  case NET_SOCKET_STREAM:
+    type = SOCK_STREAM;
+    break;
   }
 
   /* Try to create TCP/UDP socket */
   fd = syscall_socket(pf, type, proto);
 
-  if(fd < 0)
+  if (fd < 0)
     return -1;
 
   /* Set O_NONBLOCK flag */
   io_nonblocking(fd);
 
   /* Some info */
-/*  debug(net_log, "new socket: fd = %i, family: %s, proto = %s",
-        fd,
-        pf == AF_INET ? "INET" : NULL,
-        type == SOCK_DGRAM ? "UDP" : "TCP");*/
+  /*  debug(net_log, "new socket: fd = %i, family: %s, proto = %s",
+          fd,
+          pf == AF_INET ? "INET" : NULL,
+          type == SOCK_DGRAM ? "UDP" : "TCP");*/
 
   /* Register it in the io_list */
   return io_new(fd, FD_SOCKET);
@@ -428,34 +408,33 @@ int net_socket(net_address_t at, net_socket_t st)
 /* ------------------------------------------------------------------------ *
  * Bind a socket to a specified address/port                                *
  * ------------------------------------------------------------------------ */
-int net_bind(int fd, net_addr_t addr, uint16_t port)
-{
+int net_bind(int fd, net_addr_t addr, uint16_t port) {
   int opt = 1;
   struct sockaddr_in local;
   /* Validate fd */
-/*  if(!io_valid(fd))
-    return -1;*/
+  /*  if(!io_valid(fd))
+      return -1;*/
 
   local.sin_family = AF_INET;
   local.sin_addr.s_addr = addr;
-  ///local.sin_port = net_htons(port);
+  /// local.sin_port = net_htons(port);
 
-  uint16_pack_big(&local.sin_port, port);
+  uint16_pack_big((void *)&local.sin_port, port);
 
-  if(syscall_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)))
-  {
+  if (syscall_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt,
+                         sizeof(opt))) {
     io_destroy(fd);
     return -1;
   }
 
-  if(syscall_bind(fd, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) != 0)
-  {
+  if (syscall_bind(fd, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) !=
+      0) {
     io_list[fd].error = syscall_errno;
     return -1;
   }
 
-/*  debug(net_log, "bound socket %i to %s:%u",
-        fd, net_ntoa(addr), port);*/
+  /*  debug(net_log, "bound socket %i to %s:%u",
+          fd, net_ntoa(addr), port);*/
 
   return 0;
 }
@@ -463,28 +442,25 @@ int net_bind(int fd, net_addr_t addr, uint16_t port)
 /* ------------------------------------------------------------------------ *
  * Listen for incoming connections and register read callback.              *
  * ------------------------------------------------------------------------ */
-int net_vlisten(int fd, int backlog, void *callback, va_list args)
-{
-/*  if(!io_valid(fd))
-    return -1;*/
+int net_vlisten(int fd, int backlog, void *callback, va_list args) {
+  /*  if(!io_valid(fd))
+      return -1;*/
 
-  if(syscall_listen(fd, backlog))
-  {
+  if (syscall_listen(fd, backlog)) {
     io_destroy(fd);
     return -1;
   }
 
-/*  io_list[fd].status.listening = 1;*/
+  /*  io_list[fd].status.listening = 1;*/
 
-  if(io_vregister(fd, IO_CB_READ, callback, args))
+  if (io_vregister(fd, IO_CB_READ, callback, args))
     return -1;
 
   return 0;
 }
 
-int net_listen(int fd, int backlog, void *callback, ...)
-{
-  int     ret;
+int net_listen(int fd, int backlog, void *callback, ...) {
+  int ret;
   va_list args;
 
   va_start(args, callback);
@@ -498,51 +474,48 @@ int net_listen(int fd, int backlog, void *callback, ...)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int net_vconnect(int   fd,    net_addr_t addr,  uint16_t port,
-                 void *cb_rd, void      *cb_wr, va_list args)
-{
+int net_vconnect(int fd, net_addr_t addr, uint16_t port, void *cb_rd,
+                 void *cb_wr, va_list args) {
   struct sockaddr_in sina;
-  void              *argp[4];
+  void *argp[4];
 
-/*  if(!io_valid(fd))
-    return -1;*/
+  /*  if(!io_valid(fd))
+      return -1;*/
 
   sina.sin_family = AF_INET;
   sina.sin_addr.s_addr = addr;
-  //sina.sin_port = net_htons(port);
-  uint16_pack_big(&sina.sin_port, port);
+  // sina.sin_port = net_htons(port);
+  uint16_pack_big((void *)&sina.sin_port, port);
 
-  if(syscall_connect(fd, (struct sockaddr *)&sina, sizeof(struct sockaddr_in)))
-  {
-    if((syscall_errno != EINPROGRESS))
-    {
+  if (syscall_connect(fd, (struct sockaddr *)&sina,
+                      sizeof(struct sockaddr_in))) {
+    if ((syscall_errno != EINPROGRESS)) {
       io_destroy(fd);
       return -1;
     }
   }
 
-/*  io_list[fd].status.connecting = 1;*/
+  /*  io_list[fd].status.connecting = 1;*/
 
-  if(cb_rd && cb_wr)
-  {
+  if (cb_rd && cb_wr) {
     argp[0] = va_arg(args, void *);
     argp[1] = va_arg(args, void *);
     argp[2] = va_arg(args, void *);
     argp[3] = va_arg(args, void *);
 
-    if(io_register(fd, IO_CB_READ, cb_rd, argp[0], argp[1], argp[2], argp[3]) ||
-       io_register(fd, IO_CB_WRITE, cb_wr, argp[0], argp[1], argp[2], argp[3]))
+    if (io_register(fd, IO_CB_READ, cb_rd, argp[0], argp[1], argp[2],
+                    argp[3]) ||
+        io_register(fd, IO_CB_WRITE, cb_wr, argp[0], argp[1], argp[2], argp[3]))
       return -1;
   }
 
   return 0;
 }
 
-int net_connect(int   fd,    net_addr_t addr,  uint16_t port,
-                void *cb_rd, void      *cb_wr, ...)
-{
+int net_connect(int fd, net_addr_t addr, uint16_t port, void *cb_rd,
+                void *cb_wr, ...) {
   va_list args;
-  int     ret;
+  int ret;
 
   va_start(args, cb_wr);
 
@@ -556,16 +529,15 @@ int net_connect(int   fd,    net_addr_t addr,  uint16_t port,
 /* ------------------------------------------------------------------------ *
  * Accept a pending connection.                                             *
  * ------------------------------------------------------------------------ */
-int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
-{
+int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr) {
   struct sockaddr_in addr;
   struct sockaddr_in local;
-  int                ret;
-  socklen_t          addrlen = sizeof(struct sockaddr_in);
+  int ret;
+  socklen_t addrlen = sizeof(struct sockaddr_in);
 
   ret = syscall_accept(fd, (struct sockaddr *)&addr, (unsigned int *)&addrlen);
 
-  if(ret == -1)
+  if (ret == -1)
     return -1;
 
 #ifdef SO_PEERNAME
@@ -577,8 +549,7 @@ int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
   addrlen = sizeof(struct sockaddr_in);
   syscall_getsockname(ret, (void *)&local, (unsigned int *)&addrlen);
 
-  if(io_new(ret, FD_SOCKET) != ret)
-  {
+  if (io_new(ret, FD_SOCKET) != ret) {
 #ifdef WIN32
     closesocket(ret);
 #else
@@ -587,8 +558,10 @@ int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
     return -1;
   }
 
-  if(addrptr) *addrptr = addr.sin_addr.s_addr;
-  if(portptr) *portptr = addr.sin_port;
+  if (addrptr)
+    *addrptr = addr.sin_addr.s_addr;
+  if (portptr)
+    *portptr = addr.sin_port;
 
   return ret;
 }
@@ -596,43 +569,39 @@ int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr)
 /* ------------------------------------------------------------------------ *
  * Get local socket address.                                                *
  * ------------------------------------------------------------------------ */
-int net_getsockname(int fd, net_addr_t *addrptr, net_port_t *portptr)
-{
+int net_getsockname(int fd, net_addr_t *addrptr, net_port_t *portptr) {
   struct sockaddr_in addr;
-  int                ret;
-  int                addrlen = sizeof(struct sockaddr_in);
+  int ret;
+  int addrlen = sizeof(struct sockaddr_in);
 
   addrlen = sizeof(struct sockaddr_in);
-  ret = syscall_getsockname(fd, (struct sockaddr *)&addr, (unsigned int *)&addrlen);
+  ret = syscall_getsockname(fd, (struct sockaddr *)&addr,
+                            (unsigned int *)&addrlen);
 
-  if(ret == -1)
+  if (ret == -1)
     return -1;
 
-  if(addrptr) *addrptr = addr.sin_addr.s_addr;
-  if(portptr) *portptr = addr.sin_port;
+  if (addrptr)
+    *addrptr = addr.sin_addr.s_addr;
+  if (portptr)
+    *portptr = addr.sin_port;
 
   return ret;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void net_dump(struct protocol *nptr)
-{
-  if(nptr == NULL)
-  {
+void net_dump(struct protocol *nptr) {
+  if (nptr == NULL) {
     dump(net_log, "[================ net summary ================]");
 
-    dlink_foreach(&net_list, nptr)
-    {
-      dump(net_log, " #%u: [%u] %-20s (%s)",
-           nptr->id, nptr->refcount, nptr->name,
-           nptr->type == NET_SERVER ? "server" : "client");
+    dlink_foreach(&net_list, nptr) {
+      dump(net_log, " #%u: [%u] %-20s (%s)", nptr->id, nptr->refcount,
+           nptr->name, nptr->type == NET_SERVER ? "server" : "client");
     }
 
     dump(net_log, "[============= end of net summary ============]");
-  }
-  else
-  {
+  } else {
     dump(net_log, "[================= net dump =================]");
 
     dump(net_log, "         id: #%u", nptr->id);

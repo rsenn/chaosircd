@@ -4,17 +4,16 @@
 #include <unistd.h>
 #endif
 
-#include "libchaos/io.h"
-#include "libchaos/mem.h"
-#include "libchaos/log.h"
 #include "libchaos/gif.h"
 #include "libchaos/image.h"
+#include "libchaos/io.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
 
-void imagetest_write(void)
-{
+void imagetest_write(void) {
   struct image *image;
-  uint32_t      i;
-  struct rect   rect;
+  uint32_t i;
+  struct rect rect;
 
   image = image_new(IMAGE_TYPE_8, 640, 480);
 
@@ -30,18 +29,18 @@ void imagetest_write(void)
 
   image_putrect(image, &rect, 80);
 
-  for(i = 0; i < 256; i++)
+  for (i = 0; i < 256; i++)
     image_putpixel(image, 20 + i, 50, i);
 
-/*  image_putstr(image, &image_font_6x10, 100, 40, 12, IMAGE_ALIGN_LEFT, "libchaos rocks!");
-  image_putstr(image, &image_font_6x10, 160, 80, 11, IMAGE_ALIGN_LEFT, "dschoint");*/
+  /*  image_putstr(image, &image_font_6x10, 100, 40, 12, IMAGE_ALIGN_LEFT,
+    "libchaos rocks!"); image_putstr(image, &image_font_6x10, 160, 80, 11,
+    IMAGE_ALIGN_LEFT, "dschoint");*/
   image_save_gif(image, "lala.gif");
 
   image_delete(image);
 }
 
-int main()
-{
+int main() {
   printf("test\n");
 
   log_init(STDOUT_FILENO, LOG_ALL, L_status);
@@ -62,4 +61,3 @@ int main()
 
   return 0;
 }
-

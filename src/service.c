@@ -25,40 +25,39 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
+#include "libchaos/hook.h"
 #include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
-#include "libchaos/hook.h"
 #include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/user.h"
-#include "ircd/service.h"
-#include "ircd/usermode.h"
 #include "ircd/channel.h"
+#include "ircd/ircd.h"
 #include "ircd/numeric.h"
+#include "ircd/service.h"
+#include "ircd/user.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-int           service_log;                   /* user log source */
-struct sheap  service_heap;                  /* heap for struct service */
-struct sheap  service_handler_heap;          /* heap for struct service_handler */
-int           service_dirty;                 /* we need a garbage collect */
-struct list   service_list;                  /* list with all of them */
-uint32_t      service_seed;
-uint32_t      service_id;
+int service_log;                   /* user log source */
+struct sheap service_heap;         /* heap for struct service */
+struct sheap service_handler_heap; /* heap for struct service_handler */
+int service_dirty;                 /* we need a garbage collect */
+struct list service_list;          /* list with all of them */
+uint32_t service_seed;
+uint32_t service_id;
 
 /* -------------------------------------------------------------------------- *
  * Initialize user module.                                                    *
  * -------------------------------------------------------------------------- */
-void service_init(void)
-{
+void service_init(void) {
   service_log = log_source_register("service");
 
   /* Zero all user lists */
@@ -81,16 +80,14 @@ void service_init(void)
 /* -------------------------------------------------------------------------- *
  * Shutdown service module.                                                   *
  * -------------------------------------------------------------------------- */
-void service_shutdown(void)
-{
+void service_shutdown(void) {
   struct service *svptr;
   struct service *next;
 
   log(service_log, L_status, "Shutting down [service] module.");
 
   /* Push all users */
-  dlink_foreach_safe(&service_list, svptr, next)
-     service_delete(svptr);
+  dlink_foreach_safe(&service_list, svptr, next) service_delete(svptr);
 
   /* Destroy static heap */
   mem_static_destroy(&service_handler_heap);
@@ -104,8 +101,7 @@ void service_shutdown(void)
  * Create a new service block                                                 *
  * -------------------------------------------------------------------------- */
 struct service *service_new(const char *name, const char *user,
-                            const char *host, const char *info)
-{
+                            const char *host, const char *info) {
   struct service *svptr;
 
   /* Allocate and zero service block */
@@ -127,7 +123,7 @@ struct service *service_new(const char *name, const char *user,
 
   service_set_name(svptr, name);
 
-  if(name)
+  if (name)
     strlcpy(svptr->name, name, sizeof(svptr->name));
 
   svptr->nhash = str_hash(svptr->name);
@@ -143,8 +139,7 @@ struct service *service_new(const char *name, const char *user,
 /* -------------------------------------------------------------------------- *
  * Delete a service block                                                     *
  * -------------------------------------------------------------------------- */
-void service_delete(struct service *svptr)
-{
+void service_delete(struct service *svptr) {
   service_release(svptr);
 
   /* Unlink from main list and typed list */
@@ -159,31 +154,25 @@ void service_delete(struct service *svptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service *service_find_id(uint32_t id)
-{
+struct service *service_find_id(uint32_t id) {
   struct service *svptr;
 
-  dlink_foreach(&service_list, svptr)
-    if(svptr->id == id)
-      return svptr;
+  dlink_foreach(&service_list, svptr) if (svptr->id == id) return svptr;
 
   return NULL;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service *service_find_name(const char *name)
-{
+struct service *service_find_name(const char *name) {
   struct service *svptr;
-  hash_t          hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&service_list, svptr)
-  {
-    if(svptr->nhash == hash)
-    {
-      if(!str_icmp(svptr->name, name))
+  dlink_foreach(&service_list, svptr) {
+    if (svptr->nhash == hash) {
+      if (!str_icmp(svptr->name, name))
         return svptr;
     }
   }
@@ -193,10 +182,8 @@ struct service *service_find_name(const char *name)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void service_set_name(struct service *svptr, const char *name)
-{
-  if(name && name[0])
-  {
+void service_set_name(struct service *svptr, const char *name) {
+  if (name && name[0]) {
     strlcpy(svptr->name, name, sizeof(svptr->name));
     svptr->nhash = str_ihash(svptr->name);
   }
@@ -205,8 +192,7 @@ void service_set_name(struct service *svptr, const char *name)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 struct service_handler *service_register(struct service *svptr, const char *msg,
-                                         service_callback_t *callback)
-{
+                                         service_callback_t *callback) {
   struct service_handler *svhptr;
 
   svhptr = mem_static_alloc(&service_handler_heap);
@@ -222,47 +208,41 @@ struct service_handler *service_register(struct service *svptr, const char *msg,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service_handler *service_handler_find(struct service *svptr, const char *cmd)
-{
+struct service_handler *service_handler_find(struct service *svptr,
+                                             const char *cmd) {
   struct service_handler *svhptr;
-  hash_t                  hash;
-  
+  hash_t hash;
+
   hash = str_ihash(cmd);
 
-  dlink_foreach(&svptr->handlers, svhptr)
-    if(svhptr->hash == hash)
-    {
-      if(!str_icmp(svhptr->name, cmd))
-        return svhptr;
-    }
+  dlink_foreach(&svptr->handlers, svhptr) if (svhptr->hash == hash) {
+    if (!str_icmp(svhptr->name, cmd))
+      return svhptr;
+  }
 
   return NULL;
 }
 
-
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 void service_vhandle(struct service *svptr, struct lclient *lcptr,
-                     struct client  *cptr,  struct channel *chptr,
-                     const char     *cmd,   const char     *format,
-                     va_list         args)
-{
+                     struct client *cptr, struct channel *chptr,
+                     const char *cmd, const char *format, va_list args) {
   struct service_handler *svhptr;
-  char                    buffer[IRCD_LINELEN + 1];
+  char buffer[IRCD_LINELEN + 1];
 
-  if((svhptr = service_handler_find(svptr, cmd)) == NULL)
+  if ((svhptr = service_handler_find(svptr, cmd)) == NULL)
     return;
 
   str_vsnprintf(buffer, sizeof(buffer), format, args);
 
-  if(svhptr->callback)
+  if (svhptr->callback)
     svhptr->callback(lcptr, cptr, chptr, buffer);
 }
 
 void service_handle(struct service *svptr, struct lclient *lcptr,
-                    struct client  *cptr,  struct channel *chptr,
-                    const char     *cmd,   const char     *format, ...)
-{
+                    struct client *cptr, struct channel *chptr, const char *cmd,
+                    const char *format, ...) {
   va_list args;
 
   va_start(args, format);
@@ -273,10 +253,8 @@ void service_handle(struct service *svptr, struct lclient *lcptr,
 /* -------------------------------------------------------------------------- *
  * Loose all references                                                       *
  * -------------------------------------------------------------------------- */
-void service_release(struct service *svptr)
-{
-  if(svptr->client)
-  {
+void service_release(struct service *svptr) {
+  if (svptr->client) {
     client_exit(NULL, svptr->client, "service released");
     svptr->client = NULL;
   }
@@ -284,13 +262,10 @@ void service_release(struct service *svptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service *service_pop(struct service *svptr)
-{
-  if(svptr)
-  {
-    if(!svptr->refcount)
-      log(service_log, L_warning, "Poping deprecated service: %s",
-          svptr->name);
+struct service *service_pop(struct service *svptr) {
+  if (svptr) {
+    if (!svptr->refcount)
+      log(service_log, L_warning, "Poping deprecated service: %s", svptr->name);
 
     svptr->refcount++;
   }
@@ -300,18 +275,13 @@ struct service *service_pop(struct service *svptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct service *service_push(struct service **svptrptr)
-{
-  if(*svptrptr)
-  {
-    if((*svptrptr)->refcount == 0)
-    {
+struct service *service_push(struct service **svptrptr) {
+  if (*svptrptr) {
+    if ((*svptrptr)->refcount == 0) {
       log(service_log, L_warning, "Trying to push deprecated service: %s",
           (*svptrptr)->name);
-    }
-    else
-    {
-      if(--(*svptrptr)->refcount == 0)
+    } else {
+      if (--(*svptrptr)->refcount == 0)
         service_release(*svptrptr);
 
       (*svptrptr) = NULL;
@@ -321,35 +291,29 @@ struct service *service_push(struct service **svptrptr)
   return *svptrptr;
 }
 
-
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void service_dump(struct service *svptr)
-{
-  if(svptr == NULL)
-  {
+void service_dump(struct service *svptr) {
+  if (svptr == NULL) {
     struct node *node;
 
     dump(service_log, "[============== service summary ===============]");
 
     dlink_foreach_data(&service_list, node, svptr)
-      dump(service_log, " #%u: [%u] %-20s (%s)",
-            svptr->id, svptr->refcount,
-            svptr->name[0] ? svptr->name : "<unknown>",
-            svptr->client ? svptr->client->name : "?");
+        dump(service_log, " #%u: [%u] %-20s (%s)", svptr->id, svptr->refcount,
+             svptr->name[0] ? svptr->name : "<unknown>",
+             svptr->client ? svptr->client->name : "?");
 
     dump(service_log, "[=========== end of service summary ===========]");
-  }
-  else
-  {
+  } else {
     dump(service_log, "[============== service dump ===============]");
     dump(service_log, "         id: #%u", svptr->id);
     dump(service_log, "   refcount: %u", svptr->refcount);
     dump(service_log, "      uhash: %p", svptr->uhash);
     dump(service_log, "      nhash: %p", svptr->nhash);
     dump(service_log, "     client: %s [%i]",
-          svptr->client ? svptr->client->name : "(nil)",
-          svptr->client ? svptr->client->refcount : 0);
+         svptr->client ? svptr->client->name : "(nil)",
+         svptr->client ? svptr->client->refcount : 0);
     dump(service_log, "       name: %s", svptr->name);
     dump(service_log, "[=========== end of service dump ===========]");
   }

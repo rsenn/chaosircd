@@ -10,6 +10,7 @@ include(FindBISON)
 bison_target(ircd-parser ircd.y ${CMAKE_CURRENT_BINARY_DIR}/ircd-parser.c
              DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/y.tab.h)
 flex_target(ircd-scanner ircd.l ${CMAKE_CURRENT_BINARY_DIR}/ircd-lexer.c)
+
 add_flex_bison_dependency(ircd-scanner ircd-parser)
 
 set(SOURCES
@@ -51,6 +52,10 @@ set(SOURCES
     "${CMAKE_SOURCE_DIR}/include/ircd/usermode.h")
 
 add_definitions(-DHAVE_SSL=1)
+  
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib"
+                   "${LIBCHAOS_BINARY_DIR}")
+
 if(WINDOWS OR CYGWIN)
 
   add_library(ircd SHARED ${SOURCES})
@@ -66,19 +71,14 @@ if(WINDOWS OR CYGWIN)
   set_target_properties(chaosircd PROPERTIES INSTALL_RPATH
                                              "${CMAKE_INSTALL_PREFIX}/lib")
 
-  link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib"
-                   "${LIBCHAOS_BINARY_DIR}")
-
-  target_link_libraries(ircd chaos ${SOCKET_LIBRARIES})
+  target_link_libraries(ircd chaos owfat ${SOCKET_LIBRARIES})
   target_link_libraries(chaosircd ircd)
 
 else()
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
   add_executable(chaosircd ${SOURCES} main.c)
 
-  link_directories("${LIBCHAOS_BINARY_DIR}")
-
-  target_link_libraries(chaosircd chaos ${MYSQL_LIBS} ${OPENSSL_LIBS}
+  target_link_libraries(chaosircd chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS}
                         ${SOCKET_LIBRARIES})
 endif()
 

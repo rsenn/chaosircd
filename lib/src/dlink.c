@@ -24,22 +24,21 @@
 #define _GNU_SOURCE
 #endif
 
-
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
 #include "libchaos/dlink.h"
-#include "libchaos/mem.h"
+#include "libchaos/defs.h"
 #include "libchaos/log.h"
+#include "libchaos/mem.h"
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int           dlink_log;
-struct sheap  dlink_heap;       /* block heap on which nodes are stored */
-uint32_t      dlink_count;      /* dlink statistics */
-uint32_t      dlink_linked;     /* dlink statistics */
+int dlink_log;
+struct sheap dlink_heap; /* block heap on which nodes are stored */
+uint32_t dlink_count;    /* dlink statistics */
+uint32_t dlink_linked;   /* dlink statistics */
 
 /* ------------------------------------------------------------------------ */
 int dlink_get_log() { return dlink_log; }
@@ -47,8 +46,7 @@ int dlink_get_log() { return dlink_log; }
 /* ------------------------------------------------------------------------ *
  * Initialize block heap for the dlink nodes                                *
  * ------------------------------------------------------------------------ */
-void dlink_init(void)
-{
+void dlink_init(void) {
   dlink_log = log_source_register("dlink");
 
   dlink_count = 0;
@@ -61,8 +59,7 @@ void dlink_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy heap                                                             *
  * ------------------------------------------------------------------------ */
-void dlink_shutdown(void)
-{
+void dlink_shutdown(void) {
   mem_static_destroy(&dlink_heap);
 
   log_source_unregister(dlink_log);
@@ -71,17 +68,13 @@ void dlink_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                          *
  * ------------------------------------------------------------------------ */
-void dlink_collect(void)
-{
-  mem_static_collect(&dlink_heap);
-}
+void dlink_collect(void) { mem_static_collect(&dlink_heap); }
 
 /* ------------------------------------------------------------------------ *
  * Allocate a new dlink node                                                *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-struct node *dlink_node_new(void)
-{
+struct node *dlink_node_new(void) {
   struct node *nptr;
 
   /* Allocate node block */
@@ -101,8 +94,7 @@ struct node *dlink_node_new(void)
  * Free a dlink node                                                        *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_node_free(struct node *nptr)
-{
+void dlink_node_free(struct node *nptr) {
   /* Free node block */
   mem_static_free(&dlink_heap, nptr);
   mem_static_collect(&dlink_heap);
@@ -120,8 +112,7 @@ void dlink_node_free(struct node *nptr)
  * <ptr>                    - a user-defined pointer                        *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_add_head(struct list *lptr, struct node *nptr, void *ptr)
-{
+void dlink_add_head(struct list *lptr, struct node *nptr, void *ptr) {
   /* Set the data pointer */
   nptr->data = ptr;
 
@@ -133,7 +124,7 @@ void dlink_add_head(struct list *lptr, struct node *nptr, void *ptr)
 
   /* If there already is a node at the head update
      its prev-reference, else update the tail */
-  if(lptr->head)
+  if (lptr->head)
     lptr->head->prev = nptr;
   else
     lptr->tail = nptr;
@@ -156,8 +147,7 @@ void dlink_add_head(struct list *lptr, struct node *nptr, void *ptr)
  * <ptr>                    - a user-defined pointer                        *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_add_tail(struct list *lptr, struct node *nptr, void *ptr)
-{
+void dlink_add_tail(struct list *lptr, struct node *nptr, void *ptr) {
   /* Set the data pointer */
   nptr->data = ptr;
 
@@ -169,7 +159,7 @@ void dlink_add_tail(struct list *lptr, struct node *nptr, void *ptr)
 
   /* If there already is a node at the tail update
      its prev-reference, else update the head */
-  if(lptr->tail)
+  if (lptr->tail)
     lptr->tail->next = nptr;
   else
     lptr->head = nptr;
@@ -193,12 +183,10 @@ void dlink_add_tail(struct list *lptr, struct node *nptr, void *ptr)
  * <ptr>                    - a user-defined pointer                        *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_add_before(struct list *lptr,   struct node *nptr,
-                      struct node *before, void        *ptr)
-{
+void dlink_add_before(struct list *lptr, struct node *nptr, struct node *before,
+                      void *ptr) {
   /* If <before> is the list head, then a dlink_add_head() does the job */
-  if(before == lptr->head)
-  {
+  if (before == lptr->head) {
     dlink_add_head(lptr, nptr, ptr);
     return;
   }
@@ -232,12 +220,10 @@ void dlink_add_before(struct list *lptr,   struct node *nptr,
  * <ptr>                    - a user-defined pointer                        *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_add_after(struct list *lptr,  struct node *nptr,
-                     struct node *after, void        *ptr)
-{
+void dlink_add_after(struct list *lptr, struct node *nptr, struct node *after,
+                     void *ptr) {
   /* If <after> is the list tail, then a dlink_add_tail() does the job */
-  if(after == lptr->tail)
-  {
+  if (after == lptr->tail) {
     dlink_add_tail(lptr, nptr, ptr);
     return;
   }
@@ -269,18 +255,17 @@ void dlink_add_after(struct list *lptr,  struct node *nptr,
  * <node>                   - the node to delete                            *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_delete(struct list *lptr, struct node *nptr)
-{
+void dlink_delete(struct list *lptr, struct node *nptr) {
   /* If there is a prev node, update its next-
      reference, otherwise update the head */
-  if(nptr == lptr->head)
+  if (nptr == lptr->head)
     lptr->head = nptr->next;
   else
     nptr->prev->next = nptr->next;
 
   /* If there is a next node, update its prev-
      reference otherwise update the tail */
-  if(lptr->tail == nptr)
+  if (lptr->tail == nptr)
     lptr->tail = nptr->prev;
   else
     nptr->next->prev = nptr->prev;
@@ -305,14 +290,12 @@ void dlink_delete(struct list *lptr, struct node *nptr)
  * Returns a node when found, NULL otherwise.                               *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-struct node *dlink_find(struct list *lptr, void *ptr)
-{
+struct node *dlink_find(struct list *lptr, void *ptr) {
   struct node *nptr;
 
   /* Loop through all nodes until we find the pointer */
-  dlink_foreach(lptr, nptr)
-  {
-    if(nptr->data == ptr)
+  dlink_foreach(lptr, nptr) {
+    if (nptr->data == ptr)
       return nptr;
   }
 
@@ -330,25 +313,22 @@ struct node *dlink_find(struct list *lptr, void *ptr)
  * Returns a node when found and deleted, NULL otherwise.                   *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-struct node *dlink_find_delete(struct list *lptr, void *ptr)
-{
+struct node *dlink_find_delete(struct list *lptr, void *ptr) {
   struct node *nptr;
 
   /* Loop through all nodes until we find the pointer */
-  dlink_foreach(lptr, nptr)
-  {
-    if(nptr->data == ptr)
-    {
+  dlink_foreach(lptr, nptr) {
+    if (nptr->data == ptr) {
       /* If there is a prev node, update its next-
          reference, otherwise update the head */
-      if(nptr->prev)
+      if (nptr->prev)
         nptr->prev->next = nptr->next;
       else
         lptr->head = nptr->next;
 
       /* If there is a next node, update its prev-
          reference otherwise update the tail */
-      if(nptr->next)
+      if (nptr->next)
         nptr->next->prev = nptr->prev;
       else
         lptr->tail = nptr->prev;
@@ -379,19 +359,17 @@ struct node *dlink_find_delete(struct list *lptr, void *ptr)
  * Returns a node when the index was valid, NULL otherwise.                 *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-struct node *dlink_index(struct list *lptr, size_t index)
-{
+struct node *dlink_index(struct list *lptr, size_t index) {
   struct node *nptr;
-  size_t       i = 0;
+  size_t i = 0;
 
   /* Damn, index is invalid */
-  if(index >= lptr->size)
+  if (index >= lptr->size)
     return NULL;
 
   /* Loop through list until index */
-  dlink_foreach(lptr, nptr)
-  {
-    if(i == index)
+  dlink_foreach(lptr, nptr) {
+    if (i == index)
       return nptr;
 
     i++;
@@ -404,13 +382,11 @@ struct node *dlink_index(struct list *lptr, size_t index)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_destroy(struct list *lptr)
-{
+void dlink_destroy(struct list *lptr) {
   struct node *nptr;
   struct node *next;
 
-  dlink_foreach_safe(lptr, nptr, next)
-    dlink_node_free(nptr);
+  dlink_foreach_safe(lptr, nptr, next) dlink_node_free(nptr);
 
   dlink_linked -= lptr->size;
 
@@ -426,34 +402,33 @@ void dlink_destroy(struct list *lptr)
  * <node2>                  - second node to swap                           *
  * ------------------------------------------------------------------------ */
 #ifdef NO_C99
-void dlink_swap(struct list *lptr, struct node *nptr1, struct node *nptr2)
-{
+void dlink_swap(struct list *lptr, struct node *nptr1, struct node *nptr2) {
   struct node n1;
   struct node n2;
 
   /* Return if its twice the same node */
-  if(nptr1 == nptr2)
+  if (nptr1 == nptr2)
     return;
 
   n1 = *nptr1;
   n2 = *nptr2;
 
-  if(n2.next)
+  if (n2.next)
     n2.next->prev = nptr1;
   else
     lptr->tail = nptr1;
 
-  if(n2.prev)
+  if (n2.prev)
     n2.prev->next = nptr1;
   else
     lptr->head = nptr1;
 
-  if(n1.next)
+  if (n1.next)
     n1.next->prev = nptr2;
   else
     lptr->tail = nptr2;
 
-  if(n1.prev)
+  if (n1.prev)
     n1.prev->next = nptr2;
   else
     lptr->head = nptr2;
@@ -475,19 +450,16 @@ void dlink_swap(struct list *lptr, struct node *nptr1, struct node *nptr2)
  * <to>                     - list to move nodes to                         *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_move_head(struct list *from, struct list *to)
-{
+void dlink_move_head(struct list *from, struct list *to) {
   /* Nothing in to-list */
-  if(to->head == NULL)
-  {
+  if (to->head == NULL) {
     /* Copy to to-list */
     to->head = from->head;
     to->tail = from->tail;
     to->size = from->size;
   }
   /* Add lists */
-  else if(from->tail != NULL)
-  {
+  else if (from->tail != NULL) {
     /* Prepend from-list */
     from->tail->next = to->head;
     to->head->prev = from->tail;
@@ -514,19 +486,16 @@ void dlink_move_head(struct list *from, struct list *to)
  * <to>                     - list to move nodes to                         *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_move_tail(struct list *from, struct list *to)
-{
+void dlink_move_tail(struct list *from, struct list *to) {
   /* Nothing in to-list */
-  if(to->tail == NULL)
-  {
+  if (to->tail == NULL) {
     /* Copy to to-list */
     to->head = from->head;
     to->tail = from->tail;
     to->size = from->size;
   }
   /* Add lists */
-  else if(from->head != NULL)
-  {
+  else if (from->head != NULL) {
     /* Append from-list */
     from->head->prev = to->tail;
     to->tail->next = from->head;
@@ -545,8 +514,7 @@ void dlink_move_tail(struct list *from, struct list *to)
  * Copy a list while overwriting destination and allocating new nodes       *
  * ------------------------------------------------------------------------ */
 #ifndef ALREADY_INLINED
-void dlink_copy(struct list *from, struct list *to)
-{
+void dlink_copy(struct list *from, struct list *to) {
   struct node *fnptr;
   struct node *tnptr;
   struct node *prev = NULL;
@@ -555,8 +523,7 @@ void dlink_copy(struct list *from, struct list *to)
   dlink_list_zero(to);
 
   /* Loop through source */
-  dlink_foreach(from, fnptr)
-  {
+  dlink_foreach(from, fnptr) {
     /* Make node for destination */
     tnptr = dlink_node_new();
 
@@ -564,18 +531,18 @@ void dlink_copy(struct list *from, struct list *to)
     tnptr->data = fnptr->data;
 
     /* Its the head, update destination head */
-    if(fnptr == from->head)
+    if (fnptr == from->head)
       to->head = tnptr;
 
     /* Its the tail, update destination tail */
-    if(fnptr == from->tail)
+    if (fnptr == from->tail)
       to->tail = tnptr;
 
     /* Make references */
     tnptr->prev = prev;
     tnptr->next = NULL;
 
-    if(prev)
+    if (prev)
       prev->next = tnptr;
 
     prev = tnptr;
@@ -587,36 +554,30 @@ void dlink_copy(struct list *from, struct list *to)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-uint32_t dlink_count_nodes(struct list *lptr)
-{
+uint32_t dlink_count_nodes(struct list *lptr) {
   uint32_t i = 0;
   struct node *nptr;
 
-  dlink_foreach(lptr, nptr)
-    i++;
+  dlink_foreach(lptr, nptr) i++;
 
   return i;
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void dlink_dump(void)
-{
+void dlink_dump(void) {
   dump(dlink_log, "[============= dlink statistics =============]");
-  dump(dlink_log, "      allocated nodes: %u (%u bytes)",
-      dlink_count, (dlink_count * sizeof(struct node)));
-  dump(dlink_log, "         linked nodes: %u (%u bytes)",
-      dlink_linked, (dlink_linked * sizeof(struct node)));
+  dump(dlink_log, "      allocated nodes: %u (%u bytes)", dlink_count,
+       (dlink_count * sizeof(struct node)));
+  dump(dlink_log, "         linked nodes: %u (%u bytes)", dlink_linked,
+       (dlink_linked * sizeof(struct node)));
   dump(dlink_log, "    total node chunks: %u (%u bytes)",
-      (dlink_heap.block_count * dlink_heap.chunks_per_block),
-      (dlink_heap.block_count * dlink_heap.chunks_per_block *
-       sizeof(struct node)));
+       (dlink_heap.block_count * dlink_heap.chunks_per_block),
+       (dlink_heap.block_count * dlink_heap.chunks_per_block *
+        sizeof(struct node)));
   dump(dlink_log, "     free node chunks: %u (%u bytes)",
-      dlink_heap.free_chunks, dlink_heap.free_chunks * sizeof(struct node));
-  dump(dlink_log, "     node heap blocks: %u",
-      dlink_heap.block_count);
-  dump(dlink_log, "node chunks per block: %u",
-      dlink_heap.chunks_per_block);
+       dlink_heap.free_chunks, dlink_heap.free_chunks * sizeof(struct node));
+  dump(dlink_log, "     node heap blocks: %u", dlink_heap.block_count);
+  dump(dlink_log, "node chunks per block: %u", dlink_heap.chunks_per_block);
   dump(dlink_log, "[========== end of dlink statistics =========]");
 }
-

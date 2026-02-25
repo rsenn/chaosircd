@@ -1,21 +1,21 @@
-/* http:/*delegate.uec.ac.jp:8081/club/mma/~shimiz98/misc/sendfile.html */*/
+/* http:/*delegate.uec.ac.jp:8081/club/mma/~shimiz98/misc/sendfile.html */ * /
 #define _FILE_OFFSET_BITS 64
-#include "io_internal.h"
 #include "havebsdsf.h"
 #include "havesendfile.h"
+#include "io_internal.h"
 #include <errno.h>
 
 #if defined(HAVE_BSDSENDFILE)
 #define SENDFILE 1
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/uio.h>
 
-int64 io_sendfile(int64 s,int64 fd,uint64 off,uint64 n) {
+    int64 io_sendfile(int64 s, int64 fd, uint64 off, uint64 n) {
   off_t sbytes;
-  int r=sendfile(fd,s,off,n,0,&sbytes,0);
-  if (r==-1)
-    return (errno==EAGAIN?(sbytes?sbytes:-1):-3);
+  int r = sendfile(fd, s, off, n, 0, &sbytes, 0);
+  if (r == -1)
+    return (errno == EAGAIN ? (sbytes ? sbytes : -1) : -3);
   return n;
 }
 
@@ -24,50 +24,52 @@ int64 io_sendfile(int64 s,int64 fd,uint64 off,uint64 n) {
 #ifdef __hpux__
 
 #define _LARGEFILE64_SOURCE
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include <sys/socket.h>
 
-int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
-  long long r=sendfile64(out,in,off,bytes,0,0);
-  if (r==-1 && errno!=EAGAIN) r=-3;
+    int64 io_sendfile(int64 out, int64 in, uint64 off, uint64 bytes) {
+  long long r = sendfile64(out, in, off, bytes, 0, 0);
+  if (r == -1 && errno != EAGAIN)
+    r = -3;
   return r;
 }
 
-#elif defined (__sun__) && defined(__svr4__)
+#elif defined(__sun__) && defined(__svr4__)
 
 #define _LARGEFILE64_SOURCE
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/sendfile.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
-int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
-  off64_t o=off;
-  long long r=sendfile64(out,in,&o,bytes);
-  if (r==-1 && errno!=EAGAIN) r=-3;
+    int64 io_sendfile(int64 out, int64 in, uint64 off, uint64 bytes) {
+  off64_t o = off;
+  long long r = sendfile64(out, in, &o, bytes);
+  if (r == -1 && errno != EAGAIN)
+    r = -3;
   return r;
 }
 
 #elif defined(_AIX)
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #include <errno.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
+    int64 io_sendfile(int64 out, int64 in, uint64 off, uint64 bytes) {
   struct sf_parms p;
-  int destfd=out;
-  p.header_data=0;
-  p.header_length=0;
-  p.file_descriptor=in;
-  p.file_offset=off;
-  p.file_bytes=bytes;
-  p.trailer_data=0;
-  p.trailer_length=0;
-  if (send_file(&destfd,&p,0)>=0)
+  int destfd = out;
+  p.header_data = 0;
+  p.header_length = 0;
+  p.file_descriptor = in;
+  p.file_offset = off;
+  p.file_bytes = bytes;
+  p.trailer_data = 0;
+  p.trailer_length = 0;
+  if (send_file(&destfd, &p, 0) >= 0)
     return p.bytes_sent;
-  if (errno==EAGAIN)
+  if (errno == EAGAIN)
     return -1;
   else
     return -3;
@@ -84,29 +86,30 @@ int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
 _syscall4(int,sendfile,int,out,int,in,long *,offset,unsigned long,count)
 #endif
 
-int64 io_sendfile(int64 s,int64 fd,uint64 off,uint64 n) {
-  off_t o=off;
-  io_entry* e=array_get(&io_fds,sizeof(io_entry),s);
+    int64 io_sendfile(int64 s, int64 fd, uint64 off, uint64 n) {
+  off_t o = off;
+  io_entry *e = array_get(&io_fds, sizeof(io_entry), s);
   off_t i;
-  uint64 done=0;
+  uint64 done = 0;
   /* What a spectacularly broken design for sendfile64.
    * The offset is 64-bit for sendfile64, but the count is not. */
   while (n) {
-    off_t todo=n>0x7fffffff?0x7fffffff:n;
-    i=sendfile(s,fd,&o,todo);
-    if (i==todo) {
-      done+=todo;
-      n-=todo;
-      if (n==0) return done;
+    off_t todo = n > 0x7fffffff ? 0x7fffffff : n;
+    i = sendfile(s, fd, &o, todo);
+    if (i == todo) {
+      done += todo;
+      n -= todo;
+      if (n == 0)
+        return done;
       continue;
-    } else if (i==-1) {
+    } else if (i == -1) {
       if (e) {
-	e->canwrite=0;
-	e->next_write=-1;
+        e->canwrite = 0;
+        e->next_write = -1;
       }
-      return (errno==EAGAIN?-1:-3);
+      return (errno == EAGAIN ? -1 : -3);
     } else
-      return done+i;
+      return done + i;
   }
   return 0;
 }
@@ -114,32 +117,39 @@ int64 io_sendfile(int64 s,int64 fd,uint64 off,uint64 n) {
 
 #elif defined(__MINGW32__)
 
-#include <windows.h>
 #include <mswsock.h>
+#include <windows.h>
 
-int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
-  io_entry* e=array_get(&io_fds,sizeof(io_entry),out);
-  if (!e) { errno=EBADF; return -3; }
-  if (e->sendfilequeued==1) {
+    int64 io_sendfile(int64 out, int64 in, uint64 off, uint64 bytes) {
+  io_entry *e = array_get(&io_fds, sizeof(io_entry), out);
+  if (!e) {
+    errno = EBADF;
+    return -3;
+  }
+  if (e->sendfilequeued == 1) {
     /* we called TransmitFile, and it returned. */
-    e->sendfilequeued=2;
-    errno=e->errorcode;
-    if (e->bytes_written==-1) return -1;
-    if (e->bytes_written!=bytes) {	/* we wrote less than caller wanted to write */
-      e->sendfilequeued=1;	/* so queue next request */
-      off+=e->bytes_written;
-      bytes-=e->bytes_written;
-      e->os.Offset=off;
-      e->os.OffsetHigh=(off>>32);
-      TransmitFile(out,(HANDLE)in,bytes>0xffff?0xffff:bytes,0,&e->os,0,TF_USE_KERNEL_APC);
+    e->sendfilequeued = 2;
+    errno = e->errorcode;
+    if (e->bytes_written == -1)
+      return -1;
+    if (e->bytes_written !=
+        bytes) {             /* we wrote less than caller wanted to write */
+      e->sendfilequeued = 1; /* so queue next request */
+      off += e->bytes_written;
+      bytes -= e->bytes_written;
+      e->os.Offset = off;
+      e->os.OffsetHigh = (off >> 32);
+      TransmitFile(out, (HANDLE)in, bytes > 0xffff ? 0xffff : bytes, 0, &e->os,
+                   0, TF_USE_KERNEL_APC);
     }
     return e->bytes_written;
   } else {
-    e->sendfilequeued=1;
-    e->os.Offset=off;
-    e->os.OffsetHigh=(off>>32);
+    e->sendfilequeued = 1;
+    e->os.Offset = off;
+    e->os.OffsetHigh = (off >> 32);
     /* we always write at most 64k, so timeout handling is possible */
-    if (!TransmitFile(out,(HANDLE)in,bytes>0xffff?0xffff:bytes,0,&e->os,0,TF_USE_KERNEL_APC))
+    if (!TransmitFile(out, (HANDLE)in, bytes > 0xffff ? 0xffff : bytes, 0,
+                      &e->os, 0, TF_USE_KERNEL_APC))
       return -3;
   }
 }
@@ -149,12 +159,12 @@ int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
 #include <iob.h>
 #include <unistd.h>
 
-static int64 writecb(int64 s,const void* buf,uint64 n) {
-  return write(s,buf,n);
+    static int64 writecb(int64 s, const void *buf, uint64 n) {
+  return write(s, buf, n);
 }
 
-int64 io_sendfile(int64 out,int64 in,uint64 off,uint64 bytes) {
-  return io_mmapwritefile(out,in,off,bytes,writecb);
+int64 io_sendfile(int64 out, int64 in, uint64 off, uint64 bytes) {
+  return io_mmapwritefile(out, in, off, bytes, writecb);
 }
 
 #endif

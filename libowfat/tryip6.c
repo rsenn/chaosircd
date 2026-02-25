@@ -1,6 +1,6 @@
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 main() {
   struct sockaddr_in6 sa;

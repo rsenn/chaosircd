@@ -35,10 +35,10 @@
 extern int syscall_errno;*/
 
 #ifndef __USE_LARGEFILE64
-# define __USE_LARGEFILE64 1
+#define __USE_LARGEFILE64 1
 #else
-# undef __USE_LARGEFILE64
-# define __USE_LARGEFILE64 1
+#undef __USE_LARGEFILE64
+#define __USE_LARGEFILE64 1
 #endif
 
 #define _SIGNAL_H
@@ -53,10 +53,10 @@ extern int syscall_errno;*/
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#include <sys/types.h>
+#include <sys/resource.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <sys/resource.h>
+#include <sys/types.h>
 #undef WNOHANG
 #undef WUNTRACED
 #include <linux/net.h>
@@ -71,251 +71,140 @@ extern int syscall_errno;*/
 #define __NR__exit __NR_exit
 #endif
 
-#define psyscall0(type,  name) \
-        type name()
+#define psyscall0(type, name) type name()
 
-#define psyscall1(type,  name, \
-                  type1, arg1) \
-        type name(type1  arg1)
+#define psyscall1(type, name, type1, arg1) type name(type1 arg1)
 
-#define psyscall2(type,  name, \
-                  type1, arg1, \
-                  type2, arg2) \
-        type name(type1  arg1, \
-                  type2  arg2)
+#define psyscall2(type, name, type1, arg1, type2, arg2)                        \
+  type name(type1 arg1, type2 arg2)
 
-#define psyscall3(type,  name, \
-                  type1, arg1, \
-                  type2, arg2, \
-                  type3, arg3) \
-        type name(type1  arg1, \
-                  type2  arg2, \
-                  type3  arg3)
+#define psyscall3(type, name, type1, arg1, type2, arg2, type3, arg3)           \
+  type name(type1 arg1, type2 arg2, type3 arg3)
 
-#define psyscall4(type,  name, \
-                  type1, arg1, \
-                  type2, arg2, \
-                  type3, arg3, \
-                  type4, arg4) \
-        type name(type1  arg1, \
-                  type2  arg2, \
-                  type3  arg3, \
-                  type4  arg4)
+#define psyscall4(type, name, type1, arg1, type2, arg2, type3, arg3, type4,    \
+                  arg4)                                                        \
+  type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4)
 
-#define psyscall5(type,  name, \
-                  type1, arg1, \
-                  type2, arg2, \
-                  type3, arg3, \
-                  type4, arg4, \
-                  type5, arg5) \
-        type name(type1  arg1, \
-                  type2  arg2, \
-                  type3  arg3, \
-                  type4  arg4, \
-                  type5  arg5)
+#define psyscall5(type, name, type1, arg1, type2, arg2, type3, arg3, type4,    \
+                  arg4, type5, arg5)                                           \
+  type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)
 
-#define psyscall6(type,  name, \
-                  type1, arg1, \
-                  type2, arg2, \
-                  type3, arg3, \
-                  type4, arg4, \
-                  type5, arg5, \
-                  type6, arg6) \
-        type name(type1  arg1, \
-                  type2  arg2, \
-                  type3  arg3, \
-                  type4  arg4, \
-                  type5  arg5, \
-                  type6  arg6)
+#define psyscall6(type, name, type1, arg1, type2, arg2, type3, arg3, type4,    \
+                  arg4, type5, arg5, type6, arg6)                              \
+  type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5,        \
+            type6 arg6)
 
-#define psocketcall2(type,  name, \
-                     type1, arg1, \
-                     type2, arg2) \
-        type name   (type1  arg1, \
-                     type2  arg2)
+#define psocketcall2(type, name, type1, arg1, type2, arg2)                     \
+  type name(type1 arg1, type2 arg2)
 
-#define _socketcall2(num, \
-                     type,  name, \
-                     type1, arg1, \
-                     type2, arg2) \
-        psocketcall2(type,  name, \
-                     type1, arg1, \
-                     type2, arg2) \
-{ \
-uint32_t __res, args[] = { (uint32_t)arg1, (uint32_t)arg2 }; \
-__asm__ volatile("int $0x80" \
-                 : "=a" (__res) \
-                 : "0" (__NR_socketcall), \
-                   "b" ((uint32_t)num), \
-                   "c" ((uint32_t)args)); \
-__syscall_return(type, __res); \
-}
+#define _socketcall2(num, type, name, type1, arg1, type2, arg2)                \
+  psocketcall2(type, name, type1, arg1, type2, arg2) {                         \
+    uint32_t __res, args[] = {(uint32_t)arg1, (uint32_t)arg2};                 \
+    __asm__ volatile("int $0x80"                                               \
+                     : "=a"(__res)                                             \
+                     : "0"(__NR_socketcall), "b"((uint32_t)num),               \
+                       "c"((uint32_t)args));                                   \
+    __syscall_return(type, __res);                                             \
+  }
 
-#define psocketcall3(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3) \
-        type name   (type1  arg1, \
-                     type2  arg2, \
-                     type3  arg3)
+#define psocketcall3(type, name, type1, arg1, type2, arg2, type3, arg3)        \
+  type name(type1 arg1, type2 arg2, type3 arg3)
 
-#define _socketcall3(num, \
-                     type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3) \
-        psocketcall3(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3) \
-{ \
-uint32_t __res, args[] = { (uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3 }; \
-__asm__ volatile("int $0x80" \
-                 : "=a" (__res) \
-                 : "0" (__NR_socketcall), \
-                   "b" ((uint32_t)num), \
-                   "c" ((uint32_t)args)); \
-__syscall_return(type, __res); \
-}
+#define _socketcall3(num, type, name, type1, arg1, type2, arg2, type3, arg3)   \
+  psocketcall3(type, name, type1, arg1, type2, arg2, type3, arg3) {            \
+    uint32_t __res, args[] = {(uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3}; \
+    __asm__ volatile("int $0x80"                                               \
+                     : "=a"(__res)                                             \
+                     : "0"(__NR_socketcall), "b"((uint32_t)num),               \
+                       "c"((uint32_t)args));                                   \
+    __syscall_return(type, __res);                                             \
+  }
 
-#define psocketcall4(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4) \
-        type name   (type1  arg1, \
-                     type2  arg2, \
-                     type3  arg3, \
-                     type4  arg4)
+#define psocketcall4(type, name, type1, arg1, type2, arg2, type3, arg3, type4, \
+                     arg4)                                                     \
+  type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4)
 
-#define _socketcall4(num, \
-                     type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4) \
-        psocketcall4(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4) \
-{ \
-uint32_t __res, args[] = { (uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3, (uint32_t)arg4 }; \
-__asm__ volatile("int $0x80" \
-                 : "=a" (__res) \
-                 : "0" (__NR_socketcall), \
-                   "b" ((uint32_t)num), \
-                   "c" ((uint32_t)args)); \
-__syscall_return(type, __res); \
-}
+#define _socketcall4(num, type, name, type1, arg1, type2, arg2, type3, arg3,   \
+                     type4, arg4)                                              \
+  psocketcall4(type, name, type1, arg1, type2, arg2, type3, arg3, type4,       \
+               arg4) {                                                         \
+    uint32_t __res, args[] = {(uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3,  \
+                              (uint32_t)arg4};                                 \
+    __asm__ volatile("int $0x80"                                               \
+                     : "=a"(__res)                                             \
+                     : "0"(__NR_socketcall), "b"((uint32_t)num),               \
+                       "c"((uint32_t)args));                                   \
+    __syscall_return(type, __res);                                             \
+  }
 
-#define psocketcall5(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4, \
-                     type5, arg5) \
-        type name   (type1  arg1, \
-                     type2  arg2, \
-                     type3  arg3, \
-                     type4  arg4, \
-                     type5  arg5)
+#define psocketcall5(type, name, type1, arg1, type2, arg2, type3, arg3, type4, \
+                     arg4, type5, arg5)                                        \
+  type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)
 
-#define _socketcall5(num, \
-                     type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4, \
-                     type5, arg5) \
-        psocketcall5(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4, \
-                     type5, arg5) \
-{ \
-uint32_t __res, args[] = { (uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3, (uint32_t)arg4, (uint32_t)arg5 }; \
-__asm__ volatile("int $0x80" \
-                 : "=a" (__res) \
-                 : "0" (__NR_socketcall), \
-                   "b" ((uint32_t)num), \
-                   "c" ((uint32_t)args)); \
-__syscall_return(type, __res); \
-}
+#define _socketcall5(num, type, name, type1, arg1, type2, arg2, type3, arg3,   \
+                     type4, arg4, type5, arg5)                                 \
+  psocketcall5(type, name, type1, arg1, type2, arg2, type3, arg3, type4, arg4, \
+               type5, arg5) {                                                  \
+    uint32_t __res, args[] = {(uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3,  \
+                              (uint32_t)arg4, (uint32_t)arg5};                 \
+    __asm__ volatile("int $0x80"                                               \
+                     : "=a"(__res)                                             \
+                     : "0"(__NR_socketcall), "b"((uint32_t)num),               \
+                       "c"((uint32_t)args));                                   \
+    __syscall_return(type, __res);                                             \
+  }
 
-#define poldmmapcall(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4, \
-                     type5, arg5, \
-                     type6, arg6) \
-        type name   (type1  arg1, \
-                     type2  arg2, \
-                     type3  arg3, \
-                     type4  arg4, \
-                     type5  arg5, \
-                     type6  arg6)
+#define poldmmapcall(type, name, type1, arg1, type2, arg2, type3, arg3, type4, \
+                     arg4, type5, arg5, type6, arg6)                           \
+  type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5,        \
+            type6 arg6)
 
-#define _oldmmapcall(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4, \
-                     type5, arg5, \
-                     type6, arg6) \
-        poldmmapcall(type,  name, \
-                     type1, arg1, \
-                     type2, arg2, \
-                     type3, arg3, \
-                     type4, arg4, \
-                     type5, arg5, \
-                     type6, arg6) \
-{ \
-uint32_t __res, args[] = { (uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3, \
-                           (uint32_t)arg4, (uint32_t)arg5, (uint32_t)arg6 }; \
-__asm__ volatile("int $0x80" \
-                 : "=a" (__res) \
-                 : "0" (__NR_mmap), \
-                   "b" ((uint32_t)args)); \
-__syscall_return(type, __res); \
-}
+#define _oldmmapcall(type, name, type1, arg1, type2, arg2, type3, arg3, type4, \
+                     arg4, type5, arg5, type6, arg6)                           \
+  poldmmapcall(type, name, type1, arg1, type2, arg2, type3, arg3, type4, arg4, \
+               type5, arg5, type6, arg6) {                                     \
+    uint32_t __res, args[] = {(uint32_t)arg1, (uint32_t)arg2, (uint32_t)arg3,  \
+                              (uint32_t)arg4, (uint32_t)arg5, (uint32_t)arg6}; \
+    __asm__ volatile("int $0x80"                                               \
+                     : "=a"(__res)                                             \
+                     : "0"(__NR_mmap), "b"((uint32_t)args));                   \
+    __syscall_return(type, __res);                                             \
+  }
 
 #if (defined USE_SELECT)
 #undef __NR_select
-#define __NR_select             __NR__newselect
-#define __NR_syscall_select       __NR_select
+#define __NR_select __NR__newselect
+#define __NR_syscall_select __NR_select
 #elif (defined USE_POLL)
-#define __NR_syscall_poll         __NR_poll
+#define __NR_syscall_poll __NR_poll
 #endif
 
-#define __NR_syscall_close        __NR_close
-#define __NR_syscall_exit         __NR_exit
-#define __NR_syscall_fork         __NR_fork
-#define __NR_syscall_setsid       __NR_setsid
-#define __NR_syscall_pipe         __NR_pipe
+#define __NR_syscall_close __NR_close
+#define __NR_syscall_exit __NR_exit
+#define __NR_syscall_fork __NR_fork
+#define __NR_syscall_setsid __NR_setsid
+#define __NR_syscall_pipe __NR_pipe
 #define __NR_syscall_gettimeofday __NR_gettimeofday
-#define __NR_syscall_kill         __NR_kill
-#define __NR_syscall_read         __NR_read
-#define __NR_syscall_write        __NR_write
-#define __NR_syscall__newselect   __NR__newselect
-#define __NR_syscall_mmap         __NR_mmap
-#define __NR_syscall_munmap       __NR_munmap
-#define __NR_syscall_mprotect     __NR_mprotect
-#define __NR_syscall_stat         __NR_stat
-#define __NR_syscall_fstat        __NR_fstat
-#define __NR_syscall_socketcall   __NR_socketcall
-#define __NR_syscall_dup2         __NR_dup2
-#define __NR_syscall_signal       __NR_signal
-#define __NR_syscall_execve       __NR_execve
-#define __NR_syscall_poll         __NR_poll
-#define __NR_syscall_waitpid      __NR_waitpid
-#define __NR_syscall_chdir        __NR_chdir
-#define __NR_syscall_setrlimit    __NR_setrlimit
-#define __NR_syscall_getpid       __NR_getpid
-#define __NR_syscall_unlink       __NR_unlink
-#define __NR_syscall_readlink     __NR_readlink
+#define __NR_syscall_kill __NR_kill
+#define __NR_syscall_read __NR_read
+#define __NR_syscall_write __NR_write
+#define __NR_syscall__newselect __NR__newselect
+#define __NR_syscall_mmap __NR_mmap
+#define __NR_syscall_munmap __NR_munmap
+#define __NR_syscall_mprotect __NR_mprotect
+#define __NR_syscall_stat __NR_stat
+#define __NR_syscall_fstat __NR_fstat
+#define __NR_syscall_socketcall __NR_socketcall
+#define __NR_syscall_dup2 __NR_dup2
+#define __NR_syscall_signal __NR_signal
+#define __NR_syscall_execve __NR_execve
+#define __NR_syscall_poll __NR_poll
+#define __NR_syscall_waitpid __NR_waitpid
+#define __NR_syscall_chdir __NR_chdir
+#define __NR_syscall_setrlimit __NR_setrlimit
+#define __NR_syscall_getpid __NR_getpid
+#define __NR_syscall_unlink __NR_unlink
+#define __NR_syscall_readlink __NR_readlink
 
 #undef PIC
 
@@ -1172,53 +1061,53 @@ _socketcall5(SYS_SETSOCKOPT,
 
 #include <errno.h>
 
-#define syscall_close        close
-#define syscall_exit         exit
+#define syscall_close close
+#define syscall_exit exit
 #define syscall_gettimeofday gettimeofday
-#define syscall_read         read
-#define syscall_write        write
-#define syscall_select       select
-#define syscall_mmap2        mmap2
-#define syscall_mprotect     mprotect
-#define syscall_munmap       munmap
-#define syscall__stat64      stat64
-#define syscall_fstat64      fstat64
-#define syscall_socket       socket
-#define syscall_bind         bind
-#define syscall_accept       accept
-#define syscall_send         send
-#define syscall_recv         recv
-#define syscall_poll         poll
-#define syscall_kill         kill
-#define syscall_open         open
-#define syscall_exit         exit
-#define syscall_pipe         pipe
-#define syscall_fork         fork
-#define syscall_setsockopt   setsockopt
-#define syscall_getsockopt   getsockopt
-#define syscall_getpeername  getpeername
-#define syscall_getsockname  getsockname
-#define syscall_signal       signal
-#define syscall_dup2         dup2
-#define syscall_mmap         mmap
-#define syscall_waitpid      waitpid
-#define syscall_execve       execve
-#define syscall_connect      connect
-#define syscall_setsid       setsid
-#define syscall_socketpair   socketpair
-#define syscall_listen       listen
-#define syscall_fcntl        fcntl
-#define syscall_stat         stat
-#define syscall_chdir        chdir
-#define syscall_setrlimit    setrlimit
-#define syscall_getpid       getpid
-#define syscall_unlink       unlink
-#define syscall_readlink     readlink
+#define syscall_read read
+#define syscall_write write
+#define syscall_select select
+#define syscall_mmap2 mmap2
+#define syscall_mprotect mprotect
+#define syscall_munmap munmap
+#define syscall__stat64 stat64
+#define syscall_fstat64 fstat64
+#define syscall_socket socket
+#define syscall_bind bind
+#define syscall_accept accept
+#define syscall_send send
+#define syscall_recv recv
+#define syscall_poll poll
+#define syscall_kill kill
+#define syscall_open open
+#define syscall_exit exit
+#define syscall_pipe pipe
+#define syscall_fork fork
+#define syscall_setsockopt setsockopt
+#define syscall_getsockopt getsockopt
+#define syscall_getpeername getpeername
+#define syscall_getsockname getsockname
+#define syscall_signal signal
+#define syscall_dup2 dup2
+#define syscall_mmap mmap
+#define syscall_waitpid waitpid
+#define syscall_execve execve
+#define syscall_connect connect
+#define syscall_setsid setsid
+#define syscall_socketpair socketpair
+#define syscall_listen listen
+#define syscall_fcntl fcntl
+#define syscall_stat stat
+#define syscall_chdir chdir
+#define syscall_setrlimit setrlimit
+#define syscall_getpid getpid
+#define syscall_unlink unlink
+#define syscall_readlink readlink
 
-#define syscall_strerror     strerror
+#define syscall_strerror strerror
 
 #include <errno.h>
-#define syscall_errno        errno
+#define syscall_errno errno
 
 #endif
 

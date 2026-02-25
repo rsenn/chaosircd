@@ -23,15 +23,15 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
+#include "libchaos/ini.h"
 #include "libchaos/defs.h"
-#include "libchaos/io.h"
 #include "libchaos/dlink.h"
-#include "libchaos/timer.h"
+#include "libchaos/image.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
-#include "libchaos/image.h"
-#include "libchaos/ini.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
@@ -46,12 +46,12 @@
 #define CHAOS_INLINE(x...) x
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int           ini_log;
-struct sheap  ini_heap;
-struct sheap  ini_key_heap;
-struct sheap  ini_sec_heap;
-struct list   ini_list;
-uint32_t      ini_id;
+int ini_log;
+struct sheap ini_heap;
+struct sheap ini_key_heap;
+struct sheap ini_sec_heap;
+struct list ini_list;
+uint32_t ini_id;
 struct timer *ini_timer;
 
 /* ------------------------------------------------------------------------ */
@@ -59,8 +59,7 @@ int ini_get_log() { return ini_log; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ini_collect(void)
-{
+int ini_collect(void) {
   mem_static_collect(&ini_heap);
   mem_static_collect(&ini_key_heap);
   mem_static_collect(&ini_sec_heap);
@@ -71,26 +70,25 @@ int ini_collect(void)
 /* ------------------------------------------------------------------------ *
  * Strip whitespace                                                         *
  * ------------------------------------------------------------------------ */
-void ini_strip(char *s)
-{
+void ini_strip(char *s) {
   uint32_t i;
   uint32_t len;
 
   len = str_len(s);
 
-  for(i = 0; str_isspace(s[i]); i++);
+  for (i = 0; str_isspace(s[i]); i++)
+    ;
 
   len -= i;
 
-  if(i > 0)
+  if (i > 0)
     memmove(s, &s[i], len + 1);
 
-  if(len <= 0) return;
+  if (len <= 0)
+    return;
 
-  for(i = len; i > 0; i--)
-  {
-    if(!str_isspace(s[i - 1]))
-    {
+  for (i = len; i > 0; i--) {
+    if (!str_isspace(s[i - 1])) {
       s[i] = '\0';
       break;
     }
@@ -100,15 +98,14 @@ void ini_strip(char *s)
 /* ------------------------------------------------------------------------ *
  * Convert a hex digit to its value                                         *
  * ------------------------------------------------------------------------ */
-uint8_t ini_get_hex(char c)
-{
+uint8_t ini_get_hex(char c) {
   uint8_t ret;
 
   c = str_tolower(c);
 
-  if(c >= 'a' && c <= 'f')
+  if (c >= 'a' && c <= 'f')
     ret = c - 'a' + 10;
-  else if(c >= '0' && c <= '9')
+  else if (c >= '0' && c <= '9')
     ret = c - '0';
   else
     ret = 0;
@@ -119,24 +116,21 @@ uint8_t ini_get_hex(char c)
 /* ------------------------------------------------------------------------ *
  * Search a key in current section.                                         *
  * ------------------------------------------------------------------------ */
-struct ini_key *ini_key_get(struct ini_section *section, const char *name)
-{
-  struct ini_key     *key;
-  struct node    *node;
-  hash_t         hash;
-  
-  if(section == NULL)
+struct ini_key *ini_key_get(struct ini_section *section, const char *name) {
+  struct ini_key *key;
+  struct node *node;
+  hash_t hash;
+
+  if (section == NULL)
     return NULL;
 
   hash = str_hash(name);
 
-  dlink_foreach(&section->keys, node)
-  {
+  dlink_foreach(&section->keys, node) {
     key = (struct ini_key *)node;
 
-    if(key->name && key->hash == hash)
-    {
-      if(!str_cmp(key->name, name))
+    if (key->name && key->hash == hash) {
+      if (!str_cmp(key->name, name))
         return key;
     }
   }
@@ -147,11 +141,11 @@ struct ini_key *ini_key_get(struct ini_section *section, const char *name)
 /* ------------------------------------------------------------------------ *
  * Create new key in current section.                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(struct ini_key *ini_key_new(struct ini_section *section, const char *name)
-{
+CHAOS_INLINE(struct ini_key *ini_key_new(struct ini_section *section,
+                                         const char *name) {
   struct ini_key *key;
 
-  if(section == NULL)
+  if (section == NULL)
     return NULL;
 
   key = mem_static_alloc(&ini_key_heap);
@@ -160,8 +154,7 @@ CHAOS_INLINE(struct ini_key *ini_key_new(struct ini_section *section, const char
   key->hash = 0;
   key->name = NULL;
 
-  if(name)
-  {
+  if (name) {
     key->name = str_dup(name);
     key->hash = str_hash(name);
   }
@@ -174,18 +167,14 @@ CHAOS_INLINE(struct ini_key *ini_key_new(struct ini_section *section, const char
 /* ------------------------------------------------------------------------ *
  * Write key to file.                                                       *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(int) ini_key_write(struct ini *ini, struct ini_key *key)
-{
-  if(key->name == NULL)
-  {
-    if(key->value == NULL)
+CHAOS_INLINE(int) ini_key_write(struct ini *ini, struct ini_key *key) {
+  if (key->name == NULL) {
+    if (key->value == NULL)
       io_puts(ini->fd, "");
     else
       io_puts(ini->fd, ";%s", key->value);
-  }
-  else
-  {
-    if(key->value == NULL)
+  } else {
+    if (key->value == NULL)
       io_puts(ini->fd, "%s=", key->name);
     else
       io_puts(ini->fd, "%s=%s", key->name, key->value);
@@ -197,12 +186,11 @@ CHAOS_INLINE(int) ini_key_write(struct ini *ini, struct ini_key *key)
 /* ------------------------------------------------------------------------ *
  * Free key.                                                                *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(void) ini_key_free(struct ini_key *key)
-{
-  if(key->name)
+CHAOS_INLINE(void) ini_key_free(struct ini_key *key) {
+  if (key->name)
     free(key->name);
 
-  if(key->value)
+  if (key->value)
     free(key->value);
 
   mem_static_free(&ini_key_heap, key);
@@ -211,13 +199,11 @@ CHAOS_INLINE(void) ini_key_free(struct ini_key *key)
 /* ------------------------------------------------------------------------ *
  * Free section.                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(void) ini_section_free(struct ini_section *section)
-{
+CHAOS_INLINE(void) ini_section_free(struct ini_section *section) {
   struct node *node;
   struct node *next;
 
-  dlink_foreach_safe(&section->keys, node, next)
-  {
+  dlink_foreach_safe(&section->keys, node, next) {
     dlink_delete(&section->keys, node);
 
     ini_key_free((struct ini_key *)node);
@@ -228,8 +214,7 @@ CHAOS_INLINE(void) ini_section_free(struct ini_section *section)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-static void ini_read_cb(int fd, void *ptr)
-{
+static void ini_read_cb(int fd, void *ptr) {
   struct ini *ini = ptr;
 
   io_unregister(fd, IO_CB_READ);
@@ -237,23 +222,22 @@ static void ini_read_cb(int fd, void *ptr)
   ini_load(ini);
   io_destroy(fd);
 
-/*  if(io_list[fd].status.closed || io_list[fd].status.err)*/
+  /*  if(io_list[fd].status.closed || io_list[fd].status.err)*/
   {
-    if(io_list[fd].error)
-      log(ini_log, L_warning, "could not read %s: %s",
-          ini->name, syscall_strerror(io_list[fd].error));
-  /*  else
-      ini_load(ini);*/
+    if (io_list[fd].error)
+      log(ini_log, L_warning, "could not read %s: %s", ini->name,
+          syscall_strerror(io_list[fd].error));
+    /*  else
+        ini_load(ini);*/
 
-/*    io_destroy(fd);*/
+    /*    io_destroy(fd);*/
   }
 }
 
 /* ------------------------------------------------------------------------ *
  * Initialize INI heaps and add garbage collect timers.                     *
  * ------------------------------------------------------------------------ */
-void ini_init(void)
-{
+void ini_init(void) {
   ini_log = log_source_register("ini");
 
   mem_static_create(&ini_heap, sizeof(struct ini), INI_BLOCK_SIZE);
@@ -269,13 +253,11 @@ void ini_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy INI heap and cancel timers.                                      *
  * ------------------------------------------------------------------------ */
-void ini_shutdown(void)
-{
+void ini_shutdown(void) {
   struct node *next;
-  struct ini  *ini;
+  struct ini *ini;
 
-  dlink_foreach_safe(&ini_list, ini, next)
-    ini_remove(ini);
+  dlink_foreach_safe(&ini_list, ini, next) ini_remove(ini);
 
   mem_static_destroy(&ini_sec_heap);
   mem_static_destroy(&ini_key_heap);
@@ -287,10 +269,9 @@ void ini_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * New INI context.                                                         *
  * ------------------------------------------------------------------------ */
-struct ini *ini_add(const char *path)
-{
+struct ini *ini_add(const char *path) {
   struct ini *ini;
-  char       *x;
+  char *x;
 
   ini = mem_static_alloc(&ini_heap);
 
@@ -298,7 +279,7 @@ struct ini *ini_add(const char *path)
 
   x = strrchr(ini->path, '/');
 
-  if(x)
+  if (x)
     strlcpy(ini->name, &x[1], sizeof(ini->name));
   else
     strlcpy(ini->name, path, sizeof(ini->name));
@@ -320,16 +301,12 @@ struct ini *ini_add(const char *path)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-int ini_update(struct ini *ini)
-{
-  return 0;
-}
+int ini_update(struct ini *ini) { return 0; }
 
 /* ------------------------------------------------------------------------ *
  * Remove INI context.                                                      *
  * ------------------------------------------------------------------------ */
-void ini_remove(struct ini *ini)
-{
+void ini_remove(struct ini *ini) {
   ini_save(ini);
 
   ini_close(ini);
@@ -342,18 +319,15 @@ void ini_remove(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Find INI context.                                                        *
  * ------------------------------------------------------------------------ */
-struct ini *ini_find_name(const char *name)
-{
-  struct ini  *ini;
-  hash_t       hash;
-  
+struct ini *ini_find_name(const char *name) {
+  struct ini *ini;
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&ini_list, ini)
-  {
-    if(ini->nhash == hash)
-    {
-      if(!str_cmp(ini->name, name))
+  dlink_foreach(&ini_list, ini) {
+    if (ini->nhash == hash) {
+      if (!str_cmp(ini->name, name))
         return ini;
     }
   }
@@ -364,18 +338,15 @@ struct ini *ini_find_name(const char *name)
 /* ------------------------------------------------------------------------ *
  * Find INI context.                                                        *
  * ------------------------------------------------------------------------ */
-struct ini *ini_find_path(const char *path)
-{
-  struct ini  *ini;
-  hash_t       hash;
-  
+struct ini *ini_find_path(const char *path) {
+  struct ini *ini;
+  hash_t hash;
+
   hash = str_hash(path);
 
-  dlink_foreach(&ini_list, ini)
-  {
-    if(ini->phash == hash)
-    {
-      if(!str_cmp(ini->path, path))
+  dlink_foreach(&ini_list, ini) {
+    if (ini->phash == hash) {
+      if (!str_cmp(ini->path, path))
         return ini;
     }
   }
@@ -386,13 +357,11 @@ struct ini *ini_find_path(const char *path)
 /* ------------------------------------------------------------------------ *
  * Find INI context.                                                        *
  * ------------------------------------------------------------------------ */
-struct ini *ini_find_id(uint32_t id)
-{
-  struct ini  *ini;
+struct ini *ini_find_id(uint32_t id) {
+  struct ini *ini;
 
-  dlink_foreach(&ini_list, ini)
-  {
-    if(ini->id == id)
+  dlink_foreach(&ini_list, ini) {
+    if (ini->id == id)
       return ini;
   }
 
@@ -402,11 +371,12 @@ struct ini *ini_find_id(uint32_t id)
 /* ------------------------------------------------------------------------ *
  * Open INI file.                                                           *
  * ------------------------------------------------------------------------ */
-int ini_open(struct ini *ini, int mode)
-{
+int ini_open(struct ini *ini, int mode) {
   ini->fd = io_open(ini->path,
-                    mode == INI_READ ? IO_OPEN_READ :
-                    IO_OPEN_WRITE|IO_OPEN_CREATE|IO_OPEN_TRUNCATE, 0644);
+                    mode == INI_READ
+                        ? IO_OPEN_READ
+                        : IO_OPEN_WRITE | IO_OPEN_CREATE | IO_OPEN_TRUNCATE,
+                    0644);
 
   io_queue_control(ini->fd, ON, OFF, ON);
 
@@ -418,8 +388,7 @@ int ini_open(struct ini *ini, int mode)
 /* ------------------------------------------------------------------------ *
  * Open INI file.                                                           *
  * ------------------------------------------------------------------------ */
-int ini_open_fd(struct ini *ini, int fd)
-{
+int ini_open_fd(struct ini *ini, int fd) {
   ini->fd = fd;
 
   io_queue_control(ini->fd, ON, OFF, ON);
@@ -432,22 +401,20 @@ int ini_open_fd(struct ini *ini, int fd)
 /* ------------------------------------------------------------------------ *
  * Load all sections of an INI file.                                        *
  * ------------------------------------------------------------------------ */
-int ini_load(struct ini *ini)
-{
+int ini_load(struct ini *ini) {
 
-  char           buf[4096];
-  char          *p;
-  uint32_t       len;
+  char buf[4096];
+  char *p;
+  uint32_t len;
   struct ini_section *section = NULL;
-  struct ini_key     *key;
-  uint32_t       line = 0;
+  struct ini_key *key;
+  uint32_t line = 0;
 
-  if(ini->mode != INI_READ || ini->sections.size || ini->fd == -1)
+  if (ini->mode != INI_READ || ini->sections.size || ini->fd == -1)
     return -1;
 
   /* Read line by line */
-  while(io_gets(ini->fd, buf, 4096))
-  {
+  while (io_gets(ini->fd, buf, 4096)) {
     line++;
 
     /* Remove leading & trailing whitespace */
@@ -455,10 +422,8 @@ int ini_load(struct ini *ini)
 
     len = str_len(buf);
 
-    if(buf[0] == ';' || len == 0)
-    {
-      if(section == NULL)
-      {
+    if (buf[0] == ';' || len == 0) {
+      if (section == NULL) {
         key = mem_static_alloc(&ini_key_heap);
 
         key->name = NULL;
@@ -466,15 +431,12 @@ int ini_load(struct ini *ini)
         key->hash = 0;
 
         dlink_add_tail(&ini->keys, &key->node, key);
-      }
-      else
-      {
+      } else {
         key = ini_key_new(section, NULL);
       }
 
-      if(key)
-      {
-        if(len)
+      if (key) {
+        if (len)
           key->value = str_dup(&buf[1]);
       }
 
@@ -482,8 +444,7 @@ int ini_load(struct ini *ini)
     }
 
     /* New section? */
-    if(buf[0] == '[' && buf[len - 1] == ']')
-    {
+    if (buf[0] == '[' && buf[len - 1] == ']') {
       /* Extract section name */
       buf[0] = ' ';
       buf[len - 1] = ' ';
@@ -495,15 +456,16 @@ int ini_load(struct ini *ini)
     }
 
     /* No section? */
-    if(section == NULL) {
-      log(ini_log, L_warning, "%s:%i: data outside of section", ini->name, line);
+    if (section == NULL) {
+      log(ini_log, L_warning, "%s:%i: data outside of section", ini->name,
+          line);
       return -1;
     }
 
     /* Split up into key & value */
     p = strchr(buf, '=');
 
-    if(p == NULL) {
+    if (p == NULL) {
       log(ini_log, L_warning, "%s:%i: missing '='", ini->name, line);
       return -1;
     }
@@ -518,9 +480,9 @@ int ini_load(struct ini *ini)
 
   ini_section_rewind(ini);
 
-/*  ini->changed = 0;*/
+  /*  ini->changed = 0;*/
 
-  if(ini->cb)
+  if (ini->cb)
     ini->cb(ini);
 
   return 0;
@@ -529,28 +491,24 @@ int ini_load(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Save all sections to an INI file.                                        *
  * ------------------------------------------------------------------------ */
-int ini_save(struct ini *ini)
-{
+int ini_save(struct ini *ini) {
   struct ini_section *section;
-  struct ini_key     *key;
+  struct ini_key *key;
 
-  if(ini->fd == -1)
+  if (ini->fd == -1)
     return -1;
 
-  if(!ini->changed)
+  if (!ini->changed)
     return 0;
 
   io_queue_control(ini->fd, OFF, ON, ON);
 
-  dlink_foreach(&ini->keys, key)
-    ini_key_write(ini, key);
+  dlink_foreach(&ini->keys, key) ini_key_write(ini, key);
 
-  dlink_foreach(&ini->sections, section)
-  {
+  dlink_foreach(&ini->sections, section) {
     io_puts(ini->fd, "[%s]", section->name);
 
-    dlink_foreach(&section->keys, key)
-      ini_key_write(ini, key);
+    dlink_foreach(&section->keys, key) ini_key_write(ini, key);
   }
 
   io_flush(ini->fd);
@@ -563,32 +521,25 @@ int ini_save(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Set up a callback.                                                       *
  * ------------------------------------------------------------------------ */
-void ini_callback(struct ini *ini, ini_callback_t *cb)
-{
-  ini->cb = cb;
-}
+void ini_callback(struct ini *ini, ini_callback_t *cb) { ini->cb = cb; }
 
 /* ------------------------------------------------------------------------ *
  * Find a INI section by name.                                              *
  * ------------------------------------------------------------------------ */
-struct ini_section *ini_section_find(struct ini *ini, const char *name)
-{
+struct ini_section *ini_section_find(struct ini *ini, const char *name) {
   struct ini_section *section;
-  hash_t              hash;
-  
-  if(name == NULL)
+  hash_t hash;
+
+  if (name == NULL)
     return NULL;
 
   hash = str_hash(name);
 
   ini->current = NULL;
 
-  dlink_foreach(&ini->sections, section)
-  {
-    if(section->name && section->hash == hash)
-    {
-      if(!str_cmp(section->name, name))
-      {
+  dlink_foreach(&ini->sections, section) {
+    if (section->name && section->hash == hash) {
+      if (!str_cmp(section->name, name)) {
         ini->current = section;
 
         return section;
@@ -602,28 +553,24 @@ struct ini_section *ini_section_find(struct ini *ini, const char *name)
 /* ------------------------------------------------------------------------ *
  * Find a INI section by name.                                              *
  * ------------------------------------------------------------------------ */
-struct ini_section *ini_section_find_next(struct ini *ini, const char *name)
-{
+struct ini_section *ini_section_find_next(struct ini *ini, const char *name) {
   struct ini_section *section;
-  struct node        *node;
-  hash_t              hash;
-  
-  if(ini->current == NULL)
+  struct node *node;
+  hash_t hash;
+
+  if (ini->current == NULL)
     return NULL;
 
-  if(name == NULL)
+  if (name == NULL)
     return NULL;
 
   hash = ini->current->hash;
 
-  for(node = ini->current->node.next; node; node = node->next)
-  {
+  for (node = ini->current->node.next; node; node = node->next) {
     section = node->data;
 
-    if(section->name && section->hash == hash)
-    {
-      if(!str_cmp(section->name, name))
-      {
+    if (section->name && section->hash == hash) {
+      if (!str_cmp(section->name, name)) {
         ini->current = section;
 
         return section;
@@ -637,8 +584,7 @@ struct ini_section *ini_section_find_next(struct ini *ini, const char *name)
 /* ------------------------------------------------------------------------ *
  * Create new section.                                                      *
  * ------------------------------------------------------------------------ */
-struct ini_section *ini_section_new(struct ini *ini, const char *name)
-{
+struct ini_section *ini_section_new(struct ini *ini, const char *name) {
   struct ini_section *section;
 
   section = mem_static_alloc(&ini_sec_heap);
@@ -661,8 +607,7 @@ struct ini_section *ini_section_new(struct ini *ini, const char *name)
 /* ------------------------------------------------------------------------ *
  * Delete a section.                                                        *
  * ------------------------------------------------------------------------ */
-void ini_section_remove(struct ini *ini, struct ini_section *section)
-{
+void ini_section_remove(struct ini *ini, struct ini_section *section) {
   dlink_delete(&ini->sections, &section->node);
 
   ini_section_free(section);
@@ -673,13 +618,12 @@ void ini_section_remove(struct ini *ini, struct ini_section *section)
 /* ------------------------------------------------------------------------ *
  * Clear content.                                                           *
  * ------------------------------------------------------------------------ */
-void ini_clear(struct ini *ini)
-{
+void ini_clear(struct ini *ini) {
   struct ini_section *isptr;
-  struct node        *next;
+  struct node *next;
 
   dlink_foreach_safe(&ini->sections, isptr, next)
-    ini_section_remove(ini, isptr);
+      ini_section_remove(ini, isptr);
 
   ini->changed = 1;
 }
@@ -687,27 +631,22 @@ void ini_clear(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Get current section name.                                                *
  * ------------------------------------------------------------------------ */
-char *ini_section_name(struct ini *ini)
-{
+char *ini_section_name(struct ini *ini) {
   return ini->current ? ini->current->name : NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * Set section by index.                                                    *
  * ------------------------------------------------------------------------ */
-struct ini_section *ini_section_index(struct ini *ini, uint32_t i)
-{
+struct ini_section *ini_section_index(struct ini *ini, uint32_t i) {
   struct node *node;
 
   node = dlink_index(&ini->sections, i);
 
-  if(node)
-  {
+  if (node) {
     ini->current = node->data;
     return ini->current;
-  }
-  else
-  {
+  } else {
     ini->current = NULL;
     return NULL;
   }
@@ -716,19 +655,17 @@ struct ini_section *ini_section_index(struct ini *ini, uint32_t i)
 /* ------------------------------------------------------------------------ *
  * Get pointer to first section.                                            *
  * ------------------------------------------------------------------------ */
-struct ini_section *ini_section_first(struct ini *ini)
-{
+struct ini_section *ini_section_first(struct ini *ini) {
   return ini->sections.head ? ini->sections.head->data : NULL;
 }
 
 /* ------------------------------------------------------------------------ *
  * Skip to next section.                                                    *
  * ------------------------------------------------------------------------ */
-struct ini_section *ini_section_next(struct ini *ini)
-{
+struct ini_section *ini_section_next(struct ini *ini) {
   struct ini_section *section;
 
-  if(ini->current == NULL)
+  if (ini->current == NULL)
     return NULL;
 
   section = ini->current;
@@ -741,22 +678,17 @@ struct ini_section *ini_section_next(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Return number of sections.                                               *
  * ------------------------------------------------------------------------ */
-uint32_t ini_section_count(struct ini *ini)
-{
-  return ini->sections.size;
-}
+uint32_t ini_section_count(struct ini *ini) { return ini->sections.size; }
 
 /* ------------------------------------------------------------------------ *
  * Return position of current section.                                      *
  * ------------------------------------------------------------------------ */
-uint32_t ini_section_pos(struct ini *ini)
-{
+uint32_t ini_section_pos(struct ini *ini) {
   struct ini_section *section;
-  uint32_t            n = 0;
+  uint32_t n = 0;
 
-  dlink_foreach(&ini->sections, section)
-  {
-    if(section == ini->current)
+  dlink_foreach(&ini->sections, section) {
+    if (section == ini->current)
       return n;
 
     n++;
@@ -768,23 +700,21 @@ uint32_t ini_section_pos(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Rewind to first section.                                                 *
  * ------------------------------------------------------------------------ */
-void ini_section_rewind(struct ini *ini)
-{
+void ini_section_rewind(struct ini *ini) {
   ini->current = (struct ini_section *)ini->sections.head;
 }
 
 /* ------------------------------------------------------------------------ *
  * Write data to .ini, creating new key when necessary.                     *
  * ------------------------------------------------------------------------ */
-int ini_write_str(struct ini_section *section, const char *key, const char *str)
-{
+int ini_write_str(struct ini_section *section, const char *key,
+                  const char *str) {
   struct ini_key *k;
 
   k = ini_key_get(section, key);
 
-  if(k)
-  {
-    if(k->value)
+  if (k) {
+    if (k->value)
       free(k->value);
 
     k->value = str_dup(str);
@@ -794,8 +724,7 @@ int ini_write_str(struct ini_section *section, const char *key, const char *str)
 
   k = ini_key_new(section, key);
 
-  if(k)
-  {
+  if (k) {
     k->value = str_dup(str);
 
     section->ini->changed = 1;
@@ -806,43 +735,39 @@ int ini_write_str(struct ini_section *section, const char *key, const char *str)
   return -1;
 }
 
-int ini_write_int(struct ini_section *section, const char *key, int i)
-{
+int ini_write_int(struct ini_section *section, const char *key, int i) {
   char buf[16];
-  
+
   str_snprintf(buf, 16, "%i", i);
-  
+
   return ini_write_str(section, key, buf);
 }
 
-int ini_write_ulong_long(struct ini_section *section, const char *key, uint64_t u)
-{
+int ini_write_ulong_long(struct ini_section *section, const char *key,
+                         uint64_t u) {
   char buf[64];
-  
+
   str_snprintf(buf, 64, "%llu", u);
-  
-  return ini_write_str(section, key, buf);  
+
+  return ini_write_str(section, key, buf);
 }
 
-int ini_write_double(struct ini_section *section, const char *key, double d)
-{
+int ini_write_double(struct ini_section *section, const char *key, double d) {
   char buf[64];
-  
+
   str_snprintf(buf, 64, "%f", d);
-  
-  return ini_write_str(section, key, buf);  
+
+  return ini_write_str(section, key, buf);
 }
 
 /* ------------------------------------------------------------------------ *
  * Read data from .ini, returning -1 when key not found.                    *
  * ------------------------------------------------------------------------ */
-int ini_read_str(struct ini_section *section, const char *key, char **str)
-{
+int ini_read_str(struct ini_section *section, const char *key, char **str) {
   struct ini_key *k = ini_key_get(section, key);
 
-  if(k)
-  {
-    if(str)
+  if (k) {
+    if (str)
       *str = k->value;
 
     return 0;
@@ -851,13 +776,12 @@ int ini_read_str(struct ini_section *section, const char *key, char **str)
   return -1;
 }
 
-int ini_get_str(struct ini_section *section, const char *key, char *str, size_t len)
-{
+int ini_get_str(struct ini_section *section, const char *key, char *str,
+                size_t len) {
   struct ini_key *k = ini_key_get(section, key);
 
-  if(k)
-  {
-    if(str && len)
+  if (k) {
+    if (str && len)
       strlcpy(str, k->value, len);
 
     return 0;
@@ -866,16 +790,14 @@ int ini_get_str(struct ini_section *section, const char *key, char *str, size_t 
   return -1;
 }
 
-int ini_read_int(struct ini_section *section, const char *key, int *i)
-{
+int ini_read_int(struct ini_section *section, const char *key, int *i) {
   char *s;
 
-  if(!ini_read_str(section, key, &s))
-  {
-    if(!s)
+  if (!ini_read_str(section, key, &s)) {
+    if (!s)
       return -1;
 
-    if(i == NULL)
+    if (i == NULL)
       return 0;
 
     *i = str_toi(s);
@@ -886,16 +808,15 @@ int ini_read_int(struct ini_section *section, const char *key, int *i)
   return -1;
 }
 
-int ini_read_ulong_long(struct ini_section *section, const char *key, uint64_t *u)
-{
+int ini_read_ulong_long(struct ini_section *section, const char *key,
+                        uint64_t *u) {
   char *s;
 
-  if(!ini_read_str(section, key, &s))
-  {
-    if(!s)
+  if (!ini_read_str(section, key, &s)) {
+    if (!s)
       return -1;
 
-    if(u == NULL)
+    if (u == NULL)
       return 0;
 
     *u = str_toull(s, NULL, 10);
@@ -906,13 +827,12 @@ int ini_read_ulong_long(struct ini_section *section, const char *key, uint64_t *
   return -1;
 }
 
-int ini_read_str_def(struct ini_section *section, const char *key, char **str, char *def)
-{
-  if(ini_read_str(section, key, str) == -1)
-  {
+int ini_read_str_def(struct ini_section *section, const char *key, char **str,
+                     char *def) {
+  if (ini_read_str(section, key, str) == -1) {
     ini_write_str(section, key, def);
 
-    if(str)
+    if (str)
       *str = def;
 
     return 1;
@@ -922,15 +842,12 @@ int ini_read_str_def(struct ini_section *section, const char *key, char **str, c
 }
 
 int ini_get_str_def(struct ini_section *section, const char *key, char *str,
-                    size_t len, char *def)
-{
-  if(ini_get_str(section, key, str, len) == -1)
-  {
+                    size_t len, char *def) {
+  if (ini_get_str(section, key, str, len) == -1) {
     ini_write_str(section, key, def);
 
-    if(str)
-    {
-      if(len)
+    if (str) {
+      if (len)
         strlcpy(str, def, len);
     }
 
@@ -940,13 +857,12 @@ int ini_get_str_def(struct ini_section *section, const char *key, char *str,
   return 0;
 }
 
-int ini_read_int_def(struct ini_section *section, const char *key, int *i, int def)
-{
-  if(ini_read_int(section, key, i) == -1)
-  {
+int ini_read_int_def(struct ini_section *section, const char *key, int *i,
+                     int def) {
+  if (ini_read_int(section, key, i) == -1) {
     ini_write_int(section, key, def);
 
-    if(i)
+    if (i)
       *i = def;
 
     return 1;
@@ -955,8 +871,8 @@ int ini_read_int_def(struct ini_section *section, const char *key, int *i, int d
   return 0;
 }
 
-int ini_read_color(struct ini_section *section, const char *key, struct color *color)
-{
+int ini_read_color(struct ini_section *section, const char *key,
+                   struct color *color) {
   char *str = "";
 
   ini_read_str(section, key, &str);
@@ -969,9 +885,8 @@ int ini_read_color(struct ini_section *section, const char *key, struct color *c
 /* ------------------------------------------------------------------------ *
  * Close INI file.                                                          *
  * ------------------------------------------------------------------------ */
-void ini_close(struct ini *ini)
-{
-  if(ini->fd >= 0)
+void ini_close(struct ini *ini) {
+  if (ini->fd >= 0)
     io_destroy(ini->fd);
 
   ini->fd = -1;
@@ -980,23 +895,20 @@ void ini_close(struct ini *ini)
 /* ------------------------------------------------------------------------ *
  * Free INI context.                                                        *
  * ------------------------------------------------------------------------ */
-void ini_free(struct ini *ini)
-{
+void ini_free(struct ini *ini) {
   struct ini_section *section;
-  struct ini_key     *key;
-  struct node        *next;
+  struct ini_key *key;
+  struct node *next;
 
-/*  if(io_valid(ini->fd))*/
-    ini_close(ini);
+  /*  if(io_valid(ini->fd))*/
+  ini_close(ini);
 
-  dlink_foreach_safe(&ini->keys, key, next)
-  {
+  dlink_foreach_safe(&ini->keys, key, next) {
     dlink_delete(&ini->keys, &key->node);
     ini_key_free(key);
   }
 
-  dlink_foreach_safe(&ini->sections, section, next)
-  {
+  dlink_foreach_safe(&ini->sections, section, next) {
     dlink_delete(&ini->sections, &section->node);
 
     ini_section_free(section);
@@ -1005,13 +917,10 @@ void ini_free(struct ini *ini)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ini *ini_pop(struct ini *ini)
-{
-  if(ini)
-  {
-    if(!ini->refcount)
-      log(ini_log, L_warning, "Poping deprecated ini: %s",
-          ini->name);
+struct ini *ini_pop(struct ini *ini) {
+  if (ini) {
+    if (!ini->refcount)
+      log(ini_log, L_warning, "Poping deprecated ini: %s", ini->name);
 
     ini->refcount++;
   }
@@ -1021,18 +930,13 @@ struct ini *ini_pop(struct ini *ini)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct ini *ini_push(struct ini **iniptr)
-{
-  if(*iniptr)
-  {
-    if((*iniptr)->refcount == 0)
-    {
+struct ini *ini_push(struct ini **iniptr) {
+  if (*iniptr) {
+    if ((*iniptr)->refcount == 0) {
       log(ini_log, L_warning, "Trying to push deprecated user: %s",
           (*iniptr)->name);
-    }
-    else
-    {
-      if(--(*iniptr)->refcount == 0)
+    } else {
+      if (--(*iniptr)->refcount == 0)
         ini_remove(*iniptr);
 
       (*iniptr) = NULL;
@@ -1045,25 +949,20 @@ struct ini *ini_push(struct ini **iniptr)
 /* ------------------------------------------------------------------------ *
  * Free INI context.                                                        *
  * ------------------------------------------------------------------------ */
-void ini_dump(struct ini *ini)
-{
+void ini_dump(struct ini *ini) {
   struct ini_section *section;
-  struct ini_key     *key;
+  struct ini_key *key;
 
-  if(ini == NULL)
-  {
+  if (ini == NULL) {
     dump(ini_log, "[================ ini summary ================]");
 
-    dlink_foreach(&ini_list, ini)
-    {
-      dump(ini_log, " #%u: [%u] %-20s (%i)",
-           ini->id, ini->refcount, ini->name, ini->fd);
+    dlink_foreach(&ini_list, ini) {
+      dump(ini_log, " #%u: [%u] %-20s (%i)", ini->id, ini->refcount, ini->name,
+           ini->fd);
     }
 
     dump(ini_log, "[============= end of ini summary ============]");
-  }
-  else
-  {
+  } else {
     dump(ini_log, "[================= ini dump =================]");
 
     dump(ini_log, "         id: #%u", ini->id);
@@ -1082,44 +981,29 @@ void ini_dump(struct ini *ini)
 
     dump(ini_log, "------------------ ini data -----------------");
 
-    dlink_foreach(&ini->keys, key)
-    {
-      if(key->name == NULL)
-      {
-        if(key->value)
-        {
+    dlink_foreach(&ini->keys, key) {
+      if (key->name == NULL) {
+        if (key->value) {
           dump(ini_log, ";%s", key->value);
-        }
-        else
-        {
+        } else {
           dump(ini_log, "");
         }
-      }
-      else
-      {
+      } else {
         dump(ini_log, "%s=%s", key->name, key->value);
       }
     }
 
-    dlink_foreach(&ini->sections, section)
-    {
+    dlink_foreach(&ini->sections, section) {
       dump(ini_log, "[%s]", section->name);
 
-      dlink_foreach(&section->keys, key)
-      {
-        if(key->name == NULL)
-        {
-          if(key->value)
-          {
+      dlink_foreach(&section->keys, key) {
+        if (key->name == NULL) {
+          if (key->value) {
             dump(ini_log, ";%s", key->value);
-          }
-          else
-          {
+          } else {
             dump(ini_log, "");
           }
-        }
-        else
-        {
+        } else {
           dump(ini_log, "%s=%s", key->name, key->value);
         }
       }

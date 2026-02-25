@@ -17,8 +17,8 @@
  * to lock the array for read accesses. */
 
 typedef struct {
-  char** pages;
-  size_t elemsize,pagefence,elemperpage,bytesperpage;
+  char **pages;
+  size_t elemsize, pagefence, elemperpage, bytesperpage;
   /* pagefence is the number of pages + 1,
    * i.e. the first out of bounds index in "pages" */
 #ifdef __MINGW32__
@@ -28,13 +28,13 @@ typedef struct {
 #endif
 } iarray;
 
-void iarray_init(iarray* ia,size_t elemsize);
-void* iarray_get(iarray* ia,size_t pos);
-void* iarray_allocate(iarray* ia,size_t pos);
+void iarray_init(iarray *ia, size_t elemsize);
+void *iarray_get(iarray *ia, size_t pos);
+void *iarray_allocate(iarray *ia, size_t pos);
 
 /* WARNING: do not use the array during or after iarray_free, make sure
  * no threads are potentially doing anything with the iarray while it is
  * being freed! */
-void iarray_free(iarray* ia);
+void iarray_free(iarray *ia);
 
 #endif

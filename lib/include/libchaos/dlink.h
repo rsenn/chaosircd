@@ -36,7 +36,7 @@
 #ifndef CHAOS_NODE_STRUCT
 #define CHAOS_NODE_STRUCT
 struct node {
-  void        *data;
+  void *data;
   struct node *prev;
   struct node *next;
 };
@@ -51,7 +51,7 @@ struct node {
 struct list {
   struct node *head;
   struct node *tail;
-  size_t       size;
+  size_t size;
 };
 #endif
 
@@ -60,117 +60,123 @@ struct list {
  * ------------------------------------------------------------------------ */
 struct sheap;
 
-extern void *mem_static_alloc   (struct sheap *shptr);
+extern void *mem_static_alloc(struct sheap *shptr);
 
-extern void  mem_static_free    (struct sheap *shptr,
-                                 void         *scptr);
+extern void mem_static_free(struct sheap *shptr, void *scptr);
 
-extern int   mem_static_collect (struct sheap *shptr);
+extern int mem_static_collect(struct sheap *shptr);
 
 /* ------------------------------------------------------------------------ *
  * Macros to walk through a dlink list from head to tail.                     *
  * ------------------------------------------------------------------------ */
 /* n is set to the current node */
-#define dlink_foreach_down(list, n) \
-  for((n) = (void *)(list)->head; \
-      (n) != NULL; \
-      (n) = (void *)(((struct node *)n)->next))
+#define dlink_foreach_down(list, n)                                            \
+  for ((n) = (void *)(list)->head; (n) != NULL;                                \
+       (n) = (void *)(((struct node *)n)->next))
 
 /* n is set to the current node and d is set to n->data */
-#define dlink_foreach_down_data(list, n, d) \
-  for((n) = (void *)(list)->head; \
-      ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL); \
-      (n) = (void *)((struct node *)n)->next)
+#define dlink_foreach_down_data(list, n, d)                                    \
+  for ((n) = (void *)(list)->head;                                             \
+       ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL);    \
+       (n) = (void *)((struct node *)n)->next)
 
 /* n is set to the current node and n->next is backupped
    into m before loop body for safe walk-throught when
    nodes get deleted */
-#define dlink_foreach_down_safe(list, n, m) \
-  for((n) = (void *)(list)->head, \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->next : NULL; \
-      (n) != NULL; \
-      (n) = (void *)((struct node *)m), \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->next : NULL)
+#define dlink_foreach_down_safe(list, n, m)                                    \
+  for ((n) = (void *)(list)->head,                                             \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                ? (void *)((struct node *)n)->next                             \
+                : NULL;                                                        \
+       (n) != NULL; (n) = (void *)((struct node *)m),                          \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                        ? (void *)((struct node *)n)->next                     \
+                        : NULL)
 
 /* same as above but sets d = n->data */
-#define dlink_foreach_down_safe_data(list, n, m, d) \
-  for((n) = (void *)(list)->head, \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->next : NULL; \
-      ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL); \
-      (n) = (void *)((struct node *)m), \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->next : NULL)
+#define dlink_foreach_down_safe_data(list, n, m, d)                            \
+  for ((n) = (void *)(list)->head,                                             \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                ? (void *)((struct node *)n)->next                             \
+                : NULL;                                                        \
+       ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL);    \
+       (n) = (void *)((struct node *)m),                                       \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                ? (void *)((struct node *)n)->next                             \
+                : NULL)
 
 /* ------------------------------------------------------------------------ *
  * Macros to walk through a dlink list from tail to head.                     *
  * ------------------------------------------------------------------------ */
 /* n is set to the current node */
-#define dlink_foreach_up(list, n) \
-  for((n) = (void *)(list)->tail; \
-      (n) != NULL; \
-      (n) = (void *)(((struct node *)n)->prev))
+#define dlink_foreach_up(list, n)                                              \
+  for ((n) = (void *)(list)->tail; (n) != NULL;                                \
+       (n) = (void *)(((struct node *)n)->prev))
 
 /* n is set to the current node and d is set to n->data */
-#define dlink_foreach_up_data(list, n, d) \
-  for((n) = (void *)(list)->tail; \
-      ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL); \
-      (d) = (void *)((struct node *)n)->data, \
+#define dlink_foreach_up_data(list, n, d)                                      \
+  for ((n) = (void *)(list)->tail;                                             \
+       ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL);    \
+       (d) = (void *)((struct node *)n)->data,                                 \
       (n) = (void *)((struct node *)n)->prev)
 
 /* n is set to the current node and n->prev is backupped
    into m before loop body for safe walk-throught when
    nodes get deleted */
-#define dlink_foreach_up_safe(list, n, m) \
-  for((n) = (void *)(list)->tail, \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->prev : NULL; \
-      (n) != NULL; \
-      (n) = (void *)((struct node *)m), \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->prev : NULL)
+#define dlink_foreach_up_safe(list, n, m)                                      \
+  for ((n) = (void *)(list)->tail,                                             \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                ? (void *)((struct node *)n)->prev                             \
+                : NULL;                                                        \
+       (n) != NULL; (n) = (void *)((struct node *)m),                          \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                        ? (void *)((struct node *)n)->prev                     \
+                        : NULL)
 
 /* same as above but sets d = n->data */
-#define dlink_foreach_up_safe_data(list, n, m, d) \
-  for((n) = (void *)(list)->tail, \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->prev : NULL; \
-      ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL); \
-      (d) = (void *)((struct node *)n)->data, \
-      (n) = (void *)((struct node *)m), \
-      (m) = (void *)((struct node *)n) != NULL ? (void *)((struct node *)n)->prev : NULL)
+#define dlink_foreach_up_safe_data(list, n, m, d)                              \
+  for ((n) = (void *)(list)->tail,                                             \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                ? (void *)((struct node *)n)->prev                             \
+                : NULL;                                                        \
+       ((n) != NULL) && (((d) = (void *)((struct node *)n)->data) != NULL);    \
+       (d) = (void *)((struct node *)n)->data,                                 \
+      (n) = (void *)((struct node *)m),                                        \
+      (m) = (void *)((struct node *)n) != NULL                                 \
+                ? (void *)((struct node *)n)->prev                             \
+                : NULL)
 
 /* aliases for backwards compatibility */
-#define dlink_foreach           dlink_foreach_down
-#define dlink_foreach_data      dlink_foreach_down_data
-#define dlink_foreach_safe      dlink_foreach_down_safe
+#define dlink_foreach dlink_foreach_down
+#define dlink_foreach_data dlink_foreach_down_data
+#define dlink_foreach_safe dlink_foreach_down_safe
 #define dlink_foreach_safe_data dlink_foreach_down_safe_data
 
 /* ------------------------------------------------------------------------ *
  * Zero a dlink node                                                          *
  * ------------------------------------------------------------------------ */
-#define dlink_node_zero(x) ( \
-  ((struct node *)x)->data = NULL, \
-  ((struct node *)x)->next = NULL, \
-  ((struct node *)x)->prev = NULL \
-)
+#define dlink_node_zero(x)                                                     \
+  (((struct node *)x)->data = NULL, ((struct node *)x)->next = NULL,           \
+   ((struct node *)x)->prev = NULL)
 
 /* ------------------------------------------------------------------------ */
-#define dlink_node_data(x) ( \
-  ((struct node *)(x) ? ((struct node *)(x))->data : NULL) \
-)
+#define dlink_node_data(x)                                                     \
+  (((struct node *)(x) ? ((struct node *)(x))->data : NULL))
 
 /* ------------------------------------------------------------------------ *
  * Zero a dlink list                                                          *
  * ------------------------------------------------------------------------ */
-#define dlink_list_zero(x) ( \
-  ((struct list *)x)->head = NULL, \
-  ((struct list *)x)->tail = NULL, \
-  ((struct list *)x)->size = 0 \
-)
+#define dlink_list_zero(x)                                                     \
+  (((struct list *)x)->head = NULL, ((struct list *)x)->tail = NULL,           \
+   ((struct list *)x)->size = 0)
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-CHAOS_DATA(int)                  dlink_log;
-CHAOS_DATA(struct sheap)        dlink_heap;     /* block heap on which nodes are stored */
-CHAOS_DATA(uint32_t)            dlink_count;    /* dlink statistics */
-CHAOS_DATA(int)                 dlink_dirty;
+CHAOS_DATA(int) dlink_log;
+CHAOS_DATA(struct sheap) dlink_heap; /* block heap on which nodes are stored */
+CHAOS_DATA(uint32_t) dlink_count;    /* dlink statistics */
+CHAOS_DATA(int) dlink_dirty;
 
 /* ------------------------------------------------------------------------ */
 CHAOS_API(int dlink_get_log(void))
@@ -178,25 +184,23 @@ CHAOS_API(int dlink_get_log(void))
 /* ------------------------------------------------------------------------ *
  * Initialize a block heap for the dlink nodes                                *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void                 dlink_init        (void))
+CHAOS_API(void dlink_init(void))
 
 /* ------------------------------------------------------------------------ *
  * Destroy heap                                                               *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void                 dlink_shutdown    (void))
+CHAOS_API(void dlink_shutdown(void))
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_API(void                 dlink_collect     (void))
+CHAOS_API(void dlink_collect(void))
 
 /* ------------------------------------------------------------------------ *
  * Allocate a new dlink node                                                  *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(struct node *        dlink_node_new    (void))
-;
-CHAOS_INLINE_FN( struct node    * dlink_node_new    (void)
-{
+CHAOS_INLINE_API(struct node *dlink_node_new(void));
+CHAOS_INLINE_FN(struct node *dlink_node_new(void) {
   struct node *nptr;
 
   /* Allocate node block */
@@ -214,10 +218,8 @@ CHAOS_INLINE_FN( struct node    * dlink_node_new    (void)
 /* ------------------------------------------------------------------------ *
  * Frees a dlink node                                                         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_node_free   (struct node *nptr))
-;
-CHAOS_INLINE_FN( void             dlink_node_free   (struct node *nptr)
-{
+CHAOS_INLINE_API(void dlink_node_free(struct node *nptr));
+CHAOS_INLINE_FN(void dlink_node_free(struct node *nptr) {
   /* Free node block */
   mem_static_free(&dlink_heap, nptr);
 
@@ -235,14 +237,11 @@ CHAOS_INLINE_FN( void             dlink_node_free   (struct node *nptr)
  * <node>                   - the node to add                                 *
  * <ptr>                    - a user-defined pointer                          *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_add_head    (struct list *lptr,
-                                                  struct node *nptr,
-                                                  void        *ptr));
+CHAOS_INLINE_API(void dlink_add_head(struct list *lptr, struct node *nptr,
+                                     void *ptr));
 #ifndef DARWIN
-CHAOS_INLINE_FN( void             dlink_add_head    (struct list *lptr,
-                                                  struct node *nptr,
-                                                  void        *ptr)
-{
+CHAOS_INLINE_FN(void dlink_add_head(struct list *lptr, struct node *nptr,
+                                    void *ptr) {
   /* Set the data pointer */
   nptr->data = ptr;
 
@@ -254,7 +253,7 @@ CHAOS_INLINE_FN( void             dlink_add_head    (struct list *lptr,
 
   /* If there already is a node at the head update
      its prev-reference, else update the tail */
-  if(lptr->head)
+  if (lptr->head)
     lptr->head->prev = nptr;
   else
     lptr->tail = nptr;
@@ -274,14 +273,11 @@ CHAOS_INLINE_FN( void             dlink_add_head    (struct list *lptr,
  * <node>                   - the node to add                                 *
  * <ptr>                    - a user-defined pointer                          *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_add_tail    (struct list *lptr,
-                                                  struct node *nptr,
-                                                  void        *ptr));
+CHAOS_INLINE_API(void dlink_add_tail(struct list *lptr, struct node *nptr,
+                                     void *ptr));
 
-CHAOS_INLINE_FN( void             dlink_add_tail    (struct list *lptr,
-                                                  struct node *nptr,
-                                                  void        *ptr)
-{
+CHAOS_INLINE_FN(void dlink_add_tail(struct list *lptr, struct node *nptr,
+                                    void *ptr) {
   /* Set the data pointer */
   nptr->data = ptr;
 
@@ -293,7 +289,7 @@ CHAOS_INLINE_FN( void             dlink_add_tail    (struct list *lptr,
 
   /* If there already is a node at the tail update
      its prev-reference, else update the head */
-  if(lptr->tail)
+  if (lptr->tail)
     lptr->tail->next = nptr;
   else
     lptr->head = nptr;
@@ -313,19 +309,13 @@ CHAOS_INLINE_FN( void             dlink_add_tail    (struct list *lptr,
  * <before>                 - add the new node before this node               *
  * <ptr>                    - a user-defined pointer                          *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                dlink_add_before  (struct list *lptr,
-                                                  struct node *nptr,
-                                                  struct node *before,
-                                                  void        *ptr));
+CHAOS_INLINE_API(void dlink_add_before(struct list *lptr, struct node *nptr,
+                                       struct node *before, void *ptr));
 
-CHAOS_INLINE_FN( void             dlink_add_before  (struct list *lptr,
-                                                  struct node *nptr,
-                                                  struct node *before,
-                                                  void        *ptr)
-{
+CHAOS_INLINE_FN(void dlink_add_before(struct list *lptr, struct node *nptr,
+                                      struct node *before, void *ptr) {
   /* If <before> is the list head, then a dlink_add_head() does the job */
-  if(before == lptr->head)
-  {
+  if (before == lptr->head) {
     dlink_add_head(lptr, nptr, ptr);
     return;
   }
@@ -355,19 +345,13 @@ CHAOS_INLINE_FN( void             dlink_add_before  (struct list *lptr,
  * <after>                  - add the new node after this node                *
  * <ptr>                    - a user-defined pointer                          *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                dlink_add_after   (struct list *lptr,
-                                                  struct node *nptr,
-                                                  struct node *after,
-                                                  void        *ptr));
+CHAOS_INLINE_API(void dlink_add_after(struct list *lptr, struct node *nptr,
+                                      struct node *after, void *ptr));
 
-CHAOS_INLINE_FN( void             dlink_add_after   (struct list *lptr,
-                                                  struct node *nptr,
-                                                  struct node *after,
-                                                  void        *ptr)
-{
+CHAOS_INLINE_FN(void dlink_add_after(struct list *lptr, struct node *nptr,
+                                     struct node *after, void *ptr) {
   /* If <after> is the list tail, then a dlink_add_tail() does the job */
-  if(after == lptr->tail)
-  {
+  if (after == lptr->tail) {
     dlink_add_tail(lptr, nptr, ptr);
     return;
   }
@@ -395,22 +379,19 @@ CHAOS_INLINE_FN( void             dlink_add_after   (struct list *lptr,
  * <list>                   - list to delete node from                        *
  * <node>                   - the node to delete                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                dlink_delete      (struct list *lptr,
-                                                  struct node *nptr));
+CHAOS_INLINE_API(void dlink_delete(struct list *lptr, struct node *nptr));
 
-CHAOS_INLINE_FN( void             dlink_delete      (struct list *lptr,
-                                                  struct node *nptr)
-{
+CHAOS_INLINE_FN(void dlink_delete(struct list *lptr, struct node *nptr) {
   /* If there is a prev node, update its next-
      reference, otherwise update the head */
-  if(nptr == lptr->head)
+  if (nptr == lptr->head)
     lptr->head = nptr->next;
   else
     nptr->prev->next = nptr->next;
 
   /* If there is a next node, update its prev-
      reference otherwise update the tail */
-  if(lptr->tail == nptr)
+  if (lptr->tail == nptr)
     lptr->tail = nptr->prev;
   else
     nptr->next->prev = nptr->prev;
@@ -431,18 +412,14 @@ CHAOS_INLINE_FN( void             dlink_delete      (struct list *lptr,
  *                                                                            *
  * Returns a node when found, NULL otherwise.                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(struct node *       dlink_find        (struct list *lptr,
-                                                  void        *ptr));
+CHAOS_INLINE_API(struct node *dlink_find(struct list *lptr, void *ptr));
 #ifndef DARWIN
-CHAOS_INLINE_FN( struct node     *dlink_find        (struct list *lptr,
-                                                  void        *ptr)
-{
+CHAOS_INLINE_FN(struct node *dlink_find(struct list *lptr, void *ptr) {
   struct node *nptr;
 
   /* Loop through all nodes until we find the pointer */
-  dlink_foreach(lptr, nptr)
-  {
-    if(nptr->data == ptr)
+  dlink_foreach(lptr, nptr) {
+    if (nptr->data == ptr)
       return nptr;
   }
 
@@ -459,27 +436,24 @@ CHAOS_INLINE_FN( struct node     *dlink_find        (struct list *lptr,
  *                                                                            *
  * Returns a node when found and deleted, NULL otherwise.                     *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(struct node *       dlink_find_delete (struct list *lptr, void *ptr));
+CHAOS_INLINE_API(struct node *dlink_find_delete(struct list *lptr, void *ptr));
 
-CHAOS_INLINE_FN( struct node    * dlink_find_delete (struct list *lptr, void *ptr);
-{
+CHAOS_INLINE_FN(struct node *dlink_find_delete(struct list *lptr, void *ptr) {
   struct node *nptr;
 
   /* Loop through all nodes until we find the pointer */
-  dlink_foreach(lptr, nptr)
-  {
-    if(nptr->data == ptr)
-    {
+  dlink_foreach(lptr, nptr) {
+    if (nptr->data == ptr) {
       /* If there is a prev node, update its next-
          reference, otherwise update the head */
-      if(nptr->prev)
+      if (nptr->prev)
         nptr->prev->next = nptr->next;
       else
         lptr->head = nptr->next;
 
       /* If there is a next node, update its prev-
          reference otherwise update the tail */
-      if(nptr->next)
+      if (nptr->next)
         nptr->next->prev = nptr->prev;
       else
         lptr->tail = nptr->prev;
@@ -506,23 +480,19 @@ CHAOS_INLINE_FN( struct node    * dlink_find_delete (struct list *lptr, void *pt
  *                                                                            *
  * Returns a node when the index was valid, NULL otherwise.                   *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(struct node *       dlink_index       (struct list *lptr,
-                                                  size_t       index));
+CHAOS_INLINE_API(struct node *dlink_index(struct list *lptr, size_t index));
 
-CHAOS_INLINE_FN( struct node    * dlink_index       (struct list *lptr,
-                                                  size_t       index)
-{
+CHAOS_INLINE_FN(struct node *dlink_index(struct list *lptr, size_t index) {
   struct node *nptr;
-  size_t       i = 0;
+  size_t i = 0;
 
   /* Damn, index is invalid */
-  if(index >= lptr->size)
+  if (index >= lptr->size)
     return NULL;
 
   /* Loop through list until index */
-  dlink_foreach(lptr, nptr)
-  {
-    if(i == index)
+  dlink_foreach(lptr, nptr) {
+    if (i == index)
       return nptr;
 
     i++;
@@ -537,15 +507,13 @@ CHAOS_INLINE_FN( struct node    * dlink_index       (struct list *lptr,
  *                                                                            *
  * <list>                   - list to destroy                                 *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                dlink_destroy     (struct list *lptr));
+CHAOS_INLINE_API(void dlink_destroy(struct list *lptr));
 
-CHAOS_INLINE_FN( void             dlink_destroy     (struct list *lptr)
-{
+CHAOS_INLINE_FN(void dlink_destroy(struct list *lptr) {
   struct node *nptr;
   struct node *next;
 
-  dlink_foreach_safe(lptr, nptr, next)
-    dlink_node_free(nptr);
+  dlink_foreach_safe(lptr, nptr, next) dlink_node_free(nptr);
 
   dlink_list_zero(lptr);
 })
@@ -557,9 +525,8 @@ CHAOS_INLINE_FN( void             dlink_destroy     (struct list *lptr)
  * <node1>                  - first node to swap                              *
  * <node2>                  - second node to swap                             *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_swap        (struct list *lptr,
-                                                  struct node *nptr1,
-                                                  struct node *nptr2));
+CHAOS_INLINE_API(void dlink_swap(struct list *lptr, struct node *nptr1,
+                                 struct node *nptr2));
 
 #if 0
 CHAOS_INLINE_FN( void             dlink_swap        (struct list *lptr,
@@ -611,23 +578,18 @@ CHAOS_INLINE_FN( void             dlink_swap        (struct list *lptr,
  * <from>                   - list to move nodes from                         *
  * <to>                     - list to move nodes to                           *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void               dlink_move_head     (struct list *from,
-                                                  struct list *to));
+CHAOS_INLINE_API(void dlink_move_head(struct list *from, struct list *to));
 
-CHAOS_INLINE_FN( void           dlink_move_head     (struct list *from,
-                                                  struct list *to)
-{
+CHAOS_INLINE_FN(void dlink_move_head(struct list *from, struct list *to) {
   /* Nothing in to-list */
-  if(to->head == NULL)
-  {
+  if (to->head == NULL) {
     /* Copy to to-list */
     to->head = from->head;
     to->tail = from->tail;
     to->size = from->size;
   }
   /* Add lists */
-  else if(from->tail != NULL)
-  {
+  else if (from->tail != NULL) {
     /* Prepend from-list */
     from->tail->next = to->head;
     to->head->prev = from->tail;
@@ -652,23 +614,18 @@ CHAOS_INLINE_FN( void           dlink_move_head     (struct list *from,
  * <from>                   - list to move nodes from                         *
  * <to>                     - list to move nodes to                           *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_move_tail   (struct list *from,
-                                                  struct list *to));
+CHAOS_INLINE_API(void dlink_move_tail(struct list *from, struct list *to));
 
-CHAOS_INLINE_FN( void             dlink_move_tail   (struct list *from,
-                                                  struct list *to)
-{
+CHAOS_INLINE_FN(void dlink_move_tail(struct list *from, struct list *to) {
   /* Nothing in to-list */
-  if(to->tail == NULL)
-  {
+  if (to->tail == NULL) {
     /* Copy to to-list */
     to->head = from->head;
     to->tail = from->tail;
     to->size = from->size;
   }
   /* Add lists */
-  else if(from->head != NULL)
-  {
+  else if (from->head != NULL) {
     /* Append from-list */
     from->head->prev = to->tail;
     to->tail->next = from->head;
@@ -685,12 +642,9 @@ CHAOS_INLINE_FN( void             dlink_move_tail   (struct list *from,
 /* ------------------------------------------------------------------------ *
  * Copy a list while overwriting destination and allocating new nodes         *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_copy        (struct list *from,
-                                                  struct list *to));
+CHAOS_INLINE_API(void dlink_copy(struct list *from, struct list *to));
 
-CHAOS_INLINE_FN( void             dlink_copy        (struct list *from,
-                                                  struct list *to)
-{
+CHAOS_INLINE_FN(void dlink_copy(struct list *from, struct list *to) {
   struct node *fnptr;
   struct node *tnptr;
   struct node *prev = NULL;
@@ -699,8 +653,7 @@ CHAOS_INLINE_FN( void             dlink_copy        (struct list *from,
   dlink_list_zero(to);
 
   /* Loop through source */
-  dlink_foreach(from, fnptr)
-  {
+  dlink_foreach(from, fnptr) {
     /* Make node for destination */
     tnptr = dlink_node_new();
 
@@ -708,18 +661,18 @@ CHAOS_INLINE_FN( void             dlink_copy        (struct list *from,
     tnptr->data = fnptr->data;
 
     /* Its the head, update destination head */
-    if(fnptr == from->head)
+    if (fnptr == from->head)
       to->head = tnptr;
 
     /* Its the tail, update destination tail */
-    if(fnptr == from->tail)
+    if (fnptr == from->tail)
       to->tail = tnptr;
 
     /* Make references */
     tnptr->prev = prev;
     tnptr->next = NULL;
 
-    if(prev)
+    if (prev)
       prev->next = tnptr;
 
     prev = tnptr;
@@ -727,12 +680,12 @@ CHAOS_INLINE_FN( void             dlink_copy        (struct list *from,
 })
 
 /* ------------------------------------------------------------------------ *
-  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(uint32_t             dlink_count_nodes (struct list *lptr));
+ * ------------------------------------------------------------------------ */
+CHAOS_INLINE_API(uint32_t dlink_count_nodes(struct list *lptr));
 
 /* ------------------------------------------------------------------------ *
  * Dump dlink statistics.                                                     *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(void                 dlink_dump        (void));
+void dlink_dump(void);
 
 #endif

@@ -1,23 +1,24 @@
-#include "libchaos/mem.h"
-#include "libchaos/log.h"
 #include "libchaos/gif.h"
 #include "libchaos/image.h"
+#include "libchaos/log.h"
+#include "libchaos/mem.h"
 
 #ifdef HAVE_FT2
 #include "libchaos/ttf.h"
 
 int ttftest_log;
 
-void ttftest_write(const char *text, const char *font, const char *file, const char *bg, const char *color)
-{
-  struct image   *ttftext;
-  struct image   *gradient;
-  struct ttf     *ttf;
-  struct color    fg;
-  struct rect     drect;
-  struct rect     srect;
+void ttftest_write(const char *text, const char *font, const char *file,
+                   const char *bg, const char *color) {
+  struct image *ttftext;
+  struct image *gradient;
+  struct ttf *ttf;
+  struct color fg;
+  struct rect drect;
+  struct rect srect;
 
-  log(ttftest_log, L_status, "---------- TrueType GIF renderer ----------", text);
+  log(ttftest_log, L_status, "---------- TrueType GIF renderer ----------",
+      text);
   log(ttftest_log, L_status, "text:  %s", text);
   log(ttftest_log, L_status, "font:  %s", font);
   log(ttftest_log, L_status, "bg:    %s", bg);
@@ -27,8 +28,7 @@ void ttftest_write(const char *text, const char *font, const char *file, const c
 
   ttf = ttf_new(font);
 
-  if(ttf_open(ttf, font))
-  {
+  if (ttf_open(ttf, font)) {
     log(ttftest_log, L_fatal, "Could not load font: %s", font);
     return;
   }
@@ -43,8 +43,7 @@ void ttftest_write(const char *text, const char *font, const char *file, const c
 
   gradient = image_load_gif(bg);
 
-  if(gradient == NULL)
-  {
+  if (gradient == NULL) {
     log(ttftest_log, L_fatal, "Could not load background image: %s", bg);
     return;
   }
@@ -61,14 +60,10 @@ void ttftest_write(const char *text, const char *font, const char *file, const c
 
   image_convert(gradient, IMAGE_TYPE_8);
 
-  if(gradient == NULL)
-  {
+  if (gradient == NULL) {
     log(ttftest_log, L_warning, "Could not render test glyph.");
-  }
-  else
-  {
-    if(image_save_gif(gradient, file))
-    {
+  } else {
+    if (image_save_gif(gradient, file)) {
       log(ttftest_log, L_fatal, "Could not save output: %s", file);
     }
 
@@ -77,8 +72,7 @@ void ttftest_write(const char *text, const char *font, const char *file, const c
 }
 #endif
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 #ifdef HAVE_FT2
   const char *text = "Test text!";
   const char *font = "arial.ttf";
@@ -98,15 +92,15 @@ int main(int argc, char **argv)
 
   log_level(LOG_ALL, L_verbose);
 
-  if(argc > 1)
+  if (argc > 1)
     text = argv[1];
-  if(argc > 2)
+  if (argc > 2)
     font = argv[2];
-  if(argc > 3)
+  if (argc > 3)
     file = argv[3];
-  if(argc > 4)
+  if (argc > 4)
     bg = argv[4];
-  if(argc > 5)
+  if (argc > 5)
     color = argv[5];
 
   ttftest_write(text, font, file, bg, color);
@@ -125,4 +119,3 @@ int main(int argc, char **argv)
 #endif
   return 0;
 }
-

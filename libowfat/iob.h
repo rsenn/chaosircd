@@ -13,8 +13,8 @@
  * frames as possible.  On Linux it will also use the TCP_CORK socket
  * option. */
 
-#include "io.h"
 #include "array.h"
+#include "io.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,23 +23,23 @@ extern "C" {
 typedef struct io_batch {
   array b;
   uint64 bytesleft;
-  long next,bufs,files;
+  long next, bufs, files;
 } io_batch;
 
-io_batch* iob_new(int hint_entries);
-int iob_addbuf(io_batch* b,const void* buf,uint64 n);
-int iob_addbuf_free(io_batch* b,const void* buf,uint64 n);
-int iob_addbuf_munmap(io_batch* b,const void* buf,uint64 n);
-int iob_adds(io_batch* b,const char* s);
-int iob_adds_free(io_batch* b,const char* s);
-int iob_addfile(io_batch* b,int64 fd,uint64 off,uint64 n);
-int iob_addfile_close(io_batch* b,int64 fd,uint64 off,uint64 n);
-int64 iob_send(int64 s,io_batch* b);
-int64 iob_write(int64 s,io_batch* b,io_write_callback cb);
-void iob_reset(io_batch* b);
-void iob_free(io_batch* b);
-void iob_prefetch(io_batch* b,uint64 bytes);
-uint64 iob_bytesleft(const io_batch* b);
+io_batch *iob_new(int hint_entries);
+int iob_addbuf(io_batch *b, const void *buf, uint64 n);
+int iob_addbuf_free(io_batch *b, const void *buf, uint64 n);
+int iob_addbuf_munmap(io_batch *b, const void *buf, uint64 n);
+int iob_adds(io_batch *b, const char *s);
+int iob_adds_free(io_batch *b, const char *s);
+int iob_addfile(io_batch *b, int64 fd, uint64 off, uint64 n);
+int iob_addfile_close(io_batch *b, int64 fd, uint64 off, uint64 n);
+int64 iob_send(int64 s, io_batch *b);
+int64 iob_write(int64 s, io_batch *b, io_write_callback cb);
+void iob_reset(io_batch *b);
+void iob_free(io_batch *b);
+void iob_prefetch(io_batch *b, uint64 bytes);
+uint64 iob_bytesleft(const io_batch *b);
 
 #ifdef __cplusplus
 }

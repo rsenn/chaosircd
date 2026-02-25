@@ -5,8 +5,8 @@
 /* sysdep: +poll */
 #define IOPAUSE_POLL
 
-#include <sys/types.h>
 #include <sys/poll.h>
+#include <sys/types.h>
 
 typedef struct pollfd iopause_fd;
 #define IOPAUSE_READ POLLIN
@@ -14,6 +14,6 @@ typedef struct pollfd iopause_fd;
 
 #include "taia.h"
 
-extern void iopause(iopause_fd *,unsigned int,struct taia *,struct taia *);
+extern void iopause(iopause_fd *, unsigned int, struct taia *, struct taia *);
 
 #endif

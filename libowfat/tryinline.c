@@ -1,1 +1,1 @@
-static inline int foo(int bar) { return bar+1; }
+static inline int foo(int bar) { return bar + 1; }

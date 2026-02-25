@@ -23,53 +23,48 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
-#include "libchaos/queue.h"
 #include "libchaos/log.h"
 #include "libchaos/net.h"
+#include "libchaos/queue.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
+#include "servauth/auth.h"
+#include "servauth/cache.h"
 #include "servauth/commands.h"
 #include "servauth/control.h"
-#include "servauth/servauth.h"
-#include "servauth/cache.h"
 #include "servauth/dns.h"
-#include "servauth/auth.h"
 #include "servauth/proxy.h"
 #include "servauth/query.h"
+#include "servauth/servauth.h"
 #include "servauth/userdb.h"
 
 /* -------------------------------------------------------------------------- *
  * command prototypes                                                         *
  * -------------------------------------------------------------------------- */
-static int cmd_dns         (control_t *cptr, int ac, char **av);
-static int cmd_auth        (control_t *cptr, int ac, char **av);
-static int cmd_dns_forward (control_t *cptr, int ac, char **av);
-static int cmd_dns_reverse (control_t *cptr, int ac, char **av);
-static int cmd_proxy       (control_t *cptr, int ac, char **av);
-static int cmd_userdb      (control_t *cptr, int ac, char **av);
+static int cmd_dns(control_t *cptr, int ac, char **av);
+static int cmd_auth(control_t *cptr, int ac, char **av);
+static int cmd_dns_forward(control_t *cptr, int ac, char **av);
+static int cmd_dns_reverse(control_t *cptr, int ac, char **av);
+static int cmd_proxy(control_t *cptr, int ac, char **av);
+static int cmd_userdb(control_t *cptr, int ac, char **av);
 
 /* -------------------------------------------------------------------------- *
  * main commands                                                              *
  * -------------------------------------------------------------------------- */
-struct cmd_table cmds[] = {
-  { "dns",     &cmd_dns   },
-  { "auth",    &cmd_auth  },
-  { "proxy",   &cmd_proxy },
-  { "userdb",  &cmd_userdb },
-  { NULL,      NULL       }
-};
+struct cmd_table cmds[] = {{"dns", &cmd_dns},
+                           {"auth", &cmd_auth},
+                           {"proxy", &cmd_proxy},
+                           {"userdb", &cmd_userdb},
+                           {NULL, NULL}};
 
 /* -------------------------------------------------------------------------- *
  * subcommands for dns                                                        *
  * -------------------------------------------------------------------------- */
 struct cmd_table dns_cmds[] = {
-  { "reverse", cmd_dns_reverse },
-  { "forward", cmd_dns_forward },
-  { NULL,      NULL            }
-};
+    {"reverse", cmd_dns_reverse}, {"forward", cmd_dns_forward}, {NULL, NULL}};
 
 /* -------------------------------------------------------------------------- *
  * command_get - find a command in the cmd table                              *
@@ -77,16 +72,14 @@ struct cmd_table dns_cmds[] = {
  * cmd_table  - the command table                                             *
  * name       - name of the command to find                                   *
  * -------------------------------------------------------------------------- */
-struct cmd_table *command_get(struct cmd_table *cmd_table, const char *name)
-{
+struct cmd_table *command_get(struct cmd_table *cmd_table, const char *name) {
   struct cmd_table *cmdptr;
 
-  if(!cmd_table || !name)
+  if (!cmd_table || !name)
     return NULL;
 
-  for(cmdptr = cmd_table; cmdptr->name; cmdptr++)
-  {
-    if(!str_cmp(name, cmdptr->name))
+  for (cmdptr = cmd_table; cmdptr->name; cmdptr++) {
+    if (!str_cmp(name, cmdptr->name))
       return cmdptr;
   }
 
@@ -102,21 +95,19 @@ struct cmd_table *command_get(struct cmd_table *cmd_table, const char *name)
  * av[3] = "src port"                                                         *
  * av[4] = "dst port"                                                         *
  * -------------------------------------------------------------------------- */
-static int cmd_auth(control_t *cptr, int ac, char **av)
-{
+static int cmd_auth(control_t *cptr, int ac, char **av) {
 
   struct servauth_query *q;
   net_addr_t addr;
 
-  if(ac != 5)
+  if (ac != 5)
     return -1;
 
-  if(net_aton(av[2], &addr) == 0)
+  if (net_aton(av[2], &addr) == 0)
     return -1;
 
   /* check the cache */
-  if(cache_auth_pick(&servauth_authcache, addr, timer_systime))
-  {
+  if (cache_auth_pick(&servauth_authcache, addr, timer_systime)) {
     /* reply failure */
     control_send(&servauth_control, "auth %s", av[1]);
     return 0;
@@ -125,10 +116,10 @@ static int cmd_auth(control_t *cptr, int ac, char **av)
   /* start query */
   q = query_find(servauth_queries, MAX_QUERIES);
 
-  if(query_set_auth(q, av[1], av[2], av[3], av[4]))
+  if (query_set_auth(q, av[1], av[2], av[3], av[4]))
     return -1;
 
-  if(query_start(q, QUERY_AUTH, timer_systime) == -1)
+  if (query_start(q, QUERY_AUTH, timer_systime) == -1)
     return -1;
 
   return 0;
@@ -141,47 +132,53 @@ static int cmd_auth(control_t *cptr, int ac, char **av)
  * av[1] = id
  * av[2] = "verify"|"register"|"mutate"
  * -------------------------------------------------------------------------- */
-static int cmd_userdb(control_t *cptr, int ac, char **av)
-{
+static int cmd_userdb(control_t *cptr, int ac, char **av) {
   static struct userdb_client *udb;
 
-  if(!udb) {
-    udb = calloc(sizeof(struct userdb_client),1);
+  if (!udb) {
+    udb = calloc(sizeof(struct userdb_client), 1);
 
-    if(   userdb_connect(udb, "127.0.0.1", "root", "") )
+    if (userdb_connect(udb, "127.0.0.1", "root", ""))
       log(servauth_log, L_status, "userdb connection succeeded");
   }
   const char *cmd, *id;
 
-  if(str_isdigit(av[1][0])) {
-	  id = av[1];
-	  cmd = av[2];
-	  ++av;
-	  --ac;
+  if (str_isdigit(av[1][0])) {
+    id = av[1];
+    cmd = av[2];
+    ++av;
+    --ac;
   } else {
-	  id = "";
-	  cmd = av[1];
+    id = "";
+    cmd = av[1];
   }
 
-  if(!strcmp(cmd, "verify")) {
+  if (!strcmp(cmd, "verify")) {
     char *s;
-    int v = userdb_verify(udb, (const char*)av[2]?av[2]:"", av[3]?av[3]:"", &s);
-    control_send(&servauth_control, "userdb %s%sverify %s %d %s", id, id[0]?" ":"", av[2]?av[2]:"", !!v, s ? s : "");
+    int v = userdb_verify(udb, (const char *)av[2] ? av[2] : "",
+                          av[3] ? av[3] : "", &s);
+    control_send(&servauth_control, "userdb %s%sverify %s %d %s", id,
+                 id[0] ? " " : "", av[2] ? av[2] : "", !!v, s ? s : "");
     free(s);
 
-  } else if(!strcmp(cmd, "register")) {
-    int v = userdb_register(udb, ( char*)av[2]?av[2]:"", &av[3], ac - 3);
-    control_send(&servauth_control, "userdb %s%sregister %s %d", id, id[0]?" ":"", av[2]?av[2]:"", !v);
-  } else if(!strcmp(cmd, "mutate")) {
-    int v = userdb_mutate(udb, ( char*)av[2]?av[2]:"", &av[3], ac - 3);
-    control_send(&servauth_control, "userdb %s%smutate %s %d", id, id[0]?" ":"", av[2]?av[2]:"", !v);
-  } else if(!strcmp(cmd, "search")) {
+  } else if (!strcmp(cmd, "register")) {
+    int v = userdb_register(udb, (char *)av[2] ? av[2] : "", &av[3], ac - 3);
+    control_send(&servauth_control, "userdb %s%sregister %s %d", id,
+                 id[0] ? " " : "", av[2] ? av[2] : "", !v);
+  } else if (!strcmp(cmd, "mutate")) {
+    int v = userdb_mutate(udb, (char *)av[2] ? av[2] : "", &av[3], ac - 3);
+    control_send(&servauth_control, "userdb %s%smutate %s %d", id,
+                 id[0] ? " " : "", av[2] ? av[2] : "", !v);
+  } else if (!strcmp(cmd, "search")) {
     char *s;
     /*int v = userdb_search(udb, av[2]?av[2]:"", &av[3], ac - 3);*/
-    /*control_send(&servauth_control, "userdb search %s %d %s", av[2]?av[2]:"", !v, s ? s : "");*/
+    /*control_send(&servauth_control, "userdb search %s %d %s", av[2]?av[2]:"",
+     * !v, s ? s : "");*/
     int v = userdb_search(udb, &av[2], ac - 2, &s);
-    control_send(&servauth_control, "userdb %s%ssearch %s %d %s", id, id[0]?" ":"", av[2]?av[2]:"", v, s ? s : "");
-    if(s) free(s);
+    control_send(&servauth_control, "userdb %s%ssearch %s %d %s", id,
+                 id[0] ? " " : "", av[2] ? av[2] : "", v, s ? s : "");
+    if (s)
+      free(s);
   }
 
   return 0;
@@ -195,16 +192,15 @@ static int cmd_userdb(control_t *cptr, int ac, char **av)
  * av[3] = id                                                                 *
  * av[4] = hostname or ip address                                             *
  * -------------------------------------------------------------------------- */
-static int cmd_dns(control_t *cptr, int ac, char **av)
-{
+static int cmd_dns(control_t *cptr, int ac, char **av) {
   struct cmd_table *cmdptr;
 
-  if(ac < 2)
+  if (ac < 2)
     return -1;
 
   cmdptr = command_get(dns_cmds, av[1]);
 
-  if(cmdptr && (cmdptr != (struct cmd_table *) -1))
+  if (cmdptr && (cmdptr != (struct cmd_table *)-1))
     return cmdptr->func(cptr, ac, av);
 
   return 0;
@@ -218,15 +214,14 @@ static int cmd_dns(control_t *cptr, int ac, char **av)
  * av[2] = id                                                                 *
  * av[3] = hostname                                                           *
  * -------------------------------------------------------------------------- */
-static int cmd_dns_forward(control_t *cptr, int ac, char **av)
-{
+static int cmd_dns_forward(control_t *cptr, int ac, char **av) {
   struct servauth_query *q;
 #if 0
   struct in_addr         addr;
 #endif
-  int                    ret;
+  int ret;
 
-  if(ac != 4)
+  if (ac != 4)
     return -1;
 
 #if 0
@@ -243,10 +238,10 @@ static int cmd_dns_forward(control_t *cptr, int ac, char **av)
 
   q = query_find(servauth_queries, MAX_QUERIES);
 
-  if(query_set_host(q, av[2], av[3]))
+  if (query_set_host(q, av[2], av[3]))
     return -1;
 
-  if((ret = query_start(q, QUERY_DNS_FORWARD, timer_systime)) == -1)
+  if ((ret = query_start(q, QUERY_DNS_FORWARD, timer_systime)) == -1)
     return -1;
 
   return 0;
@@ -260,24 +255,22 @@ static int cmd_dns_forward(control_t *cptr, int ac, char **av)
  * av[2] = id                                                                 *
  * av[3] = ip address                                                         *
  * -------------------------------------------------------------------------- */
-static int cmd_dns_reverse(control_t *cptr, int ac, char **av)
-{
+static int cmd_dns_reverse(control_t *cptr, int ac, char **av) {
   struct servauth_query *q;
   int ret;
   const char *name;
   net_addr_t addr;
 
-  if(ac != 4)
+  if (ac != 4)
     return -1;
 
-  if(net_aton(av[3], &addr) == 0)
+  if (net_aton(av[3], &addr) == 0)
     return -1;
 
   /* check the cache */
-  if(cache_dns_pick_reverse(&servauth_dnscache, addr, &name, timer_systime))
-  {
+  if (cache_dns_pick_reverse(&servauth_dnscache, addr, &name, timer_systime)) {
     /* reply cached response */
-    if(name)
+    if (name)
       control_send(cptr, "dns reverse %s %s", av[2], name);
     else
       control_send(cptr, "dns reverse %s", av[2]);
@@ -287,10 +280,10 @@ static int cmd_dns_reverse(control_t *cptr, int ac, char **av)
 
   q = query_find(servauth_queries, MAX_QUERIES);
 
-  if(query_set_addr(q, av[2], av[3]))
+  if (query_set_addr(q, av[2], av[3]))
     return -1;
 
-  if((ret = query_start(q, QUERY_DNS_REVERSE, timer_systime)) == -1)
+  if ((ret = query_start(q, QUERY_DNS_REVERSE, timer_systime)) == -1)
     return -1;
 
   return 0;
@@ -305,36 +298,36 @@ static int cmd_dns_reverse(control_t *cptr, int ac, char **av)
  * av[3] = "testaddr:testport"                                                *
  * av[4] = "type"                                                             *
  * -------------------------------------------------------------------------- */
-static int cmd_proxy(control_t *cptr, int ac, char **av)
-{
+static int cmd_proxy(control_t *cptr, int ac, char **av) {
   struct servauth_query *q;
-  net_addr_t             addr;
-  uint16_t               port;
-  int                    type;
-  int                    status;
-  char                  *ptr;
-  char                   remote[32];
+  net_addr_t addr;
+  uint16_t port;
+  int type;
+  int status;
+  char *ptr;
+  char remote[32];
 
-  if(ac != 5)
+  if (ac != 5)
     return -1;
 
   strlcpy(remote, av[2], sizeof(remote));
 
-  if((ptr = strchr(remote, ':')) == NULL)
+  if ((ptr = strchr(remote, ':')) == NULL)
     return -1;
 
   *ptr++ = '\0';
 
-  if(net_aton(remote, &addr) == 0)
+  if (net_aton(remote, &addr) == 0)
     return -1;
 
   port = (uint16_t)str_toul(ptr, NULL, 10);
   type = proxy_parse_type(av[4]);
 
   /* check the cache */
-  if((status = cache_proxy_pick(&servauth_proxycache, addr, port, type, timer_systime)))
-  {
-    control_send(&servauth_control, "proxy %s %s", av[1], proxy_replies[status]);
+  if ((status = cache_proxy_pick(&servauth_proxycache, addr, port, type,
+                                 timer_systime))) {
+    control_send(&servauth_control, "proxy %s %s", av[1],
+                 proxy_replies[status]);
 
     return 0;
   }
@@ -342,12 +335,11 @@ static int cmd_proxy(control_t *cptr, int ac, char **av)
   /* start query */
   q = query_find(servauth_queries, MAX_QUERIES);
 
-  if(query_set_proxy(q, av[1], av[2], av[3], av[4]))
+  if (query_set_proxy(q, av[1], av[2], av[3], av[4]))
     return -1;
 
-  if(query_start(q, QUERY_PROXY, timer_systime) == -1)
+  if (query_start(q, QUERY_PROXY, timer_systime) == -1)
     return -1;
 
   return 0;
 }
-

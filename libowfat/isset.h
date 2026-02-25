@@ -13,7 +13,7 @@
   if (is_set(FOO))
 
  We will allow both
- 
+
 #define FOO
 
  and
@@ -23,9 +23,8 @@
 
 /* Original question posed by Linus Torvalds
  * https:/*plus.google.com/102150693225130002912/posts/9gntjh57dXt*/
- * Solution by comex
- * https:/*gist.github.com/2365372*/
- */
+*Solution by comex *https : /*gist.github.com/2365372*/
+                            * /
 
 #define is_set(macro) is_set_(macro)
 #define macrotest_1 ,

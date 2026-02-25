@@ -1,14 +1,13 @@
-#include <sys/types.h>
 #include <sys/param.h>
+#include <sys/types.h>
 #ifndef __MINGW32__
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #endif
-#include "windoze.h"
 #include "socket.h"
+#include "windoze.h"
 
-int socket_mcttl4(int s,char TTL)
-{
-  return winsock2errno(setsockopt(s,IPPROTO_IP,IP_MULTICAST_TTL,&TTL,sizeof TTL));
+int socket_mcttl4(int s, char TTL) {
+  return winsock2errno(
+      setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &TTL, sizeof TTL));
 }
-

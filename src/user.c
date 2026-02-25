@@ -25,40 +25,40 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
+#include "libchaos/hook.h"
 #include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
-#include "libchaos/hook.h"
 #include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/user.h"
-#include "ircd/oper.h"
-#include "ircd/usermode.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/ircd.h"
 #include "ircd/numeric.h"
+#include "ircd/oper.h"
+#include "ircd/user.h"
+#include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Global variables                                                           *
  * -------------------------------------------------------------------------- */
-int           user_log;                   /* user log source */
-struct sheap  user_heap;                  /* heap for struct user */
-int           user_dirty;                 /* we need a garbage collect */
-struct list   user_list;                  /* list with all of them */
-struct list   user_lists[USER_HASH_SIZE]; /* hashed list */
-uint32_t      user_seed;
-uint32_t      user_id;
-char          user_readbuf[IRCD_BUFSIZE];
-const char    user_base[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
-                            "WXYZabcdefghijklmnopqrstuvwxyz½¾"
-                            "¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞ"
-                            "ßàáâãäåæçèéêëìíîïğñòóôõö÷øùúûüış";
+int user_log;                           /* user log source */
+struct sheap user_heap;                 /* heap for struct user */
+int user_dirty;                         /* we need a garbage collect */
+struct list user_list;                  /* list with all of them */
+struct list user_lists[USER_HASH_SIZE]; /* hashed list */
+uint32_t user_seed;
+uint32_t user_id;
+char user_readbuf[IRCD_BUFSIZE];
+const char user_base[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
+                         "WXYZabcdefghijklmnopqrstuvwxyz½¾"
+                         "¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞ"
+                         "ßàáâãäåæçèéêëìíîïğñòóôõö÷øùúûüış";
 
 /* ------------------------------------------------------------------------ */
 int user_get_log() { return user_log; }
@@ -66,8 +66,7 @@ int user_get_log() { return user_log; }
 /* -------------------------------------------------------------------------- *
  * Initialize user module.                                                    *
  * -------------------------------------------------------------------------- */
-void user_init(void)
-{
+void user_init(void) {
   uint32_t i;
 
   user_log = log_source_register("user");
@@ -75,7 +74,7 @@ void user_init(void)
   /* Zero all user lists */
   dlink_list_zero(&user_list);
 
-  for(i = 0; i < USER_HASH_SIZE; i++)
+  for (i = 0; i < USER_HASH_SIZE; i++)
     dlink_list_zero(&user_lists[i]);
 
   /* Setup user heap & timer */
@@ -93,40 +92,38 @@ void user_init(void)
  * -------------------------------------------------------------------------- */
 #define ROR(v, n) ((v >> ((n) & 0x1f)) | (v << (32 - ((n) & 0x1f))))
 #define ROL(v, n) ((v >> ((n) & 0x1f)) | (v << (32 - ((n) & 0x1f))))
-static uint32_t user_random(void)
-{
-  int      it;
-  int      i;
+static uint32_t user_random(void) {
+  int it;
+  int i;
   uint32_t ns = timer_mtime;
 
   it = (ns & 0x1f) + 0x20;
 
-  for(i = 0; i < it; i++)
-  {
+  for (i = 0; i < it; i++) {
     ns = ROL(ns, user_seed);
 
-    if(ns & 0x01)
+    if (ns & 0x01)
       user_seed -= 0x35014541;
     else
       user_seed += 0x21524110;
 
     ns = ROR(ns, user_seed >> 27);
 
-    if(user_seed & 0x02)
+    if (user_seed & 0x02)
       ns ^= user_seed;
     else
       ns -= user_seed;
 
     user_seed = ROL(user_seed, ns >> 5);
 
-    if(ns & 0x04)
+    if (ns & 0x04)
       user_seed += ns;
     else
       user_seed ^= ns;
 
     ns = ROL(ns, user_seed >> 13);
 
-    if(user_seed & 0x08)
+    if (user_seed & 0x08)
       ns += user_seed;
     else
       user_seed -= ns;
@@ -140,16 +137,14 @@ static uint32_t user_random(void)
 /* -------------------------------------------------------------------------- *
  * Shutdown user module.                                                      *
  * -------------------------------------------------------------------------- */
-void user_shutdown(void)
-{
+void user_shutdown(void) {
   struct user *uptr;
   struct user *next;
 
   log(user_log, L_status, "Shutting down [user] module.");
 
   /* Push all users */
-  dlink_foreach_safe(&user_list, uptr, next)
-    user_delete(uptr);
+  dlink_foreach_safe(&user_list, uptr, next) user_delete(uptr);
 
   /* Destroy static heap */
   mem_static_destroy(&user_heap);
@@ -160,27 +155,23 @@ void user_shutdown(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void user_uid(struct user *uptr)
-{
+static void user_uid(struct user *uptr) {
   uint64_t val = 0;
-  size_t   i;
+  size_t i;
 
-  do
-  {
+  do {
     /* Create ID */
-    for(i = 0; i < IRCD_IDLEN; i++)
-    {
-      if(!(i & 0x03))
+    for (i = 0; i < IRCD_IDLEN; i++) {
+      if (!(i & 0x03))
         val = user_random();
-     
+
       uptr->uid[i] = user_base[(val & 0x7Full)];
-      
+
       val >>= 7;
     }
 
     uptr->uid[i] = '\0';
-  }
-  while(user_find_uid(uptr->uid));
+  } while (user_find_uid(uptr->uid));
 
   /* Hash it */
   uptr->uhash = str_hash(uptr->uid);
@@ -189,8 +180,7 @@ static void user_uid(struct user *uptr)
 /* -------------------------------------------------------------------------- *
  * Create a new user block                                                    *
  * -------------------------------------------------------------------------- */
-struct user *user_new(const char *name, const char *uid)
-{
+struct user *user_new(const char *name, const char *uid) {
   struct user *uptr;
 
   /* Allocate and zero user block */
@@ -205,7 +195,7 @@ struct user *user_new(const char *name, const char *uid)
   uptr->modes = 0ULL;
 
   uptr->name[0] = '\0';
-  uptr->uid [0] = '\0';
+  uptr->uid[0] = '\0';
   uptr->away[0] = '\0';
   uptr->mode[0] = '\0';
 
@@ -214,19 +204,16 @@ struct user *user_new(const char *name, const char *uid)
 
   user_set_name(uptr, name);
 
-  if(name)
+  if (name)
     strlcpy(uptr->name, name, sizeof(uptr->name));
 
   uptr->nhash = str_hash(uptr->name);
 
-  if(uid)
-  {
+  if (uid) {
     strlcpy(uptr->uid, uid, sizeof(uptr->uid));
 
     uptr->uhash = str_hash(uptr->uid);
-  }
-  else
-  {
+  } else {
     user_uid(uptr);
   }
 
@@ -243,8 +230,7 @@ struct user *user_new(const char *name, const char *uid)
 /* -------------------------------------------------------------------------- *
  * Delete a user block                                                        *
  * -------------------------------------------------------------------------- */
-void user_delete(struct user *uptr)
-{
+void user_delete(struct user *uptr) {
   user_release(uptr);
 
   /* Unlink from main list and typed list */
@@ -260,35 +246,29 @@ void user_delete(struct user *uptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct user *user_find_id(uint32_t id)
-{
+struct user *user_find_id(uint32_t id) {
   struct user *uptr;
 
-  dlink_foreach(&user_list, uptr)
-    if(uptr->id == id)
-      return uptr;
+  dlink_foreach(&user_list, uptr) if (uptr->id == id) return uptr;
 
   return NULL;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct user *user_find_uid(const char *uid)
-{
+struct user *user_find_uid(const char *uid) {
   struct user *uptr = NULL;
   struct node *node;
-  hash_t       hash;
-  char         uidbuf[IRCD_IDLEN + 1];
+  hash_t hash;
+  char uidbuf[IRCD_IDLEN + 1];
 
   strlcpy(uidbuf, uid, sizeof(uidbuf));
 
   hash = str_hash(uidbuf);
 
-  dlink_foreach_data(&user_lists[hash % USER_HASH_SIZE], node, uptr)
-  {
-    if(uptr->uhash == hash)
-    {
-      if(!str_cmp(uptr->uid, uidbuf))
+  dlink_foreach_data(&user_lists[hash % USER_HASH_SIZE], node, uptr) {
+    if (uptr->uhash == hash) {
+      if (!str_cmp(uptr->uid, uidbuf))
         return uptr;
     }
   }
@@ -298,18 +278,15 @@ struct user *user_find_uid(const char *uid)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct user *user_find_name(const char *name)
-{
+struct user *user_find_name(const char *name) {
   struct user *uptr;
-  hash_t       hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&user_list, uptr)
-  {
-    if(uptr->nhash == hash)
-    {
-      if(!str_icmp(uptr->name, name))
+  dlink_foreach(&user_list, uptr) {
+    if (uptr->nhash == hash) {
+      if (!str_icmp(uptr->name, name))
         return uptr;
     }
   }
@@ -319,10 +296,8 @@ struct user *user_find_name(const char *name)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void user_set_name(struct user *uptr, const char *name)
-{
-  if(name && name[0])
-  {
+void user_set_name(struct user *uptr, const char *name) {
+  if (name && name[0]) {
     strlcpy(uptr->name, name, sizeof(uptr->name));
     uptr->nhash = str_ihash(uptr->name);
   }
@@ -330,39 +305,35 @@ void user_set_name(struct user *uptr, const char *name)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void user_whois(struct client *cptr, struct user *auptr)
-{
+void user_whois(struct client *cptr, struct user *auptr) {
   struct client *acptr = auptr->client;
 
-  numeric_send(cptr, RPL_WHOISUSER, acptr->name,
-               auptr->name, acptr->host, acptr->info);
+  numeric_send(cptr, RPL_WHOISUSER, acptr->name, auptr->name, acptr->host,
+               acptr->info);
 
-  if(auptr->channels.size)
+  if (auptr->channels.size)
     chanuser_whois(cptr, auptr);
 
-  numeric_send(cptr, RPL_WHOISSERVER, acptr->name,
-               client_me->name, client_me->info);
+  numeric_send(cptr, RPL_WHOISSERVER, acptr->name, client_me->name,
+               client_me->info);
 
   hooks_call(user_whois, HOOK_DEFAULT, cptr, auptr);
 
-  if(auptr->away[0])
-    numeric_send(cptr, RPL_AWAY, acptr->name,
-                 auptr->away);
+  if (auptr->away[0])
+    numeric_send(cptr, RPL_AWAY, acptr->name, auptr->away);
 
-  if(client_is_local(acptr) && !client_is_service(acptr))
+  if (client_is_local(acptr) && !client_is_service(acptr))
     numeric_send(cptr, RPL_WHOISIDLE, acptr->name,
                  (timer_systime - acptr->lastmsg), acptr->created);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void user_invite(struct user *uptr, struct channel *chptr)
-{
+void user_invite(struct user *uptr, struct channel *chptr) {
   struct invite *ivptr;
 
-  dlink_foreach(&uptr->invites, ivptr)
-  {
-    if(ivptr->channel == chptr)
+  dlink_foreach(&uptr->invites, ivptr) {
+    if (ivptr->channel == chptr)
       return;
   }
 
@@ -377,8 +348,7 @@ void user_invite(struct user *uptr, struct channel *chptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void user_uninvite(struct invite *ivptr)
-{
+void user_uninvite(struct invite *ivptr) {
   dlink_delete(&ivptr->channel->invites, &ivptr->cnode);
   dlink_delete(&ivptr->user->invites, &ivptr->unode);
   mem_static_free(&channel_invite_heap, ivptr);
@@ -387,17 +357,14 @@ void user_uninvite(struct invite *ivptr)
 /* -------------------------------------------------------------------------- *
  * Loose all references                                                       *
  * -------------------------------------------------------------------------- */
-void user_release(struct user *uptr)
-{
+void user_release(struct user *uptr) {
   struct chanuser *cuptr;
-  struct invite   *ivptr;
-  struct node     *nptr;
+  struct invite *ivptr;
+  struct node *nptr;
 
-  dlink_foreach_safe(&uptr->channels, cuptr, nptr)
-    chanuser_delete(cuptr);
+  dlink_foreach_safe(&uptr->channels, cuptr, nptr) chanuser_delete(cuptr);
 
-  dlink_foreach_safe(&uptr->invites, ivptr, nptr)
-    user_uninvite(ivptr);
+  dlink_foreach_safe(&uptr->invites, ivptr, nptr) user_uninvite(ivptr);
 
   usermode_unlinkall_user(uptr);
 
@@ -406,13 +373,10 @@ void user_release(struct user *uptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct user *user_pop(struct user *uptr)
-{
-  if(uptr)
-  {
-    if(!uptr->refcount)
-      log(user_log, L_warning, "Poping deprecated user: %s",
-          uptr->name);
+struct user *user_pop(struct user *uptr) {
+  if (uptr) {
+    if (!uptr->refcount)
+      log(user_log, L_warning, "Poping deprecated user: %s", uptr->name);
 
     uptr->refcount++;
   }
@@ -422,18 +386,13 @@ struct user *user_pop(struct user *uptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct user *user_push(struct user **uptrptr)
-{
-  if(*uptrptr)
-  {
-    if((*uptrptr)->refcount == 0)
-    {
+struct user *user_push(struct user **uptrptr) {
+  if (*uptrptr) {
+    if ((*uptrptr)->refcount == 0) {
       log(user_log, L_warning, "Trying to push deprecated user: %s",
           (*uptrptr)->name);
-    }
-    else
-    {
-      if(--(*uptrptr)->refcount == 0)
+    } else {
+      if (--(*uptrptr)->refcount == 0)
         user_release(*uptrptr);
 
       (*uptrptr) = NULL;
@@ -443,39 +402,32 @@ struct user *user_push(struct user **uptrptr)
   return *uptrptr;
 }
 
-
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-void user_dump(struct user *uptr)
-{
-  if(uptr == NULL)
-  {
+void user_dump(struct user *uptr) {
+  if (uptr == NULL) {
     struct node *node;
 
     dump(user_log, "[============== user summary ===============]");
 
     dlink_foreach_data(&user_list, node, uptr)
-      dump(user_log, " #%u: [%u] %-20s %-8s (%s)",
-            uptr->id, uptr->refcount,
-            uptr->name[0] ? uptr->name : "<unknown>",
-            uptr->uid,
-            uptr->client ? uptr->client->name : "?");
+        dump(user_log, " #%u: [%u] %-20s %-8s (%s)", uptr->id, uptr->refcount,
+             uptr->name[0] ? uptr->name : "<unknown>", uptr->uid,
+             uptr->client ? uptr->client->name : "?");
 
     dump(user_log, "[=========== end of user summary ===========]");
-  }
-  else
-  {
+  } else {
     dump(user_log, "[============== user dump ===============]");
     dump(user_log, "         id: #%u", uptr->id);
     dump(user_log, "   refcount: %u", uptr->refcount);
     dump(user_log, "      uhash: %p", uptr->uhash);
     dump(user_log, "      nhash: %p", uptr->nhash);
     dump(user_log, "     client: %s [%i]",
-          uptr->client ? uptr->client->name : "(nil)",
-          uptr->client ? uptr->client->refcount : 0);
+         uptr->client ? uptr->client->name : "(nil)",
+         uptr->client ? uptr->client->refcount : 0);
     dump(user_log, "       oper: %s [%i]",
-          uptr->oper ? uptr->oper->name : "(nil)",
-          uptr->oper ? uptr->oper->refcount : 0);
+         uptr->oper ? uptr->oper->name : "(nil)",
+         uptr->oper ? uptr->oper->refcount : 0);
     dump(user_log, "   channels: %u links", uptr->channels.size);
     dump(user_log, "    invites: %u links", uptr->invites.size);
     dump(user_log, "      modes: %llu", uptr->modes);

@@ -34,79 +34,79 @@
  * ------------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------------ *
- * template block structure.                                                     *
+ * template block structure. *
  * ------------------------------------------------------------------------ */
 struct template {
-  struct node            node;        /* linking node for template_list */
-  uint32_t               id;
-  uint32_t               refcount;    /* times this block is referenced */
-  hash_t                 hash;
-  char                   name[64];    /* user-definable name */
+  struct node node; /* linking node for template_list */
+  uint32_t id;
+  uint32_t refcount; /* times this block is referenced */
+  hash_t hash;
+  char name[64]; /* user-definable name */
 };
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                           *
  * ------------------------------------------------------------------------ */
-extern int                      template_log;
-extern struct sheap             template_heap;     /* heap containing template blocks */
-extern struct dheap             template_data_heap;/* heap containing the actual templates */
-extern struct list              template_list;     /* list linking template blocks */
-extern struct timer            *template_timer;
-extern uint32_t                 template_id;
-extern int                      template_dirty;
+extern int template_log;
+extern struct sheap template_heap; /* heap containing template blocks */
+extern struct dheap
+    template_data_heap;           /* heap containing the actual templates */
+extern struct list template_list; /* list linking template blocks */
+extern struct timer *template_timer;
+extern uint32_t template_id;
+extern int template_dirty;
 
 /* ------------------------------------------------------------------------ *
- * Initialize template heap and add garbage collect timer.                        *
+ * Initialize template heap and add garbage collect timer. *
  * ------------------------------------------------------------------------ */
-extern void              template_init            (void);
+extern void template_init(void);
 
 /* ------------------------------------------------------------------------ *
- * Destroy template heap and cancel timer.                                        *
+ * Destroy template heap and cancel timer. *
  * ------------------------------------------------------------------------ */
-extern void              template_shutdown        (void);
+extern void template_shutdown(void);
 
 /* ------------------------------------------------------------------------ *
  * Garbage collect                                                            *
  * ------------------------------------------------------------------------ */
-extern int               template_collect         (void);
+extern int template_collect(void);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void              template_default         (struct template  *iptr);
+extern void template_default(struct template *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct template  *template_new             (const char       *name);
+extern struct template *template_new(const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void              template_delete          (struct template  *iptr);
+extern void template_delete(struct template *iptr);
 
 /* ------------------------------------------------------------------------ *
  * Loose all references                                                       *
  * ------------------------------------------------------------------------ */
-extern void              template_release         (struct template  *iptr);
+extern void template_release(struct template *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern void              template_set_name        (struct template  *iptr,
-                                                   const char    *name);
+extern void template_set_name(struct template *iptr, const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern const char       *template_get_name        (struct template  *iptr);
+extern const char *template_get_name(struct template *iptr);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct template  *template_find_name       (const char    *name);
+extern struct template *template_find_name(const char *name);
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern struct template  *template_find_id         (uint32_t       id);
+extern struct template *template_find_id(uint32_t id);
 
 /* ------------------------------------------------------------------------ *
- * Dump templateers and template heap.                                            *
+ * Dump templateers and template heap. *
  * ------------------------------------------------------------------------ */
-extern void              template_dump            (struct template  *iptr);
+extern void template_dump(struct template *iptr);
 
 #endif

@@ -27,24 +27,24 @@
 /* ------------------------------------------------------------------------ *
  * Library headers                                                          *
  * ------------------------------------------------------------------------ */
-#include "libchaos/defs.h"
-#include "config.h"
 #include "libchaos/filter.h"
+#include "config.h"
+#include "libchaos/defs.h"
+#include "libchaos/io.h"
 #include "libchaos/listen.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
-#include "libchaos/io.h"
 #include "libchaos/syscall.h"
+#include "libchaos/timer.h"
 
 /* ------------------------------------------------------------------------ *
  * System headers                                                           *
  * ------------------------------------------------------------------------ */
 #include "config.h"
 
-#include <sys/socket.h>
 #include <linux/filter.h>
+#include <sys/socket.h>
 
 #if HAVE_SOCKET_FILTER
 
@@ -75,36 +75,36 @@
  * System dependant constants                                               *
  * ------------------------------------------------------------------------ */
 #ifdef LINUX_SOCKET_FILTER
-#define bf_len      len
-#define bf_insns    filter
-#define bpf_insn    sock_filter
-#define fprog_type  struct sock_fprog
+#define bf_len len
+#define bf_insns filter
+#define bpf_insn sock_filter
+#define fprog_type struct sock_fprog
 #endif
 
 #ifdef BSD_SOCKET_FILTER
 #define SKF_NET_OFF ETHER_HDR_LEN
-#define fprog_type  struct bpf_program
+#define fprog_type struct bpf_program
 #endif
 
 /* ------------------------------------------------------------------------ *
  * Global variables                                                         *
  * ------------------------------------------------------------------------ */
-int           filter_log;
-struct sheap  filter_heap;       /* heap containing filter blocks */
-struct sheap  filter_rule_heap;  /* heap containing filter rules */
-struct dheap  filter_prog_heap;  /* heap containing filter rules */
-struct list   filter_list;       /* list linking filter blocks */
+int filter_log;
+struct sheap filter_heap;      /* heap containing filter blocks */
+struct sheap filter_rule_heap; /* heap containing filter rules */
+struct dheap filter_prog_heap; /* heap containing filter rules */
+struct list filter_list;       /* list linking filter blocks */
 struct timer *filter_timer;
-uint32_t      filter_id;
-int           filter_dirty;
+uint32_t filter_id;
+int filter_dirty;
 
 int filter_get_log() { return filter_log; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-#define IPHDR_PROTO  0x09 /* Byte-location of protocol type in IP header */
-#define IPHDR_SRCIP  0x0c /* Byte-location of source IP in IP header */
-#define IPHDR_DSTIP  0x10 /* Byte-location of source IP in IP header */
+#define IPHDR_PROTO 0x09 /* Byte-location of protocol type in IP header */
+#define IPHDR_SRCIP 0x0c /* Byte-location of source IP in IP header */
+#define IPHDR_DSTIP 0x10 /* Byte-location of source IP in IP header */
 #define IPHDR_TOTLEN 2
 
 #define ETHDR_PROTO 0x0c
@@ -112,35 +112,26 @@ int filter_get_log() { return filter_log; }
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_jmp         (struct filter *fptr,
-                                uint16_t       code,
-                                uint8_t        jt,
-                                uint8_t        jf,
-                                uint32_t       k);
-static void filter_begin       (struct filter *fptr);
-static void filter_ins         (struct filter *fptr,
-                                uint16_t       code,
-                                uint32_t       k);
+static void filter_jmp(struct filter *fptr, uint16_t code, uint8_t jt,
+                       uint8_t jf, uint32_t k);
+static void filter_begin(struct filter *fptr);
+static void filter_ins(struct filter *fptr, uint16_t code, uint32_t k);
 #endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_cleanup(void)
-{
-  struct filter      *fptr;
+static void filter_cleanup(void) {
+  struct filter *fptr;
   struct filter_rule *frptr;
-  struct node        *next;
-  int                 reattach;
+  struct node *next;
+  int reattach;
 
-  dlink_foreach(&filter_list, fptr)
-  {
+  dlink_foreach(&filter_list, fptr) {
     reattach = 0;
 
-    dlink_foreach_safe(&fptr->rules, frptr, next)
-    {
-      if(frptr->ts && frptr->ts < timer_mtime)
-      {
+    dlink_foreach_safe(&fptr->rules, frptr, next) {
+      if (frptr->ts && frptr->ts < timer_mtime) {
         dlink_delete(&fptr->rules, &frptr->node);
 
         log(filter_log, L_verbose, "Deleted socket filter for %s",
@@ -150,11 +141,9 @@ static void filter_cleanup(void)
 
         reattach = 1;
       }
-
     }
 
-    if(reattach)
-    {
+    if (reattach) {
       filter_rule_compile(fptr);
 
       filter_reattach_all(fptr);
@@ -166,54 +155,51 @@ static void filter_cleanup(void)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_begin(struct filter *fptr)
-{
+static void filter_begin(struct filter *fptr) {
   fprog_type *prog = fptr->prog;
 
-  if(prog->bf_insns)
+  if (prog->bf_insns)
     mem_dynamic_free(&filter_prog_heap, prog->bf_insns);
 
   prog->bf_len = 0;
   prog->bf_insns = NULL;
 
   /* This drops non-ip shit */
-/*  filter_ins(fptr, BPF_LD|BPF_B|BPF_ABS, SKF_NET_OFF +   );
-  filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 0, 1, 0x92);
-  filter_ins(fptr, BPF_RET + BPF_K, 0xffff);
-  filter_ins(fptr, BPF_RET + BPF_K, 0x0);*/
+  /*  filter_ins(fptr, BPF_LD|BPF_B|BPF_ABS, SKF_NET_OFF +   );
+    filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 0, 1, 0x92);
+    filter_ins(fptr, BPF_RET + BPF_K, 0xffff);
+    filter_ins(fptr, BPF_RET + BPF_K, 0x0);*/
 }
 #endif
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_entry(struct filter *fptr, int type,
-                         uint32_t data1, uint32_t data2)
-{
-  switch(type)
-  {
-/*    case FILTER_PROTO:
-      filter_ins(fptr, BPF_LD|BPF_H|BPF_ABS, ETHER_HDR_LEN + IPHDR_PROTO);
-      filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 1, 0, (data & 0xffff) | ((data & 0xffff) << 16));
-      break;*/
-    case FILTER_SRCIP:
-      filter_ins(fptr, BPF_LD|BPF_W|BPF_ABS, SKF_NET_OFF + IPHDR_SRCIP);
-      filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 0, 1, net_ntohl(data1));
-      break;
-    case FILTER_DSTIP:
-      filter_ins(fptr, BPF_LD|BPF_W|BPF_ABS, SKF_NET_OFF + IPHDR_DSTIP);
-      filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 0, 1, net_ntohl(data1));
-      break;
-    case FILTER_SRCNET:
-      filter_ins(fptr, BPF_LD|BPF_W|BPF_ABS, SKF_NET_OFF + IPHDR_SRCIP);
-      filter_ins(fptr, BPF_ALU|BPF_AND|BPF_K, net_ntohl(data2));
-      filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 0, 1, net_ntohl(data1));
-      break;
-    case FILTER_DSTNET:
-      filter_ins(fptr, BPF_LD|BPF_W|BPF_ABS, SKF_NET_OFF + IPHDR_DSTIP);
-      filter_ins(fptr, BPF_ALU|BPF_AND|BPF_K, net_ntohl(data2));
-      filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 0, 1, net_ntohl(data1));
-      break;
+static void filter_entry(struct filter *fptr, int type, uint32_t data1,
+                         uint32_t data2) {
+  switch (type) {
+    /*    case FILTER_PROTO:
+          filter_ins(fptr, BPF_LD|BPF_H|BPF_ABS, ETHER_HDR_LEN + IPHDR_PROTO);
+          filter_jmp(fptr, BPF_JMP|BPF_JEQ|BPF_K, 1, 0, (data & 0xffff) | ((data
+       & 0xffff) << 16)); break;*/
+  case FILTER_SRCIP:
+    filter_ins(fptr, BPF_LD | BPF_W | BPF_ABS, SKF_NET_OFF + IPHDR_SRCIP);
+    filter_jmp(fptr, BPF_JMP | BPF_JEQ | BPF_K, 0, 1, net_ntohl(data1));
+    break;
+  case FILTER_DSTIP:
+    filter_ins(fptr, BPF_LD | BPF_W | BPF_ABS, SKF_NET_OFF + IPHDR_DSTIP);
+    filter_jmp(fptr, BPF_JMP | BPF_JEQ | BPF_K, 0, 1, net_ntohl(data1));
+    break;
+  case FILTER_SRCNET:
+    filter_ins(fptr, BPF_LD | BPF_W | BPF_ABS, SKF_NET_OFF + IPHDR_SRCIP);
+    filter_ins(fptr, BPF_ALU | BPF_AND | BPF_K, net_ntohl(data2));
+    filter_jmp(fptr, BPF_JMP | BPF_JEQ | BPF_K, 0, 1, net_ntohl(data1));
+    break;
+  case FILTER_DSTNET:
+    filter_ins(fptr, BPF_LD | BPF_W | BPF_ABS, SKF_NET_OFF + IPHDR_DSTIP);
+    filter_ins(fptr, BPF_ALU | BPF_AND | BPF_K, net_ntohl(data2));
+    filter_jmp(fptr, BPF_JMP | BPF_JEQ | BPF_K, 0, 1, net_ntohl(data1));
+    break;
   }
 
   filter_ins(fptr, BPF_RET + BPF_K, 0);
@@ -223,10 +209,9 @@ static void filter_entry(struct filter *fptr, int type,
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_end(struct filter *fptr)
-{
-  filter_ins(fptr, BPF_LD|BPF_H|BPF_ABS, SKF_NET_OFF + IPHDR_TOTLEN);
-/*  filter_ins(fptr, BPF_ALU|BPF_ADD|BPF_K, ETHER_HDR_LEN);*/
+static void filter_end(struct filter *fptr) {
+  filter_ins(fptr, BPF_LD | BPF_H | BPF_ABS, SKF_NET_OFF + IPHDR_TOTLEN);
+  /*  filter_ins(fptr, BPF_ALU|BPF_ADD|BPF_K, ETHER_HDR_LEN);*/
   filter_ins(fptr, BPF_RET + BPF_A, 0);
 }
 #endif
@@ -234,13 +219,12 @@ static void filter_end(struct filter *fptr)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_ins(struct filter *fptr, uint16_t code, uint32_t k)
-{
+static void filter_ins(struct filter *fptr, uint16_t code, uint32_t k) {
   fprog_type *prog = fptr->prog;
 
   prog->bf_insns =
-    mem_dynamic_realloc(&filter_prog_heap, prog->bf_insns,
-                        sizeof(struct bpf_insn) * (prog->bf_len + 1));
+      mem_dynamic_realloc(&filter_prog_heap, prog->bf_insns,
+                          sizeof(struct bpf_insn) * (prog->bf_len + 1));
 
   prog->bf_insns[prog->bf_len].code = code;
   prog->bf_insns[prog->bf_len].k = k;
@@ -254,14 +238,13 @@ static void filter_ins(struct filter *fptr, uint16_t code, uint32_t k)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 #ifdef HAVE_SOCKET_FILTER
-static void filter_jmp(struct filter *fptr, uint16_t code,
-                       uint8_t jt, uint8_t jf, uint32_t k)
-{
+static void filter_jmp(struct filter *fptr, uint16_t code, uint8_t jt,
+                       uint8_t jf, uint32_t k) {
   fprog_type *prog = fptr->prog;
 
   prog->bf_insns =
-    mem_dynamic_realloc(&filter_prog_heap, prog->bf_insns,
-                        sizeof(struct bpf_insn) * (prog->bf_len + 1));
+      mem_dynamic_realloc(&filter_prog_heap, prog->bf_insns,
+                          sizeof(struct bpf_insn) * (prog->bf_len + 1));
 
   prog->bf_insns[prog->bf_len].code = code;
   prog->bf_insns[prog->bf_len].jt = jt;
@@ -275,8 +258,7 @@ static void filter_jmp(struct filter *fptr, uint16_t code,
 /* ------------------------------------------------------------------------ *
  * Initialize filterer heap and add garbage collect timer.                  *
  * ------------------------------------------------------------------------ */
-void filter_init(void)
-{
+void filter_init(void) {
   filter_log = log_source_register("filter");
 
   dlink_list_zero(&filter_list);
@@ -285,11 +267,12 @@ void filter_init(void)
   filter_dirty = 0;
 
 #ifdef HAVE_SOCKET_FILTER
-  mem_static_create(&filter_heap, sizeof(struct filter) +
-                    sizeof(fprog_type), FILTER_BLOCK_SIZE);
+  mem_static_create(&filter_heap, sizeof(struct filter) + sizeof(fprog_type),
+                    FILTER_BLOCK_SIZE);
 
   mem_static_note(&filter_heap, "filter block heap");
-  mem_static_create(&filter_rule_heap, sizeof(struct filter_rule), FILTER_BLOCK_SIZE);
+  mem_static_create(&filter_rule_heap, sizeof(struct filter_rule),
+                    FILTER_BLOCK_SIZE);
   mem_static_note(&filter_rule_heap, "filter rule heap");
   mem_dynamic_create(&filter_prog_heap, FILTER_MAX_SIZE);
 
@@ -300,17 +283,15 @@ void filter_init(void)
 /* ------------------------------------------------------------------------ *
  * Destroy filterer heap and cancel timer.                                  *
  * ------------------------------------------------------------------------ */
-void filter_shutdown(void)
-{
+void filter_shutdown(void) {
   struct filter *fptr;
   struct filter *next;
 
   timer_cancel(&filter_timer);
 
   /* Remove all filter blocks */
-  dlink_foreach_safe(&filter_list, fptr, next)
-  {
-    if(fptr->refcount)
+  dlink_foreach_safe(&filter_list, fptr, next) {
+    if (fptr->refcount)
       fptr->refcount--;
 
     filter_delete(fptr);
@@ -332,22 +313,18 @@ void filter_shutdown(void)
 /* ------------------------------------------------------------------------ *
  * Collect filter block garbage.                                            *
  * ------------------------------------------------------------------------ */
-int filter_collect(void)
-{
+int filter_collect(void) {
   struct filter *cnptr;
   struct filter *next;
-  size_t         n = 0;
+  size_t n = 0;
 
-  if(filter_dirty)
-  {
+  if (filter_dirty) {
     /* Report verbose */
     log(filter_log, L_verbose, "Doing garbage collect for [filter] module.");
 
     /* Free all filter blocks with a zero refcount */
-    dlink_foreach_safe(&filter_list, cnptr, next)
-    {
-      if(!cnptr->refcount)
-      {
+    dlink_foreach_safe(&filter_list, cnptr, next) {
+      if (!cnptr->refcount) {
         filter_delete(cnptr);
 
         n++;
@@ -365,8 +342,7 @@ int filter_collect(void)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_default(struct filter *filter)
-{
+void filter_default(struct filter *filter) {
   dlink_node_zero(&filter->node);
 
   strcpy(filter->name, "default");
@@ -377,8 +353,7 @@ void filter_default(struct filter *filter)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct filter *filter_add(const char *name)
-{
+struct filter *filter_add(const char *name) {
 #ifdef HAVE_SOCKET_FILTER
   struct filter *filter;
 
@@ -402,8 +377,7 @@ struct filter *filter_add(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_delete(struct filter *filter)
-{
+void filter_delete(struct filter *filter) {
 #ifdef HAVE_SOCKET_FILTER
   log(filter_log, L_status, "Deleting filter block: %s", filter->name);
 
@@ -413,23 +387,17 @@ void filter_delete(struct filter *filter)
 #endif
 }
 
- /* ------------------------------------------------------------------------ *
-  * Loose all references                                                     *
-  * ------------------------------------------------------------------------ */
-void filter_release(struct filter *fptr)
-{
-  filter_dirty = 1;
-}
+/* ------------------------------------------------------------------------ *
+ * Loose all references                                                     *
+ * ------------------------------------------------------------------------ */
+void filter_release(struct filter *fptr) { filter_dirty = 1; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct filter *filter_pop(struct filter *fptr)
-{
-  if(fptr)
-  {
-    if(!fptr->refcount)
-      log(filter_log, L_warning, "Poping deprecated filter: %s",
-          fptr->name);
+struct filter *filter_pop(struct filter *fptr) {
+  if (fptr) {
+    if (!fptr->refcount)
+      log(filter_log, L_warning, "Poping deprecated filter: %s", fptr->name);
 
     fptr->refcount++;
   }
@@ -437,21 +405,15 @@ struct filter *filter_pop(struct filter *fptr)
   return fptr;
 }
 
-
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct filter *filter_push(struct filter **fptrptr)
-{
-  if(*fptrptr)
-  {
-    if(!(*fptrptr)->refcount)
-    {
+struct filter *filter_push(struct filter **fptrptr) {
+  if (*fptrptr) {
+    if (!(*fptrptr)->refcount) {
       log(filter_log, L_warning, "Trying to push deprecated filter %s",
           (*fptrptr)->name);
-    }
-    else
-    {
-      if(--(*fptrptr)->refcount == 0)
+    } else {
+      if (--(*fptrptr)->refcount == 0)
         filter_release(*fptrptr);
     }
 
@@ -463,8 +425,7 @@ struct filter *filter_push(struct filter **fptrptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_set_name(struct filter *filter, const char *name)
-{
+void filter_set_name(struct filter *filter, const char *name) {
   strlcpy(filter->name, name, sizeof(filter->name));
 
   filter->hash = str_ihash(filter->name);
@@ -472,28 +433,22 @@ void filter_set_name(struct filter *filter, const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-const char *filter_get_name(struct filter *filter)
-{
-  return filter->name;
-}
+const char *filter_get_name(struct filter *filter) { return filter->name; }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct filter *filter_find_name(const char *name)
-{
-  struct node   *node;
+struct filter *filter_find_name(const char *name) {
+  struct node *node;
   struct filter *filter;
-  hash_t         hash;
-  
+  hash_t hash;
+
   hash = str_ihash(name);
 
-  dlink_foreach(&filter_list, node)
-  {
+  dlink_foreach(&filter_list, node) {
     filter = node->data;
 
-    if(filter->hash == hash)
-    {
-      if(!str_icmp(filter->name, name))
+    if (filter->hash == hash) {
+      if (!str_icmp(filter->name, name))
         return filter;
     }
   }
@@ -503,13 +458,11 @@ struct filter *filter_find_name(const char *name)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-struct filter *filter_find_id(uint32_t id)
-{
+struct filter *filter_find_id(uint32_t id) {
   struct filter *fptr;
 
-  dlink_foreach(&filter_list, fptr)
-  {
-    if(fptr->id == id)
+  dlink_foreach(&filter_list, fptr) {
+    if (fptr->id == id)
       return fptr;
   }
 
@@ -519,13 +472,12 @@ struct filter *filter_find_id(uint32_t id)
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 struct filter_rule *filter_rule_find(struct filter *fptr, int type, int action,
-                                     uint32_t data1, uint32_t data2)
-{
+                                     uint32_t data1, uint32_t data2) {
   struct filter_rule *rule;
 
-  dlink_foreach(&fptr->rules, rule)
-  {
-    if(rule->type == type && rule->action == action && rule->address == data1 && rule->netmask == data2)
+  dlink_foreach(&fptr->rules, rule) {
+    if (rule->type == type && rule->action == action &&
+        rule->address == data1 && rule->netmask == data2)
       return rule;
   }
 
@@ -534,12 +486,11 @@ struct filter_rule *filter_rule_find(struct filter *fptr, int type, int action,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_rule_add(struct filter *fptr, int type, int action,
-                     uint32_t data1, uint32_t data2, uint64_t lifetime)
-{
+void filter_rule_add(struct filter *fptr, int type, int action, uint32_t data1,
+                     uint32_t data2, uint64_t lifetime) {
   struct filter_rule *frptr;
 
-  if(filter_rule_find(fptr, type, action, data1, data2))
+  if (filter_rule_find(fptr, type, action, data1, data2))
     return;
 
   frptr = mem_static_alloc(&filter_rule_heap);
@@ -549,7 +500,7 @@ void filter_rule_add(struct filter *fptr, int type, int action,
   frptr->address = data1;
   frptr->netmask = data2;
 
-  if(lifetime)
+  if (lifetime)
     frptr->ts = timer_mtime + lifetime;
   else
     frptr->ts = 0;
@@ -558,16 +509,15 @@ void filter_rule_add(struct filter *fptr, int type, int action,
 
   log(filter_log, L_verbose, "Added socket filter for %s",
       net_ntoa((net_addr_t)data1));
- }
+}
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 void filter_rule_insert(struct filter *fptr, int type, int action,
-                        uint32_t data1, uint32_t data2, uint64_t lifetime)
-{
+                        uint32_t data1, uint32_t data2, uint64_t lifetime) {
   struct filter_rule *frptr;
 
-  if(filter_rule_find(fptr, type, action, data1, data2))
+  if (filter_rule_find(fptr, type, action, data1, data2))
     return;
 
   frptr = mem_static_alloc(&filter_rule_heap);
@@ -577,7 +527,7 @@ void filter_rule_insert(struct filter *fptr, int type, int action,
   frptr->address = data1;
   frptr->netmask = data2;
 
-  if(lifetime)
+  if (lifetime)
     frptr->ts = timer_mtime + lifetime;
   else
     frptr->ts = 0;
@@ -590,29 +540,28 @@ void filter_rule_insert(struct filter *fptr, int type, int action,
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_rule_delete(struct filter *fptr, int type, int action, uint32_t data1, uint32_t data2)
-{
+void filter_rule_delete(struct filter *fptr, int type, int action,
+                        uint32_t data1, uint32_t data2) {
   struct filter_rule *rule;
-  struct node        *next;
+  struct node *next;
 
-  dlink_foreach_safe(&fptr->rules, rule, next)
-  {
-    if(rule->type == type && rule->action == action && rule->address == data1 && rule->netmask == data2)
+  dlink_foreach_safe(&fptr->rules, rule, next) {
+    if (rule->type == type && rule->action == action &&
+        rule->address == data1 && rule->netmask == data2)
       dlink_delete(&fptr->rules, &rule->node);
   }
 }
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_rule_compile(struct filter *fptr)
-{
+void filter_rule_compile(struct filter *fptr) {
 #ifdef HAVE_SOCKET_FILTER
   struct filter_rule *frptr;
 
   filter_begin(fptr);
 
   dlink_foreach(&fptr->rules, frptr)
-    filter_entry(fptr, frptr->type, frptr->address, frptr->netmask);
+      filter_entry(fptr, frptr->type, frptr->address, frptr->netmask);
 
   filter_end(fptr);
 #endif
@@ -621,21 +570,19 @@ void filter_rule_compile(struct filter *fptr)
 /* ------------------------------------------------------------------------ *
  * Attach a filter to a socket                                              *
  * ------------------------------------------------------------------------ */
-int filter_attach_socket(struct filter *fptr, int fd)
-{
+int filter_attach_socket(struct filter *fptr, int fd) {
 #ifdef LINUX_SOCKET_FILTER
   int error = 0;
   socklen_t errsize = sizeof(error);
 
   syscall_setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, fptr->prog,
-                      sizeof(fprog_type));
+                     sizeof(fprog_type));
   syscall_getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &errsize);
 
   return error;
 #endif
 #ifdef BSD_PACKET_FILTER
-  if(ioctl(fd, BIOCSETF, &fptr->prog) == EOPNOTSUPP)
-  {
+  if (ioctl(fd, BIOCSETF, &fptr->prog) == EOPNOTSUPP) {
     log(filter_log, L_warning, "Socket filters are not supported!");
     return -1;
   }
@@ -646,15 +593,15 @@ int filter_attach_socket(struct filter *fptr, int fd)
 /* ------------------------------------------------------------------------ *
  * Detach filter from socket                                                *
  * ------------------------------------------------------------------------ */
-int filter_detach_socket(struct filter *fptr, int fd)
-{
+int filter_detach_socket(struct filter *fptr, int fd) {
 #ifdef LINUX_SOCKET_FILTER
-  struct sock_fprog dummy = { 0, NULL };
+  struct sock_fprog dummy = {0, NULL};
 
-  return syscall_setsockopt(fd, SOL_SOCKET, SO_DETACH_FILTER, &dummy, sizeof(dummy));
+  return syscall_setsockopt(fd, SOL_SOCKET, SO_DETACH_FILTER, &dummy,
+                            sizeof(dummy));
 #endif
 #ifdef BSD_SOCKET_FILTER
-  struct bpf_program dummy = { 0, NULL };
+  struct bpf_program dummy = {0, NULL};
 
   return ioctl(fd, BIOCSETF, &dummy);
 #endif
@@ -665,8 +612,7 @@ int filter_detach_socket(struct filter *fptr, int fd)
 /* ------------------------------------------------------------------------ *
  * Attach a filter to a listener                                            *
  * ------------------------------------------------------------------------ */
-int filter_attach_listener(struct filter *fptr, struct listen *liptr)
-{
+int filter_attach_listener(struct filter *fptr, struct listen *liptr) {
   struct node *nptr;
 
   nptr = dlink_node_new();
@@ -679,14 +625,12 @@ int filter_attach_listener(struct filter *fptr, struct listen *liptr)
 /* ------------------------------------------------------------------------ *
  * Detach filter from listener                                              *
  * ------------------------------------------------------------------------ */
-int filter_detach_listener(struct filter *fptr, struct listen *liptr)
-{
+int filter_detach_listener(struct filter *fptr, struct listen *liptr) {
   struct node *nptr;
 
   nptr = dlink_find_delete(&fptr->listeners, liptr);
 
-  if(nptr)
-  {
+  if (nptr) {
     dlink_node_free(nptr);
 
     return listen_detach_filter(liptr);
@@ -698,9 +642,8 @@ int filter_detach_listener(struct filter *fptr, struct listen *liptr)
 /* ------------------------------------------------------------------------ *
  * Reattach filter to a listener (After a recompile)                        *
  * ------------------------------------------------------------------------ */
-int filter_reattach_listener(struct filter *fptr, struct listen *liptr)
-{
-  if(liptr->filter)
+int filter_reattach_listener(struct filter *fptr, struct listen *liptr) {
+  if (liptr->filter)
     filter_detach_socket(fptr, liptr->fd);
 
   return filter_attach_socket(fptr, liptr->fd);
@@ -708,36 +651,28 @@ int filter_reattach_listener(struct filter *fptr, struct listen *liptr)
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-void filter_reattach_all(struct filter *fptr)
-{
-  struct node   *nptr;
+void filter_reattach_all(struct filter *fptr) {
+  struct node *nptr;
   struct listen *lptr = NULL;
 
   dlink_foreach_data(&fptr->listeners, nptr, lptr)
-    filter_reattach_listener(fptr, lptr);
+      filter_reattach_listener(fptr, lptr);
 }
 
 /* ------------------------------------------------------------------------ *
  * Dump filterers and filter heap.                                          *
  * ------------------------------------------------------------------------ */
-void filter_dump(struct filter *fptr)
-{
-  if(fptr == NULL)
-  {
+void filter_dump(struct filter *fptr) {
+  if (fptr == NULL) {
     dump(filter_log, "[============== filter summary ===============]");
 
-    dlink_foreach(&filter_list, fptr)
-      dump(filter_log, " #%03u: [%u] %-20s",
-           fptr->id,
-           fptr->refcount,
-           fptr->name);
+    dlink_foreach(&filter_list, fptr) dump(
+        filter_log, " #%03u: [%u] %-20s", fptr->id, fptr->refcount, fptr->name);
 
     dump(filter_log, "[========== end of filter summary ============]");
-  }
-  else
-  {
+  } else {
     struct filter_rule *rule;
-    uint32_t            i = 0;
+    uint32_t i = 0;
 
     dump(filter_log, "[============== filter dump ===============]");
     dump(filter_log, "         id: #%u", fptr->id);
@@ -748,18 +683,20 @@ void filter_dump(struct filter *fptr)
     dump(filter_log, "  listeners: %u nodes", fptr->listeners.size);
 
     /* dump filter rules */
-    dlink_foreach(&fptr->rules, rule)
-    {
+    dlink_foreach(&fptr->rules, rule) {
       char netmask[16];
 
       net_ntoa_r((net_addr_t)rule->netmask, netmask);
 
-      dump(filter_log, "   rule #%u: %s %s %s/%s",
-           i,
-           rule->type == FILTER_PROTO ? "PROTO" :
-           (rule->type == FILTER_SRCIP ? "SRCIP" :
-            (rule->type == FILTER_SRCNET ? "SRCNET" :
-             (rule->type == FILTER_DSTIP ? "DSTIP" : "DSTNET"))),
+      dump(filter_log, "   rule #%u: %s %s %s/%s", i,
+           rule->type == FILTER_PROTO
+               ? "PROTO"
+               : (rule->type == FILTER_SRCIP
+                      ? "SRCIP"
+                      : (rule->type == FILTER_SRCNET
+                             ? "SRCNET"
+                             : (rule->type == FILTER_DSTIP ? "DSTIP"
+                                                           : "DSTNET"))),
            rule->action == FILTER_DENY ? "DENY" : "ACCEPT",
            net_ntoa((net_addr_t)rule->address), netmask);
 
@@ -770,12 +707,10 @@ void filter_dump(struct filter *fptr)
     fprog_type *prog = fptr->prog;
 
     /* dump filter rules */
-    if(prog->bf_len)
-    {
+    if (prog->bf_len) {
       dump(filter_log, " ----------- filter program -------------");
 
-      for(i = 0; i < prog->bf_len; i++)
-      {
+      for (i = 0; i < prog->bf_len; i++) {
         struct bpf_insn *p;
         char operand[64];
         char *fmt, *op;
@@ -785,239 +720,237 @@ void filter_dump(struct filter *fptr)
         v = p->k;
 
         /* disassemble filter rule */
-        switch (p->code)
-        {
-          default:
-            op = "unimp";
-            fmt = "%x";
-            v = p->code;
-            break;
+        switch (p->code) {
+        default:
+          op = "unimp";
+          fmt = "%x";
+          v = p->code;
+          break;
 
-          case BPF_RET|BPF_K:
-            op = "ret";
-            fmt = "#%d";
-            break;
+        case BPF_RET | BPF_K:
+          op = "ret";
+          fmt = "#%d";
+          break;
 
-          case BPF_RET|BPF_A:
-            op = "ret";
-            fmt = "";
-            break;
+        case BPF_RET | BPF_A:
+          op = "ret";
+          fmt = "";
+          break;
 
-          case BPF_LD|BPF_W|BPF_ABS:
-            op = "ld";
-            fmt = "[%d]";
-            break;
+        case BPF_LD | BPF_W | BPF_ABS:
+          op = "ld";
+          fmt = "[%d]";
+          break;
 
-          case BPF_LD|BPF_H|BPF_ABS:
-            op = "ldh";
-            fmt = "[%d]";
-            break;
+        case BPF_LD | BPF_H | BPF_ABS:
+          op = "ldh";
+          fmt = "[%d]";
+          break;
 
-          case BPF_LD|BPF_B|BPF_ABS:
-            op = "ldb";
-            fmt = "[%d]";
-            break;
+        case BPF_LD | BPF_B | BPF_ABS:
+          op = "ldb";
+          fmt = "[%d]";
+          break;
 
-          case BPF_LD|BPF_W|BPF_LEN:
-            op = "ld";
-            fmt = "#pktlen";
-          case BPF_LD|BPF_W|BPF_IND:
-            op = "ld";
-            fmt = "[x + %d]";
-            break;
+        case BPF_LD | BPF_W | BPF_LEN:
+          op = "ld";
+          fmt = "#pktlen";
+        case BPF_LD | BPF_W | BPF_IND:
+          op = "ld";
+          fmt = "[x + %d]";
+          break;
 
-          case BPF_LD|BPF_H|BPF_IND:
-            op = "ldh";
-            fmt = "[x + %d]";
-            break;
+        case BPF_LD | BPF_H | BPF_IND:
+          op = "ldh";
+          fmt = "[x + %d]";
+          break;
 
-          case BPF_LD|BPF_B|BPF_IND:
-            op = "ldb";
-            fmt = "[x + %d]";
-            break;
+        case BPF_LD | BPF_B | BPF_IND:
+          op = "ldb";
+          fmt = "[x + %d]";
+          break;
 
-          case BPF_LD|BPF_IMM:
-            op = "ld";
-            fmt = "#%x";
-            break;
+        case BPF_LD | BPF_IMM:
+          op = "ld";
+          fmt = "#%x";
+          break;
 
-          case BPF_LDX|BPF_IMM:
-            op = "ldx";
-            fmt = "#%x";
-            break;
+        case BPF_LDX | BPF_IMM:
+          op = "ldx";
+          fmt = "#%x";
+          break;
 
-          case BPF_LDX|BPF_MSH|BPF_B:
-            op = "ldxb";
-            fmt = "4*([%d]&0xf)";
-            break;
+        case BPF_LDX | BPF_MSH | BPF_B:
+          op = "ldxb";
+          fmt = "4*([%d]&0xf)";
+          break;
 
-          case BPF_LD|BPF_MEM:
-            op = "ld";
-            fmt = "M[%d]";
-            break;
+        case BPF_LD | BPF_MEM:
+          op = "ld";
+          fmt = "M[%d]";
+          break;
 
-          case BPF_LDX|BPF_MEM:
-            op = "ldx";
-            fmt = "M[%d]";
-            break;
+        case BPF_LDX | BPF_MEM:
+          op = "ldx";
+          fmt = "M[%d]";
+          break;
 
-          case BPF_ST:
-            op = "st";
-            fmt = "M[%d]";
-            break;
+        case BPF_ST:
+          op = "st";
+          fmt = "M[%d]";
+          break;
 
-          case BPF_STX:
-            op = "stx";
-            fmt = "M[%d]";
-            break;
+        case BPF_STX:
+          op = "stx";
+          fmt = "M[%d]";
+          break;
 
-          case BPF_JMP|BPF_JA:
-            op = "ja";
-            fmt = "%d";
-            v = i + 1 + p->k;
-            break;
+        case BPF_JMP | BPF_JA:
+          op = "ja";
+          fmt = "%d";
+          v = i + 1 + p->k;
+          break;
 
-          case BPF_JMP|BPF_JGT|BPF_K:
-            op = "jgt";
-            fmt = "#%x";
-            break;
+        case BPF_JMP | BPF_JGT | BPF_K:
+          op = "jgt";
+          fmt = "#%x";
+          break;
 
-          case BPF_JMP|BPF_JGE|BPF_K:
-            op = "jge";
-            fmt = "#%x";
-            break;
+        case BPF_JMP | BPF_JGE | BPF_K:
+          op = "jge";
+          fmt = "#%x";
+          break;
 
-          case BPF_JMP|BPF_JEQ|BPF_K:
-            op = "jeq";
-            fmt = "#%x";
-            break;
+        case BPF_JMP | BPF_JEQ | BPF_K:
+          op = "jeq";
+          fmt = "#%x";
+          break;
 
-          case BPF_JMP|BPF_JSET|BPF_K:
-            op = "jset";
-            fmt = "#%x";
-            break;
+        case BPF_JMP | BPF_JSET | BPF_K:
+          op = "jset";
+          fmt = "#%x";
+          break;
 
-          case BPF_JMP|BPF_JGT|BPF_X:
-            op = "jgt";
-            fmt = "x";
-            break;
+        case BPF_JMP | BPF_JGT | BPF_X:
+          op = "jgt";
+          fmt = "x";
+          break;
 
-          case BPF_JMP|BPF_JGE|BPF_X:
-            op = "jge";
-            fmt = "x";
-            break;
+        case BPF_JMP | BPF_JGE | BPF_X:
+          op = "jge";
+          fmt = "x";
+          break;
 
-          case BPF_JMP|BPF_JEQ|BPF_X:
-            op = "jeq";
-            fmt = "x";
-            break;
+        case BPF_JMP | BPF_JEQ | BPF_X:
+          op = "jeq";
+          fmt = "x";
+          break;
 
-          case BPF_JMP|BPF_JSET|BPF_X:
-            op = "jset";
-            fmt = "x";
-            break;
-          case BPF_ALU|BPF_ADD|BPF_X:
-            op = "add";
-            fmt = "x";
-            break;
+        case BPF_JMP | BPF_JSET | BPF_X:
+          op = "jset";
+          fmt = "x";
+          break;
+        case BPF_ALU | BPF_ADD | BPF_X:
+          op = "add";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_SUB|BPF_X:
-            op = "sub";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_SUB | BPF_X:
+          op = "sub";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_MUL|BPF_X:
-            op = "mul";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_MUL | BPF_X:
+          op = "mul";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_DIV|BPF_X:
-            op = "div";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_DIV | BPF_X:
+          op = "div";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_AND|BPF_X:
-            op = "and";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_AND | BPF_X:
+          op = "and";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_OR|BPF_X:
-            op = "or";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_OR | BPF_X:
+          op = "or";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_LSH|BPF_X:
-            op = "lsh";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_LSH | BPF_X:
+          op = "lsh";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_RSH|BPF_X:
-            op = "rsh";
-            fmt = "x";
-            break;
+        case BPF_ALU | BPF_RSH | BPF_X:
+          op = "rsh";
+          fmt = "x";
+          break;
 
-          case BPF_ALU|BPF_ADD|BPF_K:
-            op = "add";
-            fmt = "#%d";
-            break;
-          case BPF_ALU|BPF_SUB|BPF_K:
-            op = "sub";
-            fmt = "#%d";
-            break;
+        case BPF_ALU | BPF_ADD | BPF_K:
+          op = "add";
+          fmt = "#%d";
+          break;
+        case BPF_ALU | BPF_SUB | BPF_K:
+          op = "sub";
+          fmt = "#%d";
+          break;
 
-          case BPF_ALU|BPF_MUL|BPF_K:
-            op = "mul";
-            fmt = "#%d";
-            break;
+        case BPF_ALU | BPF_MUL | BPF_K:
+          op = "mul";
+          fmt = "#%d";
+          break;
 
-          case BPF_ALU|BPF_DIV|BPF_K:
-            op = "div";
-            fmt = "#%d";
-            break;
+        case BPF_ALU | BPF_DIV | BPF_K:
+          op = "div";
+          fmt = "#%d";
+          break;
 
-          case BPF_ALU|BPF_AND|BPF_K:
-            op = "and";
-            fmt = "#%x";
-            break;
+        case BPF_ALU | BPF_AND | BPF_K:
+          op = "and";
+          fmt = "#%x";
+          break;
 
-          case BPF_ALU|BPF_OR|BPF_K:
-            op = "or";
-            fmt = "#%x";
-            break;
+        case BPF_ALU | BPF_OR | BPF_K:
+          op = "or";
+          fmt = "#%x";
+          break;
 
-          case BPF_ALU|BPF_LSH|BPF_K:
-            op = "lsh";
-            fmt = "#%d";
-            break;
+        case BPF_ALU | BPF_LSH | BPF_K:
+          op = "lsh";
+          fmt = "#%d";
+          break;
 
-          case BPF_ALU|BPF_RSH|BPF_K:
-            op = "rsh";
-            fmt = "#%d";
-            break;
+        case BPF_ALU | BPF_RSH | BPF_K:
+          op = "rsh";
+          fmt = "#%d";
+          break;
 
-          case BPF_ALU|BPF_NEG:
-            op = "neg";
-            fmt = "";
-            break;
+        case BPF_ALU | BPF_NEG:
+          op = "neg";
+          fmt = "";
+          break;
 
-          case BPF_MISC|BPF_TAX:
-            op = "tax";
-            fmt = "";
-            break;
+        case BPF_MISC | BPF_TAX:
+          op = "tax";
+          fmt = "";
+          break;
 
-          case BPF_MISC|BPF_TXA:
-            op = "txa";
-            fmt = "";
+        case BPF_MISC | BPF_TXA:
+          op = "txa";
+          fmt = "";
 
           break;
         }
-        
+
         str_snprintf(operand, sizeof(operand), fmt, v);
-        dump(filter_log, 
-             (BPF_CLASS(p->code) == BPF_JMP &&
-              BPF_OP(p->code) != BPF_JA) ?
-             "(%03d) %-8s %-16s jt %d\tjf %d" :
-             "(%03d) %-8s %s",
+        dump(filter_log,
+             (BPF_CLASS(p->code) == BPF_JMP && BPF_OP(p->code) != BPF_JA)
+                 ? "(%03d) %-8s %-16s jt %d\tjf %d"
+                 : "(%03d) %-8s %s",
              i, op, operand, i + 1 + p->jt, i + 1 + p->jf);
       }
     }
