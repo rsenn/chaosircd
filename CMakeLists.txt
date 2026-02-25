@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.5)
+
 set(PACKAGENAME chaosircd)
 set(PACKAGEVERSION 2.2.1)
 set(PACKAGERELEASE "peace, love & hippie edition")
@@ -16,8 +18,6 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 project(${PACKAGENAME} C)
-
-cmake_minimum_required(VERSION 2.6)
 
 set(SYSCONFDIR
     ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME}
