@@ -95,7 +95,7 @@
 #  define IRCD_API(type)         __declspec(dllexport) type
 # else
 #  define IRCD_DATA(type) extern __declspec(dllimport) type
-#  define IRCD_API(type)                                    type
+#  define IRCD_API(type)                               type
 # endif
 #endif
 
@@ -108,11 +108,11 @@
 #endif
 
 #ifndef IRCD_API
-#define IRCD_API(type) type
+#define IRCD_API(type) __attribute__((visibility("default"))) type
 #endif
 
 #ifndef IRCD_DATA_DECL
-#define IRCD_DATA_DECL(type) type
+#define IRCD_DATA_DECL(type) __attribute__((visibility("default"))) type
 #endif
 
 extern int         ircd_log;
