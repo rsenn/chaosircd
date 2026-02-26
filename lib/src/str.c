@@ -581,8 +581,8 @@ size_t strlcpy(char *d, const char *s, size_t n) {
  * Append string <src> to <dst>. Don't let <dst> be bigger than <siz> bytes *
  * and always null-terminate. Returns new string length of <dst>            *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
 #ifndef HAVE_STRLCAT
+CHAOS_INLINE(
 size_t strlcat(char *d, const char *s, size_t n) {
   size_t i = 0;
 
@@ -839,9 +839,9 @@ int str_sprintf(char *str, const char *format, ...) {
 /* ------------------------------------------------------------------------ *
  * Converts a string to a signed int.                                       *
  * ------------------------------------------------------------------------ */
+#define ISNUM(c) ((c) >= '0' && (c) <= '9')
 CHAOS_INLINE(
 int str_toi(const char *s) {
-#define ISNUM(c) ((c) >= '0' && (c) <= '9')
   register uint32_t i = 0;
   register uint32_t sign = 0;
   register const uint8_t *p = (const uint8_t *)s;
@@ -870,9 +870,8 @@ int str_toi(const char *s) {
     return -i;
   else
     return i;
-
-#undef ISNUM
 })
+#undef ISNUM
 
 /* ------------------------------------------------------------------------ *
  * Splits a string into tokens.                                             *
@@ -915,7 +914,7 @@ size_t str_tokenize(char *s, char **v, size_t maxtok) {
       v[c++] = &s[1];
 
       break;
-    })
+    }
     /* Add to token list */
     v[c++] = s;
 
@@ -1071,22 +1070,20 @@ char *str_dup(const char *s) {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
 #define ROR(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
 #define ROL(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
+CHAOS_INLINE(
 hash_t str_hash(const char *s) {
   hash_t ret = 0xdefaced;
   hash_t temp;
   hash_t i;
 
-#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
-#endif
 
   if (s == NULL)
     return ret;
@@ -1101,6 +1098,7 @@ hash_t str_hash(const char *s) {
 
   return ret;
 })
+
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE(
@@ -1109,10 +1107,8 @@ hash_t str_ihash(const char *s) {
   hash_t temp;
   hash_t i;
 
-#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
-#endif
 
   if (s == NULL)
     return ret;
@@ -1126,10 +1122,9 @@ hash_t str_ihash(const char *s) {
   }
 
   return ret;
-}
+})
 #undef ROL
 #undef ROR
-)
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                    *

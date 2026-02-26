@@ -578,10 +578,8 @@ CHAOS_INLINE_FN(hash_t str_ihash(const char *s) {
   hash_t temp;
   hash_t i;
 
-#if HASH_BIT_SIZE > 32
   ret <<= 32;
   ret |= 0xcafebabe;
-#endif
 
   if (s == NULL)
     return ret;
@@ -597,7 +595,7 @@ CHAOS_INLINE_FN(hash_t str_ihash(const char *s) {
   return ret;
 })
 #undef ROL
-#undef ROR*/
+#undef ROR
 
 /* ------------------------------------------------------------------------ *
  * Convert a string to an unsigned long.                                      *

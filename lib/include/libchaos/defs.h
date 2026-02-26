@@ -22,6 +22,7 @@
 
 #ifndef CHAOS_DEFS_H
 #define CHAOS_DEFS_H
+#warning defs.h
 
 #ifdef HAVE_CONFIG_H
 /*#include "libchaos/config.h"*/
@@ -109,10 +110,10 @@ typedef int ssize_t;
 #endif
 
 #ifndef CHAOS_API
-#define CHAOS_API(type...) type;
+#define CHAOS_API(type...)  __attribute__((visibility("default"))) type;
 #endif
 #ifndef CHAOS_DATA
-#define CHAOS_DATA(type...) extern type
+#define CHAOS_DATA(type...)  __attribute__((visibility("default"))) extern type
 #endif
 
 #ifndef CHAOS_DATA_DECL
@@ -132,8 +133,8 @@ typedef int ssize_t;
 #if __GNUC__ > 4
 #warning GNUC > 4
 #define CHAOS_INLINE(x...) x
-#define CHAOS_INLINE_API(proto) proto;
-#define CHAOS_INLINE_FN(x...) //extern __inline__ x
+#define CHAOS_INLINE_API(proto) // proto;
+#define CHAOS_INLINE_FN(x...) static __inline__ x
 #else
 #warning GNUC <= 4
 #define CHAOS_INLINE(x...) x
