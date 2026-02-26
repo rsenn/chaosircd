@@ -52,24 +52,18 @@ set(SOURCES
     "${CMAKE_SOURCE_DIR}/include/ircd/usermode.h")
 
 add_definitions(-DHAVE_SSL=1)
-  
-link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib"
-                   "${LIBCHAOS_BINARY_DIR}")
+
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "${LIBCHAOS_BINARY_DIR}")
 
 if(WINDOWS OR CYGWIN)
 
   add_library(ircd SHARED ${SOURCES})
-  set_target_properties(ircd PROPERTIES INSTALL_RPATH
-                                        "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(ircd PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
 
-  add_executable(
-    chaosircd
-    main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h"
-    "${CMAKE_BINARY_DIR}/include/ircd/config.h"
-    "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
-  set_target_properties(chaosircd PROPERTIES INSTALL_RPATH
-                                             "${CMAKE_INSTALL_PREFIX}/lib")
+  add_executable(chaosircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_BINARY_DIR}/include/ircd/config.h"
+                           "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
+  set_target_properties(chaosircd PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
   target_link_libraries(ircd chaos owfat ${SOCKET_LIBRARIES})
   target_link_libraries(chaosircd ircd)
@@ -78,8 +72,7 @@ else()
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
   add_executable(chaosircd ${SOURCES} main.c)
 
-  target_link_libraries(chaosircd chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS}
-                        ${SOCKET_LIBRARIES})
+  target_link_libraries(chaosircd chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS} ${SOCKET_LIBRARIES})
 endif()
 
 install(TARGETS chaosircd RUNTIME DESTINATION bin)

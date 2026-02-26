@@ -33,9 +33,11 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}" # "${CMAKE_CURRENT_SOURCE_DIR}/libowfat"
 )
 
-file(GLOB LIBOWFAT_SOURCES 
-  libowfat/byte/*.c 
-  libowfat/str/*.c 
+file(
+  GLOB
+  LIBOWFAT_SOURCES
+  libowfat/byte/*.c
+  libowfat/str/*.c
   libowfat/stralloc/*.c
   libowfat/uint/*.c
   libowfat/*.h)
@@ -58,8 +60,7 @@ include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/UseFreeType.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/DllExt.cmake")
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
-# if(NOT BUILD_SHARED) add_definitions(-DSTATIC_LIBCHAOS=1)
-# add_definitions(-DSTATIC_IRCD=1) endif()
+# if(NOT BUILD_SHARED) add_definitions(-DSTATIC_LIBCHAOS=1) add_definitions(-DSTATIC_IRCD=1) endif()
 
 if(NOT HAVE_UNISTD_H)
   set(YY_NO_UNISTD_H 1)
@@ -110,8 +111,7 @@ check_include_file(ws2tcpip.h HAVE_WS_TCPIP_H)
 
 include("${CMAKE_SOURCE_DIR}/lib/CMakeModules/SubstituteProjectIncludes.cmake")
 
-include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
-                         "${LIBCHAOS_BINARY_DIR}")
+include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 # substitute_project_includes(ircd "${CMAKE_CURRENT_SOURCE_DIR}"
 # "${CMAKE_CURRENT_BINARY_DIR}")
 substitute_project_includes(ircd "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
@@ -139,8 +139,7 @@ set(TOOLS
 set(INSTALL_CONF_FILES)
 foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
   list(APPEND INSTALL_CONF_FILES ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
 
@@ -177,9 +176,8 @@ set(TOOLS
 set(INSTALL_SUBST_FILES)
 foreach(SUBSTFILE ${TOOLS})
   message(STATUS "Substituting ${SUBSTFILE}.in")
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY NEWLINE_STYLE UNIX)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE} @ONLY
+                 NEWLINE_STYLE UNIX)
   list(APPEND INSTALL_SUBST_FILES ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
 endforeach(SUBSTFILE)
 

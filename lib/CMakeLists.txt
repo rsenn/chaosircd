@@ -20,8 +20,8 @@ if(NOT LIBCHAOS_BINARY_DIR)
   set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
-# set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
-# set(CMAKE_CURRENT_LIST_DIR "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
+# set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules") set(CMAKE_CURRENT_LIST_DIR
+# "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigBuildType.cmake")
@@ -90,8 +90,7 @@ else(HAVE_POLL)
   set(USE_SELECT 1)
 endif(HAVE_POLL)
 
-check_library_exists(owfat stralloc_init "${CMAKE_INSTALL_PREFIX}/lib"
-                     HAVE_LOWFAT)
+check_library_exists(owfat stralloc_init "${CMAKE_INSTALL_PREFIX}/lib" HAVE_LOWFAT)
 if(HAVE_LOWFAT)
   set(LOWFAT_LIBRARY owfat)
 endif()
@@ -100,8 +99,7 @@ add_definitions(-DHAVE_CONFIG_H=1)
 
 check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 
-substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
-                            "${LIBCHAOS_BINARY_DIR}")
+substitute_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
 set(PLUGINDIR
     ${CMAKE_INSTALL_PREFIX}/lib/chaosircd
@@ -111,11 +109,8 @@ add_definitions(-DPLUGINDIR=\"${PLUGINDIR}\")
 
 add_definitions(-DBUILD_LIBCHAOS=1)
 
-include_directories(
-  "${CMAKE_CURRENT_BINARY_DIR}"
-  "${CMAKE_CURRENT_BINARY_DIR}/lib"
-  "${CMAKE_CURRENT_BINARY_DIR}/include"
-  )
+include_directories("${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/lib"
+                    "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 set(LIBCHAOS_HEADERS
     include/libchaos/cfg.h
@@ -190,9 +185,7 @@ string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 if(BUILD_SHARED)
   add_library(chaos SHARED ${LIBCHAOS_SOURCES} ${LIBCHAOS_HEADERS})
 
-  set_target_properties(
-    chaos PROPERTIES SOVERSION "${LIBRARY_VERSION}"
-                     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(chaos PROPERTIES SOVERSION "${LIBRARY_VERSION}" INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
   target_link_libraries(
     chaos

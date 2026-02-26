@@ -43,8 +43,7 @@ endif(NOT BUILD_SHARED_LIBS)
 
 include("${LIBCHAOS_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
 
-substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}"
-                            "${LIBCHAOS_BINARY_DIR}")
+substitute_project_includes(${PACKAGE_NAME} "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
 set(PLUGINDIR
     ${CMAKE_INSTALL_PREFIX}/lib/chaosircd
@@ -126,10 +125,8 @@ target_compile_definitions(libchaos PUBLIC "-DBUILD_LIBCHAOS=1")
 
 string(REGEX REPLACE \\..* "" LIBRARY_VERSION "${PACKAGE_VERSION}")
 
-set_target_properties(libchaos PROPERTIES SOVERSION "${LIBRARY_VERSION}" PREFIX
-                                                                         "")
-target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES}
-                      ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
+set_target_properties(libchaos PROPERTIES SOVERSION "${LIBRARY_VERSION}" PREFIX "")
+target_link_libraries(libchaos LINK_PUBLIC ${SOCKET_LIBRARIES} ${DLFCN_LIBRARIES} ${MATH_LIBRARIES})
 
 install(
   TARGETS libchaos

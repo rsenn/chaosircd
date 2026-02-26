@@ -14,8 +14,7 @@ endif(NOT BUILD_SHARED_LIBS)
 
 include("${LIBCHAOS_SOURCE_DIR}/cmake/SubstituteProjectIncludes.cmake")
 
-include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}"
-                         "${LIBCHAOS_BINARY_DIR}")
+include_project_includes(libchaos "${LIBCHAOS_SOURCE_DIR}" "${LIBCHAOS_BINARY_DIR}")
 
 link_directories("${LIBCHAOS_BINARY_DIR}")
 

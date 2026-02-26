@@ -26,14 +26,9 @@ add_executable(servauth ${SERVAUTH_SOURCES})
 
 link_directories("${LIBCHAOS_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/../../lib" "${CMAKE_CURRENT_BINARY_DIR}/../..")
 
-target_link_libraries(servauth chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS}
-                      ${SOCKET_LIBRARIES})
+target_link_libraries(servauth chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS} ${SOCKET_LIBRARIES})
 
-include_directories(
-  "${CMAKE_CURRENT_SOURCE_DIR}/include"
-  "${CMAKE_CURRENT_SOURCE_DIR}/.."
-  "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../../libowfat"
-)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/.."
+                    "${CMAKE_CURRENT_SOURCE_DIR}/../include" "${CMAKE_CURRENT_SOURCE_DIR}/../../libowfat")
 
 install(TARGETS servauth RUNTIME DESTINATION libexec)

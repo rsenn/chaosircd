@@ -1,17 +1,15 @@
 include(CheckFunctionExists)
 
-  include(ConfigStdIncludes)
-  include(ConfigSockets)
-  include(ConfigDlFcn)
-  include(ConfigIntTypes)
-
+include(ConfigStdIncludes)
+include(ConfigSockets)
+include(ConfigDlFcn)
+include(ConfigIntTypes)
 
 if(NOT HAVE_DLFCN)
   if(CMAKE_HOST_WIN32)
     set(DLFCN_SOURCES src/dlfcn_win32.c)
-  endif(CMAKE_HOST_WIN32)  
+  endif(CMAKE_HOST_WIN32)
 endif(NOT HAVE_DLFCN)
-
 
 if(CMAKE_HOST_WIN32)
   if(NOT HAVE_SELECT)
@@ -33,7 +31,6 @@ else(CMAKE_HOST_WIN32)
   endif()
 
 endif(CMAKE_HOST_WIN32)
-
 
 if(HAVE_POLL)
   set(USE_POLL 1)
