@@ -37,15 +37,16 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
 
   # string(REGEX REPLACE \\.c$ "" MODULE_NAME "${MODULE_SOURCE}")
 
-  link_directories("${CMAKE_BINARY_DIR}/src" "${chaosircd_BINARY_DIR}")
+  link_directories("${CMAKE_BINARY_DIR}/src" "${CMAKE_CURRENT_BINARY_DIR}/.." "${chaosircd_BINARY_DIR}")
 
   if(BUILD_LOADABLE_MODULES)
     add_library("${MODULE_NAME}" MODULE SHARED "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
     set_target_properties("${MODULE_NAME}" PROPERTIES PREFIX "")
 
-    if(WINDOWS OR CYGWIN)
+    if(BUILD_LIBIRCD)
       target_link_libraries("${MODULE_NAME}" ircd)
     endif()
+    target_link_libraries("${MODULE_NAME}" owfat)
 
     # target_compile_options("${MODULE_NAME}" BEFORE "-rdynamic ${CMAKE_CURRENT_BINARY_DIR}/../chaosircd")
   else()
