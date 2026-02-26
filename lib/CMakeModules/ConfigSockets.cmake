@@ -14,13 +14,11 @@ check_include_file(cygwin/in.h HAVE_CYGWIN_IN_H)
 check_include_file(linux/filter.h HAVE_LINUX_FILTER_H)
 check_include_file(linux/types.h HAVE_LINUX_TYPES_H)
 
-
 if(CMAKE_HOST_WIN32)
-#  check_include_file(winsock.h HAVE_WINSOCK2_H)
+  # check_include_file(winsock.h HAVE_WINSOCK2_H)
   check_include_file(winsock2.h HAVE_WINSOCK2_H)
   check_include_file(ws2tcpip.h HAVE_WS2TCPIP_H)
 endif(CMAKE_HOST_WIN32)
-
 
 if(HAVE_SYS_SOCKET_H)
   set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} sys/socket.h)

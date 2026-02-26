@@ -20,7 +20,7 @@ if(NOT LIBCHAOS_BINARY_DIR)
   set(LIBCHAOS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
-#set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules")                  
+# set(CMAKE_MODULE_PATH "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
 set(CMAKE_CURRENT_LIST_DIR "${LIBCHAOS_SOURCE_DIR}/CMakeModules")
 
 include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/PlatformChecks.cmake")
@@ -38,7 +38,7 @@ if(BUILD_STATIC)
   add_definitions(-DSTATIC_LIBCHAOS=1)
 endif()
 
-#add_definitions(-std = c89)
+# add_definitions(-std = c89)
 
 include(CheckLibraryExists)
 include(CheckIncludeFile)
