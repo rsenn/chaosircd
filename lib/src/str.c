@@ -544,8 +544,7 @@ int str_vsprintf(char *str, const char *format, va_list args) {
  * Copy string from <s> to <d>. Write max <n> bytes to <d> and always       *
  * null-terminate it. Returns new string length of <d>.                     *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-size_t strlcpy(char *d, const char *s, size_t n) {
+CHAOS_INLINE(size_t strlcpy(char *d, const char *s, size_t n) {
   size_t i = 0;
 
   if (n == 0)
@@ -582,8 +581,7 @@ size_t strlcpy(char *d, const char *s, size_t n) {
  * and always null-terminate. Returns new string length of <dst>            *
  * ------------------------------------------------------------------------ */
 #ifndef HAVE_STRLCAT
-CHAOS_INLINE(
-size_t strlcat(char *d, const char *s, size_t n) {
+CHAOS_INLINE(size_t strlcat(char *d, const char *s, size_t n) {
   size_t i = 0;
 
   if (n == 0)
@@ -642,8 +640,7 @@ size_t strlcat(char *d, const char *s, size_t n) {
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-int str_cmp(const char *s1, const char *s2) {
+CHAOS_INLINE(int str_cmp(const char *s1, const char *s2) {
   size_t i = 0;
 
   for (EVER) {
@@ -676,8 +673,7 @@ int str_cmp(const char *s1, const char *s2) {
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                          *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-int str_icmp(const char *s1, const char *s2) {
+CHAOS_INLINE(int str_icmp(const char *s1, const char *s2) {
   size_t i = 0;
 
   for (EVER) {
@@ -710,8 +706,7 @@ int str_icmp(const char *s1, const char *s2) {
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-int str_ncmp(const char *s1, const char *s2, size_t n) {
+CHAOS_INLINE(int str_ncmp(const char *s1, const char *s2, size_t n) {
   size_t i = 0;
 
   if (n == 0)
@@ -747,8 +742,7 @@ int str_ncmp(const char *s1, const char *s2, size_t n) {
 /* ------------------------------------------------------------------------ *
  * Compare string, abort after <n> chars.                                   *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-int str_nicmp(const char *s1, const char *s2, size_t n) {
+CHAOS_INLINE(int str_nicmp(const char *s1, const char *s2, size_t n) {
   size_t i = 0;
 
   if (n == 0)
@@ -793,33 +787,33 @@ int str_nicmp(const char *s1, const char *s2, size_t n) {
  * Formatted print to string                                                *
  * ------------------------------------------------------------------------ */
 CHAOS_INLINE(
-int str_snprintf(char *str, size_t n, const char *format, ...) {
-  int ret;
+    int str_snprintf(char *str, size_t n, const char *format, ...) {
+      int ret;
 
-  va_list args;
+      va_list args;
 
-  va_start(args, format);
+      va_start(args, format);
 
-  ret = str_vsnprintf(str, n, format, args);
+      ret = str_vsnprintf(str, n, format, args);
 
-  va_end(args);
+      va_end(args);
 
-  return ret;
-}
+      return ret;
+    }
 
-int str_sprintf(char *str, const char *format, ...) {
-  int ret;
+    int str_sprintf(char *str, const char *format, ...) {
+      int ret;
 
-  va_list args;
+      va_list args;
 
-  va_start(args, format);
+      va_start(args, format);
 
-  ret = str_vsnprintf(str, (uint32_t)(int32_t)-1, format, args);
+      ret = str_vsnprintf(str, (uint32_t)(int32_t)-1, format, args);
 
-  va_end(args);
+      va_end(args);
 
-  return ret;
-})
+      return ret;
+    })
 
 /*int sprintf(char *str, const char *format, ...)
 {
@@ -840,8 +834,7 @@ int str_sprintf(char *str, const char *format, ...) {
  * Converts a string to a signed int.                                       *
  * ------------------------------------------------------------------------ */
 #define ISNUM(c) ((c) >= '0' && (c) <= '9')
-CHAOS_INLINE(
-int str_toi(const char *s) {
+CHAOS_INLINE(int str_toi(const char *s) {
   register uint32_t i = 0;
   register uint32_t sign = 0;
   register const uint8_t *p = (const uint8_t *)s;
@@ -890,8 +883,7 @@ int str_toi(const char *s) {
  *                                                                          *
  * return value will not be bigger than maxtok                              *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-size_t str_tokenize(char *s, char **v, size_t maxtok) {
+CHAOS_INLINE(size_t str_tokenize(char *s, char **v, size_t maxtok) {
   size_t c = 0;
 
   for (EVER) {
@@ -906,7 +898,7 @@ size_t str_tokenize(char *s, char **v, size_t maxtok) {
     if (c == maxtok)
       break;
 
-      /* Stop tokenizing when we spot a ':' at token start */
+    /* Stop tokenizing when we spot a ':' at token start */
     if (*s == ':') {
       /* The remains are a single argument
          so it can include blanks also */
@@ -1056,8 +1048,7 @@ size_t str_tokenize_s(char *s, char **v, size_t maxtok, char delim) {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-char *str_dup(const char *s) {
+CHAOS_INLINE(char *str_dup(const char *s) {
   char *r;
 
   r = malloc(str_len(s) + 1);
@@ -1076,8 +1067,7 @@ char *str_dup(const char *s) {
 #define ROL(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
-CHAOS_INLINE(
-hash_t str_hash(const char *s) {
+CHAOS_INLINE(hash_t str_hash(const char *s) {
   hash_t ret = 0xdefaced;
   hash_t temp;
   hash_t i;
@@ -1101,8 +1091,7 @@ hash_t str_hash(const char *s) {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE(
-hash_t str_ihash(const char *s) {
+CHAOS_INLINE(hash_t str_ihash(const char *s) {
   hash_t ret = 0xdefaced;
   hash_t temp;
   hash_t i;

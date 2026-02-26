@@ -110,10 +110,10 @@ typedef int ssize_t;
 #endif
 
 #ifndef CHAOS_API
-#define CHAOS_API(type...)  __attribute__((visibility("default"))) type;
+#define CHAOS_API(type...) __attribute__((visibility("default"))) type;
 #endif
 #ifndef CHAOS_DATA
-#define CHAOS_DATA(type...)  __attribute__((visibility("default"))) extern type
+#define CHAOS_DATA(type...) __attribute__((visibility("default"))) extern type
 #endif
 
 #ifndef CHAOS_DATA_DECL
@@ -139,7 +139,7 @@ typedef int ssize_t;
 #warning GNUC <= 4
 #define CHAOS_INLINE(x...) x
 #define CHAOS_INLINE_API(proto) proto;
-#define CHAOS_INLINE_FN(x...) //extern __inline__ x
+#define CHAOS_INLINE_FN(x...) // extern __inline__ x
 #endif
 #else
 #warning other compiler
