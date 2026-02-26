@@ -32,28 +32,17 @@
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_wallops =
-{
-  'w',
-  USERMODE_LIST_OFF,
-  USERMODE_LIST_LOCAL,
-  USERMODE_ARG_DISABLE,
-  NULL
-};
+static struct usermode um_wallops = {
+    'w', USERMODE_LIST_OFF, USERMODE_LIST_LOCAL, USERMODE_ARG_DISABLE, NULL};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_wallops_load(void)
-{
-  if(usermode_register(&um_wallops))
+int um_wallops_load(void) {
+  if (usermode_register(&um_wallops))
     return -1;
 
   return 0;
 }
 
-void um_wallops_unload(void)
-{
-  usermode_unregister(&um_wallops);
-}
-
+void um_wallops_unload(void) { usermode_unregister(&um_wallops); }

@@ -23,59 +23,55 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_pass (struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void mr_pass(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *mr_pass_help[] = {
-  "PASS <password> [flags]",
-  "",
-  "Used in the beginning of a irc session, to allow you",
-  "to connect to the server. Also user on server connection",
-  "for link authentication.",
-  NULL
-};
+    "PASS <password> [flags]",
+    "",
+    "Used in the beginning of a irc session, to allow you",
+    "to connect to the server. Also user on server connection",
+    "for link authentication.",
+    NULL};
 
-static struct msg mr_pass_msg = {
-  "PASS", 1, 2, MFLG_CLIENT | MFLG_UNREG,
-  { mr_pass, m_registered, NULL, m_registered },
-  mr_pass_help
-};
+static struct msg mr_pass_msg = {"PASS",
+                                 1,
+                                 2,
+                                 MFLG_CLIENT | MFLG_UNREG,
+                                 {mr_pass, m_registered, NULL, m_registered},
+                                 mr_pass_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_pass_load(void)
-{
-  if(msg_register(&mr_pass_msg) == NULL)
+int m_pass_load(void) {
+  if (msg_register(&mr_pass_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_pass_unload(void)
-{
-  msg_unregister(&mr_pass_msg);
-}
+void m_pass_unload(void) { msg_unregister(&mr_pass_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -83,16 +79,13 @@ void m_pass_unload(void)
  * argv[2] - password                                                         *
  * argv[3] - optional ts info                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_pass(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void mr_pass(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   strlcpy(lcptr->pass, argv[2], sizeof(lcptr->pass));
 
-  if(argc > 3)
-  {
-    if(lcptr->ts == 0)
-    {
-      if(str_tolower(argv[3][0]) == 't' && str_tolower(argv[3][1]) == 's')
+  if (argc > 3) {
+    if (lcptr->ts == 0) {
+      if (str_tolower(argv[3][0]) == 't' && str_tolower(argv[3][1]) == 's')
         lcptr->ts = SERVER_TS;
     }
   }

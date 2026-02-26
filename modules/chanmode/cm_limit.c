@@ -27,22 +27,22 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/str.h"
 #include "libchaos/hook.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/user.h"
-#include "ircd/numeric.h"
-#include "ircd/channel.h"
 #include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/ircd.h"
+#include "ircd/numeric.h"
+#include "ircd/user.h"
 
-#  define ULONG_MAX     ((unsigned long) ~(unsigned long) 0)
-#  define LONG_MAX      ((long int) (ULONG_MAX >> 1))                      
-#  define LONG_MIN      ((long int) (-LONG_MAX - 1L))
+#define ULONG_MAX ((unsigned long)~(unsigned long)0)
+#define LONG_MAX ((long int)(ULONG_MAX >> 1))
+#define LONG_MIN ((long int)(-LONG_MAX - 1L))
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 #define CM_LIMIT_CHAR 'l'
@@ -51,45 +51,36 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_limit_hook   (struct client         *cptr,
-                             struct channel        *chptr,
-                             const char            *key,
-                             int                   *reply);
-static int  cm_limit_bounce (struct lclient        *lcptr,
-                             struct client         *cptr,
-                             struct channel        *chptr,
-                             struct chanuser       *cuptr,
-                             struct list           *lptr,
-                             struct chanmodechange *cmcptr);
-static void cm_limit_build  (char                  *dst,
-                             struct channel        *chptr,
-                             uint32_t              *di,
-                             uint64_t              *flag);
+static void cm_limit_hook(struct client *cptr, struct channel *chptr,
+                          const char *key, int *reply);
+static int cm_limit_bounce(struct lclient *lcptr, struct client *cptr,
+                           struct channel *chptr, struct chanuser *cuptr,
+                           struct list *lptr, struct chanmodechange *cmcptr);
+static void cm_limit_build(char *dst, struct channel *chptr, uint32_t *di,
+                           uint64_t *flag);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_limit_help[] = {
-  "+l <n>          Limit users in channel. Users can be invited to break limit.",
-  NULL
-};
+static const char *cm_limit_help[] = {"+l <n>          Limit users in channel. "
+                                      "Users can be invited to break limit.",
+                                      NULL};
 
 static struct chanmode cm_limit_mode = {
-  CM_LIMIT_CHAR,           /* Mode character */
-  '\0',                    /* No prefix, because its not a privilege */
-  CHANMODE_TYPE_KEY,       /* Channel mode is of key type */
-  CHFLG(o) | CHFLG(h),     /* Only OPs and Halfops can change the key */
-  0,                       /* No order and no reply */
-  cm_limit_bounce,         /* Bounce handler */
-  cm_limit_help            /* Help text */
+    CM_LIMIT_CHAR,       /* Mode character */
+    '\0',                /* No prefix, because its not a privilege */
+    CHANMODE_TYPE_KEY,   /* Channel mode is of key type */
+    CHFLG(o) | CHFLG(h), /* Only OPs and Halfops can change the key */
+    0,                   /* No order and no reply */
+    cm_limit_bounce,     /* Bounce handler */
+    cm_limit_help        /* Help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_limit_load(void)
-{
+int cm_limit_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_limit_mode) == NULL)
+  if (chanmode_register(&cm_limit_mode) == NULL)
     return -1;
 
   hook_register(channel_join, HOOK_1ST, cm_limit_hook);
@@ -98,8 +89,7 @@ int cm_limit_load(void)
   return 0;
 }
 
-void cm_limit_unload(void)
-{
+void cm_limit_unload(void) {
   /* unregister the channel mode */
   chanmode_unregister(&cm_limit_mode);
 
@@ -110,44 +100,38 @@ void cm_limit_unload(void)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void cm_limit_hook(struct client *cptr, struct channel *chptr,
-                           const char    *key,  int            *reply)
-{
+                          const char *key, int *reply) {
   /* We're already denied or an invex matched */
-  if(*reply > 0 || *reply == -CM_INVEX_CHAR || *reply == -CM_INVITE_CHAR)
+  if (*reply > 0 || *reply == -CM_INVEX_CHAR || *reply == -CM_INVITE_CHAR)
     return;
 
-  if((chptr->modes & CHFLG(l)) && chptr->chanusers.size + 1 > chptr->limit)
-  {
+  if ((chptr->modes & CHFLG(l)) && chptr->chanusers.size + 1 > chptr->limit) {
     *reply = ERR_CHANNELISFULL;
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-int cm_limit_bounce(struct lclient *lcptr, struct client         *cptr,
-                    struct channel *chptr, struct chanuser       *cuptr,
-                    struct list    *lptr,  struct chanmodechange *cmcptr)
-{
-  if(cmcptr->what == CHANMODE_DEL)
-  {
-    if(!(chptr->modes & cmcptr->mode->flag))
+int cm_limit_bounce(struct lclient *lcptr, struct client *cptr,
+                    struct channel *chptr, struct chanuser *cuptr,
+                    struct list *lptr, struct chanmodechange *cmcptr) {
+  if (cmcptr->what == CHANMODE_DEL) {
+    if (!(chptr->modes & cmcptr->mode->flag))
       return 1;
 
     chptr->limit = -1;
   }
 
-  if(cmcptr->what == CHANMODE_ADD)
-  {
+  if (cmcptr->what == CHANMODE_ADD) {
     unsigned long limit;
 
     limit = str_toul(cmcptr->arg, NULL, 10);
 
-    if(limit == ULONG_MAX || limit == 0)
+    if (limit == ULONG_MAX || limit == 0)
       return 1;
 
-    if((chptr->modes & cmcptr->mode->flag))
-    {
-      if(chptr->limit != limit)
+    if ((chptr->modes & cmcptr->mode->flag)) {
+      if (chptr->limit != limit)
         chptr->modes &= ~cmcptr->mode->flag;
     }
 
@@ -159,12 +143,10 @@ int cm_limit_bounce(struct lclient *lcptr, struct client         *cptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void cm_limit_build(char     *dst, struct channel *chptr,
-                           uint32_t *di,  uint64_t       *flag)
-{
-  if(*flag == CHFLG(l) && chptr->modes & CHFLG(l) && chptr->limit > 0)
-  {
-    if(*di != 0)
+static void cm_limit_build(char *dst, struct channel *chptr, uint32_t *di,
+                           uint64_t *flag) {
+  if (*flag == CHFLG(l) && chptr->modes & CHFLG(l) && chptr->limit > 0) {
+    if (*di != 0)
       dst[(*di)++] = ' ';
 
     *di += str_snprintf(&dst[*di], IRCD_KEYLEN * 8 + 1, "%i", chptr->limit);

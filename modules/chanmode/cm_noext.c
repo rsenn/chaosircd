@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -39,35 +39,31 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_noext_hook(struct client  *cptr, struct channel *chptr,
-	                 intptr_t        type, const char     *text);
+static int cm_noext_hook(struct client *cptr, struct channel *chptr,
+                         intptr_t type, const char *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_noext_help[] =
-{
-  "+n              No external messages. Only members can send to the channel.",
-  NULL
-};
+static const char *cm_noext_help[] = {"+n              No external messages. "
+                                      "Only members can send to the channel.",
+                                      NULL};
 
-static struct chanmode cm_noext_mode =
-{
-  CM_NOEXT_CHAR,           /* mode character */
-  '\0',                    /* no prefix, because its not a privilege */
-  CHANMODE_TYPE_SINGLE,    /* channel mode is a single flag */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the flag */
-  0,                       /* no order and no reply */
-  chanmode_bounce_simple,  /* bounce handler */
-  cm_noext_help            /* help text */
+static struct chanmode cm_noext_mode = {
+    CM_NOEXT_CHAR,          /* mode character */
+    '\0',                   /* no prefix, because its not a privilege */
+    CHANMODE_TYPE_SINGLE,   /* channel mode is a single flag */
+    CHFLG(o) | CHFLG(h),    /* only OPs and Halfops can change the flag */
+    0,                      /* no order and no reply */
+    chanmode_bounce_simple, /* bounce handler */
+    cm_noext_help           /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_noext_load(void)
-{
+int cm_noext_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_noext_mode) == NULL)
+  if (chanmode_register(&cm_noext_mode) == NULL)
     return -1;
 
   hook_register(channel_message, HOOK_DEFAULT, cm_noext_hook);
@@ -75,8 +71,7 @@ int cm_noext_load(void)
   return 0;
 }
 
-void cm_noext_unload(void)
-{
+void cm_noext_unload(void) {
   /* unregister the channel mode */
   chanmode_unregister(&cm_noext_mode);
 
@@ -86,16 +81,13 @@ void cm_noext_unload(void)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static int cm_noext_hook(struct client *cptr, struct channel *chptr,
-	                 intptr_t       type, const char     *text)
-{
+                         intptr_t type, const char *text) {
   struct chanuser *cuptr = chanuser_find(chptr, cptr);
 
-  if(cuptr == NULL && (chptr->modes & CHFLG(n)))
-  {
+  if (cuptr == NULL && (chptr->modes & CHFLG(n))) {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);
     return 1;
   }
 
   return 0;
 }
-

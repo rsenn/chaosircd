@@ -22,57 +22,47 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/log.h"
 #include "libchaos/dlink.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/server.h"
 #include "ircd/client.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_squit(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void mo_squit(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *mo_squit_help[] = {
-  "SQUIT [target] <victim> [reason]",
-  "",
-  "Disconnects victim from the target. If target is ommitted",
-  "the victims origin will be assumed.",
-  NULL
-};
+    "SQUIT [target] <victim> [reason]", "",
+    "Disconnects victim from the target. If target is ommitted",
+    "the victims origin will be assumed.", NULL};
 
 static struct msg mo_squit_msg = {
-  "SQUIT", 1, 2, MFLG_OPER,
-  { NULL, NULL, mo_squit, mo_squit },
-  mo_squit_help
-};
+    "SQUIT", 1, 2, MFLG_OPER, {NULL, NULL, mo_squit, mo_squit}, mo_squit_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_squit_load(void)
-{
-  if(msg_register(&mo_squit_msg) == NULL)
+int m_squit_load(void) {
+  if (msg_register(&mo_squit_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_squit_unload(void)
-{
-  msg_unregister(&mo_squit_msg);
-}
+void m_squit_unload(void) { msg_unregister(&mo_squit_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -80,37 +70,31 @@ void m_squit_unload(void)
  * argv[2] - server/link to drop                                              *
  * argv[3] - link to drop                                                     *
  * -------------------------------------------------------------------------- */
-static void mo_squit(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void mo_squit(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   struct server *sptr;
   struct server *asptr;
 
-  if((sptr = server_find_namew(cptr, argv[2])) == NULL)
+  if ((sptr = server_find_namew(cptr, argv[2])) == NULL)
     return;
 
-  if(argc == 4)
-  {
-    if((asptr = server_find_namew(cptr, argv[3])) == NULL)
+  if (argc == 4) {
+    if ((asptr = server_find_namew(cptr, argv[3])) == NULL)
       return;
-  }
-  else
-  {
+  } else {
     asptr = sptr;
 
-    if(client_is_remote(sptr->client))
+    if (client_is_remote(sptr->client))
       sptr = sptr->client->origin->server;
     else
       sptr = server_me;
   }
 
-  if(sptr == server_me)
-  {
-    if(!client_is_local(asptr->client) || asptr == server_me)
-    {
+  if (sptr == server_me) {
+    if (!client_is_local(asptr->client) || asptr == server_me) {
       log(server_log, L_warning,
-          "Dropping invalid SQUIT from %N (%U@%H) for remote server %S",
-          cptr, cptr, cptr, asptr);
+          "Dropping invalid SQUIT from %N (%U@%H) for remote server %S", cptr,
+          cptr, cptr, asptr);
       client_send(cptr, ":%S NOTICE %C :*** Server %S is not my client.",
                   server_me, cptr, asptr);
       return;
@@ -122,7 +106,5 @@ static void mo_squit(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-  client_send(sptr->client, ":%C SQUIT %S %S",
-              cptr, sptr, asptr);
+  client_send(sptr->client, ":%C SQUIT %S %S", cptr, sptr, asptr);
 }
-

@@ -24,72 +24,60 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/dlink.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
 #include "ircd/lclient.h"
-#include "ircd/server.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
+#include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_pong (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void m_pong(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_pong_help[] = {
-  "PONG [origin] [text]",
-  "",
-  "Reply to a received PING command.",
-  NULL
-};
+static char *m_pong_help[] = {"PONG [origin] [text]", "",
+                              "Reply to a received PING command.", NULL};
 
 static struct msg m_pong_msg = {
-  "PONG", 1, 2, MFLG_CLIENT | MFLG_UNREG,
-  { NULL, m_pong, m_pong, m_pong },
-  m_pong_help
-};
+    "PONG",     1, 2, MFLG_CLIENT | MFLG_UNREG, {NULL, m_pong, m_pong, m_pong},
+    m_pong_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_pong_load(void)
-{
-  if(msg_register(&m_pong_msg) == NULL)
+int m_pong_load(void) {
+  if (msg_register(&m_pong_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_pong_unload(void)
-{
-  msg_unregister(&m_pong_msg);
-}
+void m_pong_unload(void) { msg_unregister(&m_pong_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'pong'                                                           *
  * -------------------------------------------------------------------------- */
-static void m_pong(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_pong(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   struct server *asptr;
   struct client *acptr;
 
   /* do pings on server-server links */
-  if(client_is_server(cptr) && client_is_local(cptr) &&
-     argv[2] && chars_isdigit(argv[2][0]))
-  {
+  if (client_is_server(cptr) && client_is_local(cptr) && argv[2] &&
+      chars_isdigit(argv[2][0])) {
     lcptr->ping = str_toull(argv[2], NULL, 10);
     lcptr->lag = timer_mtime - lcptr->ping;
 
@@ -98,35 +86,27 @@ static void m_pong(struct lclient *lcptr, struct client *cptr,
 
   asptr = server_find_name(argv[2]);
 
-  if(asptr == NULL)
-  {
-    if(lcptr->caps & CAP_UID)
+  if (asptr == NULL) {
+    if (lcptr->caps & CAP_UID)
       acptr = client_find_uid(argv[2]);
     else
       acptr = client_find_nick(argv[2]);
-  }
-  else
-  {
+  } else {
     acptr = asptr->client;
   }
 
-  if(acptr == NULL)
-  {
+  if (acptr == NULL) {
     numeric_send(cptr, ERR_NOSUCHSERVER, argv[2]);
     return;
   }
 
-  if(acptr == client_me)
-  {
-    if(client_is_user(cptr) && client_is_local(cptr))
+  if (acptr == client_me) {
+    if (client_is_user(cptr) && client_is_local(cptr))
       lcptr->lag = timer_mtime - lcptr->ping;
-  }
-  else
-  {
-    if(argv[3])
+  } else {
+    if (argv[3])
       client_send(acptr, ":%C PONG %C :%s", cptr, acptr, argv[3]);
     else
       client_send(acptr, ":%C PONG %C", cptr, acptr, argv[3]);
   }
 }
-

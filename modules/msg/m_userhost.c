@@ -22,59 +22,53 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
+#include "libchaos/dlink.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
-#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_userhost (struct lclient *lcptr, struct client *cptr,
-                         int             argc,  char         **argv);
-static void m_userhost  (struct lclient *lcptr, struct client *cptr,
-                         int             argc,  char         **argv);
+static void mr_userhost(struct lclient *lcptr, struct client *cptr, int argc,
+                        char **argv);
+static void m_userhost(struct lclient *lcptr, struct client *cptr, int argc,
+                       char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_userhost_help[] = {
-  "USERHOST <nick> [nick] [...]",
-  "",
-  "Displays the given nicks username, hostname, away status,",
-  "operator status and real name in one single line.",
-  NULL
-};    
+    "USERHOST <nick> [nick] [...]", "",
+    "Displays the given nicks username, hostname, away status,",
+    "operator status and real name in one single line.", NULL};
 
-static struct msg m_userhost_msg = {
-  "USERHOST", 1, 1, MFLG_CLIENT | MFLG_UNREG,
-  { mr_userhost, m_userhost, NULL, m_userhost },
-  m_userhost_help
-};
+static struct msg m_userhost_msg = {"USERHOST",
+                                    1,
+                                    1,
+                                    MFLG_CLIENT | MFLG_UNREG,
+                                    {mr_userhost, m_userhost, NULL, m_userhost},
+                                    m_userhost_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_userhost_load(void)
-{
-  if(msg_register(&m_userhost_msg) == NULL)
+int m_userhost_load(void) {
+  if (msg_register(&m_userhost_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
-void m_userhost_unload(void)
-{
-  msg_unregister(&m_userhost_msg);
-}
+void m_userhost_unload(void) { msg_unregister(&m_userhost_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -83,58 +77,55 @@ void m_userhost_unload(void)
  * argv[3] - [nick2]                                                          *
  * argv[4] - ...                                                              *
  * -------------------------------------------------------------------------- */
-static void mr_userhost(struct lclient *lcptr, struct client *cptr,
-                        int             argc,  char         **argv)
-{
+static void mr_userhost(struct lclient *lcptr, struct client *cptr, int argc,
+                        char **argv) {
   return;
 }
 
-static void m_userhost(struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv)
-{
+static void m_userhost(struct lclient *lcptr, struct client *cptr, int argc,
+                       char **argv) {
   struct client *acptr;
-  char          *av[64];
-  char           result[IRCD_LINELEN - 1];
-  size_t         len;
-  size_t         n;
-  size_t         i;
-  int            first = 1;
-  
-	len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
-                 client_me->name, cptr->name);
-  
+  char *av[64];
+  char result[IRCD_LINELEN - 1];
+  size_t len;
+  size_t n;
+  size_t i;
+  int first = 1;
+
+  len = str_snprintf(result, sizeof(result), ":%s 302 %s :", client_me->name,
+                     cptr->name);
+
   n = str_tokenize(argv[2], av, 63);
-  
-  for(i = 0; i < n; i++)
-  {
+
+  for (i = 0; i < n; i++) {
     acptr = client_find_nick(av[i]);
-    
-    if(acptr == NULL)
+
+    if (acptr == NULL)
       continue;
-    
-    if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
+
+    if (len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
-    
-    if(!first)
+
+    if (!first)
       result[len++] = ' ';
-    
+
     len += strlcpy(&result[len], acptr->name, IRCD_LINELEN - 1 - len);
-    
-/*    if(acptr->user->modes & UFLG(o))
-      result[len++] = '*';*/
+
+    /*    if(acptr->user->modes & UFLG(o))
+          result[len++] = '*';*/
     result[len++] = '=';
 
-    if(acptr->user->away[0])
+    if (acptr->user->away[0])
       result[len++] = '-';
     else
       result[len++] = '+';
-    
+
     len += strlcpy(&result[len], acptr->user->name, IRCD_LINELEN - 1 - len);
     result[len++] = '@';
     len += strlcpy(&result[len], acptr->hostreal, IRCD_LINELEN - 1 - len);
-    
+
     first = 0;
   }
-  
+
   client_send(cptr, "%s", result);
 }

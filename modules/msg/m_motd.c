@@ -30,87 +30,73 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/chars.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/lclient.h"
-#include "ircd/numeric.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_motd (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void m_motd(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_motd_help[] = {
-  "MOTD [server]",
-  "",
-  "Displays message of the day of the specified server.",
-  "If used without parameters, the motd of the local",
-  "server is displayed.",
-  NULL
-};
+    "MOTD [server]",
+    "",
+    "Displays message of the day of the specified server.",
+    "If used without parameters, the motd of the local",
+    "server is displayed.",
+    NULL};
 
 static struct msg m_motd_msg = {
-  "MOTD", 0, 1, MFLG_CLIENT,
-  { NULL, m_motd, m_motd, m_motd },
-  m_motd_help
-};
+    "MOTD", 0, 1, MFLG_CLIENT, {NULL, m_motd, m_motd, m_motd}, m_motd_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_motd_load(void)
-{
-  if(msg_register(&m_motd_msg) == NULL)
+int m_motd_load(void) {
+  if (msg_register(&m_motd_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_motd_unload(void)
-{
-  msg_unregister(&m_motd_msg);
-}
+void m_motd_unload(void) { msg_unregister(&m_motd_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'motd'                                                           *
  * -------------------------------------------------------------------------- */
-static void m_motd(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_motd(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   struct mfile *motd;
 
-  if(argc > 2)
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C MOTD :%s", &argc, argv))
+  if (argc > 2) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C MOTD :%s", &argc, argv))
       return;
   }
 
-  if((motd = mfile_find_name("ircd.motd")) == NULL)
-  {
+  if ((motd = mfile_find_name("ircd.motd")) == NULL) {
     numeric_send(cptr, ERR_NOMOTD);
-  }
-  else
-  {
+  } else {
     struct node *nptr;
-    char        *line = NULL;
+    char *line = NULL;
 
     numeric_send(cptr, RPL_MOTDSTART, server_me->name);
 
     dlink_foreach_data(&motd->lines, nptr, line)
-      numeric_send(cptr, RPL_MOTD, line);
+        numeric_send(cptr, RPL_MOTD, line);
 
     numeric_send(cptr, RPL_ENDOFMOTD);
   }
 }
-

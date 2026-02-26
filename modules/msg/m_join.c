@@ -24,66 +24,58 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/ircd.h"
-#include "ircd/user.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/channel.h"
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_join (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void m_join(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_join_help[] = {
-  "JOIN <channel[,channel,...]> [key[,key,...]]",
-  "",
-  "This command makes you to join the given channel, or",
-  "multiple channels. If they have keys set, you should",
-  "give the key, or the keys as the second parameter.",
-  "Multiple channel names, or keys are seperated with",
-  "commata.",
-  NULL
-};
+    "JOIN <channel[,channel,...]> [key[,key,...]]",
+    "",
+    "This command makes you to join the given channel, or",
+    "multiple channels. If they have keys set, you should",
+    "give the key, or the keys as the second parameter.",
+    "Multiple channel names, or keys are seperated with",
+    "commata.",
+    NULL};
 
 static struct msg m_join_msg = {
-  "JOIN", 1, 2, MFLG_CLIENT,
-  { NULL, m_join, NULL, m_join },
-  m_join_help
-};
+    "JOIN", 1, 2, MFLG_CLIENT, {NULL, m_join, NULL, m_join}, m_join_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_join_load(void)
-{
-  if(msg_register(&m_join_msg) == NULL)
+int m_join_load(void) {
+  if (msg_register(&m_join_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_join_unload(void)
-{
-  msg_unregister(&m_join_msg);
-}
+void m_join_unload(void) { msg_unregister(&m_join_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -91,37 +83,32 @@ void m_join_unload(void)
  * argv[2] - channel                                                          *
  * argv[3] - key                                                              *
  * -------------------------------------------------------------------------- */
-static void m_join(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
-  char    *chanv[IRCD_MAXCHANNELS + 1];
-  char    *keyv[IRCD_MAXCHANNELS + 1];
+static void m_join(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
+  char *chanv[IRCD_MAXCHANNELS + 1];
+  char *keyv[IRCD_MAXCHANNELS + 1];
   uint32_t n;
   uint32_t i;
 
   n = str_tokenize_s(argv[2], chanv, IRCD_MAXCHANNELS, ',');
   memset(keyv, 0, sizeof(keyv));
 
-  if(argv[3])
+  if (argv[3])
     str_tokenize_s(argv[3], keyv, IRCD_MAXCHANNELS, ',');
 
-  for(i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     /* Check for valid channel name */
-    if(!chars_valid_chan(chanv[i]) || str_len(chanv[i]) > IRCD_CHANNELLEN)
-    {
+    if (!chars_valid_chan(chanv[i]) || str_len(chanv[i]) > IRCD_CHANNELLEN) {
       numeric_send(cptr, ERR_BADCHANNAME, chanv[i]);
       return;
     }
 
-    if(!channel_is_valid(chanv[i]))
-    {
+    if (!channel_is_valid(chanv[i])) {
       numeric_send(cptr, ERR_NOSUCHCHANNEL, chanv[i]);
       return;
     }
 
-    if(cptr->user->channels.size == IRCD_MAXCHANNELS)
-    {
+    if (cptr->user->channels.size == IRCD_MAXCHANNELS) {
       numeric_send(cptr, ERR_TOOMANYCHANNELS, chanv[i]);
       return;
     }

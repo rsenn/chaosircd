@@ -27,106 +27,91 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/chars.h"
-#include "ircd/client.h"
-#include "ircd/lclient.h"
-#include "ircd/numeric.h"
+#include "ircd/chanmode.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
-#include "ircd/chanmode.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/ircd.h"
+#include "ircd/lclient.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_names  (struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv);
+static void m_names(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_names_help[] = {
-  "NAMES [channel]",
-  "",
-  "Displays a list of nicks in the given channel.",
-  "Channeluser flags like op/halfop/voice are prepended",
-  "to the names of the users with their appropriate",
-  "symbols.",
-  NULL
-};
+    "NAMES [channel]",
+    "",
+    "Displays a list of nicks in the given channel.",
+    "Channeluser flags like op/halfop/voice are prepended",
+    "to the names of the users with their appropriate",
+    "symbols.",
+    NULL};
 
 static struct msg m_names_msg = {
-  "NAMES", 0, 1, MFLG_CLIENT,
-  { NULL, m_names, NULL, m_names },
-  m_names_help
-};
+    "NAMES", 0, 1, MFLG_CLIENT, {NULL, m_names, NULL, m_names}, m_names_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_names_load(void)
-{
-  if(msg_register(&m_names_msg) == NULL)
+int m_names_load(void) {
+  if (msg_register(&m_names_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_names_unload(void)
-{
-  msg_unregister(&m_names_msg);
-}
+void m_names_unload(void) { msg_unregister(&m_names_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'names'                                                          *
  * -------------------------------------------------------------------------- */
-static void m_names(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void m_names(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   struct chanuser *cuptr;
-  struct channel  *chptr;
+  struct channel *chptr;
 
-  if(!client_is_user(cptr))
+  if (!client_is_user(cptr))
     return;
 
-  if(argv[2] && argv[2][0] != '*')
-  {
+  if (argv[2] && argv[2][0] != '*') {
     struct channel *chptr;
 
-    if(!chars_valid_chan(argv[2]))
-    {
-      client_send(cptr, numeric_format(ERR_BADCHANNAME),
-                  client_me->name, cptr->name, argv[2]);
+    if (!chars_valid_chan(argv[2])) {
+      client_send(cptr, numeric_format(ERR_BADCHANNAME), client_me->name,
+                  cptr->name, argv[2]);
       return;
     }
 
-    if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
+    if ((chptr = channel_find_warn(cptr, argv[2])) == NULL)
       return;
 
     cuptr = chanuser_find(chptr, cptr);
 
     chanuser_show(cptr, chptr, cuptr, 1);
-  }
-  else
-  {
+  } else {
     channel_serial++;
 
-    dlink_foreach(&cptr->user->channels, cuptr)
-    {
+    dlink_foreach(&cptr->user->channels, cuptr) {
       cuptr->channel->serial = channel_serial;
 
       chanuser_show(cptr, cuptr->channel, cuptr, 1);
     }
 
-    dlink_foreach(&channel_list, chptr)
-    {
-      if(chptr->serial == channel_serial)
+    dlink_foreach(&channel_list, chptr) {
+      if (chptr->serial == channel_serial)
         continue;
 
-      if(!(chptr->modes & CHFLG(s)))
+      if (!(chptr->modes & CHFLG(s)))
         chanuser_show(cptr, chptr, NULL, 2);
     }
   }

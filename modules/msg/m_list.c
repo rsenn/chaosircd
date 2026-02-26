@@ -28,45 +28,37 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
+#include "ircd/chanmode.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
-#include "ircd/chanmode.h"
+#include "ircd/client.h"
+#include "ircd/msg.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_list      (struct lclient *lcptr, struct client  *cptr,
-                         int             argc,  char          **argv);
+static void m_list(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
-static int  m_list_hook (struct client  *cptr,  struct channel *chptr);
+static int m_list_hook(struct client *cptr, struct channel *chptr);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_list_help[] = {
-  "LIST",
-  "",
-  "Displays a list of channels, the number of users in them",
-  "and also their topic.",
-  NULL
-};
+    "LIST", "", "Displays a list of channels, the number of users in them",
+    "and also their topic.", NULL};
 
 static struct msg m_list_msg = {
-  "LIST", 0, 0, MFLG_CLIENT,
-  { NULL, m_list, m_ignore, m_list },
-  m_list_help
-};
+    "LIST", 0, 0, MFLG_CLIENT, {NULL, m_list, m_ignore, m_list}, m_list_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_list_load(void)
-{
-  if(msg_register(&m_list_msg) == NULL)
+int m_list_load(void) {
+  if (msg_register(&m_list_msg) == NULL)
     return -1;
 
   hook_register(channel_show, HOOK_DEFAULT, m_list_hook);
@@ -74,8 +66,7 @@ int m_list_load(void)
   return 0;
 }
 
-void m_list_unload(void)
-{
+void m_list_unload(void) {
   hook_unregister(channel_show, HOOK_DEFAULT, m_list_hook);
 
   msg_unregister(&m_list_msg);
@@ -85,22 +76,18 @@ void m_list_unload(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'list'                                                           *
  * -------------------------------------------------------------------------- */
-static void m_list(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_list(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   channel_show(cptr);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int m_list_hook(struct client *cptr, struct channel *chptr)
-{
-  if(chptr->modes & CHFLG(s))
-  {
-    if(!channel_is_member(chptr, cptr))
+static int m_list_hook(struct client *cptr, struct channel *chptr) {
+  if (chptr->modes & CHFLG(s)) {
+    if (!channel_is_member(chptr, cptr))
       return 1;
   }
 
   return 0;
 }
-

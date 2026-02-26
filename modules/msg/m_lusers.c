@@ -27,65 +27,56 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
 #include "ircd/client.h"
-#include "ircd/server.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_lusers(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void m_lusers(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_lusers_help[] = {
-  "LUSERS [server]",
-  "",
-  "Displays the amount of online users, and max amount of",
-  "online users in the server, and globally in the network.",
-  "If no parameter given, the local server is queried.",
-  "",
-  "Also displays information about connected clients,",
-  "number of online operators, and used channels.",
-  NULL
-};
+    "LUSERS [server]",
+    "",
+    "Displays the amount of online users, and max amount of",
+    "online users in the server, and globally in the network.",
+    "If no parameter given, the local server is queried.",
+    "",
+    "Also displays information about connected clients,",
+    "number of online operators, and used channels.",
+    NULL};
 
 static struct msg m_lusers_msg = {
-  "LUSERS", 0, 1, MFLG_CLIENT,
-  { NULL, m_lusers, m_lusers, m_lusers },
-  m_lusers_help
-};
+    "LUSERS",     0, 1, MFLG_CLIENT, {NULL, m_lusers, m_lusers, m_lusers},
+    m_lusers_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_lusers_load(void)
-{
-  if(msg_register(&m_lusers_msg) == NULL)
+int m_lusers_load(void) {
+  if (msg_register(&m_lusers_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_lusers_unload(void)
-{
-  msg_unregister(&m_lusers_msg);
-}
+void m_lusers_unload(void) { msg_unregister(&m_lusers_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'lusers'                                                         *
  * -------------------------------------------------------------------------- */
-static void m_lusers(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
-  if(argc > 2)
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C LUSERS :%s", &argc, argv))
+static void m_lusers(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
+  if (argc > 2) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C LUSERS :%s", &argc, argv))
       return;
   }
 

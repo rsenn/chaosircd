@@ -22,53 +22,43 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/log.h"
 #include "libchaos/dlink.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
 #include "ircd/client.h"
+#include "ircd/msg.h"
 #include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void ms_nquit(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void ms_nquit(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *ms_nquit_help[] = {
-  "NQUIT <uplink> <victim>",
-  "",
-  "Notifies remote servers about a network split.",
-  NULL
-};
+    "NQUIT <uplink> <victim>", "",
+    "Notifies remote servers about a network split.", NULL};
 
 static struct msg ms_nquit_msg = {
-  "NQUIT", 1, 2, MFLG_SERVER,
-  { NULL, NULL, ms_nquit, NULL },
-  ms_nquit_help
-};
+    "NQUIT", 1, 2, MFLG_SERVER, {NULL, NULL, ms_nquit, NULL}, ms_nquit_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_nquit_load(void)
-{
-  if(msg_register(&ms_nquit_msg) == NULL)
+int m_nquit_load(void) {
+  if (msg_register(&ms_nquit_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_nquit_unload(void)
-{
-  msg_unregister(&ms_nquit_msg);
-}
+void m_nquit_unload(void) { msg_unregister(&ms_nquit_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -76,20 +66,17 @@ void m_nquit_unload(void)
  * argv[2] - server                                                           *
  * argv[3] - reason                                                           *
  * -------------------------------------------------------------------------- */
-static void ms_nquit(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void ms_nquit(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   struct server *sptr;
 
-  if((sptr = server_find_name(argv[2])) == NULL)
-  {
+  if ((sptr = server_find_name(argv[2])) == NULL) {
     log(server_log, L_warning, "Dropping NQUIT from %s for unknown server %s.",
         cptr->name, argv[2]);
     return;
   }
 
-  if(sptr == server_me)
-  {
+  if (sptr == server_me) {
     log(server_log, L_warning, "I do not NQUIT myself!!! (from %s)",
         cptr->name);
     return;
@@ -97,4 +84,3 @@ static void ms_nquit(struct lclient *lcptr, struct client *cptr,
 
   client_exit(lcptr, sptr->client, "%s", argv[3]);
 }
-

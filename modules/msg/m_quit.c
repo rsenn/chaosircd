@@ -23,71 +23,64 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
 #include "ircd/lclient.h"
-#include "ircd/channel.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_quit (struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void mr_quit(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
-static void m_quit  (struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void m_quit(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_quit_help[] = {
-  "QUIT [text]",
-  "",
-  "Disconnects your irc session. If a message is supplied,",
-  "it will be sent to all channels you have been in.",
-  NULL
-};
+    "QUIT [text]", "",
+    "Disconnects your irc session. If a message is supplied,",
+    "it will be sent to all channels you have been in.", NULL};
 
-static struct msg m_quit_msg = {
-  "QUIT", 0, 1, MFLG_CLIENT | MFLG_UNREG,
-  { mr_quit, m_quit, m_quit, m_quit },
-  m_quit_help
-};
+static struct msg m_quit_msg = {"QUIT",
+                                0,
+                                1,
+                                MFLG_CLIENT | MFLG_UNREG,
+                                {mr_quit, m_quit, m_quit, m_quit},
+                                m_quit_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_quit_load(void)
-{
-  if(msg_register(&m_quit_msg) == NULL)
+int m_quit_load(void) {
+  if (msg_register(&m_quit_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_quit_unload(void)
-{
-  msg_unregister(&m_quit_msg);
-}
+void m_quit_unload(void) { msg_unregister(&m_quit_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'quit'                                                           *
  * argv[2] - comment                                                          *
  * -------------------------------------------------------------------------- */
-static void mr_quit(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void mr_quit(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   lclient_exit(lcptr, "%s", argv[2] ? argv[2] : "client exited");
 }
 
@@ -96,8 +89,7 @@ static void mr_quit(struct lclient *lcptr, struct client *cptr,
  * argv[1] - 'quit'                                                           *
  * argv[2] - comment                                                          *
  * -------------------------------------------------------------------------- */
-static void m_quit(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_quit(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   client_exit(lcptr, cptr, "%s", argv[2] ? argv[2] : "client exited");
 }

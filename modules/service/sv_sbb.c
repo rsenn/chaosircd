@@ -22,136 +22,122 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/log.h"
-#include "libchaos/timer.h"
 #include "libchaos/hook.h"
-#include "libchaos/str.h"
-#include "libchaos/httpc.h"
 #include "libchaos/htmlp.h"
+#include "libchaos/httpc.h"
+#include "libchaos/log.h"
+#include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/numeric.h"
+#include "ircd/chanuser.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
 #include "ircd/server.h"
 #include "ircd/service.h"
-#include "ircd/chanuser.h"
 #include "ircd/user.h"
-#include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#define SV_SBB_LOCLEN      128
-#define SV_SBB_TRAINLEN     32
-#define SV_SBB_TRACKLEN     16
-#define SV_SBB_REMARKSLEN   32
+#define SV_SBB_LOCLEN 128
+#define SV_SBB_TRAINLEN 32
+#define SV_SBB_TRACKLEN 16
+#define SV_SBB_REMARKSLEN 32
 #define SV_SBB_REQUEST_SIZE 16
 #define SV_SBB_RESPONSE_SIZE (SV_SBB_REQUEST_SIZE * 4)
-#define SV_SBB_RECORDS_SIZE  (SV_SBB_RESPONSE_SIZE * 4)
-#define SV_SBB_AGENT_NAME   "RailServ"
-#define SV_SBB_AGENT_USER   "timetable"
-#define SV_SBB_AGENT_HOST   "sbb.ch"
-#define SV_SBB_AGENT_REAL   "SBB Timetable Agent"
+#define SV_SBB_RECORDS_SIZE (SV_SBB_RESPONSE_SIZE * 4)
+#define SV_SBB_AGENT_NAME "RailServ"
+#define SV_SBB_AGENT_USER "timetable"
+#define SV_SBB_AGENT_HOST "sbb.ch"
+#define SV_SBB_AGENT_REAL "SBB Timetable Agent"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct sv_sbb_request
-{
-  struct node          node;
-  struct client       *client;
-  struct channel      *channel;
-  char                 rsrc[IRCD_LINELEN + 1];
-  char                 rdst[IRCD_LINELEN + 1];
-  char                 error[IRCD_LINELEN + 1];
-  uint64_t             rtime;
-  uint64_t             rdate;
-  struct list          responses;
+struct sv_sbb_request {
+  struct node node;
+  struct client *client;
+  struct channel *channel;
+  char rsrc[IRCD_LINELEN + 1];
+  char rdst[IRCD_LINELEN + 1];
+  char error[IRCD_LINELEN + 1];
+  uint64_t rtime;
+  uint64_t rdate;
+  struct list responses;
 };
 
-struct sv_sbb_response
-{
-  struct node          node;
-  struct list          records;
+struct sv_sbb_response {
+  struct node node;
+  struct list records;
 };
 
-struct sv_sbb_record
-{
-  struct node          node;
-  char                 origin[SV_SBB_LOCLEN];
-  char                 destination[SV_SBB_LOCLEN];
-  char                 track[SV_SBB_TRACKLEN];
-  char                 train[SV_SBB_TRAINLEN];
-  char                 remarks[SV_SBB_REMARKSLEN];
-  uint64_t             date;
-  uint64_t             departure;
-  uint64_t             arrival;
+struct sv_sbb_record {
+  struct node node;
+  char origin[SV_SBB_LOCLEN];
+  char destination[SV_SBB_LOCLEN];
+  char track[SV_SBB_TRACKLEN];
+  char train[SV_SBB_TRAINLEN];
+  char remarks[SV_SBB_REMARKSLEN];
+  uint64_t date;
+  uint64_t departure;
+  uint64_t arrival;
 };
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_handle_invite(struct lclient        *lcptr, struct client *cptr,
-                                 struct channel        *chptr, const char     *msg);
-static void sv_sbb_handle_msg   (struct lclient        *lcptr, struct client *cptr,
-                                 struct channel        *chptr, const char     *msg);
-static void sv_sbb_remove       (struct lclient        *lcptr, struct client *cptr);
-static void sv_sbb_query        (struct sv_sbb_request *rqst);
-static void sv_sbb_cancel       (struct sv_sbb_request *query);
-static void sv_sbb_send_error   (struct sv_sbb_request *query);
+static void sv_sbb_handle_invite(struct lclient *lcptr, struct client *cptr,
+                                 struct channel *chptr, const char *msg);
+static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
+                              struct channel *chptr, const char *msg);
+static void sv_sbb_remove(struct lclient *lcptr, struct client *cptr);
+static void sv_sbb_query(struct sv_sbb_request *rqst);
+static void sv_sbb_cancel(struct sv_sbb_request *query);
+static void sv_sbb_send_error(struct sv_sbb_request *query);
 static void sv_sbb_send_response(struct sv_sbb_request *query);
-static void mo_sbb              (struct lclient        *lcptr, struct client *cptr,
-                                 int                    argc,  char         **argv);
+static void mo_sbb(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static struct service *sv_sbb_service;
-static struct sheap    sv_sbb_request_heap;
-static struct sheap    sv_sbb_response_heap;
-static struct sheap    sv_sbb_record_heap;
-static struct list     sv_sbb_requests;
-static struct httpc   *sv_sbb_httpc;
-static int             sv_sbb_idle;
-static struct htmlp   *sv_sbb_htmlp;
+static struct sheap sv_sbb_request_heap;
+static struct sheap sv_sbb_response_heap;
+static struct sheap sv_sbb_record_heap;
+static struct list sv_sbb_requests;
+static struct httpc *sv_sbb_httpc;
+static int sv_sbb_idle;
+static struct htmlp *sv_sbb_htmlp;
 
-static const char     *sv_sbb_help[] =
-{
-  "SBB Timetable Services",
-  "----------------------",
-  " ",
-  "Queries are sent by /msg to the Agent or a channel the Agent is in:",
-  "/msg "SV_SBB_AGENT_NAME" <query>",
-  "/msg #channel "SV_SBB_AGENT_NAME" <query>",
-  " ",
-  "Query format is:",
-  "<origin> -> <destination> [time] [date]",
-  " ",
-  "Examples:",
-  "/msg "SV_SBB_AGENT_NAME" bern -> zürich 16:20",
-  "/msg #channel "SV_SBB_AGENT_NAME" basel -> olten 18:30 17.12.2004",
-  NULL
-};
+static const char *sv_sbb_help[] = {
+    "SBB Timetable Services",
+    "----------------------",
+    " ",
+    "Queries are sent by /msg to the Agent or a channel the Agent is in:",
+    "/msg " SV_SBB_AGENT_NAME " <query>",
+    "/msg #channel " SV_SBB_AGENT_NAME " <query>",
+    " ",
+    "Query format is:",
+    "<origin> -> <destination> [time] [date]",
+    " ",
+    "Examples:",
+    "/msg " SV_SBB_AGENT_NAME " bern -> zürich 16:20",
+    "/msg #channel " SV_SBB_AGENT_NAME " basel -> olten 18:30 17.12.2004",
+    NULL};
 
-static char           *mo_sbb_help[] =
-{
-  "SBB <list|clear|del> [arg]",
-  "",
-  "Administration frontend for the "SV_SBB_AGENT_NAME" service.",
-  NULL
-};
+static char *mo_sbb_help[] = {
+    "SBB <list|clear|del> [arg]", "",
+    "Administration frontend for the " SV_SBB_AGENT_NAME " service.", NULL};
 
-static struct msg      m_sbb_msg =
-{
-  "SBB", 1, 2, MFLG_OPER,
-  { NULL, NULL, mo_sbb, mo_sbb },
-  mo_sbb_help
-};
+static struct msg m_sbb_msg = {
+    "SBB", 1, 2, MFLG_OPER, {NULL, NULL, mo_sbb, mo_sbb}, mo_sbb_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int sv_sbb_load(void)
-{
+int sv_sbb_load(void) {
   /* Create the service and register some message handlers */
   sv_sbb_service = service_new(SV_SBB_AGENT_NAME, SV_SBB_AGENT_USER,
                                SV_SBB_AGENT_HOST, SV_SBB_AGENT_REAL);
@@ -189,8 +175,7 @@ int sv_sbb_load(void)
   return 0;
 }
 
-void sv_sbb_unload(void)
-{
+void sv_sbb_unload(void) {
   hook_unregister(client_exit, HOOK_DEFAULT, sv_sbb_remove);
 
   msg_unregister(&m_sbb_msg);
@@ -208,47 +193,43 @@ void sv_sbb_unload(void)
 /* -------------------------------------------------------------------------- *
  * An error event occurs when origin or/and destination are invalid           *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_parse_error(struct sv_sbb_request *query)
-{
-  struct sv_sbb_response  resp;
+static void sv_sbb_parse_error(struct sv_sbb_request *query) {
+  struct sv_sbb_response resp;
   struct sv_sbb_response *pptr;
-  struct sv_sbb_record   *rptr;
-  struct htmlp_tag       *htptr;
-  struct htmlp_var       *name;
-  const char             *unknown = "error";
+  struct sv_sbb_record *rptr;
+  struct htmlp_tag *htptr;
+  struct htmlp_var *name;
+  const char *unknown = "error";
 
   /* Skip to next tag */
   htmlp_tag_next(sv_sbb_htmlp);
 
   /* Find the attribute named 'name' */
-  if((name = htmlp_var_find(sv_sbb_htmlp, "name")))
-  {
+  if ((name = htmlp_var_find(sv_sbb_htmlp, "name"))) {
     /* If the origin is invalid then its this way */
-    if(!str_icmp(name->value, "REQ0JourneyStopsSK1"))
+    if (!str_icmp(name->value, "REQ0JourneyStopsSK1"))
       unknown = "origin";
     /* If the destination is invalid then its this way */
-    if(!str_icmp(name->value, "REQ0JourneyStopsZK1"))
+    if (!str_icmp(name->value, "REQ0JourneyStopsZK1"))
       unknown = "destination";
   }
-   
-  str_snprintf(query->error, sizeof(query->error), 
-           "You specified an inaccurate %s, please use one of those:",
-           unknown);
+
+  str_snprintf(
+      query->error, sizeof(query->error),
+      "You specified an inaccurate %s, please use one of those:", unknown);
 
   /* Clear The record list */
   dlink_list_zero(&resp.records);
 
   /* Find the <option> tags containing possible locations */
-  if((htptr = htmlp_tag_find(sv_sbb_htmlp, "option")))
-  {
-    do
-    {
+  if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "option"))) {
+    do {
       /* Spotted closing <option> tag, continue */
-      if(htptr->closing)
+      if (htptr->closing)
         continue;
 
       /* It's not an <option> ag, abort */
-      if(str_icmp(htptr->name, "option"))
+      if (str_icmp(htptr->name, "option"))
         break;
 
       /* Allocate a record */
@@ -259,8 +240,7 @@ static void sv_sbb_parse_error(struct sv_sbb_request *query)
 
       /* Add every possible location to the record list */
       dlink_add_tail(&resp.records, &rptr->node, rptr);
-    }
-    while((htptr = htmlp_tag_next(sv_sbb_htmlp)));
+    } while ((htptr = htmlp_tag_next(sv_sbb_htmlp)));
 
     /* We got a record, now lets allocate a response */
     pptr = mem_static_alloc(&sv_sbb_response_heap);
@@ -278,63 +258,40 @@ static void sv_sbb_parse_error(struct sv_sbb_request *query)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_send_error(struct sv_sbb_request *query)
-{
+static void sv_sbb_send_error(struct sv_sbb_request *query) {
   struct sv_sbb_response *pptr;
-  struct sv_sbb_record   *rptr;
+  struct sv_sbb_record *rptr;
 
   /* Send the header */
-  if(client_is_local(query->client))
-  {
+  if (client_is_local(query->client)) {
     client_send(query->client, ":%N!%U@%H NOTICE %C : %s",
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                query->client,
-                query->error);
-    client_send(query->client, ":%N!%U@%H NOTICE %C : "
+                sv_sbb_service->client, sv_sbb_service->client,
+                sv_sbb_service->client, query->client, query->error);
+    client_send(query->client,
+                ":%N!%U@%H NOTICE %C : "
                 "----------------------------------"
                 "----------------------------------",
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                query->client);
-  }
-  else
-  {
-    client_send(query->client, ":%C NOTICE %C : %s",
-                sv_sbb_service->client,
-                query->client,
-                query->error);
-    client_send(query->client, ":%C NOTICE %C : "
+                sv_sbb_service->client, sv_sbb_service->client,
+                sv_sbb_service->client, query->client);
+  } else {
+    client_send(query->client, ":%C NOTICE %C : %s", sv_sbb_service->client,
+                query->client, query->error);
+    client_send(query->client,
+                ":%C NOTICE %C : "
                 "----------------------------------"
                 "----------------------------------",
-                sv_sbb_service->client,
-                query->client);
+                sv_sbb_service->client, query->client);
   }
 
-
-  dlink_foreach(&query->responses, pptr)
-  {
-    dlink_foreach(&pptr->records, rptr)
-    {
-      if(client_is_local(query->client))
-      {
-        client_send(query->client,
-                    ":%N!%U@%H NOTICE %C : %s",
-                    sv_sbb_service->client,
-                    sv_sbb_service->client,
-                    sv_sbb_service->client,
-                    query->client,
-                    rptr->origin);
-      }
-      else
-      {
-        client_send(query->client,
-                    ":%C NOTICE %C : %s",
-                    sv_sbb_service->client,
-                    query->client,
-                    rptr->origin);
+  dlink_foreach(&query->responses, pptr) {
+    dlink_foreach(&pptr->records, rptr) {
+      if (client_is_local(query->client)) {
+        client_send(query->client, ":%N!%U@%H NOTICE %C : %s",
+                    sv_sbb_service->client, sv_sbb_service->client,
+                    sv_sbb_service->client, query->client, rptr->origin);
+      } else {
+        client_send(query->client, ":%C NOTICE %C : %s", sv_sbb_service->client,
+                    query->client, rptr->origin);
       }
     }
   }
@@ -342,21 +299,18 @@ static void sv_sbb_send_error(struct sv_sbb_request *query)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_send_response(struct sv_sbb_request *query)
-{
+static void sv_sbb_send_response(struct sv_sbb_request *query) {
   struct sv_sbb_response *pptr;
-  struct sv_sbb_record   *rptr;
+  struct sv_sbb_record *rptr;
 
-  if(client_is_local(query->client))
-  {
-    client_send(query->client, ":%N!%U@%H NOTICE %C : "
+  if (client_is_local(query->client)) {
+    client_send(query->client,
+                ":%N!%U@%H NOTICE %C : "
                 "================================================"
-                " "SV_SBB_AGENT_NAME" response "
+                " " SV_SBB_AGENT_NAME " response "
                 "================================================ ",
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                query->client);
+                sv_sbb_service->client, sv_sbb_service->client,
+                sv_sbb_service->client, query->client);
     client_send(query->client,
                 ":%N!%U@%H NOTICE %C : "
                 "From                           "
@@ -366,20 +320,15 @@ static void sv_sbb_send_response(struct sv_sbb_request *query)
                 "Arrival "
                 "Train      "
                 "Remarks",
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                query->client);
-  }
-  else
-  {
+                sv_sbb_service->client, sv_sbb_service->client,
+                sv_sbb_service->client, query->client);
+  } else {
     client_send(query->client,
                 ":%C NOTICE %C : "
                 "================================================"
-                " "SV_SBB_AGENT_NAME" response "
+                " " SV_SBB_AGENT_NAME " response "
                 "================================================ ",
-                sv_sbb_service->client,
-                query->client);
+                sv_sbb_service->client, query->client);
     client_send(query->client,
                 ":%N!%U@%H NOTICE %C : "
                 "From                           "
@@ -389,192 +338,151 @@ static void sv_sbb_send_response(struct sv_sbb_request *query)
                 "Arrival "
                 "Train      "
                 "Remarks",
-                sv_sbb_service->client,
-                query->client);
+                sv_sbb_service->client, query->client);
   }
 
-  dlink_foreach(&query->responses, pptr)
-  {
-    if(client_is_local(query->client))
+  dlink_foreach(&query->responses, pptr) {
+    if (client_is_local(query->client))
       client_send(query->client,
                   ":%N!%U@%H NOTICE %C : "
                   "---------------------------------------------------------"
                   "---------------------------------------------------------",
-                  sv_sbb_service->client,
-                  sv_sbb_service->client,
-                  sv_sbb_service->client,
-                  query->client);
+                  sv_sbb_service->client, sv_sbb_service->client,
+                  sv_sbb_service->client, query->client);
     else
       client_send(query->client,
                   ":%C NOTICE %C : "
                   "---------------------------------------------------------"
                   "---------------------------------------------------------",
-                  sv_sbb_service->client,
-                  query->client);
+                  sv_sbb_service->client, query->client);
 
-    dlink_foreach(&pptr->records, rptr)
-    {
-      if(client_is_local(query->client))
-      {
+    dlink_foreach(&pptr->records, rptr) {
+      if (client_is_local(query->client)) {
         client_send(query->client,
                     ":%N!%U@%H NOTICE %C : %-30s %-30s %10D %t   %t   %-10s %s",
-                    sv_sbb_service->client,
-                    sv_sbb_service->client,
-                    sv_sbb_service->client,
-                    query->client,
-                    rptr->origin,
-                    rptr->destination,
-                    &rptr->date,
-                    &rptr->departure,
-                    &rptr->arrival,
-                    rptr->train,
-                    rptr->remarks);
-      }
-      else
-      {
+                    sv_sbb_service->client, sv_sbb_service->client,
+                    sv_sbb_service->client, query->client, rptr->origin,
+                    rptr->destination, &rptr->date, &rptr->departure,
+                    &rptr->arrival, rptr->train, rptr->remarks);
+      } else {
         client_send(query->client,
                     ":%C NOTICE %C : %-30s %-30s %10D %t   %t   %-10s %s",
-                    sv_sbb_service->client,
-                    query->client,
-                    rptr->origin,
-                    rptr->destination,
-                    &rptr->date,
-                    &rptr->departure,
-                    &rptr->arrival,
-                    rptr->train,
-                    rptr->remarks);
+                    sv_sbb_service->client, query->client, rptr->origin,
+                    rptr->destination, &rptr->date, &rptr->departure,
+                    &rptr->arrival, rptr->train, rptr->remarks);
       }
     }
   }
 
-  if(client_is_local(query->client))
-  {
+  if (client_is_local(query->client)) {
     client_send(query->client,
                 ":%N!%U@%H NOTICE %C : "
                 "============================================"
-                " End of "SV_SBB_AGENT_NAME" response "
+                " End of " SV_SBB_AGENT_NAME " response "
                 "============================================ ",
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                sv_sbb_service->client,
-                query->client);
-  }
-  else
-  {
-    client_send(query->client, ":%C NOTICE %C : "
+                sv_sbb_service->client, sv_sbb_service->client,
+                sv_sbb_service->client, query->client);
+  } else {
+    client_send(query->client,
+                ":%C NOTICE %C : "
                 "============================================"
-                " End of "SV_SBB_AGENT_NAME" response "
+                " End of " SV_SBB_AGENT_NAME " response "
                 "============================================ ",
-                sv_sbb_service->client,
-                query->client);
+                sv_sbb_service->client, query->client);
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_parse_response(struct sv_sbb_request *query)
-{
-  struct htmlp_tag       *htptr;
-  struct htmlp_var       *hvptr;
-  char                   *product = NULL;
-  struct sv_sbb_record    rec;
-  struct sv_sbb_response  resp;
-  struct sv_sbb_record   *rptr;
+static void sv_sbb_parse_response(struct sv_sbb_request *query) {
+  struct htmlp_tag *htptr;
+  struct htmlp_var *hvptr;
+  char *product = NULL;
+  struct sv_sbb_record rec;
+  struct sv_sbb_response resp;
+  struct sv_sbb_record *rptr;
   struct sv_sbb_response *pptr;
 
   dlink_list_zero(&resp.records);
   dlink_list_zero(&query->responses);
 
-  if((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")) == NULL)
+  if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")) == NULL)
     return;
 
-  do
-  {
-    if((hvptr = htmlp_var_find(sv_sbb_htmlp, "summary")) == NULL)
-    {
+  do {
+    if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "summary")) == NULL) {
       htmlp_tag_next(sv_sbb_htmlp);
       continue;
     }
 
     /* check connection */
-    if(str_nicmp(hvptr->value, "Details", 7))
-    {
+    if (str_nicmp(hvptr->value, "Details", 7)) {
       htmlp_tag_next(sv_sbb_htmlp);
       continue;
     }
 
-    nextrec:
+  nextrec:
     /* get the station */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
       continue;
 
-    do
-    {
-      if((hvptr = htmlp_var_find(sv_sbb_htmlp, "headers")) == NULL)
-      {
+    do {
+      if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "headers")) == NULL) {
         htmlp_tag_next(sv_sbb_htmlp);
         continue;
       }
 
-      if(!str_icmp(hvptr->value, "stops"))
+      if (!str_icmp(hvptr->value, "stops"))
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
 
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
 
-    while(htptr->text[0] == '\0' || htptr->text[0] == '&')
-    {
-      if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    while (htptr->text[0] == '\0' || htptr->text[0] == '&') {
+      if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
         return;
     }
 
     strlcpy(rec.origin, htmlp_decode(htptr->text), sizeof(rec.origin));
 
     /* get the date */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
       continue;
 
-    do
-    {
-      if((hvptr = htmlp_var_find(sv_sbb_htmlp, "align")) == NULL)
-      {
+    do {
+      if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "align")) == NULL) {
         htmlp_tag_next(sv_sbb_htmlp);
         continue;
       }
 
-      if(!str_icmp(hvptr->value, "left"))
+      if (!str_icmp(hvptr->value, "left"))
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
 
     rec.date = timer_parse_date(htmlp_decode(htptr->text));
 
     htmlp_tag_next(sv_sbb_htmlp);
 
     /* get the time */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
       continue;
 
-    do
-    {
-      if((hvptr = htmlp_var_find(sv_sbb_htmlp, "align")) == NULL)
-      {
+    do {
+      if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "align")) == NULL) {
         htmlp_tag_next(sv_sbb_htmlp);
         continue;
       }
 
-      if(!str_icmp(hvptr->value, "left"))
+      if (!str_icmp(hvptr->value, "left"))
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
 
     htptr = htmlp_tag_next(sv_sbb_htmlp);
     htptr = htmlp_tag_next(sv_sbb_htmlp);
@@ -582,19 +490,18 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     rec.departure = timer_parse_time(htmlp_decode(htptr->text));
 
     /* get product */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")) == NULL)
       break;
 
-    while((htptr = htmlp_tag_next(sv_sbb_htmlp)))
-    {
-      if(!str_icmp(htptr->name, "tr") && htptr->closing)
+    while ((htptr = htmlp_tag_next(sv_sbb_htmlp))) {
+      if (!str_icmp(htptr->name, "tr") && htptr->closing)
         break;
 
-      if(htptr->text[0] && str_len(htptr->text) > 1)
+      if (htptr->text[0] && str_len(htptr->text) > 1)
         product = htptr->text;
     }
 
-    if(product)
+    if (product)
       strlcpy(rec.train, htmlp_decode(product), sizeof(rec.train));
     else
       rec.train[0] = '\0';
@@ -602,107 +509,97 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     product = NULL;
 
     /* get remarks */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
       continue;
 
-    do
-    {
-      if((hvptr = htmlp_var_find(sv_sbb_htmlp, "valign")) == NULL)
-      {
+    do {
+      if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "valign")) == NULL) {
         htmlp_tag_next(sv_sbb_htmlp);
         continue;
       }
 
-      if(!str_icmp(hvptr->value, "top"))
+      if (!str_icmp(hvptr->value, "top"))
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
 
     strlcpy(rec.remarks, htmlp_decode(htptr->text), sizeof(rec.remarks));
 
     /* get destination */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
       continue;
 
-    do
-    {
-      if((hvptr = htmlp_var_find(sv_sbb_htmlp, "headers")) == NULL)
-      {
+    do {
+      if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "headers")) == NULL) {
         htmlp_tag_next(sv_sbb_htmlp);
         continue;
       }
 
-      if(!str_icmp(hvptr->value, "stops"))
+      if (!str_icmp(hvptr->value, "stops"))
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
 
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
 
-    strlcpy(rec.destination, htmlp_decode(htptr->text), sizeof(rec.destination));
+    strlcpy(rec.destination, htmlp_decode(htptr->text),
+            sizeof(rec.destination));
 
     /* get the time */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")) == NULL)
       continue;
 
-    do
-    {
-      if((hvptr = htmlp_var_find(sv_sbb_htmlp, "align")) == NULL)
-      {
+    do {
+      if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "align")) == NULL) {
         htmlp_tag_next(sv_sbb_htmlp);
         continue;
       }
 
-      if(!str_icmp(hvptr->value, "left"))
+      if (!str_icmp(hvptr->value, "left"))
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "td")));
 
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
 
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
 
     rec.arrival = timer_parse_time(htmlp_decode(htptr->text));
 
     /* check if we have another record */
-    if((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")) == NULL)
+    if ((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")) == NULL)
       continue;
 
-    do
-    {
-      if(htptr->closing)
+    do {
+      if (htptr->closing)
         break;
 
       htmlp_tag_next(sv_sbb_htmlp);
-    }
-    while((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")));
+    } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")));
 
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
-    if((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
+    if ((htptr = htmlp_tag_next(sv_sbb_htmlp)) == NULL)
       break;
 
     /* add result record */
@@ -717,7 +614,7 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     str_trim(rptr->train);
     str_trim(rptr->remarks);
 
-    if(!str_icmp(htptr->name, "td") && htmlp_var_find(sv_sbb_htmlp, "headers"))
+    if (!str_icmp(htptr->name, "td") && htmlp_var_find(sv_sbb_htmlp, "headers"))
       goto nextrec;
 
     /* add response */
@@ -730,27 +627,23 @@ static void sv_sbb_parse_response(struct sv_sbb_request *query)
     dlink_list_zero(&resp.records);
 
     htmlp_tag_next(sv_sbb_htmlp);
-  }
-  while((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")));
+  } while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "table")));
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_parse(void)
-{
+static void sv_sbb_parse(void) {
   struct htmlp_tag *htptr;
   struct htmlp_var *hvptr;
 
   /* check for error */
   htmlp_tag_first(sv_sbb_htmlp);
 
-  while((htptr = htmlp_tag_find(sv_sbb_htmlp, "img")))
-  {
-    if((hvptr = htmlp_var_find(sv_sbb_htmlp, "src")))
-    {
-      if(!str_icmp(hvptr->value, "/img/vs_sbb/error_arrow.gif"))
-      {
-        sv_sbb_parse_error(sv_sbb_requests.head ? sv_sbb_requests.head->data : NULL);
+  while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "img"))) {
+    if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "src"))) {
+      if (!str_icmp(hvptr->value, "/img/vs_sbb/error_arrow.gif")) {
+        sv_sbb_parse_error(sv_sbb_requests.head ? sv_sbb_requests.head->data
+                                                : NULL);
         return;
       }
     }
@@ -761,14 +654,13 @@ static void sv_sbb_parse(void)
   /* check for response */
   htmlp_tag_first(sv_sbb_htmlp);
 
-  while((htptr = htmlp_tag_find(sv_sbb_htmlp, "form")))
-  {
-    if((hvptr = htmlp_var_find(sv_sbb_htmlp, "name")))
-    {
-      if(!str_icmp(hvptr->value, "tp_results_form"))
-      {
-        sv_sbb_parse_response(sv_sbb_requests.head ? sv_sbb_requests.head->data : NULL);
-        sv_sbb_send_response(sv_sbb_requests.head ? sv_sbb_requests.head->data : NULL);
+  while ((htptr = htmlp_tag_find(sv_sbb_htmlp, "form"))) {
+    if ((hvptr = htmlp_var_find(sv_sbb_htmlp, "name"))) {
+      if (!str_icmp(hvptr->value, "tp_results_form")) {
+        sv_sbb_parse_response(sv_sbb_requests.head ? sv_sbb_requests.head->data
+                                                   : NULL);
+        sv_sbb_send_response(sv_sbb_requests.head ? sv_sbb_requests.head->data
+                                                  : NULL);
         return;
       }
     }
@@ -779,19 +671,17 @@ static void sv_sbb_parse(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_request_delete(struct sv_sbb_request *query)
-{
+static void sv_sbb_request_delete(struct sv_sbb_request *query) {
   struct sv_sbb_response *resp;
-  struct sv_sbb_record   *rec;
-  struct node            *next1;
-  struct node            *next2;
+  struct sv_sbb_record *rec;
+  struct node *next1;
+  struct node *next2;
 
-  log(service_log, L_status, "deleting request for client %s", query->client->name);
+  log(service_log, L_status, "deleting request for client %s",
+      query->client->name);
 
-  dlink_foreach_safe(&query->responses, resp, next1)
-  {
-    dlink_foreach_safe(&resp->records, rec, next2)
-    {
+  dlink_foreach_safe(&query->responses, resp, next1) {
+    dlink_foreach_safe(&resp->records, rec, next2) {
       dlink_delete(&resp->records, &rec->node);
       mem_static_free(&sv_sbb_record_heap, rec);
     }
@@ -803,20 +693,16 @@ static void sv_sbb_request_delete(struct sv_sbb_request *query)
   dlink_delete(&sv_sbb_requests, &query->node);
   mem_static_free(&sv_sbb_request_heap, query);
 
-  if(!sv_sbb_requests.size)
-  {
+  if (!sv_sbb_requests.size) {
     sv_sbb_idle = 1;
-  }
-  else
-  {
+  } else {
     sv_sbb_query(sv_sbb_requests.head->data);
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_cancel(struct sv_sbb_request *query)
-{
+static void sv_sbb_cancel(struct sv_sbb_request *query) {
   httpc_clear(sv_sbb_httpc);
   htmlp_clear(sv_sbb_htmlp);
 
@@ -825,17 +711,13 @@ static void sv_sbb_cancel(struct sv_sbb_request *query)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_remove(struct lclient *lcptr, struct client *cptr)
-{
+static void sv_sbb_remove(struct lclient *lcptr, struct client *cptr) {
   struct sv_sbb_request *query;
-  struct node           *next;
+  struct node *next;
 
-  dlink_foreach_safe(&sv_sbb_requests, query, next)
-  {
-    if(query->client == cptr)
-    {
-      if(&query->node == sv_sbb_requests.head)
-      {
+  dlink_foreach_safe(&sv_sbb_requests, query, next) {
+    if (query->client == cptr) {
+      if (&query->node == sv_sbb_requests.head) {
         sv_sbb_cancel(query);
         return;
       }
@@ -847,17 +729,14 @@ static void sv_sbb_remove(struct lclient *lcptr, struct client *cptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_data(struct httpc *hcptr)
-{
+static void sv_sbb_data(struct httpc *hcptr) {
   log(service_log, L_status, "Content-Length: %u", hcptr->data_length);
 
-  if(htmlp_parse(sv_sbb_htmlp, hcptr->data, hcptr->data_length) == -1)
-  {
+  if (htmlp_parse(sv_sbb_htmlp, hcptr->data, hcptr->data_length) == -1) {
     log(service_log, L_status, "Parse error in HTML");
-  }
-  else
-  {
-    log(service_log, L_status, "HTML Parsed. Got %u tags.", sv_sbb_htmlp->tags.size);
+  } else {
+    log(service_log, L_status, "HTML Parsed. Got %u tags.",
+        sv_sbb_htmlp->tags.size);
 
     sv_sbb_parse();
   }
@@ -867,8 +746,7 @@ static void sv_sbb_data(struct httpc *hcptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void sv_sbb_query(struct sv_sbb_request *rqst)
-{
+static void sv_sbb_query(struct sv_sbb_request *rqst) {
   httpc_var_set(sv_sbb_httpc, "queryPageDisplayed", "yes");
   httpc_var_set(sv_sbb_httpc, "REQ0JourneyStopsSG1", rqst->rsrc);
   httpc_var_set(sv_sbb_httpc, "REQ0JourneyStopsSID1", NULL);
@@ -902,12 +780,11 @@ static void sv_sbb_query(struct sv_sbb_request *rqst)
  * When the service gets invited to a channel it will join.                   *
  * -------------------------------------------------------------------------- */
 static void sv_sbb_handle_invite(struct lclient *lcptr, struct client *cptr,
-                                 struct channel *chptr, const char    *msg)
-{
+                                 struct channel *chptr, const char *msg) {
   struct chanuser *cuptr;
 
   /* We're already in. */
-  if(channel_is_member(chptr, sv_sbb_service->client))
+  if (channel_is_member(chptr, sv_sbb_service->client))
     return;
 
   /* Add to channel member list */
@@ -923,64 +800,51 @@ static void sv_sbb_handle_invite(struct lclient *lcptr, struct client *cptr,
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
-                              struct channel *chptr, const char    *msg)
-{
-  char    *p;
-  char    *timestr;
-  char    *datestr;
+                              struct channel *chptr, const char *msg) {
+  char *p;
+  char *timestr;
+  char *datestr;
   uint64_t q_time = timer_mtime - timer_today;
   uint64_t q_date = timer_today;
 
-  if(!str_nicmp(msg, "help", 4))
-  {
+  if (!str_nicmp(msg, "help", 4)) {
     uint32_t i;
 
-    for(i = 0; sv_sbb_help[i]; i++)
-    {
-      if(client_is_local(cptr))
-        client_send(cptr, ":%N!%U@%H PRIVMSG %C :%s",
-                    sv_sbb_service->client,
-                    sv_sbb_service->client,
-                    sv_sbb_service->client,
-                    cptr, sv_sbb_help[i]);
+    for (i = 0; sv_sbb_help[i]; i++) {
+      if (client_is_local(cptr))
+        client_send(cptr, ":%N!%U@%H PRIVMSG %C :%s", sv_sbb_service->client,
+                    sv_sbb_service->client, sv_sbb_service->client, cptr,
+                    sv_sbb_help[i]);
       else
-        client_send(cptr, ":%C PRIVMSG %C :%s",
-                    sv_sbb_service->client,
-                    cptr, sv_sbb_help[i]);
+        client_send(cptr, ":%C PRIVMSG %C :%s", sv_sbb_service->client, cptr,
+                    sv_sbb_help[i]);
     }
 
     return;
   }
 
-  if((p = strstr(msg, "->")))
-  {
+  if ((p = strstr(msg, "->"))) {
     struct sv_sbb_request *rqst;
 
     *p++ = '\0';
     *p++ = '\0';
 
-    if((timestr = strchr(p, ':')))
-    {
-      while(*timestr != ' ' && timestr > p)
+    if ((timestr = strchr(p, ':'))) {
+      while (*timestr != ' ' && timestr > p)
         timestr--;
 
-      if(timestr == p)
-      {
+      if (timestr == p) {
         timestr = NULL;
-      }
-      else
-      {
+      } else {
         *timestr++ = '\0';
 
-        if((q_time = timer_parse_time(timestr)) == (uint64_t)-1LL)
+        if ((q_time = timer_parse_time(timestr)) == (uint64_t)-1LL)
           q_time = timer_mtime - timer_today;
 
-        if((datestr = strchr(timestr, ' ')))
-        {
+        if ((datestr = strchr(timestr, ' '))) {
           *datestr++ = '\0';
 
-          if((q_date = timer_parse_date(datestr)) == (uint64_t)-1LL)
-          {
+          if ((q_date = timer_parse_date(datestr)) == (uint64_t)-1LL) {
             q_date = timer_today;
           }
         }
@@ -1003,66 +867,66 @@ static void sv_sbb_handle_msg(struct lclient *lcptr, struct client *cptr,
     rqst->rtime = q_time;
     rqst->rdate = q_date;
 
-    if(client_is_local(cptr))
+    if (client_is_local(cptr))
       client_send(cptr, ":%N!%U@%H PRIVMSG %C :Query: %s -> %s %T %D",
-                  sv_sbb_service->client,
-                  sv_sbb_service->client,
-                  sv_sbb_service->client,
-                  cptr, rqst->rsrc, rqst->rdst, &q_time, &q_date);
+                  sv_sbb_service->client, sv_sbb_service->client,
+                  sv_sbb_service->client, cptr, rqst->rsrc, rqst->rdst, &q_time,
+                  &q_date);
     else
       client_send(cptr, ":%C PRIVMSG %C :Query: %s -> %s %T %D",
-                  sv_sbb_service->client, cptr, rqst->rsrc, rqst->rdst, &q_time, &q_date);
+                  sv_sbb_service->client, cptr, rqst->rsrc, rqst->rdst, &q_time,
+                  &q_date);
 
     dlink_add_tail(&sv_sbb_requests, &rqst->node, rqst);
 
-    if(sv_sbb_idle)
+    if (sv_sbb_idle)
       sv_sbb_query(rqst);
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void mo_sbb(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
-  if(argc > 3)
-  {
-    if(argv[4])
-    {
-      if(server_relay_maybe(lcptr, cptr, 2, ":%C PROXY %s %s :%s", &argc, argv))
+static void mo_sbb(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
+  if (argc > 3) {
+    if (argv[4]) {
+      if (server_relay_maybe(lcptr, cptr, 2, ":%C PROXY %s %s :%s", &argc,
+                             argv))
         return;
-    }
-    else
-    {
-      if(server_relay_maybe(lcptr, cptr, 1, ":%C PROXY %s :%s", &argc, argv))
+    } else {
+      if (server_relay_maybe(lcptr, cptr, 1, ":%C PROXY %s :%s", &argc, argv))
         return;
     }
   }
 
-  if(!str_icmp(argv[2], "list"))
-  {
+  if (!str_icmp(argv[2], "list")) {
     struct sv_sbb_request *rqst;
 
-    client_send(cptr, ":%C NOTICE %C : =================== "SV_SBB_AGENT_NAME" request list ==================== ",
+    client_send(cptr,
+                ":%C NOTICE %C : =================== " SV_SBB_AGENT_NAME
+                " request list ==================== ",
                 client_me, cptr);
-    client_send(cptr, ":%C NOTICE %C : client     channel    from       to         date      time",
+    client_send(cptr,
+                ":%C NOTICE %C : client     channel    from       to         "
+                "date      time",
                 client_me, cptr);
-    client_send(cptr, ":%C NOTICE %C : --------------------------------------------------------------",
-                client_me, cptr);
+    client_send(
+        cptr,
+        ":%C NOTICE %C : "
+        "--------------------------------------------------------------",
+        client_me, cptr);
 
-    dlink_foreach(&sv_sbb_requests, rqst)
-    {
+    dlink_foreach(&sv_sbb_requests, rqst) {
       client_send(cptr, ":%C NOTICE %C : %-10s %-10s %-10s %-10s %D %T",
-                  client_me, cptr,
-                  rqst->client->name, rqst->channel ? rqst->channel->name : "<none>",
-                  rqst->rsrc, rqst->rdst, &rqst->rdate, &rqst->rtime);
+                  client_me, cptr, rqst->client->name,
+                  rqst->channel ? rqst->channel->name : "<none>", rqst->rsrc,
+                  rqst->rdst, &rqst->rdate, &rqst->rtime);
     }
 
-    client_send(cptr, ":%C NOTICE %C : ================ end of "SV_SBB_AGENT_NAME" request list ================ ",
+    client_send(cptr,
+                ":%C NOTICE %C : ================ end of " SV_SBB_AGENT_NAME
+                " request list ================ ",
                 client_me, cptr);
-  }
-  else if(!str_nicmp(argv[2], "del", 3))
-  {
+  } else if (!str_nicmp(argv[2], "del", 3)) {
   }
 }
-

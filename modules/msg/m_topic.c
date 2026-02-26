@@ -30,57 +30,53 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_topic  (struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv);
-static void ms_topic (struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv);
+static void m_topic(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
+static void ms_topic(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_topic_help[] = {
-  "TOPIC <channel> [+][text]",
-  "",
-  "If used with a text, it changes the topic of the given",
-  "channel. If used without text, the actual topic is shown.",
-  "If + is prepended to the text then the text is added in",
-  "front of the topic.",
-  NULL
-};
+    "TOPIC <channel> [+][text]",
+    "",
+    "If used with a text, it changes the topic of the given",
+    "channel. If used without text, the actual topic is shown.",
+    "If + is prepended to the text then the text is added in",
+    "front of the topic.",
+    NULL};
 
-static struct msg m_topic_msg = {
-  "TOPIC", 1, 2, MFLG_CLIENT,
-  { m_unregistered, m_topic, ms_topic, m_topic },
-  m_topic_help
-};
+static struct msg m_topic_msg = {"TOPIC",
+                                 1,
+                                 2,
+                                 MFLG_CLIENT,
+                                 {m_unregistered, m_topic, ms_topic, m_topic},
+                                 m_topic_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_topic_load(void)
-{
-  if(msg_register(&m_topic_msg) == NULL)
+int m_topic_load(void) {
+  if (msg_register(&m_topic_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_topic_unload(void)
-{
-  msg_unregister(&m_topic_msg);
-}
+void m_topic_unload(void) { msg_unregister(&m_topic_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -88,35 +84,29 @@ void m_topic_unload(void)
  * argv[2] - channel                                                          *
  * argv[3] - [topic]                                                          *
  * -------------------------------------------------------------------------- */
-static void m_topic(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
-  struct channel  *chptr;
+static void m_topic(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
+  struct channel *chptr;
   struct chanuser *cuptr;
-  char             newtopic[IRCD_TOPICLEN + 1];
+  char newtopic[IRCD_TOPICLEN + 1];
 
-  if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
+  if ((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
 
   cuptr = chanuser_find(chptr, cptr);
 
-  if(cuptr == NULL)
-  {
+  if (cuptr == NULL) {
     numeric_send(cptr, ERR_NOTONCHANNEL, chptr->name);
     return;
   }
 
-  if(argc < 4)
-  {
-    if(chptr->topic[0] == '\0')
-    {
+  if (argc < 4) {
+    if (chptr->topic[0] == '\0') {
       numeric_send(cptr, RPL_NOTOPIC, chptr->name);
-    }
-    else
-    {
+    } else {
       numeric_send(cptr, RPL_TOPIC, chptr->name, chptr->topic);
-      numeric_send(cptr, RPL_TOPICWHOTIME,
-                   chptr->name, chptr->topic_info, chptr->topic_ts);
+      numeric_send(cptr, RPL_TOPICWHOTIME, chptr->name, chptr->topic_info,
+                   chptr->topic_ts);
     }
 
     return;
@@ -124,8 +114,7 @@ static void m_topic(struct lclient *lcptr, struct client *cptr,
 
   strlcpy(newtopic, argv[3], sizeof(newtopic));
 
-  if(newtopic[0] == '+')
-  {
+  if (newtopic[0] == '+') {
     strlcpy(newtopic, &argv[3][1], sizeof(newtopic));
     strlcat(newtopic, " | ", sizeof(newtopic));
     strlcat(newtopic, chptr->topic, sizeof(newtopic));
@@ -140,13 +129,11 @@ static void m_topic(struct lclient *lcptr, struct client *cptr,
  * argv[2] - channel                                                          *
  * argv[3] - [topic]                                                          *
  * -------------------------------------------------------------------------- */
-static void ms_topic(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void ms_topic(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   struct channel *chptr;
 
-  if((chptr = channel_find_name(argv[2])) == NULL)
-  {
+  if ((chptr = channel_find_name(argv[2])) == NULL) {
     log(channel_log, L_warning, "Dropping TOPIC for unknown channel %s.",
         argv[2]);
     return;

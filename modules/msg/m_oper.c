@@ -30,60 +30,54 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/ircd.h"
-#include "ircd/oper.h"
-#include "ircd/user.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
-#include "ircd/channel.h"
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
+#include "ircd/oper.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_oper (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void m_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
-static void ms_oper(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void ms_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
-static void mo_oper(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void mo_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_oper_help[] = {
-  "OPER <username> <password>",
-  "",
-  "If supplied with a correct username/password pair,",
-  "you get oper'ed, and have elevated privileges.",
-  NULL
-};
+    "OPER <username> <password>", "",
+    "If supplied with a correct username/password pair,",
+    "you get oper'ed, and have elevated privileges.", NULL};
 
-static struct msg m_oper_msg = {
-  "OPER", 2, 2, MFLG_CLIENT | MFLG_UNREG,
-  { m_unregistered, m_oper, ms_oper, mo_oper },
-  m_oper_help
-};
+static struct msg m_oper_msg = {"OPER",
+                                2,
+                                2,
+                                MFLG_CLIENT | MFLG_UNREG,
+                                {m_unregistered, m_oper, ms_oper, mo_oper},
+                                m_oper_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_oper_load(void)
-{
-  if(msg_register(&m_oper_msg) == NULL)
+int m_oper_load(void) {
+  if (msg_register(&m_oper_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_oper_unload(void)
-{
-  msg_unregister(&m_oper_msg);
-}
+void m_oper_unload(void) { msg_unregister(&m_oper_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -91,39 +85,33 @@ void m_oper_unload(void)
  * argv[2] - name                                                             *
  * argv[3] - password                                                         *
  * -------------------------------------------------------------------------- */
-static void m_oper(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   struct oper *oper;
 
   oper = oper_find(argv[2]);
 
-  if(oper == NULL)
-  {
+  if (oper == NULL) {
     numeric_send(cptr, ERR_NOOPERHOST);
     log(oper_log, L_warning,
         "failed oper attempt by %s (%s@%s) - "
         "no such oper entry: %s [%s]",
-        cptr->name, cptr->user->name,
-        cptr->host, argv[2], argv[3]);
+        cptr->name, cptr->user->name, cptr->host, argv[2], argv[3]);
     return;
   }
 
-  if(str_cmp(argv[3], oper->passwd))
-  {
-    client_send(cptr, numeric_format(ERR_PASSWDMISMATCH),
-                client_me->name, cptr->name);
+  if (str_cmp(argv[3], oper->passwd)) {
+    client_send(cptr, numeric_format(ERR_PASSWDMISMATCH), client_me->name,
+                cptr->name);
 
     log(oper_log, L_warning,
         "failed oper attempt by %s (%s@%s) - "
         "wrong password for %s: %s",
-        cptr->name, cptr->user->name,
-        cptr->host, argv[2], argv[3]);
+        cptr->name, cptr->user->name, cptr->host, argv[2], argv[3]);
     return;
   }
 
-  if(cptr->oper == NULL)
-  {
+  if (cptr->oper == NULL) {
     oper_up(oper, cptr);
     cptr->oper = oper;
   }
@@ -135,10 +123,8 @@ static void m_oper(struct lclient *lcptr, struct client *cptr,
  * argv[2] - name                                                             *
  * argv[3] - password                                                         *
  * -------------------------------------------------------------------------- */
-static void ms_oper(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
-}
+static void ms_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {}
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -146,8 +132,7 @@ static void ms_oper(struct lclient *lcptr, struct client *cptr,
  * argv[2] - name                                                             *
  * argv[3] - password                                                         *
  * -------------------------------------------------------------------------- */
-static void mo_oper(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void mo_oper(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   numeric_send(cptr, RPL_YOUREOPER);
 }

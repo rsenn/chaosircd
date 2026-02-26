@@ -23,59 +23,55 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_cap (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void mr_cap(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *mr_cap_help[] = {
-  "CAP <LS|LIST|REQ|ACK|NAK|CLEAR|END> [args...]",
-  "",
-  "Used in the beginning of a irc session, to allow you",
-  "to connect to the server. Also user on server connection",
-  "for link authentication.",
-  NULL
-};
+    "CAP <LS|LIST|REQ|ACK|NAK|CLEAR|END> [args...]",
+    "",
+    "Used in the beginning of a irc session, to allow you",
+    "to connect to the server. Also user on server connection",
+    "for link authentication.",
+    NULL};
 
-static struct msg mr_cap_msg = {
-  "CAP", 1, 2, MFLG_CLIENT | MFLG_UNREG,
-  { mr_cap, m_registered, NULL, m_registered },
-  mr_cap_help
-};
+static struct msg mr_cap_msg = {"CAP",
+                                1,
+                                2,
+                                MFLG_CLIENT | MFLG_UNREG,
+                                {mr_cap, m_registered, NULL, m_registered},
+                                mr_cap_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_cap_load(void)
-{
-  if(msg_register(&mr_cap_msg) == NULL)
+int m_cap_load(void) {
+  if (msg_register(&mr_cap_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_cap_unload(void)
-{
-  msg_unregister(&mr_cap_msg);
-}
+void m_cap_unload(void) { msg_unregister(&mr_cap_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -83,32 +79,31 @@ void m_cap_unload(void)
  * argv[2] - subcommand                                                       *
  * argv[3] - arguments                                                        *
  * -------------------------------------------------------------------------- */
-static void mr_cap(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
-/*  Mitchell, et al.       Expires September 5, 2005               [Page 16]
- *
- *
- *  Internet-Draft                  IRC CAP                       March 2005
- *
- *  Appendix A. Examples
- *
- *
- *     In the following examples, lines preceded by "CLIENT:" indicate
- *     protocol messages sent by the client, and lines preceded by "SERVER:"
- *     indicate protocol messages sent by the server.  For clarity, the
- *     origin field for server-originated protocol messages has been
- *     omitted.  This field would consist of a colon (':') followed by the
- *     full server name, and would be the first field in the command.
- *
- *     A client communicating with a server not supporting CAP.
- *
- *            CLIENT: CAP LS
- *            CLIENT: NICK nickname
- *            CLIENT: USER username ignored ignored :real name
- *            SERVER: 001 [...]
- */
+static void mr_cap(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
+  /*  Mitchell, et al.       Expires September 5, 2005               [Page 16]
+   *
+   *
+   *  Internet-Draft                  IRC CAP                       March 2005
+   *
+   *  Appendix A. Examples
+   *
+   *
+   *     In the following examples, lines preceded by "CLIENT:" indicate
+   *     protocol messages sent by the client, and lines preceded by "SERVER:"
+   *     indicate protocol messages sent by the server.  For clarity, the
+   *     origin field for server-originated protocol messages has been
+   *     omitted.  This field would consist of a colon (':') followed by the
+   *     full server name, and would be the first field in the command.
+   *
+   *     A client communicating with a server not supporting CAP.
+   *
+   *            CLIENT: CAP LS
+   *            CLIENT: NICK nickname
+   *            CLIENT: USER username ignored ignored :real name
+   *            SERVER: 001 [...]
+   */
 
-
-  log(lclient_log, L_warning, "Unsupported CAP command: %s %s", argv[1], argv[2]);
+  log(lclient_log, L_warning, "Unsupported CAP command: %s %s", argv[1],
+      argv[2]);
 }

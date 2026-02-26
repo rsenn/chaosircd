@@ -28,57 +28,56 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/server.h"
-#include "ircd/numeric.h"
-#include "ircd/channel.h"
 #include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/ircd.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
  * -------------------------------------------------------------------------- */
-#define CM_HALFOP_CHAR   'h'
+#define CM_HALFOP_CHAR 'h'
 #define CM_HALFOP_PREFIX '%'
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully CREATED a channel         *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_hook(struct list     *lptr,   struct chanuser  *cuptr);
+static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client tries to kick someone off a channel    *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_kick(struct lclient  *lcptr,  struct client    *cptr,
-                          struct channel  *chptr,  struct chanuser  *cuptr,
-                          struct chanuser *acuptr, const char       *reason);
+static int cm_halfop_kick(struct lclient *lcptr, struct client *cptr,
+                          struct channel *chptr, struct chanuser *cuptr,
+                          struct chanuser *acuptr, const char *reason);
 
 /* -------------------------------------------------------------------------- *
  * Setup chanmode structure                                                   *
  * -------------------------------------------------------------------------- */
 static const char *cm_halfop_help[] = {
-  "+h <nickname>   Halfop status. Halfops can do the same as chanops but",
-  "                nothing that influences any operator (+/-o, +/-O, op-kick).",
-  NULL
-};
+    "+h <nickname>   Halfop status. Halfops can do the same as chanops but",
+    "                nothing that influences any operator (+/-o, +/-O, "
+    "op-kick).",
+    NULL};
 
 static struct chanmode cm_halfop_mode = {
-  CM_HALFOP_CHAR,          /* mode character */
-  CM_HALFOP_PREFIX,        /* privilege prefix */
-  CHANMODE_TYPE_PRIVILEGE, /* channel mode is a privilege */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the privilege */
-  50,                      /* sorting order */
-  chanuser_mode_bounce,    /* bounce handler */
-  cm_halfop_help           /* help text */
+    CM_HALFOP_CHAR,          /* mode character */
+    CM_HALFOP_PREFIX,        /* privilege prefix */
+    CHANMODE_TYPE_PRIVILEGE, /* channel mode is a privilege */
+    CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the privilege */
+    50,                      /* sorting order */
+    chanuser_mode_bounce,    /* bounce handler */
+    cm_halfop_help           /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_halfop_load(void)
-{
+int cm_halfop_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_halfop_mode) == NULL)
+  if (chanmode_register(&cm_halfop_mode) == NULL)
     return -1;
 
   hook_register(channel_join, HOOK_2ND, cm_halfop_hook);
@@ -89,8 +88,7 @@ int cm_halfop_load(void)
   return 0;
 }
 
-void cm_halfop_unload(void)
-{
+void cm_halfop_unload(void) {
   server_default_caps &= ~CAP_HOP;
 
   hook_unregister(chanuser_kick, HOOK_DEFAULT, cm_halfop_kick);
@@ -103,8 +101,7 @@ void cm_halfop_unload(void)
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully CREATED a channel         *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr)
-{
+static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr) {
   cuptr->flags |= CHFLG(h);
 
   chanmode_prefix_make(cuptr->prefix, cuptr->flags);
@@ -117,19 +114,16 @@ static int cm_halfop_hook(struct list *lptr, struct chanuser *cuptr)
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client tries to kick someone off a channel    *
  * -------------------------------------------------------------------------- */
-static int cm_halfop_kick(struct lclient  *lcptr,  struct client    *cptr,
-                          struct channel  *chptr,  struct chanuser  *cuptr,
-                          struct chanuser *acuptr, const char       *reason)
-{
-  if(cuptr)
-  {
-    if(cuptr->flags & CHFLG(o))
+static int cm_halfop_kick(struct lclient *lcptr, struct client *cptr,
+                          struct channel *chptr, struct chanuser *cuptr,
+                          struct chanuser *acuptr, const char *reason) {
+  if (cuptr) {
+    if (cuptr->flags & CHFLG(o))
       return 1;
 
-    if((cuptr->flags & CHFLG(h)) && !(acuptr->flags & CHFLG(o)))
+    if ((cuptr->flags & CHFLG(h)) && !(acuptr->flags & CHFLG(o)))
       return 1;
   }
 
   return 0;
 }
-

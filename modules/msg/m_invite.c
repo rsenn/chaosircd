@@ -22,60 +22,54 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/log.h"
 #include "libchaos/dlink.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/channel.h"
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/lclient.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/channel.h"
-#include "ircd/numeric.h"
 #include "ircd/msg.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
 #include "ircd/service.h"
 #include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_invite(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void m_invite(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_invite_help[] = {
-  "INVITE <nickname> <channel> [key]",
-  "",
-  "INVITE sends a notice to the user that you have",
-  "asked him/her to come to the specified channel.",
-  NULL
-};
+    "INVITE <nickname> <channel> [key]", "",
+    "INVITE sends a notice to the user that you have",
+    "asked him/her to come to the specified channel.", NULL};
 
-static struct msg m_invite_msg = {
-  "INVITE", 2, 3, MFLG_CLIENT | MFLG_UNREG,
-  { NULL, m_invite, m_invite, m_invite },
-  m_invite_help
-};
+static struct msg m_invite_msg = {"INVITE",
+                                  2,
+                                  3,
+                                  MFLG_CLIENT | MFLG_UNREG,
+                                  {NULL, m_invite, m_invite, m_invite},
+                                  m_invite_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_invite_load(void)
-{
-  if(msg_register(&m_invite_msg) == NULL)
+int m_invite_load(void) {
+  if (msg_register(&m_invite_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_invite_unload(void)
-{
-  msg_unregister(&m_invite_msg);
-}
+void m_invite_unload(void) { msg_unregister(&m_invite_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -83,60 +77,48 @@ void m_invite_unload(void)
  * argv[2] - nick                                                             *
  * argv[3] - channel                                                          *
  * -------------------------------------------------------------------------- */
-static void m_invite(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void m_invite(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   struct channel *chptr;
-  struct client  *acptr;
+  struct client *acptr;
 
-  if(client_is_local(cptr) && client_is_user(cptr))
-  {
-    if((acptr = client_find_nickhw(cptr, argv[2])) == NULL)
+  if (client_is_local(cptr) && client_is_user(cptr)) {
+    if ((acptr = client_find_nickhw(cptr, argv[2])) == NULL)
       return;
-  }
-  else
-  {
-    if((acptr = client_find_uid(argv[2])) == NULL)
-      if((acptr = client_find_name(argv[2])) == NULL)
-      {
+  } else {
+    if ((acptr = client_find_uid(argv[2])) == NULL)
+      if ((acptr = client_find_name(argv[2])) == NULL) {
         log(server_log, L_warning, "Dropping INVITE for invalid user %s.",
             argv[2]);
         return;
       }
   }
 
-  if((chptr = channel_find_warn(cptr, argv[3])) == NULL)
+  if ((chptr = channel_find_warn(cptr, argv[3])) == NULL)
     return;
 
-  if(client_is_local(cptr))
+  if (client_is_local(cptr))
     numeric_send(cptr, RPL_INVITING, acptr->name, chptr->name);
 
-  if(client_is_service(acptr))
-  {
+  if (client_is_service(acptr)) {
     service_handle(acptr->service, lcptr, cptr, chptr, "INVITE", "%s",
                    argv[4] ? argv[4] : "");
-  }
-  else
-  {
-    if(client_is_remote(acptr))
-    {
-      if(argv[4])
-        client_send(acptr, ":%C INVITE %C %s :%s",
-                    cptr, acptr, chptr->name, argv[4]);
+  } else {
+    if (client_is_remote(acptr)) {
+      if (argv[4])
+        client_send(acptr, ":%C INVITE %C %s :%s", cptr, acptr, chptr->name,
+                    argv[4]);
       else
-        client_send(acptr, ":%C INVITE %C %s",
-                    cptr, acptr, chptr->name);
-    }
-    else
-    {
+        client_send(acptr, ":%C INVITE %C %s", cptr, acptr, chptr->name);
+    } else {
       user_invite(acptr->user, chptr);
 
-      if(argv[4])
-        client_send(acptr, ":%N!%U@%H INVITE %N %s :%s",
-                    cptr, cptr, cptr, acptr, chptr->name, argv[4]);
+      if (argv[4])
+        client_send(acptr, ":%N!%U@%H INVITE %N %s :%s", cptr, cptr, cptr,
+                    acptr, chptr->name, argv[4]);
       else
-        client_send(acptr, ":%N!%U@%H INVITE %N %s",
-                    cptr, cptr, cptr, acptr, chptr->name);
+        client_send(acptr, ":%N!%U@%H INVITE %N %s", cptr, cptr, cptr, acptr,
+                    chptr->name);
     }
   }
 }

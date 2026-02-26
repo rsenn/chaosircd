@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
@@ -42,33 +42,32 @@
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_except_hook(struct client *cptr, struct channel *chptr,
-                           const char    *key,  int            *reply);
+                           const char *key, int *reply);
 
 /* -------------------------------------------------------------------------- *
  * Setup chanmode structure                                                   *
  * -------------------------------------------------------------------------- */
 static const char *cm_except_help[] = {
-  "+e <mask>       Users matching the mask are excepted from bans and denies.",
-  NULL
-};
+    "+e <mask>       Users matching the mask are excepted from bans and "
+    "denies.",
+    NULL};
 
 static struct chanmode cm_except_mode = {
-  CM_EXCEPT_CHAR,          /* mode character */
-  '\0',                    /* no prefix, because its not a privilege */
-  CHANMODE_TYPE_LIST,      /* channel mode is a list */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the modelist */
-  RPL_EXCEPTLIST,          /* use this reply when dumping modelist */
-  chanmode_bounce_ban,     /* bounce handler */
-  cm_except_help           /* help text */
+    CM_EXCEPT_CHAR,      /* mode character */
+    '\0',                /* no prefix, because its not a privilege */
+    CHANMODE_TYPE_LIST,  /* channel mode is a list */
+    CHFLG(o) | CHFLG(h), /* only OPs and Halfops can change the modelist */
+    RPL_EXCEPTLIST,      /* use this reply when dumping modelist */
+    chanmode_bounce_ban, /* bounce handler */
+    cm_except_help       /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_except_load(void)
-{
+int cm_except_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_except_mode) == NULL)
+  if (chanmode_register(&cm_except_mode) == NULL)
     return -1;
 
   /* register a hook in channel_join */
@@ -80,8 +79,7 @@ int cm_except_load(void)
   return 0;
 }
 
-void cm_except_unload(void)
-{
+void cm_except_unload(void) {
   /* unset the support flag */
   ircd_support_unset("EXCEPTS");
 
@@ -96,18 +94,18 @@ void cm_except_unload(void)
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_except_hook(struct client *cptr, struct channel *chptr,
-                           const char    *key,  int            *reply)
-{
+                           const char *key, int *reply) {
   struct list *mlptr;
 
   /* client not banned and not denied but something else */
-  if(*reply > 0 && *reply != ERR_BANNEDFROMCHAN && *reply != ERR_DENIEDFROMCHAN)
+  if (*reply > 0 && *reply != ERR_BANNEDFROMCHAN &&
+      *reply != ERR_DENIEDFROMCHAN)
     return;
 
   /* get the mode list for +e */
   mlptr = &chptr->modelists[chanmode_index(CM_EXCEPT_CHAR)];
 
   /* except the client from bans and denys */
-  if(chanmode_match_ban(cptr, chptr, mlptr))
+  if (chanmode_match_ban(cptr, chptr, mlptr))
     *reply = -CM_EXCEPT_CHAR;
 }

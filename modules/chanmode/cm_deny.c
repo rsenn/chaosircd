@@ -27,51 +27,47 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
  * -------------------------------------------------------------------------- */
-#define CM_DENY_CHAR   'd'
-#define CM_EXCEPT_CHAR 'e'   /* exceptions work together with this module */
+#define CM_DENY_CHAR 'd'
+#define CM_EXCEPT_CHAR 'e' /* exceptions work together with this module */
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_deny_hook(struct client *cptr, struct channel *chptr,
-                         const char    *key,  int            *reply);
+                         const char *key, int *reply);
 
 /* -------------------------------------------------------------------------- *
  * Set up the channel mode structure                                          *
  * -------------------------------------------------------------------------- */
-static const char *cm_deny_help[] =
-{
-  "+d <mask>       Users having a realname matching the mask are banned.",
-  NULL
-};
+static const char *cm_deny_help[] = {
+    "+d <mask>       Users having a realname matching the mask are banned.",
+    NULL};
 
-static struct chanmode cm_deny_mode =
-{
-  CM_DENY_CHAR,            /* mode character */
-  '\0',                    /* no prefix, because its not a privilege */
-  CHANMODE_TYPE_LIST,      /* channel mode is a list */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the modelist */
-  RPL_DENYLIST,            /* use this reply when dumping modelist */
-  chanmode_bounce_ban,     /* bounce handler */
-  cm_deny_help             /* help text */
+static struct chanmode cm_deny_mode = {
+    CM_DENY_CHAR,        /* mode character */
+    '\0',                /* no prefix, because its not a privilege */
+    CHANMODE_TYPE_LIST,  /* channel mode is a list */
+    CHFLG(o) | CHFLG(h), /* only OPs and Halfops can change the modelist */
+    RPL_DENYLIST,        /* use this reply when dumping modelist */
+    chanmode_bounce_ban, /* bounce handler */
+    cm_deny_help         /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_deny_load(void)
-{
+int cm_deny_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_deny_mode) == NULL)
+  if (chanmode_register(&cm_deny_mode) == NULL)
     return -1;
 
   /* register a hook in channel_join */
@@ -80,8 +76,7 @@ int cm_deny_load(void)
   return 0;
 }
 
-void cm_deny_unload(void)
-{
+void cm_deny_unload(void) {
   /* unregister the channel mode */
   chanmode_unregister(&cm_deny_mode);
 
@@ -93,20 +88,17 @@ void cm_deny_unload(void)
  * This hook gets called when someone wants to join a channel                 *
  * -------------------------------------------------------------------------- */
 static void cm_deny_hook(struct client *cptr, struct channel *chptr,
-                         const char    *key,  int            *reply)
-{
+                         const char *key, int *reply) {
   struct list *mlptr;
 
   /* client is already denied or excepted */
-  if(*reply > 0 || *reply == -CM_EXCEPT_CHAR)
+  if (*reply > 0 || *reply == -CM_EXCEPT_CHAR)
     return;
 
   /* get the mode list for +d */
   mlptr = &chptr->modelists[chanmode_index(CM_DENY_CHAR)];
 
   /* match all masks against the client */
-  if(chanmode_match_deny(cptr, chptr, mlptr))
+  if (chanmode_match_deny(cptr, chptr, mlptr))
     *reply = ERR_DENIEDFROMCHAN;
 }
-
-

@@ -28,42 +28,34 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/user.h"
-#include "ircd/server.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
 #include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void um_crowdguard_whois_hook (struct client         *cptr,
-                                      struct user           *uptr);
+static void um_crowdguard_whois_hook(struct client *cptr, struct user *uptr);
 
-int         um_crowdguard_bounce     (struct user           *uptr,
-                                      struct usermodechange *umcptr,
-                                      uint32_t               flags);
+int um_crowdguard_bounce(struct user *uptr, struct usermodechange *umcptr,
+                         uint32_t flags);
 
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_crowdguard =
-{
-  'g',
-  USERMODE_LIST_OFF,
-  USERMODE_LIST_LOCAL,
-  USERMODE_ARG_DISABLE,
-  um_crowdguard_bounce
-};
+static struct usermode um_crowdguard = {
+    'g', USERMODE_LIST_OFF, USERMODE_LIST_LOCAL, USERMODE_ARG_DISABLE,
+    um_crowdguard_bounce};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_crowdguard_load(void)
-{
-  if(usermode_register(&um_crowdguard))
+int um_crowdguard_load(void) {
+  if (usermode_register(&um_crowdguard))
     return -1;
 
   hook_register(user_whois, HOOK_DEFAULT, um_crowdguard_whois_hook);
@@ -71,30 +63,26 @@ int um_crowdguard_load(void)
   return 0;
 }
 
-void um_crowdguard_unload(void)
-{
+void um_crowdguard_unload(void) {
   hook_unregister(user_whois, HOOK_DEFAULT, um_crowdguard_whois_hook);
   usermode_unregister(&um_crowdguard);
-
 }
 
 int um_crowdguard_bounce(struct user *uptr, struct usermodechange *umcptr,
-                         uint32_t flags)
-{
-/*  return -1;*/
+                         uint32_t flags) {
+  /*  return -1;*/
 
-/*  if(flags & USERMODE_OPTION_PERMISSION)
-    return -1;
-*/
+  /*  if(flags & USERMODE_OPTION_PERMISSION)
+      return -1;
+  */
   return 0;
 }
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-static void um_crowdguard_whois_hook(struct client *cptr,
-                                     struct user   *uptr)
-{
-  if(uptr->modes & (1ll << ((int)'g' - 0x40)))
-    client_send(cptr, ":%S 320 %N %N :is at geolocation %s", server_me, cptr, uptr->client, uptr->name);
+static void um_crowdguard_whois_hook(struct client *cptr, struct user *uptr) {
+  if (uptr->modes & (1ll << ((int)'g' - 0x40)))
+    client_send(cptr, ":%S 320 %N %N :is at geolocation %s", server_me, cptr,
+                uptr->client, uptr->name);
 }

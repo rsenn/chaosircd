@@ -55,8 +55,7 @@ add_definitions(-DHAVE_SSL=1)
 
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib" "${LIBCHAOS_BINARY_DIR}")
 
-if(WINDOWS OR CYGWIN)
-
+if(BUILD_LIBIRCD)
   add_library(ircd SHARED ${SOURCES})
   set_target_properties(ircd PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   target_compile_definitions(ircd PUBLIC "-DBUILD_IRCD=1")
@@ -68,6 +67,7 @@ if(WINDOWS OR CYGWIN)
   target_link_libraries(ircd chaos owfat ${SOCKET_LIBRARIES})
   target_link_libraries(chaosircd ircd)
 
+  install(TARGETS ircd RUNTIME DESTINATION lib)
 else()
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
   add_executable(chaosircd ${SOURCES} main.c)

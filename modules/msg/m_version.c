@@ -30,72 +30,63 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/config.h"
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/chars.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/lclient.h"
-#include "ircd/numeric.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/config.h"
+#include "ircd/lclient.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 #include "../../config.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_version (struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv);
+static void m_version(struct lclient *lcptr, struct client *cptr, int argc,
+                      char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_version_help[] = {
-  "VERSION [server]",
-  "",
-  "Displays version of the given server. If used",
-  "without parameters, the information from the",
-  "local server is displayed.",
-  NULL
-};    
+    "VERSION [server]",
+    "",
+    "Displays version of the given server. If used",
+    "without parameters, the information from the",
+    "local server is displayed.",
+    NULL};
 
 static struct msg m_version_msg = {
-  "VERSION", 0, 1, MFLG_CLIENT,
-  { NULL, m_version, m_version, m_version },
-  m_version_help
-};
+    "VERSION",     0, 1, MFLG_CLIENT, {NULL, m_version, m_version, m_version},
+    m_version_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_version_load(void)
-{
-  if(msg_register(&m_version_msg) == NULL)
+int m_version_load(void) {
+  if (msg_register(&m_version_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
-void m_version_unload(void)
-{
-  msg_unregister(&m_version_msg);
-}
+void m_version_unload(void) { msg_unregister(&m_version_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
- * argv[1] - 'version'                                                           *
+ * argv[1] - 'version' *
  * -------------------------------------------------------------------------- */
-static void m_version(struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv)
-{
-  if(argc > 2)
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C VERSION :%s", &argc, argv))
+static void m_version(struct lclient *lcptr, struct client *cptr, int argc,
+                      char **argv) {
+  if (argc > 2) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C VERSION :%s", &argc, argv))
       return;
   }
-  
+
   numeric_send(cptr, RPL_VERSION, PACKAGE_NAME, PACKAGE_VERSION,
 #ifdef DEBUG
                "DEBUG",
@@ -103,7 +94,6 @@ static void m_version(struct lclient *lcptr, struct client *cptr,
                "PRODUCTION",
 #endif
                client_me->name, PACKAGE_RELEASE);
-  
-	ircd_support_show(cptr);
-}
 
+  ircd_support_show(cptr);
+}

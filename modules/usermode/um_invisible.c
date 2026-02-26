@@ -32,27 +32,17 @@
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_invisible =
-{
-  'i',
-  USERMODE_LIST_OFF,
-  USERMODE_LIST_LOCAL,
-  USERMODE_ARG_DISABLE,
-  NULL
-};
+static struct usermode um_invisible = {
+    'i', USERMODE_LIST_OFF, USERMODE_LIST_LOCAL, USERMODE_ARG_DISABLE, NULL};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_invisible_load(void)
-{
-  if(usermode_register(&um_invisible))
+int um_invisible_load(void) {
+  if (usermode_register(&um_invisible))
     return -1;
 
   return 0;
 }
 
-void um_invisible_unload(void)
-{
-  usermode_unregister(&um_invisible);
-}
+void um_invisible_unload(void) { usermode_unregister(&um_invisible); }

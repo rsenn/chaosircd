@@ -28,11 +28,11 @@
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
 #include "ircd/ircd.h"
-#include "ircd/oper.h"
-#include "ircd/user.h"
-#include "ircd/server.h"
 #include "ircd/lclient.h"
 #include "ircd/numeric.h"
+#include "ircd/oper.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
@@ -42,30 +42,23 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int  um_client_bounce     (struct user           *uptr,
-                                  struct usermodechange *umcptr,
-                                  uint32_t               flags);
-static void um_client_reg        (struct lclient        *lcptr);
-static void um_client_quit       (struct lclient        *lcptr,
-                                  struct client         *cptr);
+static int um_client_bounce(struct user *uptr, struct usermodechange *umcptr,
+                            uint32_t flags);
+static void um_client_reg(struct lclient *lcptr);
+static void um_client_quit(struct lclient *lcptr, struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_client = {
-  UM_CLIENT_CHAR,
-  USERMODE_LIST_ON,
-  USERMODE_LIST_LOCAL,
-  USERMODE_ARG_DISABLE,
-  um_client_bounce
-};
+static struct usermode um_client = {UM_CLIENT_CHAR, USERMODE_LIST_ON,
+                                    USERMODE_LIST_LOCAL, USERMODE_ARG_DISABLE,
+                                    um_client_bounce};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_client_load(void)
-{
-  if(usermode_register(&um_client))
+int um_client_load(void) {
+  if (usermode_register(&um_client))
     return -1;
 
   hook_register(lclient_register, HOOK_2ND, um_client_reg);
@@ -74,8 +67,7 @@ int um_client_load(void)
   return 0;
 }
 
-void um_client_unload(void)
-{
+void um_client_unload(void) {
   hook_unregister(client_exit, HOOK_DEFAULT, um_client_quit);
   hook_unregister(lclient_register, HOOK_2ND, um_client_reg);
 
@@ -86,16 +78,12 @@ void um_client_unload(void)
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
 static int um_client_bounce(struct user *uptr, struct usermodechange *umcptr,
-                            uint32_t flags)
-{
-  if(client_is_local(uptr->client))
-  {
+                            uint32_t flags) {
+  if (client_is_local(uptr->client)) {
     /* +o */
-    if(umcptr->change == USERMODE_ON)
-    {
+    if (umcptr->change == USERMODE_ON) {
       /* deny this request if it's from a user */
-      if(uptr->oper == NULL)
-      {
+      if (uptr->oper == NULL) {
         numeric_send(uptr->client, ERR_NOPRIVILEGES, "UMODE");
         return -1;
       }
@@ -105,47 +93,44 @@ static int um_client_bounce(struct user *uptr, struct usermodechange *umcptr,
   return 0;
 }
 
-static void um_client_reg(struct lclient *lcptr)
-{
+static void um_client_reg(struct lclient *lcptr) {
   struct usermode *umptr;
-  struct node     *nptr;
-  struct user     *uptr = NULL;
+  struct node *nptr;
+  struct user *uptr = NULL;
 
-  if(lcptr->client == NULL)
+  if (lcptr->client == NULL)
     return;
 
-  if((umptr = usermode_find(UM_CLIENT_CHAR)) == NULL)
+  if ((umptr = usermode_find(UM_CLIENT_CHAR)) == NULL)
     return;
 
-  dlink_foreach_data(&umptr->list, nptr, uptr)
-  {
-    if(uptr->client == NULL)
+  dlink_foreach_data(&umptr->list, nptr, uptr) {
+    if (uptr->client == NULL)
       continue;
 
-    client_send(uptr->client, ":%S NOTICE %N :*** client connecting: %N (%U@%s)",
-                server_me, uptr->client, lcptr->client, lcptr->client, lcptr->client->hostreal);
+    client_send(uptr->client,
+                ":%S NOTICE %N :*** client connecting: %N (%U@%s)", server_me,
+                uptr->client, lcptr->client, lcptr->client,
+                lcptr->client->hostreal);
   }
 }
 
-static void um_client_quit(struct lclient *lcptr, struct client *cptr)
-{
+static void um_client_quit(struct lclient *lcptr, struct client *cptr) {
   struct usermode *umptr;
-  struct node     *nptr;
-  struct user     *uptr = NULL;
+  struct node *nptr;
+  struct user *uptr = NULL;
 
-  if(!client_is_local(cptr) || cptr->user == NULL)
+  if (!client_is_local(cptr) || cptr->user == NULL)
     return;
 
-  if((umptr = usermode_find(UM_CLIENT_CHAR)) == NULL)
+  if ((umptr = usermode_find(UM_CLIENT_CHAR)) == NULL)
     return;
 
-  dlink_foreach_data(&umptr->list, nptr, uptr)
-  {
-    if(uptr->client == NULL)
+  dlink_foreach_data(&umptr->list, nptr, uptr) {
+    if (uptr->client == NULL)
       continue;
 
     client_send(uptr->client, ":%S NOTICE %N :*** client exiting: %N (%U@%s)",
                 server_me, uptr->client, cptr, cptr, cptr->hostreal);
   }
 }
-

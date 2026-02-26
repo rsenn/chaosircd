@@ -17,6 +17,12 @@ execute_process(
 
 project(${PACKAGENAME} C)
 
+if(WIN32 OR CYGWIN)
+  option(BUILD_LIBIRCD "Build ircd as library" ON)
+else(WIN32 OR CYGWIN)
+  option(BUILD_LIBIRCD "Build ircd as library" OFF)
+endif(WIN32 OR CYGWIN)
+
 set(SYSCONFDIR
     ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME}
     CACHE PATH "configuration directory")

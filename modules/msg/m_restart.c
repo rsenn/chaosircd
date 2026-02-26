@@ -24,78 +24,66 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/ircd.h"
-#include "ircd/user.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/channel.h"
+#include "ircd/ircd.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_restart(struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv);
+static void mo_restart(struct lclient *lcptr, struct client *cptr, int argc,
+                       char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *mo_restart_help[] =
-{
-  "RESTART [server]",
-  "",
-  "Operator command causing a server to restart.",
-  NULL
-};
+static char *mo_restart_help[] = {
+    "RESTART [server]", "", "Operator command causing a server to restart.",
+    NULL};
 
 static struct msg mo_restart_msg = {
-  "RESTART", 0, 1, MFLG_OPER,
-  { NULL, NULL, mo_restart, mo_restart },
-  mo_restart_help
-};
+    "RESTART",      0, 1, MFLG_OPER, {NULL, NULL, mo_restart, mo_restart},
+    mo_restart_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_restart_load(void)
-{
-  if(msg_register(&mo_restart_msg) == NULL)
+int m_restart_load(void) {
+  if (msg_register(&mo_restart_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_restart_unload(void)
-{
-  msg_unregister(&mo_restart_msg);
-}
+void m_restart_unload(void) { msg_unregister(&mo_restart_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'restart'                                                         *
  * argv[2] - name                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_restart(struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv)
-{
-  if(argc == 3)
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C restart %s", &argc, argv))
+static void mo_restart(struct lclient *lcptr, struct client *cptr, int argc,
+                       char **argv) {
+  if (argc == 3) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C restart %s", &argc, argv))
       return;
   }
 
-  log(ircd_log, L_status, "%s (%s@%s) is restarting me.",
-      cptr->name, cptr->user->name, cptr->host);
+  log(ircd_log, L_status, "%s (%s@%s) is restarting me.", cptr->name,
+      cptr->user->name, cptr->host);
 
   ircd_restart();
 }

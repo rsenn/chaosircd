@@ -24,23 +24,23 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/channel.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
+#include "ircd/server.h"
 
 #include <stddef.h>
 #include <sys/types.h>
@@ -48,55 +48,47 @@
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_capab(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void mr_capab(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *mr_capab_help[] = {
-  "CAPAB <capabilities>",
-  "",
-  "Informs the remote server about this servers capabilities.",
-  NULL
-};
+    "CAPAB <capabilities>", "",
+    "Informs the remote server about this servers capabilities.", NULL};
 
-static struct msg mr_capab_msg = {
-  "CAPAB", 1, 1, MFLG_CLIENT | MFLG_UNREG,
-  { mr_capab, m_ignore, m_ignore, m_ignore },
-  mr_capab_help
-};
+static struct msg mr_capab_msg = {"CAPAB",
+                                  1,
+                                  1,
+                                  MFLG_CLIENT | MFLG_UNREG,
+                                  {mr_capab, m_ignore, m_ignore, m_ignore},
+                                  mr_capab_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_capab_load(void)
-{
-  if(msg_register(&mr_capab_msg) == NULL)
+int m_capab_load(void) {
+  if (msg_register(&mr_capab_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_capab_unload(void)
-{
-  msg_unregister(&mr_capab_msg);
-}
+void m_capab_unload(void) { msg_unregister(&mr_capab_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'capab'                                                          *
  * argv[2] - capabilities                                                     *
  * -------------------------------------------------------------------------- */
-static void mr_capab(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
-  char  *capv[64];
-  ssize_t    capc,capi,i;
+static void mr_capab(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
+  char *capv[64];
+  ssize_t capc, capi, i;
 
   /* Ooops, already got caps? */
-  if(lcptr->caps)
-  {
+  if (lcptr->caps) {
     lclient_exit(lcptr, "CAPAB received twice");
     return;
   }
@@ -111,20 +103,16 @@ static void mr_capab(struct lclient *lcptr, struct client *cptr,
   capc = str_tokenize(argv[2], capv, 63);
 
   /* Loop through tokens */
-  for(i = 0; i < capc; i++)
-  {
+  for (i = 0; i < capc; i++) {
     /* Encryption capability needs special care */
-    if(!str_nicmp(capv[i], "enc:", 4))
-    {
+    if (!str_nicmp(capv[i], "enc:", 4)) {
       /* TODO */
-    }
-    else
-    {
+    } else {
       /* Find the capab */
       capi = server_find_capab(capv[i]);
 
       /* Set the flag */
-      if(capi >= 0)
+      if (capi >= 0)
         lcptr->caps |= server_caps[capi].cap;
     }
   }

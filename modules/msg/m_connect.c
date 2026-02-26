@@ -22,56 +22,49 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/dlink.h"
 #include "libchaos/connect.h"
+#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/msg.h"
-#include "ircd/client.h"
 #include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_connect(struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv);
+static void mo_connect(struct lclient *lcptr, struct client *cptr, int argc,
+                       char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *mo_connect_help[] = {
-  "CONNECT [from] <to>",
-  "",
-  "Operator command causing a server to connect to",
-  "another server. If [from] is ommitted then the",
-  "current server will connect.",
-  NULL
-};
+    "CONNECT [from] <to>",
+    "",
+    "Operator command causing a server to connect to",
+    "another server. If [from] is ommitted then the",
+    "current server will connect.",
+    NULL};
 
 static struct msg mo_connect_msg = {
-  "CONNECT", 1, 2, MFLG_OPER,
-  { NULL, NULL, mo_connect, mo_connect },
-  mo_connect_help
-};
+    "CONNECT",      1, 2, MFLG_OPER, {NULL, NULL, mo_connect, mo_connect},
+    mo_connect_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_connect_load(void)
-{
-  if(msg_register(&mo_connect_msg) == NULL)
+int m_connect_load(void) {
+  if (msg_register(&mo_connect_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_connect_unload(void)
-{
-  msg_unregister(&mo_connect_msg);
-}
+void m_connect_unload(void) { msg_unregister(&mo_connect_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -79,46 +72,39 @@ void m_connect_unload(void)
  * argv[2] - server to connect from/to                                        *
  * argv[3] - [server to connect to]                                           *
  * -------------------------------------------------------------------------- */
-static void mo_connect(struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv)
-{
+static void mo_connect(struct lclient *lcptr, struct client *cptr, int argc,
+                       char **argv) {
   struct connect *cnptr;
-  struct server  *asptr;
+  struct server *asptr;
 
   /* We have 2 arguments, the message must be relayed */
-  if(argv[3])
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C CONNECT %s %s", &argc, argv))
+  if (argv[3]) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C CONNECT %s %s", &argc, argv))
       return;
   }
 
   /* Message is targeted to us, search connect{} block */
-  if((cnptr = connect_find_name(argv[2])) == NULL)
-  {
-    client_send(cptr, ":%S NOTICE %C :*** no connect{} block for %s",
-                server_me, cptr, argv[3]);
+  if ((cnptr = connect_find_name(argv[2])) == NULL) {
+    client_send(cptr, ":%S NOTICE %C :*** no connect{} block for %s", server_me,
+                cptr, argv[3]);
     return;
   }
 
   /* Cannot have redundant links (currently) */
-  if((asptr = server_find_name(cnptr->name)))
-  {
-    if(asptr->client->origin != client_me)
-      client_send(cptr,
-                  ":%S NOTICE %C :*** server %S already exists from %S.",
+  if ((asptr = server_find_name(cnptr->name))) {
+    if (asptr->client->origin != client_me)
+      client_send(cptr, ":%S NOTICE %C :*** server %S already exists from %S.",
                   server_me, cptr, asptr, asptr->client->origin->server);
     else
-      client_send(cptr,
-                  ":%S NOTICE %C :*** server %S already exists.",
+      client_send(cptr, ":%S NOTICE %C :*** server %S already exists.",
                   server_me, cptr, asptr);
     return;
   }
 
   /* Intitiate the connect{} block */
-  if(server_connect(cptr, cnptr))
-  {
+  if (server_connect(cptr, cnptr)) {
     client_send(cptr, ":%S NOTICE %C :*** couldn't connect to %s[%s:%u]",
-                server_me, cptr, cnptr->name,
-                cnptr->address, cnptr->port_remote);
+                server_me, cptr, cnptr->name, cnptr->address,
+                cnptr->port_remote);
   }
 }

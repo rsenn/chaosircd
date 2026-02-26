@@ -28,8 +28,8 @@
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
 #include "ircd/ircd.h"
-#include "ircd/user.h"
 #include "ircd/oper.h"
+#include "ircd/user.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
@@ -41,53 +41,41 @@ int um_servernotice_bounce(struct user *uptr, struct usermodechange *umptr,
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_servnotice =
-{
-  's',
-  USERMODE_LIST_OFF,
-  USERMODE_LIST_LOCAL,
-  USERMODE_ARG_DISABLE,
-  NULL
-};
+static struct usermode um_servnotice = {
+    's', USERMODE_LIST_OFF, USERMODE_LIST_LOCAL, USERMODE_ARG_DISABLE, NULL};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_servnotice_load(void)
-{
-  if(usermode_register(&um_servnotice))
+int um_servnotice_load(void) {
+  if (usermode_register(&um_servnotice))
     return -1;
 
   return 0;
 }
 
-void um_servnotice_unload(void)
-{
-  usermode_unregister(&um_servnotice);
-}
+void um_servnotice_unload(void) { usermode_unregister(&um_servnotice); }
 
 int um_servernotice_bounce(struct user *uptr, struct usermodechange *umcptr,
-                           uint32_t flags)
-{
-  int      index;
+                           uint32_t flags) {
+  int index;
   uint64_t flag;
 
-  if(uptr->oper == NULL)
+  if (uptr->oper == NULL)
     return -1;
 
-  if(umcptr->arg == NULL)
+  if (umcptr->arg == NULL)
     flag = 1ULL;
 
   /* if the change is + or -s <argument> */
-  else
-  {
-    if((index = log_source_find(umcptr->arg)) == -1)
+  else {
+    if ((index = log_source_find(umcptr->arg)) == -1)
       return -1;
 
     flag = log_sources[index].flag;
   }
 
-  if(umcptr->change == USERMODE_ON)
+  if (umcptr->change == USERMODE_ON)
     uptr->oper->sources |= flag;
   else
     uptr->oper->sources &= ~flag;

@@ -22,83 +22,70 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
+#include "libchaos/dlink.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
-#include "libchaos/dlink.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/msg.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
+#include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#define M_HELP_INDEX     "INDEX"
+#define M_HELP_INDEX "INDEX"
 #define M_HELP_USERMODES "USERMODES"
 #define M_HELP_CHANMODES "CHANMODES"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_help           (struct lclient *lcptr, struct client *cptr,
-                              int             argc,  char         **argv);
-static void m_help_index     (struct client  *cptr,  int            flags);
+static void m_help(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
+static void m_help_index(struct client *cptr, int flags);
 /*static void m_help_usermodes (struct client  *cptr);*/
-static void m_help_chanmodes (struct client  *cptr);
+static void m_help_chanmodes(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_help_help[] = {
-  "HELP [topic]",
-  "",
-  "Displays help about the given topic.",
-  NULL
-};
+static char *m_help_help[] = {"HELP [topic]", "",
+                              "Displays help about the given topic.", NULL};
 
 static struct msg m_help_msg = {
-  "HELP", 0, 1, MFLG_CLIENT,
-  { NULL, m_help, NULL, m_help },
-  m_help_help
-};
+    "HELP", 0, 1, MFLG_CLIENT, {NULL, m_help, NULL, m_help}, m_help_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_help_load(void)
-{
-  if(msg_register(&m_help_msg) == NULL)
+int m_help_load(void) {
+  if (msg_register(&m_help_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_help_unload(void)
-{
-  msg_unregister(&m_help_msg);
-}
+void m_help_unload(void) { msg_unregister(&m_help_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'help'                                                           *
  * argv[2] - command                                                          *
  * -------------------------------------------------------------------------- */
-static void m_help(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_help(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   struct msg *mptr;
-  uint32_t    i;
+  uint32_t i;
 
-  if(!client_is_user(cptr))
+  if (!client_is_user(cptr))
     return;
 
-  if(argv[2] == NULL || !str_icmp(argv[2], M_HELP_INDEX))
-  {
+  if (argv[2] == NULL || !str_icmp(argv[2], M_HELP_INDEX)) {
     numeric_send(cptr, RPL_HELPSTART, M_HELP_INDEX,
                  "---------------- Help topics ----------------");
     numeric_send(cptr, RPL_HELPTXT, M_HELP_INDEX, "Client commands:");
@@ -113,35 +100,31 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
     return;
   }
 
-/*  if(!str_icmp(argv[2], "usermodes") || !str_icmp(argv[2], "umodes"))
-  {
-    m_help_usermodes(cptr);
-    return;
-  }*/
+  /*  if(!str_icmp(argv[2], "usermodes") || !str_icmp(argv[2], "umodes"))
+    {
+      m_help_usermodes(cptr);
+      return;
+    }*/
 
-  if(!str_icmp(argv[2], "channelmodes") || !str_icmp(argv[2], "chanmodes"))
-  {
+  if (!str_icmp(argv[2], "channelmodes") || !str_icmp(argv[2], "chanmodes")) {
     m_help_chanmodes(cptr);
     return;
   }
 
-  if((mptr = msg_find(argv[2])) == NULL)
-  {
+  if ((mptr = msg_find(argv[2])) == NULL) {
     numeric_send(cptr, ERR_HELPNOTFOUND, argv[2]);
     return;
   }
 
-  if(mptr->help == NULL || mptr->help[0] == NULL)
-  {
+  if (mptr->help == NULL || mptr->help[0] == NULL) {
     log(msg_log, L_fatal,
         "The developer was too lazy to write a help for %s. This must be sued.",
         mptr->cmd);
     ircd_shutdown();
   }
 
-  for(i = 0; mptr->help[i]; i++)
-  {
-    if(i == 0)
+  for (i = 0; mptr->help[i]; i++) {
+    if (i == 0)
       numeric_send(cptr, RPL_HELPSTART, mptr->cmd, mptr->help[0]);
     else
       numeric_send(cptr, RPL_HELPTXT, mptr->cmd, mptr->help[i]);
@@ -152,49 +135,36 @@ static void m_help(struct lclient *lcptr, struct client *cptr,
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_help_index(struct client *cptr, int flags)
-{
+static void m_help_index(struct client *cptr, int flags) {
   struct node *node;
-  struct msg  *mptr = NULL;
-  uint32_t     msgi = 0;
-  char        *msgs[4];
-  uint32_t     i;
+  struct msg *mptr = NULL;
+  uint32_t msgi = 0;
+  char *msgs[4];
+  uint32_t i;
 
-  for(i = 0; i < MSG_HASH_SIZE; i++)
-  {
-    dlink_foreach_data(&msg_table[i], node, mptr)
-    {
-      if((mptr->flags & flags) == 0)
+  for (i = 0; i < MSG_HASH_SIZE; i++) {
+    dlink_foreach_data(&msg_table[i], node, mptr) {
+      if ((mptr->flags & flags) == 0)
         continue;
 
       msgs[msgi++] = mptr->cmd;
 
-      if(msgi == 4)
-      {
-        client_send(cptr, ":%S 705 %C %s :%-12s %-12s %-12s %s",
-                    server_me, cptr, M_HELP_INDEX,
-                    msgs[0], msgs[1], msgs[2], msgs[3]);
+      if (msgi == 4) {
+        client_send(cptr, ":%S 705 %C %s :%-12s %-12s %-12s %s", server_me,
+                    cptr, M_HELP_INDEX, msgs[0], msgs[1], msgs[2], msgs[3]);
         msgi = 0;
       }
     }
   }
 
-  if(msgi == 3)
-  {
-    client_send(cptr, ":%S 705 %C %s :%-12s %-12s %s",
-                server_me, cptr, M_HELP_INDEX,
-                msgs[0], msgs[1], msgs[2]);
-  }
-  else if(msgi == 2)
-  {
-    client_send(cptr, ":%S 705 %C %s :%-12s %s",
-                server_me, cptr, M_HELP_INDEX,
+  if (msgi == 3) {
+    client_send(cptr, ":%S 705 %C %s :%-12s %-12s %s", server_me, cptr,
+                M_HELP_INDEX, msgs[0], msgs[1], msgs[2]);
+  } else if (msgi == 2) {
+    client_send(cptr, ":%S 705 %C %s :%-12s %s", server_me, cptr, M_HELP_INDEX,
                 msgs[0], msgs[1]);
-  }
-  else if(msgi == 1)
-  {
-    client_send(cptr, ":%S 705 %C %s :%s",
-                server_me, cptr, M_HELP_INDEX,
+  } else if (msgi == 1) {
+    client_send(cptr, ":%S 705 %C %s :%s", server_me, cptr, M_HELP_INDEX,
                 msgs[0]);
   }
 }
@@ -205,22 +175,20 @@ static void m_help_index(struct client *cptr, int flags)
 {
 }*/
 
-static void m_help_chanmodes(struct client  *cptr)
-{
+static void m_help_chanmodes(struct client *cptr) {
   uint32_t i;
   uint32_t j;
 
-  numeric_send(cptr, RPL_HELPSTART, M_HELP_CHANMODES, "Supported channel modes:");
+  numeric_send(cptr, RPL_HELPSTART, M_HELP_CHANMODES,
+               "Supported channel modes:");
   numeric_send(cptr, RPL_HELPTXT, M_HELP_CHANMODES, "");
 
-  for(i = 0; i < 0x40; i++)
-  {
-    if(chanmode_table[i].type == 0)
+  for (i = 0; i < 0x40; i++) {
+    if (chanmode_table[i].type == 0)
       continue;
 
-    for(j = 0; chanmode_table[i].help[j]; j++)
+    for (j = 0; chanmode_table[i].help[j]; j++)
       numeric_send(cptr, RPL_HELPTXT, M_HELP_CHANMODES,
                    chanmode_table[i].help[j]);
   }
 }
-

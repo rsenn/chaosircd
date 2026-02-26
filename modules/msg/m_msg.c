@@ -22,87 +22,73 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
+#include "libchaos/dlink.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
-#include "libchaos/dlink.h"
 #include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
-#include "ircd/user.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
 #include "ircd/server.h"
 #include "ircd/service.h"
-#include "ircd/channel.h"
-#include "ircd/numeric.h"
-#include "ircd/chanmode.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Constants                                                                  *
  * -------------------------------------------------------------------------- */
 #define PRIVMSG 0
-#define NOTICE  1
+#define NOTICE 1
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_privmsg (struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv);
-static void m_notice  (struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv);
-static void m_multimsg(int             type,  const char    *cmd,
-                       struct lclient *lcptr, struct client *cptr,
-                       int             argc,  char         **argv);
-static void m_msg     (int             type,  const char    *cmd,
-                       struct lclient *lcptr, struct client *cptr,
-                       const char     *rcpt,  const char    *msg);
+static void m_privmsg(struct lclient *lcptr, struct client *cptr, int argc,
+                      char **argv);
+static void m_notice(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
+static void m_multimsg(int type, const char *cmd, struct lclient *lcptr,
+                       struct client *cptr, int argc, char **argv);
+static void m_msg(int type, const char *cmd, struct lclient *lcptr,
+                  struct client *cptr, const char *rcpt, const char *msg);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_privmsg_help[] = {
-  "PRIVMSG <target>[,target2[,target3]]... <text>",
-  "",
-  "Sends the given text to the given target.",
-  "The target can be either a person, or a channel.",
-  NULL
-};
+    "PRIVMSG <target>[,target2[,target3]]... <text>", "",
+    "Sends the given text to the given target.",
+    "The target can be either a person, or a channel.", NULL};
 
 static struct msg m_privmsg_msg = {
-  "PRIVMSG", 0, 2, MFLG_CLIENT,
-  { NULL, m_privmsg, m_privmsg, m_privmsg },
-  m_privmsg_help
-};
+    "PRIVMSG",     0, 2, MFLG_CLIENT, {NULL, m_privmsg, m_privmsg, m_privmsg},
+    m_privmsg_help};
 
 static char *m_notice_help[] = {
-  "NOTICE <target>[,target2[,target3]]... <text>",
-  "",
-  "Sends the given text to the given target.",
-  "The target can be either a person, or a channel.",
-  NULL
-};
+    "NOTICE <target>[,target2[,target3]]... <text>", "",
+    "Sends the given text to the given target.",
+    "The target can be either a person, or a channel.", NULL};
 
 static struct msg m_notice_msg = {
-  "NOTICE", 0, 2, MFLG_CLIENT,
-  { NULL, m_notice, m_notice, m_notice },
-  m_notice_help
-};
+    "NOTICE",     0, 2, MFLG_CLIENT, {NULL, m_notice, m_notice, m_notice},
+    m_notice_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_msg_load(void)
-{
-  if(msg_register(&m_privmsg_msg) == NULL)
+int m_msg_load(void) {
+  if (msg_register(&m_privmsg_msg) == NULL)
     return -1;
 
-  if(msg_register(&m_notice_msg) == NULL)
-  {
+  if (msg_register(&m_notice_msg) == NULL) {
     msg_unregister(&m_privmsg_msg);
     return -1;
   }
@@ -110,8 +96,7 @@ int m_msg_load(void)
   return 0;
 }
 
-void m_msg_unload(void)
-{
+void m_msg_unload(void) {
   msg_unregister(&m_notice_msg);
   msg_unregister(&m_privmsg_msg);
 }
@@ -122,100 +107,84 @@ void m_msg_unload(void)
  * argv[2] - recipient                                                        *
  * argv[3] - text                                                             *
  * -------------------------------------------------------------------------- */
-static void m_privmsg(struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv)
-{
+static void m_privmsg(struct lclient *lcptr, struct client *cptr, int argc,
+                      char **argv) {
   /* reject PRIVMSG coming from servers */
-  if(!client_is_user(cptr))
+  if (!client_is_user(cptr))
     return;
 
   m_multimsg(PRIVMSG, "PRIVMSG", lcptr, cptr, argc, argv);
 }
 
-static void m_notice(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void m_notice(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   m_multimsg(NOTICE, "NOTICE", lcptr, cptr, argc, argv);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_multimsg(int            type, const char *cmd,  struct lclient *lcptr,
-                       struct client *cptr, int         argc, char          **argv)
-{
-  char  *recipients[IRCD_MAXTARGETS + 1];
+static void m_multimsg(int type, const char *cmd, struct lclient *lcptr,
+                       struct client *cptr, int argc, char **argv) {
+  char *recipients[IRCD_MAXTARGETS + 1];
   size_t i, n;
 
-  if(argc < 3)
-  {
-    client_send(cptr, numeric_format(ERR_NORECIPIENT),
-                client_me->name, cptr->name, cmd);
+  if (argc < 3) {
+    client_send(cptr, numeric_format(ERR_NORECIPIENT), client_me->name,
+                cptr->name, cmd);
     return;
   }
 
-  if(argc < 4)
-  {
-    client_send(cptr, numeric_format(ERR_NOTEXTTOSEND),
-                client_me->name, cptr->name);
+  if (argc < 4) {
+    client_send(cptr, numeric_format(ERR_NOTEXTTOSEND), client_me->name,
+                cptr->name);
     return;
   }
 
   n = str_tokenize_s(argv[2], recipients, IRCD_MAXTARGETS, ',');
 
-  for(i = 0; i < n; i++)
+  for (i = 0; i < n; i++)
     m_msg(type, cmd, lcptr, cptr, recipients[i], argv[3]);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_msg(int            type, const char *cmd,  struct lclient *lcptr,
-                  struct client *cptr, const char *rcpt, const char     *msg)
-{
+static void m_msg(int type, const char *cmd, struct lclient *lcptr,
+                  struct client *cptr, const char *rcpt, const char *msg) {
   struct channel *chptr;
-  struct client  *acptr = NULL;
+  struct client *acptr = NULL;
 
-  if(channel_is_valid(rcpt) && chars_valid_chan(rcpt))
-  {
+  if (channel_is_valid(rcpt) && chars_valid_chan(rcpt)) {
     chptr = channel_find_name(rcpt);
 
-    if(chptr)
+    if (chptr)
       channel_message(lcptr, cptr, chptr, type, msg);
-    else if(client_is_user(cptr))
-      client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL),
-                  client_me->name, cptr->name, rcpt);
-  }
-  else
-  {
-    if(lclient_is_server(lcptr))
-    {
-      if(lcptr->caps & CAP_UID)
-      {
+    else if (client_is_user(cptr))
+      client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL), client_me->name,
+                  cptr->name, rcpt);
+  } else {
+    if (lclient_is_server(lcptr)) {
+      if (lcptr->caps & CAP_UID) {
         struct user *uptr;
 
-        if((uptr = user_find_uid(rcpt)))
+        if ((uptr = user_find_uid(rcpt)))
           acptr = uptr->client;
       }
 
-      if(acptr == NULL)
-      {
+      if (acptr == NULL) {
         acptr = client_find_nick(rcpt);
 
-        if(acptr == NULL)
-        {
-          log(server_log, L_warning, "Dropping %s with unknown target: %s",
-              cmd, rcpt);
+        if (acptr == NULL) {
+          log(server_log, L_warning, "Dropping %s with unknown target: %s", cmd,
+              rcpt);
 
           return;
         }
       }
 
       client_message(lcptr, cptr, acptr, type, msg);
-    }
-    else
-    {
-      if((acptr = client_find_nickhw(cptr, rcpt)))
+    } else {
+      if ((acptr = client_find_nickhw(cptr, rcpt)))
         client_message(lcptr, cptr, acptr, type, msg);
     }
   }
 }
-

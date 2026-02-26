@@ -30,69 +30,58 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/chars.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/lclient.h"
-#include "ircd/numeric.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_uptime (struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv);
+static void m_uptime(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_uptime_help[] = {
-  "UPTIME [server]",
-  "",
-  "Displays uptime of the given server. If used",
-  "without parameters, the uptime of the local",
-  "server is displayed.",
-  NULL
-};
+static char *m_uptime_help[] = {"UPTIME [server]",
+                                "",
+                                "Displays uptime of the given server. If used",
+                                "without parameters, the uptime of the local",
+                                "server is displayed.",
+                                NULL};
 
 static struct msg m_uptime_msg = {
-  "UPTIME", 0, 1, MFLG_CLIENT,
-  { NULL, m_uptime, m_uptime, m_uptime },
-  m_uptime_help
-};
+    "UPTIME",     0, 1, MFLG_CLIENT, {NULL, m_uptime, m_uptime, m_uptime},
+    m_uptime_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_uptime_load(void)
-{
-  if(msg_register(&m_uptime_msg) == NULL)
+int m_uptime_load(void) {
+  if (msg_register(&m_uptime_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_uptime_unload(void)
-{
-  msg_unregister(&m_uptime_msg);
-}
+void m_uptime_unload(void) { msg_unregister(&m_uptime_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'uptime'                                                         *
  * -------------------------------------------------------------------------- */
-static void m_uptime(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
-  if(argc > 2)
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C UPTIME :%s", &argc, argv))
+static void m_uptime(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
+  if (argc > 2) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C UPTIME :%s", &argc, argv))
       return;
   }
 
   numeric_send(cptr, RPL_STATSUPTIME, ircd_uptime());
 }
-

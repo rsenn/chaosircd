@@ -28,58 +28,49 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/channel.h"
 #include "ircd/numeric.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_kick (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void m_kick(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_kick_help[] = {
-  "KICK <channel> <nick[,nick,...]> [reason]",
-  "",
-  "A kick command causes the given nickname, or",
-  "multiple nicknames from being kicked off the",
-  "given channelname with the given reason.",
-  "",
-  "If no reason is specified, the name of the",
-  "user originating the kick is used.",
-  NULL
-};
+static char *m_kick_help[] = {"KICK <channel> <nick[,nick,...]> [reason]",
+                              "",
+                              "A kick command causes the given nickname, or",
+                              "multiple nicknames from being kicked off the",
+                              "given channelname with the given reason.",
+                              "",
+                              "If no reason is specified, the name of the",
+                              "user originating the kick is used.",
+                              NULL};
 
 static struct msg m_kick_msg = {
-  "KICK", 2, 3, MFLG_CLIENT,
-  { NULL, m_kick, m_kick, m_kick },
-  m_kick_help
-};
+    "KICK", 2, 3, MFLG_CLIENT, {NULL, m_kick, m_kick, m_kick}, m_kick_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_kick_load(void)
-{
-  if(msg_register(&m_kick_msg) == NULL)
+int m_kick_load(void) {
+  if (msg_register(&m_kick_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_kick_unload(void)
-{
-  msg_unregister(&m_kick_msg);
-}
+void m_kick_unload(void) { msg_unregister(&m_kick_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -88,28 +79,26 @@ void m_kick_unload(void)
  * argv[3] - target                                                           *
  * argv[4] - reason                                                           *
  * -------------------------------------------------------------------------- */
-static void m_kick(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
-  struct channel  *chptr;
+static void m_kick(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
+  struct channel *chptr;
   struct chanuser *cuptr;
-  char            *targetv[IRCD_MAXTARGETS + 1];
-/*  uint32_t         n;*/
+  char *targetv[IRCD_MAXTARGETS + 1];
+  /*  uint32_t         n;*/
 
-  if((chptr = channel_find_warn(cptr, argv[2])) == NULL)
+  if ((chptr = channel_find_warn(cptr, argv[2])) == NULL)
     return;
 
   cuptr = chanuser_find(chptr, cptr);
 
-  if(cuptr == NULL)
-  {
+  if (cuptr == NULL) {
     numeric_send(cptr, ERR_NOTONCHANNEL, chptr->name);
     return;
   }
 
-  /*n =*/ str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
+  /*n =*/str_tokenize_s(argv[3], targetv, IRCD_MAXTARGETS, ',');
 
-  if(argv[4] == NULL)
+  if (argv[4] == NULL)
     argv[4] = cptr->name;
 
   chanuser_kick(lcptr, cptr, chptr, cuptr, targetv,

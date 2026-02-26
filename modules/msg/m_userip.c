@@ -22,56 +22,47 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/str.h"
 #include "libchaos/dlink.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_userip (struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv);
+static void m_userip(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_userip_help[] = {
-  "USERIP <nick> [nick] [...]",
-  "",
-  "Displays the given nicks username, ip address, away status,",
-  "operator status and real name in one single line.",
-  NULL
-};    
+    "USERIP <nick> [nick] [...]", "",
+    "Displays the given nicks username, ip address, away status,",
+    "operator status and real name in one single line.", NULL};
 
 static struct msg m_userip_msg = {
-  "USERIP", 1, 1, MFLG_CLIENT,
-  { NULL, m_userip, NULL, m_userip },
-  m_userip_help
-};
+    "USERIP",     1, 1, MFLG_CLIENT, {NULL, m_userip, NULL, m_userip},
+    m_userip_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_userip_load(void)
-{
-  if(msg_register(&m_userip_msg) == NULL)
+int m_userip_load(void) {
+  if (msg_register(&m_userip_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
-void m_userip_unload(void)
-{
-  msg_unregister(&m_userip_msg);
-}
+void m_userip_unload(void) { msg_unregister(&m_userip_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -80,52 +71,50 @@ void m_userip_unload(void)
  * argv[3] - [nick2]                                                          *
  * argv[4] - ...                                                              *
  * -------------------------------------------------------------------------- */
-static void m_userip(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void m_userip(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   struct client *acptr;
-  char          *av[64];
-  char           result[IRCD_LINELEN - 1];
-  size_t         len;
-  size_t         n;
-  size_t         i;
-  int            first = 1;
-  
-	len = str_snprintf(result, sizeof(result), ":%s 302 %s :",
-                 client_me->name, cptr->name);
-  
+  char *av[64];
+  char result[IRCD_LINELEN - 1];
+  size_t len;
+  size_t n;
+  size_t i;
+  int first = 1;
+
+  len = str_snprintf(result, sizeof(result), ":%s 302 %s :", client_me->name,
+                     cptr->name);
+
   n = str_tokenize(argv[2], av, 63);
-  
-  for(i = 0; i < n; i++)
-  {
+
+  for (i = 0; i < n; i++) {
     acptr = client_find_nick(av[i]);
-    
-    if(acptr == NULL)
+
+    if (acptr == NULL)
       continue;
-    
-    if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
+
+    if (len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
-    
-    if(!first)
+
+    if (!first)
       result[len++] = ' ';
-    
+
     len += strlcpy(&result[len], acptr->name, IRCD_LINELEN - 1 - len);
-    
-/*    if(acptr->user->modes & UFLG(o))
-      result[len++] = '*';*/
+
+    /*    if(acptr->user->modes & UFLG(o))
+          result[len++] = '*';*/
     result[len++] = '=';
 
-    if(acptr->user->away[0])
+    if (acptr->user->away[0])
       result[len++] = '-';
     else
       result[len++] = '+';
-    
+
     len += strlcpy(&result[len], acptr->user->name, IRCD_LINELEN - 1 - len);
     result[len++] = '@';
     len += strlcpy(&result[len], acptr->hostip, IRCD_LINELEN - 1 - len);
-    
+
     first = 0;
   }
-  
+
   client_send(cptr, "%s", result);
 }

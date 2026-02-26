@@ -22,58 +22,56 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/hook.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/class.h"
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/lclient.h"
-#include "ircd/client.h"
-#include "ircd/class.h"
 #include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
  * -------------------------------------------------------------------------- */
 struct lc_mflood {
-  struct node     node;
+  struct node node;
   struct lclient *lclient;
-  uint32_t        lines;
-  uint64_t        lastrst;
-  uint64_t        lastrstm;
-  struct timer   *rtimer;
-  struct timer   *ttimer;
+  uint32_t lines;
+  uint64_t lastrst;
+  uint64_t lastrstm;
+  struct timer *rtimer;
+  struct timer *ttimer;
 };
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int               lc_mflood_hook    (struct lclient   *lcptr);
-static void              lc_mflood_release (struct lclient   *lcptr);
-static void              lc_mflood_done    (struct lc_mflood *lcmfptr);
-static int               lc_mflood_parse   (struct lclient   *lcptr,
-                                            char             *s);
-static int               lc_mflood_rtimer  (struct lc_mflood *lcmfptr);
-static int               lc_mflood_ttimer  (struct lc_mflood *lcmfptr);
+static int lc_mflood_hook(struct lclient *lcptr);
+static void lc_mflood_release(struct lclient *lcptr);
+static void lc_mflood_done(struct lc_mflood *lcmfptr);
+static int lc_mflood_parse(struct lclient *lcptr, char *s);
+static int lc_mflood_rtimer(struct lc_mflood *lcmfptr);
+static int lc_mflood_ttimer(struct lc_mflood *lcmfptr);
 
 /* -------------------------------------------------------------------------- *
  * Local variables                                                            *
  * -------------------------------------------------------------------------- */
 static struct sheap lc_mflood_heap;
-static struct list  lc_mflood_list;
+static struct list lc_mflood_list;
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int lc_mflood_load(void)
-{
-  if(hook_register(lclient_register, HOOK_2ND, lc_mflood_hook) == NULL)
+int lc_mflood_load(void) {
+  if (hook_register(lclient_register, HOOK_2ND, lc_mflood_hook) == NULL)
     return -1;
 
   hook_register(lclient_parse, HOOK_DEFAULT, lc_mflood_parse);
@@ -86,15 +84,14 @@ int lc_mflood_load(void)
   return 0;
 }
 
-void lc_mflood_unload(void)
-{
+void lc_mflood_unload(void) {
 
   struct lc_mflood *mflood = NULL;
-  struct node      *nptr;
-  struct node      *next;
+  struct node *nptr;
+  struct node *next;
 
   dlink_foreach_safe_data(&lc_mflood_list, nptr, next, mflood)
-    lc_mflood_done(mflood);
+      lc_mflood_done(mflood);
 
   hook_unregister(lclient_release, HOOK_DEFAULT, lc_mflood_release);
   hook_unregister(lclient_parse, HOOK_DEFAULT, lc_mflood_parse);
@@ -105,30 +102,29 @@ void lc_mflood_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int lc_mflood_hook(struct lclient *lcptr)
-{
+static int lc_mflood_hook(struct lclient *lcptr) {
   struct lc_mflood *lcmfptr;
-  struct class     *clptr;
+  struct class *clptr;
 
   clptr = lcptr->class;
 
-  if(clptr == NULL)
+  if (clptr == NULL)
     return 0;
 
-  if(lclient_is_user(lcptr) && clptr->flood_interval)
-  {
+  if (lclient_is_user(lcptr) && clptr->flood_interval) {
     lcmfptr = mem_static_alloc(&lc_mflood_heap);
 
     /* Add to pending mflood list */
-    if(lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD])
-      mem_static_free(&lc_mflood_heap, lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD]);
+    if (lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD])
+      mem_static_free(&lc_mflood_heap,
+                      lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD]);
 
     lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD] = lcmfptr;
     lcmfptr->lclient = lcptr;
 
     lcmfptr->lastrst = timer_mtime;
-    lcmfptr->rtimer = timer_start(lc_mflood_rtimer, clptr->flood_interval,
-                                  lcmfptr);
+    lcmfptr->rtimer =
+        timer_start(lc_mflood_rtimer, clptr->flood_interval, lcmfptr);
 
     timer_note(lcmfptr->rtimer, "message flood timer for client %s from %s:%u",
                lcptr->name, net_ntoa(lcptr->addr_remote), lcptr->port_remote);
@@ -144,48 +140,44 @@ static int lc_mflood_hook(struct lclient *lcptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int lc_mflood_parse(struct lclient *lcptr, char *s)
-{
+static int lc_mflood_parse(struct lclient *lcptr, char *s) {
   struct lc_mflood *lcmfptr;
-  struct class     *clptr;
-  uint64_t          delta;
+  struct class *clptr;
+  uint64_t delta;
 
   lcmfptr = lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD];
 
-  if(lcmfptr)
-  {
+  if (lcmfptr) {
     clptr = lcptr->class;
 
-    if(lcmfptr->lines == 0)
+    if (lcmfptr->lines == 0)
       lcmfptr->lastrstm = timer_mtime;
 
     lcmfptr->lines++;
 
-    if(lcmfptr->ttimer == NULL && clptr->throttle_trigger &&
-       clptr->throttle_interval &&
-       lcmfptr->lines >= clptr->throttle_trigger)
-    {
+    if (lcmfptr->ttimer == NULL && clptr->throttle_trigger &&
+        clptr->throttle_interval && lcmfptr->lines >= clptr->throttle_trigger) {
       lcptr->shut = 1;
-      lcmfptr->ttimer = timer_start(lc_mflood_ttimer,
-                                    clptr->throttle_interval, lcmfptr);
+      lcmfptr->ttimer =
+          timer_start(lc_mflood_ttimer, clptr->throttle_interval, lcmfptr);
 
-      timer_note(lcmfptr->rtimer, "message throttling timer for client %s from %s:%u",
+      timer_note(lcmfptr->rtimer,
+                 "message throttling timer for client %s from %s:%u",
                  lcptr->name, net_ntoa(lcptr->addr_remote), lcptr->port_remote);
 
       return 0;
     }
 
-    if(clptr->flood_trigger && lcmfptr->lines > clptr->flood_trigger)
-    {
+    if (clptr->flood_trigger && lcmfptr->lines > clptr->flood_trigger) {
       int fd;
 
       delta = timer_mtime - lcmfptr->lastrstm;
 
-      if(!lclient_is_oper(lcptr))
-      {
+      if (!lclient_is_oper(lcptr)) {
         fd = lcptr->fds[0];
         lclient_exit(lcptr, "excess flood: %umsgs in %llumsecs",
-                     lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines, delta);
+                     lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines,
+                     delta);
         io_destroy(fd);
         return 1;
       }
@@ -197,22 +189,19 @@ static int lc_mflood_parse(struct lclient *lcptr, char *s)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void lc_mflood_done(struct lc_mflood *lcmfptr)
-{
+static void lc_mflood_done(struct lc_mflood *lcmfptr) {
   lc_mflood_release(lcmfptr->lclient);
 }
 
 /* -------------------------------------------------------------------------- *
  * Hook when a lclient is released.                                           *
  * -------------------------------------------------------------------------- */
-static void lc_mflood_release(struct lclient *lcptr)
-{
+static void lc_mflood_release(struct lclient *lcptr) {
   struct lc_mflood *lcmfptr;
 
   lcmfptr = lcptr->plugdata[LCLIENT_PLUGDATA_MFLOOD];
 
-  if(lcmfptr)
-  {
+  if (lcmfptr) {
     timer_push(&lcmfptr->rtimer);
     timer_push(&lcmfptr->ttimer);
 
@@ -225,10 +214,8 @@ static void lc_mflood_release(struct lclient *lcptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int lc_mflood_rtimer(struct lc_mflood *lcmfptr)
-{
-  if(lcmfptr->ttimer == NULL)
-  {
+static int lc_mflood_rtimer(struct lc_mflood *lcmfptr) {
+  if (lcmfptr->ttimer == NULL) {
     lcmfptr->lastrst = timer_mtime;
     lcmfptr->lines = 0;
   }
@@ -238,22 +225,19 @@ static int lc_mflood_rtimer(struct lc_mflood *lcmfptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int lc_mflood_ttimer(struct lc_mflood *lcmfptr)
-{
+static int lc_mflood_ttimer(struct lc_mflood *lcmfptr) {
   struct lclient *lcptr = lcmfptr->lclient;
-  struct class   *clptr = lcptr->class;
-  uint64_t        delta;
+  struct class *clptr = lcptr->class;
+  uint64_t delta;
 
-  if(io_list[lcptr->fds[0]].recvq.lines > clptr->flood_trigger)
-  {
+  if (io_list[lcptr->fds[0]].recvq.lines > clptr->flood_trigger) {
     int fd;
 
     lcptr->shut = 0;
 
     delta = timer_mtime - lcmfptr->lastrstm;
 
-    if(!lclient_is_oper(lcptr))
-    {
+    if (!lclient_is_oper(lcptr)) {
       fd = lcptr->fds[0];
       lclient_exit(lcptr, "excess flood: %umsgs in %llumsecs",
                    lcmfptr->lines + io_list[lcptr->fds[0]].recvq.lines, delta);
@@ -262,8 +246,7 @@ static int lc_mflood_ttimer(struct lc_mflood *lcmfptr)
     }
   }
 
-  if(io_list[lcptr->fds[0]].recvq.lines == 0)
-  {
+  if (io_list[lcptr->fds[0]].recvq.lines == 0) {
     lcptr->shut = 0;
     lcmfptr->ttimer = NULL;
 
@@ -274,4 +257,3 @@ static int lc_mflood_ttimer(struct lc_mflood *lcmfptr)
 
   return 0;
 }
-

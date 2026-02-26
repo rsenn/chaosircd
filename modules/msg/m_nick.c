@@ -28,71 +28,61 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chars.h"
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/lclient.h"
-#include "ircd/numeric.h"
-#include "ircd/client.h"
-#include "ircd/chars.h"
-#include "ircd/ircd.h"
 #include "ircd/msg.h"
+#include "ircd/numeric.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mr_nick(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
-static void m_nick (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void mr_nick(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
+static void m_nick(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
-static void ms_nick(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void ms_nick(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_nick_help[] = {
-  "NICK <nickname>",
-  "",
-  "Changes your nick to the given nickname.",
-  NULL
-};
+static char *m_nick_help[] = {"NICK <nickname>", "",
+                              "Changes your nick to the given nickname.", NULL};
 
-static struct msg m_nick_msg = {
-  "NICK", 0, 2, MFLG_CLIENT | MFLG_UNREG,
-  { mr_nick, m_nick, ms_nick, m_nick },
-  m_nick_help
-};
+static struct msg m_nick_msg = {"NICK",
+                                0,
+                                2,
+                                MFLG_CLIENT | MFLG_UNREG,
+                                {mr_nick, m_nick, ms_nick, m_nick},
+                                m_nick_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_nick_load(void)
-{
-  if(msg_register(&m_nick_msg) == NULL)
+int m_nick_load(void) {
+  if (msg_register(&m_nick_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_nick_unload(void)
-{
-  msg_unregister(&m_nick_msg);
-}
+void m_nick_unload(void) { msg_unregister(&m_nick_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'nick'                                                           *
  * argv[2] - nickname                                                         *
  * -------------------------------------------------------------------------- */
-static void mr_nick(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void mr_nick(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   char *s;
-  char  nick[IRCD_NICKLEN + 1];
+  char nick[IRCD_NICKLEN + 1];
 
   /* Check if we have a nick */
-  if(argc < 3)
-  {
+  if (argc < 3) {
     lclient_exit(lcptr, "protocol mismatch: need a nickname");
     return;
   }
@@ -100,14 +90,13 @@ static void mr_nick(struct lclient *lcptr, struct client *cptr,
   /* Truncate nick */
   strlcpy(nick, argv[2], IRCD_NICKLEN + 1);
 
-  if((s = strchr(nick, '~')))
+  if ((s = strchr(nick, '~')))
     *s = '\0';
 
-  if(lcptr->name[0] == '\0')
-  {
+  if (lcptr->name[0] == '\0') {
     lclient_set_name(lcptr, nick);
 
-    if(lcptr->user)
+    if (lcptr->user)
       lclient_login(lcptr);
   }
 }
@@ -117,50 +106,40 @@ static void mr_nick(struct lclient *lcptr, struct client *cptr,
  * argv[1] - 'nick'                                                           *
  * argv[2] - nickname                                                         *
  * -------------------------------------------------------------------------- */
-static void m_nick(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_nick(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   char nick[IRCD_NICKLEN];
   struct client *acptr;
 
-  if(argc < 3)
-  {
-    lclient_send(lcptr, numeric_format(ERR_NONICKNAMEGIVEN),
-                 client_me->name, argv[0], nick);
+  if (argc < 3) {
+    lclient_send(lcptr, numeric_format(ERR_NONICKNAMEGIVEN), client_me->name,
+                 argv[0], nick);
     return;
   }
 
   strlcpy(nick, argv[2], IRCD_NICKLEN);
 
-  if(!chars_valid_nick(nick))
-  {
-    lclient_send(lcptr, numeric_format(ERR_ERRONEUSNICKNAME),
-                 client_me->name, argv[0], nick);
+  if (!chars_valid_nick(nick)) {
+    lclient_send(lcptr, numeric_format(ERR_ERRONEUSNICKNAME), client_me->name,
+                 argv[0], nick);
     return;
   }
 
   acptr = client_find_nick(nick);
 
-  if(acptr)
-  {
-    if(acptr == cptr)
-    {
-      if(str_cmp(acptr->name, nick))
-      {
+  if (acptr) {
+    if (acptr == cptr) {
+      if (str_cmp(acptr->name, nick)) {
         client_nick(lcptr, cptr, nick);
         return;
-      }
-      else
-      {
+      } else {
         return;
       }
     }
 
-    lclient_send(lcptr, numeric_format(ERR_NICKNAMEINUSE),
-                 client_me->name, cptr->name, nick);
-  }
-  else
-  {
+    lclient_send(lcptr, numeric_format(ERR_NICKNAMEINUSE), client_me->name,
+                 cptr->name, nick);
+  } else {
     client_nick(lcptr, cptr, nick);
   }
 }
@@ -170,12 +149,11 @@ static void m_nick(struct lclient *lcptr, struct client *cptr,
  * argv[1] - 'nick'                                                           *
  * argv[2] - nickname                                                         *
  * -------------------------------------------------------------------------- */
-static void ms_nick(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void ms_nick(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   uint32_t ts;
 
-  if(argc < 4)
+  if (argc < 4)
     return;
 
   ts = str_toul(argv[3], NULL, 10);
@@ -184,4 +162,3 @@ static void ms_nick(struct lclient *lcptr, struct client *cptr,
 
   cptr->ts = ts;
 }
-

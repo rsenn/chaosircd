@@ -27,52 +27,48 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/user.h"
-#include "ircd/server.h"
-#include "ircd/numeric.h"
-#include "ircd/channel.h"
 #include "ircd/chanmode.h"
+#include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/ircd.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
  * -------------------------------------------------------------------------- */
-#define CM_INVEX_CHAR  'I'
+#define CM_INVEX_CHAR 'I'
 #define CM_INVITE_CHAR 'i'
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
  * -------------------------------------------------------------------------- */
-static const char *cm_invex_help[] =
-{
-  "+I <mask>       Users matching the mask are excepted from invite only.",
-  NULL
-};
+static const char *cm_invex_help[] = {
+    "+I <mask>       Users matching the mask are excepted from invite only.",
+    NULL};
 
-static struct chanmode cm_invex_mode =
-{
-  CM_INVEX_CHAR,           /* mode character */
-  '\0',                    /* no prefix, because its not a privilege */
-  CHANMODE_TYPE_LIST,      /* channel mode is a list */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the modelist */
-  RPL_INVEXLIST,           /* use this reply when dumping modelist */
-  chanmode_bounce_ban,     /* bounce handler */
-  cm_invex_help            /* help text */
+static struct chanmode cm_invex_mode = {
+    CM_INVEX_CHAR,       /* mode character */
+    '\0',                /* no prefix, because its not a privilege */
+    CHANMODE_TYPE_LIST,  /* channel mode is a list */
+    CHFLG(o) | CHFLG(h), /* only OPs and Halfops can change the modelist */
+    RPL_INVEXLIST,       /* use this reply when dumping modelist */
+    chanmode_bounce_ban, /* bounce handler */
+    cm_invex_help        /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void cm_invex_hook(struct client *cptr, struct channel *chptr,
-                          const char    *key,  int            *reply);
+                          const char *key, int *reply);
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_invex_load(void)
-{
+int cm_invex_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_invex_mode) == NULL)
+  if (chanmode_register(&cm_invex_mode) == NULL)
     return -1;
 
   hook_register(channel_join, HOOK_1ST, cm_invex_hook);
@@ -82,8 +78,7 @@ int cm_invex_load(void)
   return 0;
 }
 
-void cm_invex_unload(void)
-{
+void cm_invex_unload(void) {
   /* unregister the channel mode */
   ircd_support_unset("INVEX");
 
@@ -95,27 +90,24 @@ void cm_invex_unload(void)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void cm_invex_hook(struct client *cptr, struct channel *chptr,
-                          const char    *key,  int            *reply)
-{
-  struct list   *mlptr;
+                          const char *key, int *reply) {
+  struct list *mlptr;
   struct invite *ivptr;
 
   /* client is already denied and not banned */
-  if((*reply > 0 && *reply != ERR_INVITEONLYCHAN &&
-      *reply != ERR_CHANNELISFULL && *reply != ERR_BADCHANNELKEY) || *reply == -CM_INVITE_CHAR)
+  if ((*reply > 0 && *reply != ERR_INVITEONLYCHAN &&
+       *reply != ERR_CHANNELISFULL && *reply != ERR_BADCHANNELKEY) ||
+      *reply == -CM_INVITE_CHAR)
     return;
 
   /* get the mode list for +I */
   mlptr = &chptr->modelists[chanmode_index(CM_INVEX_CHAR)];
 
-  if(chanmode_match_ban(cptr, chptr, mlptr))
-  {
+  if (chanmode_match_ban(cptr, chptr, mlptr)) {
     *reply = -CM_INVEX_CHAR;
 
-    dlink_foreach(&cptr->user->invites, ivptr)
-    {
-      if(ivptr->channel == chptr)
-      {
+    dlink_foreach(&cptr->user->invites, ivptr) {
+      if (ivptr->channel == chptr) {
         user_uninvite(ivptr);
         return;
       }

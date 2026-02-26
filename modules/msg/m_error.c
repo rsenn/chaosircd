@@ -22,69 +22,57 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/log.h"
-#include "libchaos/dlink.h"
 #include "libchaos/connect.h"
+#include "libchaos/dlink.h"
+#include "libchaos/log.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/server.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_error (struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv);
+static void m_error(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_error_help[] = {
-  "ERROR <message>",
-  "",
-  "Servers generate this command to warn about errors.",
-  NULL
-};
+    "ERROR <message>", "",
+    "Servers generate this command to warn about errors.", NULL};
 
 static struct msg m_error_msg = {
-  "ERROR", 1, 1, MFLG_UNREG,
-  { m_error, m_ignore, m_error, m_ignore },
-  m_error_help
-};
+    "ERROR",     1, 1, MFLG_UNREG, {m_error, m_ignore, m_error, m_ignore},
+    m_error_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_error_load(void)
-{
-  if(msg_register(&m_error_msg) == NULL)
+int m_error_load(void) {
+  if (msg_register(&m_error_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_error_unload(void)
-{
-  msg_unregister(&m_error_msg);
-}
+void m_error_unload(void) { msg_unregister(&m_error_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'error'                                                          *
  * argv[2] - message                                                          *
  * -------------------------------------------------------------------------- */
-static void m_error(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
-  if(lclient_is_unknown(lcptr))
-  {
-    if(lcptr->connect)
-    {
+static void m_error(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
+  if (lclient_is_unknown(lcptr)) {
+    if (lcptr->connect) {
       log(server_log, L_warning, "Connection to %s dropped: %s",
           lcptr->connect->name, argv[2]);
 
@@ -92,9 +80,7 @@ static void m_error(struct lclient *lcptr, struct client *cptr,
     }
 
     lclient_exit(lcptr, "%s", argv[2]);
-  }
-  else
-  {
+  } else {
     client_exit(lcptr, cptr, "%s", argv[2]);
   }
 }

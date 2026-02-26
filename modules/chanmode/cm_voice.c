@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -43,30 +43,26 @@ static int cm_voice_hook(struct list *lptr, struct chanuser *cuptr);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_voice_help[] =
-{
-  "+v <nickname>   Voice status. User can talk even when the channel is +m.",
-  NULL
-};
+static const char *cm_voice_help[] = {
+    "+v <nickname>   Voice status. User can talk even when the channel is +m.",
+    NULL};
 
-static struct chanmode cm_voice_mode =
-{
-  CM_VOICE_CHAR,           /* mode character */
-  '+',                     /* privilege prefix */
-  CHANMODE_TYPE_PRIVILEGE, /* channel mode is a privilege */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the privilege */
-  20,                      /* sorting order */
-  chanuser_mode_bounce,    /* bounce handler */
-  cm_voice_help            /* help text */
+static struct chanmode cm_voice_mode = {
+    CM_VOICE_CHAR,           /* mode character */
+    '+',                     /* privilege prefix */
+    CHANMODE_TYPE_PRIVILEGE, /* channel mode is a privilege */
+    CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the privilege */
+    20,                      /* sorting order */
+    chanuser_mode_bounce,    /* bounce handler */
+    cm_voice_help            /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_voice_load(void)
-{
+int cm_voice_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_voice_mode) == NULL)
+  if (chanmode_register(&cm_voice_mode) == NULL)
     return -1;
 
   hook_register(channel_join, HOOK_2ND, cm_voice_hook);
@@ -74,8 +70,7 @@ int cm_voice_load(void)
   return 0;
 }
 
-void cm_voice_unload(void)
-{
+void cm_voice_unload(void) {
   /* unregister the channel mode */
   chanmode_unregister(&cm_voice_mode);
 
@@ -84,8 +79,7 @@ void cm_voice_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_voice_hook(struct list *lptr, struct chanuser *cuptr)
-{
+static int cm_voice_hook(struct list *lptr, struct chanuser *cuptr) {
   cuptr->flags |= CHFLG(v);
   chanmode_prefix_make(cuptr->prefix, cuptr->flags);
   chanmode_change_add(lptr, CHANMODE_ADD, CM_VOICE_CHAR, NULL, cuptr);

@@ -29,75 +29,63 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_umode         (struct lclient *lcptr, struct client *cptr,
-                            int             argc,  char         **argv);
-static void ms_umode        (struct lclient *lcptr, struct client *cptr,
-                            int             argc,  char         **argv);
+static void m_umode(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
+static void ms_umode(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_umode_help[] = {
-  "UMODE <flags>",
-  "",
-  "Changes your usermodes. For a detailed",
-  "description of the usermodes use the",
-  "following command:",
-  "/quote help usermodes",
-  NULL
-};
+static char *m_umode_help[] = {"UMODE <flags>",
+                               "",
+                               "Changes your usermodes. For a detailed",
+                               "description of the usermodes use the",
+                               "following command:",
+                               "/quote help usermodes",
+                               NULL};
 
 static struct msg m_umode_msg = {
-  "UMODE", 0, 0, MFLG_CLIENT,
-  { NULL, m_umode, ms_umode, m_umode },
-  m_umode_help
-};
+    "UMODE",     0, 0, MFLG_CLIENT, {NULL, m_umode, ms_umode, m_umode},
+    m_umode_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_umode_load(void)
-{
-  if(msg_register(&m_umode_msg) == NULL)
+int m_umode_load(void) {
+  if (msg_register(&m_umode_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_umode_unload(void)
-{
-  msg_unregister(&m_umode_msg);
-}
+void m_umode_unload(void) { msg_unregister(&m_umode_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'umode'                                                          *
  * argv[2] - [modebuf]                                                        *
  * -------------------------------------------------------------------------- */
-static void m_umode(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_umode(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   /* call usermode_show if it's a mode request */
-  if(argc < 3)
-  {
+  if (argc < 3) {
     usermode_show(cptr);
     return;
   }
 
   /* parse the string and make struct usermodechange */
-  if(usermode_make(cptr->user, argv + 2, cptr,
-                   USERMODE_OPTION_PERMISSION))
-  {
+  if (usermode_make(cptr->user, argv + 2, cptr, USERMODE_OPTION_PERMISSION)) {
     /* let the user know his changes */
     usermode_change_send(lcptr, cptr, USERMODE_SEND_LOCAL);
 
@@ -111,11 +99,9 @@ static void m_umode(struct lclient *lcptr, struct client *cptr,
  * argv[1] - 'umode'                                                          *
  * argv[2] - [modebuf]                                                        *
  * -------------------------------------------------------------------------- */
-static void ms_umode(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
-  if(usermode_make(cptr->user, argv + 2, cptr, 0UL))
-  {
+static void ms_umode(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
+  if (usermode_make(cptr->user, argv + 2, cptr, 0UL)) {
     usermode_change_send(lcptr, cptr, USERMODE_SEND_REMOTE);
 
     return;

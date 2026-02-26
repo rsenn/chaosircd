@@ -1,15 +1,17 @@
 include(CheckFunctionExists)
 
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigStdIncludes.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSockets.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigDlFcn.cmake")
-include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigIntTypes.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigStdIncludes.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigSockets.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigDlFcn.cmake")
+  include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/ConfigIntTypes.cmake")
+
 
 if(NOT HAVE_DLFCN)
   if(CMAKE_HOST_WIN32)
     set(DLFCN_SOURCES src/dlfcn_win32.c)
-  endif(CMAKE_HOST_WIN32)
+  endif(CMAKE_HOST_WIN32)  
 endif(NOT HAVE_DLFCN)
+
 
 if(CMAKE_HOST_WIN32)
   if(NOT HAVE_SELECT)
@@ -31,6 +33,7 @@ else(CMAKE_HOST_WIN32)
   endif()
 
 endif(CMAKE_HOST_WIN32)
+
 
 if(HAVE_POLL)
   set(USE_POLL 1)

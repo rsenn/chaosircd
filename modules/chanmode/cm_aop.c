@@ -27,17 +27,17 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
  * -------------------------------------------------------------------------- */
 #define CM_AOP_CHAR 'O'
-#define CM_OP_CHAR  'o'
+#define CM_OP_CHAR 'o'
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
@@ -47,30 +47,26 @@ static void cm_aop_hook(struct list *lptr, struct chanuser *cuptr);
 /* -------------------------------------------------------------------------- *
  * Setup chanmode structure                                                   *
  * -------------------------------------------------------------------------- */
-static const char *cm_aop_help[] =
-{
-  "+O <mask>       Users matching the mask will get auto-opped on join.",
-  NULL
-};
+static const char *cm_aop_help[] = {
+    "+O <mask>       Users matching the mask will get auto-opped on join.",
+    NULL};
 
-static struct chanmode cm_ahalfop_mode =
-{
-  CM_AOP_CHAR,             /* mode character */
-  '\0',                    /* no prefix, because its not a privilege */
-  CHANMODE_TYPE_LIST,      /* channel mode is a list */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the modelist */
-  RPL_AOPLIST,             /* use this reply when dumping modelist */
-  chanmode_bounce_ban,     /* bounce handler */
-  cm_aop_help              /* help text */
+static struct chanmode cm_ahalfop_mode = {
+    CM_AOP_CHAR,         /* mode character */
+    '\0',                /* no prefix, because its not a privilege */
+    CHANMODE_TYPE_LIST,  /* channel mode is a list */
+    CHFLG(o) | CHFLG(h), /* only OPs and Halfops can change the modelist */
+    RPL_AOPLIST,         /* use this reply when dumping modelist */
+    chanmode_bounce_ban, /* bounce handler */
+    cm_aop_help          /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_aop_load(void)
-{
+int cm_aop_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_ahalfop_mode) == NULL)
+  if (chanmode_register(&cm_ahalfop_mode) == NULL)
     return -1;
 
   hook_register(channel_join, HOOK_3RD, cm_aop_hook);
@@ -80,8 +76,7 @@ int cm_aop_load(void)
   return 0;
 }
 
-void cm_aop_unload(void)
-{
+void cm_aop_unload(void) {
   /* unregister the channel mode */
   ircd_support_unset("AUTOOP");
 
@@ -93,17 +88,15 @@ void cm_aop_unload(void)
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
  * -------------------------------------------------------------------------- */
-static void cm_aop_hook(struct list *lptr, struct chanuser *cuptr)
-{
+static void cm_aop_hook(struct list *lptr, struct chanuser *cuptr) {
   struct channel *chptr = cuptr->channel;
-  struct list    *mlptr;
+  struct list *mlptr;
 
   /* get the mode list for +O */
   mlptr = &chptr->modelists[chanmode_index(CM_AOP_CHAR)];
 
   /* match the client against all masks in the list */
-  if(chanmode_match_amode(cuptr->client, chptr, mlptr))
-  {
+  if (chanmode_match_amode(cuptr->client, chptr, mlptr)) {
     /* if the client matched, then give him +o mode */
     cuptr->flags |= CHFLG(o);
 

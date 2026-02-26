@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -39,35 +39,31 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
-	                     intptr_t         type, const char     *text);
+static int cm_moderated_hook(struct client *cptr, struct channel *chptr,
+                             intptr_t type, const char *text);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_moderated_help[] =
-{
-  "+m              Moderated. Lets only ops and voices send to the channel.",
-  NULL
-};
+static const char *cm_moderated_help[] = {
+    "+m              Moderated. Lets only ops and voices send to the channel.",
+    NULL};
 
-static struct chanmode cm_moderated_mode =
-{
-  CM_MODERATED_CHAR,       /* Mode character */
-  '\0',                    /* No prefix, because its not a privilege */
-  CHANMODE_TYPE_SINGLE,    /* Channel mode is a single flag */
-  CHFLG(o) | CHFLG(h),     /* Only OPs and Halfops can change the flag */
-  0,                       /* No order and no reply */
-  chanmode_bounce_simple,  /* Bounce handler */
-  cm_moderated_help        /* Help text */
+static struct chanmode cm_moderated_mode = {
+    CM_MODERATED_CHAR,      /* Mode character */
+    '\0',                   /* No prefix, because its not a privilege */
+    CHANMODE_TYPE_SINGLE,   /* Channel mode is a single flag */
+    CHFLG(o) | CHFLG(h),    /* Only OPs and Halfops can change the flag */
+    0,                      /* No order and no reply */
+    chanmode_bounce_simple, /* Bounce handler */
+    cm_moderated_help       /* Help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_moderated_load(void)
-{
+int cm_moderated_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_moderated_mode) == NULL)
+  if (chanmode_register(&cm_moderated_mode) == NULL)
     return -1;
 
   hook_register(channel_message, HOOK_DEFAULT, cm_moderated_hook);
@@ -75,8 +71,7 @@ int cm_moderated_load(void)
   return 0;
 }
 
-void cm_moderated_unload(void)
-{
+void cm_moderated_unload(void) {
   /* unregister the channel mode */
   chanmode_unregister(&cm_moderated_mode);
 
@@ -85,18 +80,16 @@ void cm_moderated_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_moderated_hook(struct client   *cptr, struct channel *chptr,
-	                     intptr_t         type, const char     *text)
-{
+static int cm_moderated_hook(struct client *cptr, struct channel *chptr,
+                             intptr_t type, const char *text) {
   struct chanuser *cuptr = chanuser_find(chptr, cptr);
 
-  if(chptr->modes & CHFLG(m) &&
-     (cuptr == NULL || (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0ull))
-  {
+  if (chptr->modes & CHFLG(m) &&
+      (cuptr == NULL ||
+       (cuptr->flags & (CHFLG(o) | CHFLG(h) | CHFLG(v))) == 0ull)) {
     numeric_send(cptr, ERR_CANNOTSENDTOCHAN, chptr->name);
     return 1;
   }
 
   return 0;
 }
-

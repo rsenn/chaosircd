@@ -27,17 +27,17 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Mode characters                                                            *
  * -------------------------------------------------------------------------- */
 #define CM_AVOICE_CHAR 'V'
-#define CM_VOICE_CHAR  'v'
+#define CM_VOICE_CHAR 'v'
 
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
@@ -47,27 +47,25 @@ static void cm_avoice_hook(struct list *lptr, struct chanuser *cuptr);
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static const char *cm_avoice_help[] = {
-  "+V <mask>       Users matching the mask will get auto-voiced on join.",
-  NULL
-};
+    "+V <mask>       Users matching the mask will get auto-voiced on join.",
+    NULL};
 
 static struct chanmode cm_avoice_mode = {
-  CM_AVOICE_CHAR,         /* Mode character */
-  '\0',                    /* No prefix, because its not a privilege */
-  CHANMODE_TYPE_LIST,      /* Channel mode is a list */
-  CHFLG(o) | CHFLG(h),     /* Only OPs and Halfops can change the modelist */
-  RPL_AVOICELIST,          /* Use this reply when dumping modelist */
-  chanmode_bounce_ban,     /* Bounce handler */
-  cm_avoice_help           /* Help text */
+    CM_AVOICE_CHAR,      /* Mode character */
+    '\0',                /* No prefix, because its not a privilege */
+    CHANMODE_TYPE_LIST,  /* Channel mode is a list */
+    CHFLG(o) | CHFLG(h), /* Only OPs and Halfops can change the modelist */
+    RPL_AVOICELIST,      /* Use this reply when dumping modelist */
+    chanmode_bounce_ban, /* Bounce handler */
+    cm_avoice_help       /* Help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_avoice_load(void)
-{
+int cm_avoice_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_avoice_mode) == NULL)
+  if (chanmode_register(&cm_avoice_mode) == NULL)
     return -1;
 
   /* register a hook in channel_join */
@@ -79,8 +77,7 @@ int cm_avoice_load(void)
   return 0;
 }
 
-void cm_avoice_unload(void)
-{
+void cm_avoice_unload(void) {
   /* unset the support flag */
   ircd_support_unset("AUTOVOICE");
 
@@ -94,17 +91,15 @@ void cm_avoice_unload(void)
 /* -------------------------------------------------------------------------- *
  * This hook gets called when a client successfully joined a channel          *
  * -------------------------------------------------------------------------- */
-static void cm_avoice_hook(struct list *lptr, struct chanuser *cuptr)
-{
+static void cm_avoice_hook(struct list *lptr, struct chanuser *cuptr) {
   struct channel *chptr = cuptr->channel;
-  struct list    *mlptr;
+  struct list *mlptr;
 
   /* get the mode list for +V */
   mlptr = &chptr->modelists[chanmode_index(CM_AVOICE_CHAR)];
 
   /* match the client against all masks in the list */
-  if(chanmode_match_amode(cuptr->client, chptr, mlptr))
-  {
+  if (chanmode_match_amode(cuptr->client, chptr, mlptr)) {
     /* if the client matched, then give him +v mode */
     cuptr->flags |= CHFLG(v);
 

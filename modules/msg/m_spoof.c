@@ -22,117 +22,97 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/io.h"
+#include "libchaos/hook.h"
 #include "libchaos/ini.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
+#include "libchaos/module.h"
 #include "libchaos/net.h"
 #include "libchaos/str.h"
-#include "libchaos/hook.h"
-#include "libchaos/module.h"
 #include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
-#include "ircd/user.h"
-#include "ircd/chars.h"
-#include "ircd/client.h"
-#include "ircd/server.h"
-#include "ircd/lclient.h"
-#include "ircd/numeric.h"
 #include "ircd/channel.h"
 #include "ircd/chanuser.h"
+#include "ircd/chars.h"
+#include "ircd/client.h"
+#include "ircd/lclient.h"
+#include "ircd/msg.h"
+#include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-#define M_SPOOF_INTERVAL  (5 * 60 * 1000ull)
+#define M_SPOOF_INTERVAL (5 * 60 * 1000ull)
 #define M_SPOOF_SPOOFTIME (24 * 3600 * 1000ull)
-#define M_SPOOF_LIFETIME  (M_SPOOF_SPOOFTIME * 7)
+#define M_SPOOF_LIFETIME (M_SPOOF_SPOOFTIME * 7)
 #define M_SPOOF_BLOCKSIZE 32
-#define M_SPOOF_INI       "spoof.ini"
+#define M_SPOOF_INI "spoof.ini"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void                  m_spoof            (struct lclient       *lcptr,
-                                                 struct client        *cptr,
-                                                 int                   argc,
-                                                 char                **argv);
-static void                  ms_spoof           (struct lclient       *lcptr,
-                                                 struct client        *cptr,
-                                                 int                   argc,
-                                                 char                **argv);
-static int                   m_spoof_cleanup    (void);
-static void                  m_spoof_callback   (struct ini           *ini);
-static struct m_spoof_entry *m_spoof_new        (net_addr_t            ip,
-                                                 uint64_t              ts,
-                                                 const char           *host);
-static struct m_spoof_entry *m_spoof_add        (net_addr_t            ip,
-                                                 uint64_t              ts,
-                                                 const char           *host);
-static void                  m_spoof_delete     (struct m_spoof_entry *mseptr);
-static int                   m_spoof_loaddb     (void);
-static int                   m_spoof_savedb     (void);
-static struct m_spoof_entry *m_spoof_find_ip    (net_addr_t            ip);
-static struct m_spoof_entry *m_spoof_find_host  (const char           *host);
-static void                  m_spoof_hook_exit  (struct lclient       *lcptr,
-                                                 struct client        *cptr,
-                                                 const char           *comment);
-static void                  m_spoof_hook_burst (struct lclient       *lcptr,
-                                                 struct client        *acptr);
-static void                  m_spoof_hook_local (struct client        *cptr,
-                                                 struct user          *uptr);
-static void                  m_spoof_hook_remote(struct client        *cptr,
-                                                 struct user          *uptr);
-static void                  m_spoof_stats      (struct client        *cptr);
+static void m_spoof(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv);
+static void ms_spoof(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
+static int m_spoof_cleanup(void);
+static void m_spoof_callback(struct ini *ini);
+static struct m_spoof_entry *m_spoof_new(net_addr_t ip, uint64_t ts,
+                                         const char *host);
+static struct m_spoof_entry *m_spoof_add(net_addr_t ip, uint64_t ts,
+                                         const char *host);
+static void m_spoof_delete(struct m_spoof_entry *mseptr);
+static int m_spoof_loaddb(void);
+static int m_spoof_savedb(void);
+static struct m_spoof_entry *m_spoof_find_ip(net_addr_t ip);
+static struct m_spoof_entry *m_spoof_find_host(const char *host);
+static void m_spoof_hook_exit(struct lclient *lcptr, struct client *cptr,
+                              const char *comment);
+static void m_spoof_hook_burst(struct lclient *lcptr, struct client *acptr);
+static void m_spoof_hook_local(struct client *cptr, struct user *uptr);
+static void m_spoof_hook_remote(struct client *cptr, struct user *uptr);
+static void m_spoof_stats(struct client *cptr);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_spoof_help[] =
-{
-  "SPOOF <hostname>",
-  "",
-  "Spoofs your hostname to a freeform string.",
-  "This hostname will persist for at least 24 hours.",
-  NULL
-};
+static char *m_spoof_help[] = {
+    "SPOOF <hostname>", "", "Spoofs your hostname to a freeform string.",
+    "This hostname will persist for at least 24 hours.", NULL};
 
-static struct msg m_spoof_msg =
-{
-  "SPOOF", 1, 3, MFLG_CLIENT,
-  { NULL, m_spoof, ms_spoof, m_spoof },
-  m_spoof_help
+static struct msg m_spoof_msg = {
+    "SPOOF",     1, 3, MFLG_CLIENT, {NULL, m_spoof, ms_spoof, m_spoof},
+    m_spoof_help};
+
+/* -------------------------------------------------------------------------- *
+ * -------------------------------------------------------------------------- */
+struct m_spoof_entry {
+  struct node node;
+  net_addr_t ip;
+  uint64_t ts;
+  char host[IRCD_HOSTLEN];
+  hash_t hash;
+  int waslame;
 };
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-struct m_spoof_entry
-{
-  struct node    node;
-  net_addr_t     ip;
-  uint64_t       ts;
-  char           host[IRCD_HOSTLEN];
-  hash_t           hash;
-  int            waslame;
-};
-
-/* -------------------------------------------------------------------------- *
- * -------------------------------------------------------------------------- */
-static struct list   m_spoof_list;
+static struct list m_spoof_list;
 static struct timer *m_spoof_timer;
-static struct sheap  m_spoof_heap;
-static struct ini   *m_spoof_ini;
+static struct sheap m_spoof_heap;
+static struct ini *m_spoof_ini;
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_spoof_load(void)
-{
+int m_spoof_load(void) {
   dlink_list_zero(&m_spoof_list);
 
-  if(msg_register(&m_spoof_msg) == NULL)
+  if (msg_register(&m_spoof_msg) == NULL)
     return -1;
 
   m_spoof_timer = timer_start(m_spoof_cleanup, M_SPOOF_INTERVAL);
@@ -150,14 +130,13 @@ int m_spoof_load(void)
 
   server_stats_register('s', m_spoof_stats);
 
-  if((m_spoof_ini = ini_find_name(M_SPOOF_INI)) == NULL)
-  {
+  if ((m_spoof_ini = ini_find_name(M_SPOOF_INI)) == NULL) {
     log(client_log, L_status,
-        "Could not find spoof database, add '"M_SPOOF_INI
+        "Could not find spoof database, add '" M_SPOOF_INI
         "' to your config file.");
   }
 
-  if(m_spoof_ini)
+  if (m_spoof_ini)
     ini_callback(m_spoof_ini, m_spoof_callback);
 
   server_default_caps |= CAP_SPF;
@@ -165,8 +144,7 @@ int m_spoof_load(void)
   return 0;
 }
 
-void m_spoof_unload(void)
-{
+void m_spoof_unload(void) {
   server_default_caps &= ~CAP_SPF;
 
   m_spoof_cleanup();
@@ -187,9 +165,8 @@ void m_spoof_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static struct m_spoof_entry *
-m_spoof_new(net_addr_t ip, uint64_t ts, const char *host)
-{
+static struct m_spoof_entry *m_spoof_new(net_addr_t ip, uint64_t ts,
+                                         const char *host) {
   struct m_spoof_entry *mseptr;
 
   mseptr = mem_static_alloc(&m_spoof_heap);
@@ -207,17 +184,15 @@ m_spoof_new(net_addr_t ip, uint64_t ts, const char *host)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static struct m_spoof_entry *
-m_spoof_add(net_addr_t ip, uint64_t ts, const char *host)
-{
-  if(m_spoof_ini)
-  {
+static struct m_spoof_entry *m_spoof_add(net_addr_t ip, uint64_t ts,
+                                         const char *host) {
+  if (m_spoof_ini) {
     struct ini_section *isptr;
-    char                hostip[IRCD_HOSTIPLEN];
+    char hostip[IRCD_HOSTIPLEN];
 
     net_ntoa_r(ip, hostip);
 
-    if((isptr = ini_section_find(m_spoof_ini, hostip)) == NULL)
+    if ((isptr = ini_section_find(m_spoof_ini, hostip)) == NULL)
       isptr = ini_section_new(m_spoof_ini, hostip);
 
     ini_write_ulong_long(isptr, "ts", ts);
@@ -229,8 +204,7 @@ m_spoof_add(net_addr_t ip, uint64_t ts, const char *host)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_spoof_delete(struct m_spoof_entry *mseptr)
-{
+static void m_spoof_delete(struct m_spoof_entry *mseptr) {
   char hostip[IRCD_HOSTIPLEN + 1];
 
   net_ntoa_r(mseptr->ip, hostip);
@@ -238,42 +212,35 @@ static void m_spoof_delete(struct m_spoof_entry *mseptr)
   dlink_delete(&m_spoof_list, &mseptr->node);
   mem_static_free(&m_spoof_heap, mseptr);
 
-  if(m_spoof_ini)
-  {
+  if (m_spoof_ini) {
     struct ini_section *isptr;
 
-    if((isptr = ini_section_find(m_spoof_ini, hostip)))
+    if ((isptr = ini_section_find(m_spoof_ini, hostip)))
       ini_section_remove(m_spoof_ini, isptr);
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int m_spoof_cleanup(void)
-{
+static int m_spoof_cleanup(void) {
   struct m_spoof_entry *mseptr;
-  struct node          *next;
+  struct node *next;
 
-  dlink_foreach_safe(&m_spoof_list, mseptr, next)
-  {
-    if(mseptr->ts + M_SPOOF_LIFETIME < timer_mtime)
+  dlink_foreach_safe(&m_spoof_list, mseptr, next) {
+    if (mseptr->ts + M_SPOOF_LIFETIME < timer_mtime)
       m_spoof_delete(mseptr);
   }
 
-  if(m_spoof_ini)
-  {
-    if(m_spoof_savedb())
-    {
+  if (m_spoof_ini) {
+    if (m_spoof_savedb()) {
       log(client_log, L_warning, "Failed saving spoof database '%s'.",
           m_spoof_ini->name);
     }
-  }
-  else
-  {
-    if((m_spoof_ini = ini_find_name(M_SPOOF_INI)) == NULL)
+  } else {
+    if ((m_spoof_ini = ini_find_name(M_SPOOF_INI)) == NULL)
       log(client_log, L_status,
-          "Could not find spoof database, add '"
-          M_SPOOF_INI"' to your config file.");
+          "Could not find spoof database, add '" M_SPOOF_INI
+          "' to your config file.");
     else
       log(client_log, L_status, "Found spoof database: %s", m_spoof_ini->path);
   }
@@ -283,10 +250,8 @@ static int m_spoof_cleanup(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_spoof_callback(struct ini *ini)
-{
-  if(m_spoof_loaddb())
-  {
+static void m_spoof_callback(struct ini *ini) {
+  if (m_spoof_loaddb()) {
     log(client_log, L_warning, "Failed loading spoof database '%s'.",
         m_spoof_ini->name);
   }
@@ -294,20 +259,17 @@ static void m_spoof_callback(struct ini *ini)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static struct m_spoof_entry *m_spoof_find_ip(net_addr_t ip)
-{
+static struct m_spoof_entry *m_spoof_find_ip(net_addr_t ip) {
   struct m_spoof_entry *mseptr;
   char buf[16];
 
   net_ntoa_r(ip, buf);
 
-  dlink_foreach(&m_spoof_list, mseptr)
-  {
+  dlink_foreach(&m_spoof_list, mseptr) {
 
-    debug(client_log, "Spoof check: %s %s",
-          buf, net_ntoa(mseptr->ip));
+    debug(client_log, "Spoof check: %s %s", buf, net_ntoa(mseptr->ip));
 
-    if(mseptr->ip == ip)
+    if (mseptr->ip == ip)
       return mseptr;
   }
 
@@ -316,18 +278,15 @@ static struct m_spoof_entry *m_spoof_find_ip(net_addr_t ip)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static struct m_spoof_entry *m_spoof_find_host(const char *host)
-{
+static struct m_spoof_entry *m_spoof_find_host(const char *host) {
   struct m_spoof_entry *mseptr;
-  hash_t                  hash;
-  
+  hash_t hash;
+
   hash = str_ihash(host);
 
-  dlink_foreach(&m_spoof_list, mseptr)
-  {
-    if(mseptr->hash == hash)
-    {
-      if(!str_icmp(mseptr->host, host))
+  dlink_foreach(&m_spoof_list, mseptr) {
+    if (mseptr->hash == hash) {
+      if (!str_icmp(mseptr->host, host))
         return mseptr;
     }
   }
@@ -338,48 +297,39 @@ static struct m_spoof_entry *m_spoof_find_host(const char *host)
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 static void m_spoof_hook_exit(struct lclient *lcptr, struct client *cptr,
-                              const char     *comment)
-{
+                              const char *comment) {
   struct m_spoof_entry *mseptr;
 
-  if(!client_is_user(cptr))
+  if (!client_is_user(cptr))
     return;
 
-  if((mseptr = m_spoof_find_ip(cptr->ip)))
-  {
+  if ((mseptr = m_spoof_find_ip(cptr->ip))) {
     mseptr->waslame = 0;
   }
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_spoof_hook_burst(struct lclient *lcptr,
-                               struct client  *acptr)
-{
-  if(acptr->hhash != acptr->rhash)
-    lclient_send(lcptr, "SPOOF %C %llu :%s",
-                 acptr, 0ULL, acptr->host);
+static void m_spoof_hook_burst(struct lclient *lcptr, struct client *acptr) {
+  if (acptr->hhash != acptr->rhash)
+    lclient_send(lcptr, "SPOOF %C %llu :%s", acptr, 0ULL, acptr->host);
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_spoof_hook_local(struct client *cptr, struct user *uptr)
-{
+static void m_spoof_hook_local(struct client *cptr, struct user *uptr) {
   struct m_spoof_entry *mseptr;
 
-  if(!client_is_user(cptr))
+  if (!client_is_user(cptr))
     return;
 
-  if((mseptr = m_spoof_find_ip(cptr->ip)))
-  {
+  if ((mseptr = m_spoof_find_ip(cptr->ip))) {
     strncpy(cptr->host, mseptr->host, sizeof(cptr->host));
     cptr->hhash = mseptr->hash;
 
-    server_send(NULL, NULL, CAP_UID, CAP_NONE,
-                ":%S SPOOF %s %llu :%s",
+    server_send(NULL, NULL, CAP_UID, CAP_NONE, ":%S SPOOF %s %llu :%s",
                 server_me, uptr->uid, mseptr->ts, cptr->host);
-    server_send(NULL, NULL, CAP_NONE, CAP_UID,
-                ":%S SPOOF %s %llu :%s",
+    server_send(NULL, NULL, CAP_NONE, CAP_UID, ":%S SPOOF %s %llu :%s",
                 server_me, cptr->name, mseptr->ts, cptr->host);
 
     client_send(cptr, ":%S NOTICE %C :(m_spoof) spoofed your hostname to '%s'.",
@@ -389,23 +339,19 @@ static void m_spoof_hook_local(struct client *cptr, struct user *uptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_spoof_hook_remote(struct client *cptr, struct user *uptr)
-{
+static void m_spoof_hook_remote(struct client *cptr, struct user *uptr) {
   struct m_spoof_entry *mseptr;
 
-  if(!client_is_user(cptr))
+  if (!client_is_user(cptr))
     return;
 
-  if((mseptr = m_spoof_find_ip(cptr->ip)))
-  {
+  if ((mseptr = m_spoof_find_ip(cptr->ip))) {
     strncpy(cptr->host, mseptr->host, sizeof(cptr->host));
     cptr->hhash = mseptr->hash;
 
-    server_send(NULL, NULL, CAP_UID, CAP_NONE,
-                ":%S SPOOF %s %llu :%s",
+    server_send(NULL, NULL, CAP_UID, CAP_NONE, ":%S SPOOF %s %llu :%s",
                 server_me, uptr->uid, mseptr->ts, cptr->host);
-    server_send(NULL, NULL, CAP_NONE, CAP_UID,
-                ":%S SPOOF %s %llu :%s",
+    server_send(NULL, NULL, CAP_NONE, CAP_UID, ":%S SPOOF %s %llu :%s",
                 server_me, cptr->name, mseptr->ts, cptr->host);
 
     m_spoof_delete(mseptr);
@@ -414,40 +360,32 @@ static void m_spoof_hook_remote(struct client *cptr, struct user *uptr)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int m_spoof_loaddb(void)
-{
+static int m_spoof_loaddb(void) {
   struct m_spoof_entry *mseptr;
-  struct ini_section   *isptr;
-  char                  host[IRCD_HOSTLEN];
-  uint64_t              ts;
-  net_addr_t            ip;
+  struct ini_section *isptr;
+  char host[IRCD_HOSTLEN];
+  uint64_t ts;
+  net_addr_t ip;
 
-  if(m_spoof_ini == NULL)
+  if (m_spoof_ini == NULL)
     return -1;
 
-  if((isptr = ini_section_first(m_spoof_ini)))
-  {
-    do
-    {
+  if ((isptr = ini_section_first(m_spoof_ini))) {
+    do {
       ip = net_addr_any;
 
       net_aton(isptr->name, &ip);
 
-      if(!ini_get_str(isptr, "host", host, IRCD_HOSTLEN) &&
-         !ini_read_ulong_long(isptr, "ts", &ts))
-      {
-        if((mseptr = m_spoof_find_ip(ip)))
-        {
+      if (!ini_get_str(isptr, "host", host, IRCD_HOSTLEN) &&
+          !ini_read_ulong_long(isptr, "ts", &ts)) {
+        if ((mseptr = m_spoof_find_ip(ip))) {
           strlcpy(mseptr->host, host, sizeof(mseptr->host));
           mseptr->hash = str_ihash(mseptr->host);
-        }
-        else
-        {
+        } else {
           m_spoof_new(ip, ts, host);
         }
       }
-    }
-    while((isptr = ini_section_next(m_spoof_ini)));
+    } while ((isptr = ini_section_next(m_spoof_ini)));
   }
 
   ini_close(m_spoof_ini);
@@ -457,8 +395,7 @@ static int m_spoof_loaddb(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int m_spoof_savedb(void)
-{
+static int m_spoof_savedb(void) {
   ini_open(m_spoof_ini, INI_WRITE);
   io_queue_control(m_spoof_ini->fd, OFF, OFF, OFF);
   ini_save(m_spoof_ini);
@@ -471,18 +408,16 @@ static int m_spoof_savedb(void)
  * argv[0] - prefix                                                           *
  * argv[1] - 'spoof'                                                          *
  * -------------------------------------------------------------------------- */
-static void m_spoof(struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv)
-{
+static void m_spoof(struct lclient *lcptr, struct client *cptr, int argc,
+                    char **argv) {
   struct m_spoof_entry *mseptr;
-  char                  host[IRCD_HOSTLEN];
-  hash_t                  hash;
+  char host[IRCD_HOSTLEN];
+  hash_t hash;
 
   strlcpy(host, argv[2], sizeof(host));
 
   /* Validate argument */
-  if(!chars_valid_host(host))
-  {
+  if (!chars_valid_host(host)) {
     client_send(cptr, ":%S NOTICE %C :(m_spoof) invalid hostname '%s'.",
                 server_me, cptr, host);
     return;
@@ -492,33 +427,32 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
   hash = str_ihash(host);
 
   /* Return if the argument is exactly the same as the hostname */
-  if(cptr->hhash == hash && !str_cmp(cptr->host, host))
+  if (cptr->hhash == hash && !str_cmp(cptr->host, host))
     return;
 
   /* Find spoof entry for this client */
   mseptr = m_spoof_find_ip(cptr->ip);
 
-  if(mseptr)
-  {
-    log(client_log, L_warning,
-        "Found spoof entry for IP %s: %s", net_ntoa(cptr->ip), mseptr->host);
+  if (mseptr) {
+    log(client_log, L_warning, "Found spoof entry for IP %s: %s",
+        net_ntoa(cptr->ip), mseptr->host);
 
     /* If there is already a spoof entry and it hasn't expired then
        the client can only spoof back to his real host or real ip */
-    if(mseptr->ts + M_SPOOF_SPOOFTIME > timer_mtime)
-    {
-      if(hash != cptr->ihash && hash != cptr->rhash && hash != mseptr->hash &&
-         str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal) &&
-         str_cmp(host, mseptr->host))
-      {
-        if(!mseptr->waslame)
-        {
-          client_send(cptr,
-                      ":%S NOTICE %C :(m_spoof) you already spoofed, "
-                      "you can only reset to your real hostname "
-                      "within the next %u hours.",
-                      server_me, cptr, (uint32_t)((M_SPOOF_SPOOFTIME -
-                      (timer_mtime - mseptr->ts) + (30 * 60 * 1000L)) / (60 * 60 * 1000L)));
+    if (mseptr->ts + M_SPOOF_SPOOFTIME > timer_mtime) {
+      if (hash != cptr->ihash && hash != cptr->rhash && hash != mseptr->hash &&
+          str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal) &&
+          str_cmp(host, mseptr->host)) {
+        if (!mseptr->waslame) {
+          client_send(
+              cptr,
+              ":%S NOTICE %C :(m_spoof) you already spoofed, "
+              "you can only reset to your real hostname "
+              "within the next %u hours.",
+              server_me, cptr,
+              (uint32_t)((M_SPOOF_SPOOFTIME - (timer_mtime - mseptr->ts) +
+                          (30 * 60 * 1000L)) /
+                         (60 * 60 * 1000L)));
 
           mseptr->waslame++;
         }
@@ -527,39 +461,36 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
       }
 
       log(client_log, L_warning,
-          "spoof time hasn't expired but host for '%s' will be changed to '%s'.",
+          "spoof time hasn't expired but host for '%s' will be changed to "
+          "'%s'.",
           cptr->name, host);
     }
     /* There is already a spoof entry but it has expired, update
        spoofed host if the argument isn't hostreal or hostip */
-    else
-    {
+    else {
       mseptr->ts = timer_mtime;
       mseptr->waslame = 0;
     }
 
-    if(hash != cptr->ihash && hash != cptr->rhash && hash != mseptr->hash &&
-       str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal) &&
-       str_cmp(host, mseptr->host))
-    {
+    if (hash != cptr->ihash && hash != cptr->rhash && hash != mseptr->hash &&
+        str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal) &&
+        str_cmp(host, mseptr->host)) {
       mseptr->hash = hash;
       strlcpy(mseptr->host, host, sizeof(mseptr->host));
     }
-  }
-  else
-  {
+  } else {
     /* First time spoofer */
-    if(hash != cptr->ihash && hash != cptr->rhash &&
-       str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal))
-    {
+    if (hash != cptr->ihash && hash != cptr->rhash &&
+        str_cmp(host, cptr->hostip) && str_cmp(host, cptr->hostreal)) {
       struct client *acptr;
 
-      if((((acptr = client_find_host(host)) && acptr != cptr) ||
-         m_spoof_find_host(host)) && cptr->ip != acptr->ip)
-      {
-        client_send(cptr,
-                    ":%S NOTICE %C :(m_spoof) Someone already took the hostname '%s'",
-                    server_me, cptr, host);
+      if ((((acptr = client_find_host(host)) && acptr != cptr) ||
+           m_spoof_find_host(host)) &&
+          cptr->ip != acptr->ip) {
+        client_send(
+            cptr,
+            ":%S NOTICE %C :(m_spoof) Someone already took the hostname '%s'",
+            server_me, cptr, host);
         return;
       }
     }
@@ -574,12 +505,10 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
   client_send(cptr, ":%S NOTICE %C :(m_spoof) spoofed your hostname to '%s'.",
               server_me, cptr, cptr->host);
 
-  server_send(NULL, NULL, CAP_UID, CAP_NONE,
-              ":%S SPOOF %s %llu :%s",
-              server_me, cptr->user->uid, mseptr->ts, host);
-  server_send(NULL, NULL, CAP_NONE, CAP_UID,
-              ":%S SPOOF %s %llu :%s",
-              server_me, cptr->name, mseptr->ts, host);
+  server_send(NULL, NULL, CAP_UID, CAP_NONE, ":%S SPOOF %s %llu :%s", server_me,
+              cptr->user->uid, mseptr->ts, host);
+  server_send(NULL, NULL, CAP_NONE, CAP_UID, ":%S SPOOF %s %llu :%s", server_me,
+              cptr->name, mseptr->ts, host);
 }
 
 /* -------------------------------------------------------------------------- *
@@ -589,22 +518,20 @@ static void m_spoof(struct lclient *lcptr, struct client *cptr,
  * argv[3] - 'spoof'                                                          *
  * argv[4] - 'spoof'                                                          *
  * -------------------------------------------------------------------------- */
-static void ms_spoof(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
+static void ms_spoof(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
   struct client *acptr;
-  uint64_t       ts;
+  uint64_t ts;
 
-  if(argc < 5)
+  if (argc < 5)
     return;
 
-  if(lcptr->caps & CAP_UID)
+  if (lcptr->caps & CAP_UID)
     acptr = client_find_uid(argv[2]);
   else
     acptr = client_find_nick(argv[2]);
 
-  if(acptr == NULL)
-  {
+  if (acptr == NULL) {
     log(client_log, L_warning, "Dropping SPOOF for invalid client '%s'.",
         argv[2]);
     return;
@@ -615,43 +542,35 @@ static void ms_spoof(struct lclient *lcptr, struct client *cptr,
 
   ts = str_toull(argv[3], NULL, 10);
 
-  server_send(lcptr, NULL, CAP_UID, CAP_NONE,
-              ":%C SPOOF %s %llu :%s",
-              cptr, acptr->user->uid, ts, acptr->host);
-  server_send(lcptr, NULL, CAP_NONE, CAP_UID,
-              ":%C SPOOF %s %llu :%s",
-              cptr, acptr->name, ts, acptr->host);
+  server_send(lcptr, NULL, CAP_UID, CAP_NONE, ":%C SPOOF %s %llu :%s", cptr,
+              acptr->user->uid, ts, acptr->host);
+  server_send(lcptr, NULL, CAP_NONE, CAP_UID, ":%C SPOOF %s %llu :%s", cptr,
+              acptr->name, ts, acptr->host);
 
-  if(client_is_local(acptr))
-  {
+  if (client_is_local(acptr)) {
     struct m_spoof_entry *mseptr;
 
     /* Move spoof entry to this server */
-    if((mseptr = m_spoof_find_ip(acptr->ip)) == NULL)
-    {
+    if ((mseptr = m_spoof_find_ip(acptr->ip)) == NULL) {
       mseptr = m_spoof_add(acptr->ip, ts, argv[4]);
-    }
-    else
-    {
+    } else {
       mseptr->hash = acptr->hhash;
       mseptr->ts = ts;
       strlcpy(mseptr->host, argv[4], sizeof(mseptr->host));
     }
 
-    client_send(acptr, ":%S NOTICE %C :(m_spoof) spoofing your hostname to '%s'.",
+    client_send(acptr,
+                ":%S NOTICE %C :(m_spoof) spoofing your hostname to '%s'.",
                 server_me, acptr, mseptr->host);
   }
 }
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void m_spoof_stats(struct client *cptr)
-{
+static void m_spoof_stats(struct client *cptr) {
   struct m_spoof_entry *mseptr;
 
-  dlink_foreach(&m_spoof_list, mseptr)
-  {
-    numeric_send(cptr, RPL_STATSSLINE, 's',
-                 net_ntoa(mseptr->ip), mseptr->ts, mseptr->host);
+  dlink_foreach(&m_spoof_list, mseptr) {
+    numeric_send(cptr, RPL_STATSSLINE, 's', net_ntoa(mseptr->ip), mseptr->ts,
+                 mseptr->host);
   }
 }
-

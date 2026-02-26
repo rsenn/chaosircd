@@ -28,43 +28,34 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/user.h"
-#include "ircd/server.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
 #include "ircd/numeric.h"
+#include "ircd/server.h"
+#include "ircd/user.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void um_paranoid_whois_hook (struct client         *cptr,
-                                    struct user           *uptr);
+static void um_paranoid_whois_hook(struct client *cptr, struct user *uptr);
 
-int         um_paranoid_bounce     (struct user           *uptr,
-                                    struct usermodechange *umcptr,
-                                    uint32_t               flags);
-
+int um_paranoid_bounce(struct user *uptr, struct usermodechange *umcptr,
+                       uint32_t flags);
 
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_paranoid =
-{
-  'p',
-  USERMODE_LIST_OFF,
-  USERMODE_LIST_LOCAL,
-  USERMODE_ARG_DISABLE,
-  um_paranoid_bounce
-};
+static struct usermode um_paranoid = {'p', USERMODE_LIST_OFF,
+                                      USERMODE_LIST_LOCAL, USERMODE_ARG_DISABLE,
+                                      um_paranoid_bounce};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_paranoid_load(void)
-{
-  if(usermode_register(&um_paranoid))
+int um_paranoid_load(void) {
+  if (usermode_register(&um_paranoid))
     return -1;
 
   hook_register(user_whois, HOOK_DEFAULT, um_paranoid_whois_hook);
@@ -74,19 +65,16 @@ int um_paranoid_load(void)
   return 0;
 }
 
-void um_paranoid_unload(void)
-{
+void um_paranoid_unload(void) {
   server_default_caps &= ~CAP_PAR;
 
   hook_unregister(user_whois, HOOK_DEFAULT, um_paranoid_whois_hook);
   usermode_unregister(&um_paranoid);
-
 }
 
 int um_paranoid_bounce(struct user *uptr, struct usermodechange *umcptr,
-                       uint32_t flags)
-{
-  if(flags & USERMODE_OPTION_PERMISSION)
+                       uint32_t flags) {
+  if (flags & USERMODE_OPTION_PERMISSION)
     return -1;
 
   return 0;
@@ -95,13 +83,11 @@ int um_paranoid_bounce(struct user *uptr, struct usermodechange *umcptr,
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-static void um_paranoid_whois_hook(struct client *cptr,
-                                   struct user   *uptr)
-{
+static void um_paranoid_whois_hook(struct client *cptr, struct user *uptr) {
   char cipher[64];
 
   ssl_cipher(cptr->source->fds[0], cipher, sizeof(cipher));
 
-  if(uptr->modes & ((int)'p' - 0x40))
+  if (uptr->modes & ((int)'p' - 0x40))
     numeric_send(cptr, RPL_WHOISSSL, uptr->client->name, cipher);
 }

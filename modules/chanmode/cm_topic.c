@@ -27,11 +27,11 @@
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/ircd.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
@@ -39,36 +39,31 @@
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_topic_hook(struct lclient *lcptr, struct client   *cptr,
+static int cm_topic_hook(struct lclient *lcptr, struct client *cptr,
                          struct channel *chptr, struct chanuser *cuptr,
-                         const char     *topic);
+                         const char *topic);
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static const char *cm_topic_help[] =
-{
-  "+t              Topiclock. Lets only ops change the topic.",
-  NULL
-};
+static const char *cm_topic_help[] = {
+    "+t              Topiclock. Lets only ops change the topic.", NULL};
 
-static struct chanmode cm_topic_mode =
-{
-  CM_TOPIC_CHAR,           /* mode character */
-  '\0',                    /* no prefix, because its not a privilege */
-  CHANMODE_TYPE_SINGLE,    /* channel mode is a single flag */
-  CHFLG(o) | CHFLG(h),     /* only OPs and Halfops can change the flag */
-  0,                       /* no order and no reply */
-  chanmode_bounce_simple,  /* bounce handler */
-  cm_topic_help            /* help text */
+static struct chanmode cm_topic_mode = {
+    CM_TOPIC_CHAR,          /* mode character */
+    '\0',                   /* no prefix, because its not a privilege */
+    CHANMODE_TYPE_SINGLE,   /* channel mode is a single flag */
+    CHFLG(o) | CHFLG(h),    /* only OPs and Halfops can change the flag */
+    0,                      /* no order and no reply */
+    chanmode_bounce_simple, /* bounce handler */
+    cm_topic_help           /* help text */
 };
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int cm_topic_load(void)
-{
+int cm_topic_load(void) {
   /* register the channel mode */
-  if(chanmode_register(&cm_topic_mode) == NULL)
+  if (chanmode_register(&cm_topic_mode) == NULL)
     return -1;
 
   hook_register(channel_topic, HOOK_DEFAULT, cm_topic_hook);
@@ -76,8 +71,7 @@ int cm_topic_load(void)
   return 0;
 }
 
-void cm_topic_unload(void)
-{
+void cm_topic_unload(void) {
   /* unregister the channel mode */
   chanmode_unregister(&cm_topic_mode);
 
@@ -86,16 +80,13 @@ void cm_topic_unload(void)
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static int cm_topic_hook(struct lclient *lcptr, struct client   *cptr,
+static int cm_topic_hook(struct lclient *lcptr, struct client *cptr,
                          struct channel *chptr, struct chanuser *cuptr,
-                         const char     *topic)
-{
-  if(cuptr)
-  {
-    if(!(cuptr->flags & CHFLG(o)) && !(cuptr->flags & CHFLG(h)))
-    {
-      if((chptr->modes & CHFLG(t)) && client_is_user(cptr) && client_is_local(cptr))
-      {
+                         const char *topic) {
+  if (cuptr) {
+    if (!(cuptr->flags & CHFLG(o)) && !(cuptr->flags & CHFLG(h))) {
+      if ((chptr->modes & CHFLG(t)) && client_is_user(cptr) &&
+          client_is_local(cptr)) {
         numeric_send(cptr, ERR_CHANOPRIVSNEEDED, chptr->name);
         return 1;
       }

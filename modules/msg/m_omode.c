@@ -25,76 +25,64 @@
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
 #include "libchaos/log.h"
-#include "libchaos/timer.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/msg.h"
+#include "ircd/chanmode.h"
+#include "ircd/channel.h"
+#include "ircd/chanuser.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
-#include "ircd/channel.h"
 #include "ircd/usermode.h"
-#include "ircd/chanmode.h"
-#include "ircd/chanuser.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_omode         (struct lclient *lcptr, struct client *cptr,
-                              int             argc,  char         **argv);
-static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
-                              struct channel *chptr, int            argc,
-                              char          **argv);
+static void mo_omode(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv);
+static void mo_omode_channel(struct lclient *lcptr, struct client *cptr,
+                             struct channel *chptr, int argc, char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
 static char *m_omode_help[] = {
-  "OMODE <channel> <flags> [args]",
-  "",
-  "Operator command for changing mode on a given channel.",
-  "For a detailed description of the channelmodes use the",
-  "following command:",
-  "/quote help chanmodes",
-  NULL
-};
+    "OMODE <channel> <flags> [args]",
+    "",
+    "Operator command for changing mode on a given channel.",
+    "For a detailed description of the channelmodes use the",
+    "following command:",
+    "/quote help chanmodes",
+    NULL};
 
 static struct msg m_omode_msg = {
-  "OMODE", 1, 3, MFLG_OPER,
-  { NULL, NULL, NULL, mo_omode },
-  m_omode_help
-};
+    "OMODE", 1, 3, MFLG_OPER, {NULL, NULL, NULL, mo_omode}, m_omode_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_omode_load(void)
-{
-  if(msg_register(&m_omode_msg) == NULL)
+int m_omode_load(void) {
+  if (msg_register(&m_omode_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_omode_unload(void)
-{
-  msg_unregister(&m_omode_msg);
-}
+void m_omode_unload(void) { msg_unregister(&m_omode_msg); }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
-                              struct channel *chptr, int            argc,
-                              char          **argv)
-{
-  struct list           list;
+static void mo_omode_channel(struct lclient *lcptr, struct client *cptr,
+                             struct channel *chptr, int argc, char **argv) {
+  struct list list;
 
-  if(argc < 4)
-  {
+  if (argc < 4) {
     chanmode_show(cptr, chptr);
     return;
   }
@@ -105,7 +93,8 @@ static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
   chanmode_apply(lcptr, cptr, chptr, NULL, &list);
 
   chanmode_send_local(cptr, chptr, list.head,
-                      client_is_user(cptr) ? IRCD_MODESPERLINE : CHANMODE_PER_LINE);
+                      client_is_user(cptr) ? IRCD_MODESPERLINE
+                                           : CHANMODE_PER_LINE);
   chanmode_send_remote(lcptr, cptr, chptr, list.head);
 }
 
@@ -116,19 +105,16 @@ static void mo_omode_channel (struct lclient *lcptr, struct client *cptr,
  * argv[3] - [modebuf]                                                        *
  * argv[4] - [argbuf]                                                         *
  * -------------------------------------------------------------------------- */
-static void mo_omode(struct lclient *lcptr, struct client *cptr,
-                     int             argc,  char         **argv)
-{
-  if(channel_is_valid(argv[2]))
-  {
+static void mo_omode(struct lclient *lcptr, struct client *cptr, int argc,
+                     char **argv) {
+  if (channel_is_valid(argv[2])) {
     struct channel *chptr;
 
     chptr = channel_find_name(argv[2]);
 
-    if(chptr == NULL)
-    {
-      client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL),
-                  client_me->name, cptr->name, argv[2]);
+    if (chptr == NULL) {
+      client_send(cptr, numeric_format(ERR_NOSUCHCHANNEL), client_me->name,
+                  cptr->name, argv[2]);
       return;
     }
 

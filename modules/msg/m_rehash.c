@@ -24,75 +24,63 @@
  * -------------------------------------------------------------------------- */
 #include "libchaos/defs.h"
 #include "libchaos/io.h"
-#include "libchaos/timer.h"
 #include "libchaos/log.h"
 #include "libchaos/str.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/client.h"
+#include "ircd/conf.h"
 #include "ircd/ircd.h"
 #include "ircd/msg.h"
-#include "ircd/conf.h"
-#include "ircd/user.h"
 #include "ircd/server.h"
-#include "ircd/client.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void mo_rehash(struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv);
+static void mo_rehash(struct lclient *lcptr, struct client *cptr, int argc,
+                      char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *mo_rehash_help[] =
-{
-  "REHASH [server]",
-  "",
-  "Operator command causing a server to rehash its config file.",
-  NULL
-};
+static char *mo_rehash_help[] = {
+    "REHASH [server]", "",
+    "Operator command causing a server to rehash its config file.", NULL};
 
 static struct msg mo_rehash_msg = {
-  "REHASH", 0, 1, MFLG_OPER,
-  { NULL, NULL, mo_rehash, mo_rehash },
-  mo_rehash_help
-};
+    "REHASH",      0, 1, MFLG_OPER, {NULL, NULL, mo_rehash, mo_rehash},
+    mo_rehash_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_rehash_load(void)
-{
-  if(msg_register(&mo_rehash_msg) == NULL)
+int m_rehash_load(void) {
+  if (msg_register(&mo_rehash_msg) == NULL)
     return -1;
 
   return 0;
 }
 
-void m_rehash_unload(void)
-{
-  msg_unregister(&mo_rehash_msg);
-}
+void m_rehash_unload(void) { msg_unregister(&mo_rehash_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
  * argv[1] - 'rehash'                                                         *
  * argv[2] - name                                                             *
  * -------------------------------------------------------------------------- */
-static void mo_rehash(struct lclient *lcptr, struct client *cptr,
-                      int             argc,  char         **argv)
-{
-  if(argc == 3)
-  {
-    if(server_relay_always(lcptr, cptr, 2, ":%C REHASH %s", &argc, argv))
+static void mo_rehash(struct lclient *lcptr, struct client *cptr, int argc,
+                      char **argv) {
+  if (argc == 3) {
+    if (server_relay_always(lcptr, cptr, 2, ":%C REHASH %s", &argc, argv))
       return;
   }
 
-  log(ircd_log, L_status, "%s (%s@%s) is rehashing me.",
-      cptr->name, cptr->user->name, cptr->host);
+  log(ircd_log, L_status, "%s (%s@%s) is rehashing me.", cptr->name,
+      cptr->user->name, cptr->host);
 
   conf_rehash();
 }

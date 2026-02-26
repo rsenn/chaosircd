@@ -22,21 +22,21 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/io.h"
-#include "libchaos/timer.h"
+#include "libchaos/graph.h"
 #include "libchaos/hook.h"
+#include "libchaos/io.h"
 #include "libchaos/log.h"
 #include "libchaos/mem.h"
 #include "libchaos/str.h"
-#include "libchaos/graph.h"
+#include "libchaos/timer.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
+#include "ircd/class.h"
+#include "ircd/client.h"
 #include "ircd/ircd.h"
 #include "ircd/lclient.h"
-#include "ircd/client.h"
-#include "ircd/class.h"
 #include "ircd/msg.h"
 
 /* -------------------------------------------------------------------------- *
@@ -51,26 +51,26 @@ static struct graph *st_traffic_server;
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static struct graph *st_traffic_setup(const char    *name, unsigned long *out,
-                                      unsigned long *in)
-{
+static struct graph *st_traffic_setup(const char *name, unsigned long *out,
+                                      unsigned long *in) {
   struct graph *graph = NULL;
 
-/*  graph = graph_new(name, 400, 160, GRAPH_TYPE_OPS);
+  /*  graph = graph_new(name, 400, 160, GRAPH_TYPE_OPS);
 
-  graph_colorize(graph, GRAPH_COLOR_DARK);
+    graph_colorize(graph, GRAPH_COLOR_DARK);
 
-  graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, GRAPH_SOURCE_ULONG, out, "out");
-  graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, GRAPH_SOURCE_ULONG, in, "in");
+    graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, GRAPH_SOURCE_ULONG, out,
+    "out"); graph_source_add(graph, GRAPH_MEASURE_DIFFTIME, GRAPH_SOURCE_ULONG,
+    in, "in");
 
-  graph_drain_add(graph, GRAPH_DATA_HOURLY);*/
-/*  graph_drain_add(graph, GRAPH_DATA_DAILY);
-  graph_drain_add(graph, GRAPH_DATA_WEEKLY);
-  graph_drain_add(graph, GRAPH_DATA_MONTHLY);
-  graph_drain_add(graph, GRAPH_DATA_YEARLY);*/
+    graph_drain_add(graph, GRAPH_DATA_HOURLY);*/
+  /*  graph_drain_add(graph, GRAPH_DATA_DAILY);
+    graph_drain_add(graph, GRAPH_DATA_WEEKLY);
+    graph_drain_add(graph, GRAPH_DATA_MONTHLY);
+    graph_drain_add(graph, GRAPH_DATA_YEARLY);*/
 
-/*  graph_drain_render(graph, GRAPH_DATA_HOURLY);
-  graph_drain_save(graph, GRAPH_DATA_HOURLY);*/
+  /*  graph_drain_render(graph, GRAPH_DATA_HOURLY);
+    graph_drain_save(graph, GRAPH_DATA_HOURLY);*/
 
   return graph;
 }
@@ -78,20 +78,15 @@ static struct graph *st_traffic_setup(const char    *name, unsigned long *out,
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int st_traffic_load(void)
-{
-  st_traffic_client = st_traffic_setup("client",
-                                       &lclient_sendb[CLIENT_USER],
+int st_traffic_load(void) {
+  st_traffic_client = st_traffic_setup("client", &lclient_sendb[CLIENT_USER],
                                        &lclient_recvb[CLIENT_USER]);
-  st_traffic_server = st_traffic_setup("server",
-                                       &lclient_sendb[CLIENT_SERVER],
+  st_traffic_server = st_traffic_setup("server", &lclient_sendb[CLIENT_SERVER],
                                        &lclient_recvb[CLIENT_SERVER]);
   return 0;
 }
 
-void st_traffic_unload(void)
-{
+void st_traffic_unload(void) {
   graph_delete(st_traffic_client);
   graph_delete(st_traffic_server);
 }
-

@@ -22,57 +22,47 @@
 /* -------------------------------------------------------------------------- *
  * Library headers                                                            *
  * -------------------------------------------------------------------------- */
-#include "libchaos/str.h"
 #include "libchaos/dlink.h"
+#include "libchaos/str.h"
 
 /* -------------------------------------------------------------------------- *
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
-#include "ircd/ircd.h"
-#include "ircd/msg.h"
-#include "ircd/user.h"
 #include "ircd/chars.h"
 #include "ircd/client.h"
+#include "ircd/ircd.h"
 #include "ircd/lclient.h"
+#include "ircd/msg.h"
 #include "ircd/numeric.h"
+#include "ircd/user.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void m_ison (struct lclient *lcptr, struct client *cptr,
-                    int             argc,  char         **argv);
+static void m_ison(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv);
 
 /* -------------------------------------------------------------------------- *
  * Message entries                                                            *
  * -------------------------------------------------------------------------- */
-static char *m_ison_help[] = {
-  "ISON <nickname[,nickname,...]>",
-  "",
-  "Shows, whether the given nickname are on IRC.",
-  NULL
-};    
+static char *m_ison_help[] = {"ISON <nickname[,nickname,...]>", "",
+                              "Shows, whether the given nickname are on IRC.",
+                              NULL};
 
 static struct msg m_ison_msg = {
-  "ISON", 1, 1, MFLG_CLIENT,
-  { NULL, m_ison, NULL, m_ison },
-  m_ison_help
-};
+    "ISON", 1, 1, MFLG_CLIENT, {NULL, m_ison, NULL, m_ison}, m_ison_help};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int m_ison_load(void)
-{
-  if(msg_register(&m_ison_msg) == NULL)
+int m_ison_load(void) {
+  if (msg_register(&m_ison_msg) == NULL)
     return -1;
-  
+
   return 0;
 }
 
-void m_ison_unload(void)
-{
-  msg_unregister(&m_ison_msg);
-}
+void m_ison_unload(void) { msg_unregister(&m_ison_msg); }
 
 /* -------------------------------------------------------------------------- *
  * argv[0] - prefix                                                           *
@@ -81,39 +71,37 @@ void m_ison_unload(void)
  * argv[3] - [nick2]                                                          *
  * argv[4] - ...                                                              *
  * -------------------------------------------------------------------------- */
-static void m_ison(struct lclient *lcptr, struct client *cptr,
-                   int             argc,  char         **argv)
-{
+static void m_ison(struct lclient *lcptr, struct client *cptr, int argc,
+                   char **argv) {
   struct client *acptr;
-  char          *av[64];
-  char           result[IRCD_LINELEN - 1];
-  size_t         len;
-  size_t         n;
-  size_t         i;
-  int            first = 1;
-  
-	len = str_snprintf(result, sizeof(result), ":%s 303 %s :",
-                 client_me->name, cptr->name);
-  
+  char *av[64];
+  char result[IRCD_LINELEN - 1];
+  size_t len;
+  size_t n;
+  size_t i;
+  int first = 1;
+
+  len = str_snprintf(result, sizeof(result), ":%s 303 %s :", client_me->name,
+                     cptr->name);
+
   n = str_tokenize(argv[2], av, 63);
-  
-  for(i = 0; i < n; i++)
-  {
+
+  for (i = 0; i < n; i++) {
     acptr = client_find_nick(av[i]);
-    
-    if(acptr == NULL)
+
+    if (acptr == NULL)
       continue;
-    
-    if(len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
+
+    if (len + 1 + str_len(acptr->name) > IRCD_LINELEN - 2)
       break;
-    
-    if(!first)
+
+    if (!first)
       result[len++] = ' ';
-    
+
     len += strlcpy(&result[len], acptr->name, IRCD_LINELEN - 1 - len);
-    
+
     first = 0;
   }
-  
+
   client_send(cptr, "%s", result);
 }

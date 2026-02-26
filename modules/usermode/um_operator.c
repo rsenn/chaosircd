@@ -28,41 +28,33 @@
  * Core headers                                                               *
  * -------------------------------------------------------------------------- */
 #include "ircd/ircd.h"
+#include "ircd/numeric.h"
 #include "ircd/oper.h"
 #include "ircd/user.h"
-#include "ircd/numeric.h"
 #include "ircd/usermode.h"
 
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static int  um_oper_bounce     (struct user           *uptr,
-                                struct usermodechange *umcptr,
-                                uint32_t               flags);
+static int um_oper_bounce(struct user *uptr, struct usermodechange *umcptr,
+                          uint32_t flags);
 
-static void um_oper_up_hook    (struct user           *uptr);
+static void um_oper_up_hook(struct user *uptr);
 
-static void um_oper_whois_hook (struct client         *cptr,
-                                struct user           *uptr);
+static void um_oper_whois_hook(struct client *cptr, struct user *uptr);
 
 /* -------------------------------------------------------------------------- *
  * Locals                                                                     *
  * -------------------------------------------------------------------------- */
-static struct usermode um_operator =
-{
-  'o',
-  USERMODE_LIST_ON,
-  USERMODE_LIST_GLOBAL,
-  USERMODE_ARG_ENABLE | USERMODE_ARG_EMPTY,
-  um_oper_bounce
-};
+static struct usermode um_operator = {
+    'o', USERMODE_LIST_ON, USERMODE_LIST_GLOBAL,
+    USERMODE_ARG_ENABLE | USERMODE_ARG_EMPTY, um_oper_bounce};
 
 /* -------------------------------------------------------------------------- *
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
-int um_operator_load(void)
-{
-  if(usermode_register(&um_operator))
+int um_operator_load(void) {
+  if (usermode_register(&um_operator))
     return -1;
 
   hook_register(oper_up, HOOK_DEFAULT, um_oper_up_hook);
@@ -71,8 +63,7 @@ int um_operator_load(void)
   return 0;
 }
 
-void um_operator_unload(void)
-{
+void um_operator_unload(void) {
   hook_unregister(user_whois, HOOK_DEFAULT, um_oper_whois_hook);
   hook_unregister(oper_up, HOOK_DEFAULT, um_oper_up_hook);
 
@@ -83,34 +74,28 @@ void um_operator_unload(void)
  * Module hooks                                                               *
  * -------------------------------------------------------------------------- */
 static int um_oper_bounce(struct user *uptr, struct usermodechange *umcptr,
-                          uint32_t flags)
-{
-  if(client_is_local(uptr->client))
-  {
+                          uint32_t flags) {
+  if (client_is_local(uptr->client)) {
     /* +o */
-    if(umcptr->change == USERMODE_ON)
-    {
+    if (umcptr->change == USERMODE_ON) {
       /* denie this request if it's from a user */
-      if(flags & USERMODE_OPTION_PERMISSION)
+      if (flags & USERMODE_OPTION_PERMISSION)
         return -1;
     }
 
     /* -o */
-    else
-      if(uptr->oper)
-        oper_down(uptr->oper, uptr->client);
+    else if (uptr->oper)
+      oper_down(uptr->oper, uptr->client);
   }
 
   return 0;
 }
 
-static void um_oper_up_hook(struct user *uptr)
-{
+static void um_oper_up_hook(struct user *uptr) {
   usermode_change_destroy();
   usermode_change_add(&um_operator, USERMODE_ON, NULL);
 
-  if(usermode_apply(uptr, &uptr->modes, 0UL))
-  {
+  if (usermode_apply(uptr, &uptr->modes, 0UL)) {
     usermode_assemble(uptr->modes, uptr->mode);
 
     usermode_change_send(uptr->client->lclient, uptr->client,
@@ -120,10 +105,7 @@ static void um_oper_up_hook(struct user *uptr)
   }
 }
 
-static void um_oper_whois_hook(struct client *cptr,
-                               struct user   *uptr)
-{
-  if(uptr->modes & um_operator.flag)
+static void um_oper_whois_hook(struct client *cptr, struct user *uptr) {
+  if (uptr->modes & um_operator.flag)
     numeric_send(cptr, RPL_WHOISOPERATOR, uptr->client->name);
 }
-
