@@ -259,7 +259,7 @@ CHAOS_INLINE_FN(int str_cmp(const char *s1, const char *s2) {
 /* ------------------------------------------------------------------------ *
  * Compare string.                                                            *
  * ------------------------------------------------------------------------ */
-CHAOS_INLINE_API(int str_icmp(const char *s1, const char *s2))
+CHAOS_INLINE_API(int str_icmp(const char *s1, const char *s2));
 
 CHAOS_INLINE_FN(int str_icmp(const char *s1, const char *s2) {
   size_t i = 0;
@@ -564,14 +564,15 @@ CHAOS_INLINE_FN(hash_t str_hash(const char *s) {
 
 /* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
-extern hash_t str_ihash(const char *s);
-/*
+CHAOS_INLINE_API(hash_t str_ihash(const char *s));
+
 #define ROR(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
 #define ROL(v, n)                                                              \
   ((v >> (n & (HASH_BIT_SIZE - 1))) |                                          \
    (v << (HASH_BIT_SIZE - (n & (HASH_BIT_SIZE - 1)))))
+
 CHAOS_INLINE_FN(hash_t str_ihash(const char *s) {
   hash_t ret = 0xdefaced;
   hash_t temp;

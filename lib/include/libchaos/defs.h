@@ -118,35 +118,41 @@ typedef int ssize_t;
 #ifndef CHAOS_DATA_DECL
 #define CHAOS_DATA_DECL(type...) type
 #endif
+#warning CHAOS_INLINE
 
 #ifndef CHAOS_INLINE
+#warning not defined CHAOS_INLINE
 #ifdef __clang__
+#warning CLANG
 #define CHAOS_INLINE(x...) x
-#define CHAOS_INLINE_FN(x...) // static __inline__ x
+#define CHAOS_INLINE_API(proto) // proto;
+#define CHAOS_INLINE_FN(x...) static __inline__ x
 #elif defined __GNUC__ && !defined(__TINYC__)
 // #define CHAOS_INLINE(x...)  static __inline__ x
 #if __GNUC__ > 4
 #warning GNUC > 4
-#define CHAOS_INLINE(proto) extern inline proto
-#define CHAOS_INLINE_API(proto) // proto;
-#define CHAOS_INLINE_FN(x...) static __inline__ x
+#define CHAOS_INLINE(x...) x
+#define CHAOS_INLINE_API(proto) proto;
+#define CHAOS_INLINE_FN(x...) //extern __inline__ x
 #else
-#define CHAOS_INLINE(proto)
-#define CHAOS_INLINE_API(proto) // proto;
-#define CHAOS_INLINE_FN(x...) extern __inline__ x
+#warning GNUC <= 4
+#define CHAOS_INLINE(x...) x
+#define CHAOS_INLINE_API(proto) proto;
+#define CHAOS_INLINE_FN(x...) //extern __inline__ x
 #endif
 #else
-#define CHAOS_INLINE(x...) /*extern inline x*/
+#warning other compiler
+#define CHAOS_INLINE(x...) x
 #define CHAOS_INLINE_API(proto) proto;
 #define CHAOS_INLINE_FN(x...) // static inline x
 #endif
 #endif
 #ifdef CHAOS_INLINE_API
-#warning CHAOS_INLNIE_API defined
+#warning CHAOS_INLINE_API defined
 #endif
 
 #ifdef CHAOS_INLINE_API_FN
-#warning CHAOS_INLNIE_API_FN defined
+#warning CHAOS_INLINE_API_FN defined
 #endif
 #undef CHAOS_INLINE
 #ifndef CHAOS_INLINE
@@ -162,7 +168,7 @@ typedef int ssize_t;
 #define NO_C99 1
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #define ALREADY_INLINED 1
 #endif
 
