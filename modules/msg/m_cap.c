@@ -103,7 +103,7 @@ static void mr_cap(struct lclient *lcptr, struct client *cptr, int argc,
    *            CLIENT: USER username ignored ignored :real name
    *            SERVER: 001 [...]
    */
+  lclient_send(lcptr, "CAP * LS :");
 
-  log(lclient_log, L_warning, "Unsupported CAP command: %s %s", argv[1],
-      argv[2]);
+  //log(lclient_log, L_warning, "Unsupported CAP command: %s %s", argv[1], argv[2]);
 }
