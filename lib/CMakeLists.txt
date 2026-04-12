@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.5)
+
 set(PACKAGE_NAME libchaos)
 set(PACKAGE_VERSION 2.2.1)
 set(PACKAGE_RELEASE "peace, love & hippie edition")
@@ -10,8 +12,6 @@ else()
 endif()
 
 project(${PACKAGE_NAME} C)
-
-cmake_minimum_required(VERSION 2.6)
 
 if(NOT LIBCHAOS_SOURCE_DIR)
   set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
