@@ -527,6 +527,36 @@ CHAOS_INLINE(void dlink_copy(struct list *from, struct list *to) {
 })
 
 /* ------------------------------------------------------------------------ *
+ * Add a dlink node after another                                           *
+ * ------------------------------------------------------------------------ */
+#ifdef __TINYC__
+void dlink_add_after(struct list *lptr, struct node *nptr,
+                                  struct node *after, void *ptr) {
+  /* If <after> is the list tail, then a dlink_add_tail() does the job */
+  if (after == lptr->tail) {
+    dlink_add_tail(lptr, nptr, ptr);
+    return;
+  }
+
+  /* Set the data pointer */
+  nptr->data = ptr;
+
+  /* Make references on the new node */
+  nptr->next = after->next;
+  nptr->prev = after;
+
+  /* Update prev-reference of the node after the <after> node */
+  after->next->prev = nptr;
+
+  /* Update next-reference of the <after> node */
+  after->next = nptr;
+
+  /* Update list size */
+  lptr->size++;
+}
+#endif
+
+/* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 uint32_t dlink_count_nodes(struct list *lptr) {
   uint32_t i = 0;

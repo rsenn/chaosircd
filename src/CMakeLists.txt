@@ -7,8 +7,12 @@ include("${LIBCHAOS_SOURCE_DIR}/CMakeModules/UseFreeType.cmake")
 include("${CMAKE_SOURCE_DIR}/CMakeModules/ConfigGNUVars.cmake")
 include(FindBISON)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 bison_target(ircd-parser ircd.y ${CMAKE_CURRENT_BINARY_DIR}/ircd-parser.c
-             DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/y.tab.h)
+             DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/y.tab.h
+             COMPILE_FLAGS "-y --header=y.tab.h")
+
 flex_target(ircd-scanner ircd.l ${CMAKE_CURRENT_BINARY_DIR}/ircd-lexer.c)
 
 add_flex_bison_dependency(ircd-scanner ircd-parser)
