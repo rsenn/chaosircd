@@ -234,8 +234,8 @@ struct ssl_context *ssl_add(const char *name, int context, const char *cert,
   SSL_CTX_set_session_cache_mode(ctxt, SSL_SESS_CACHE_BOTH);
   SSL_CTX_set_timeout(ctxt, 360);
 
-  if (!SSL_CTX_use_RSAPrivateKey_file(ctxt, key, SSL_FILETYPE_PEM)) {
-    log(ssl_log, L_warning, "Error loading RSA private key %s", key);
+  if (!SSL_CTX_use_PrivateKey_file(ctxt, key, SSL_FILETYPE_PEM)) {
+    log(ssl_log, L_warning, "Error loading private key %s", key);
     SSL_CTX_free(ctxt);
     return NULL;
   }
