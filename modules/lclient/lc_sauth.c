@@ -152,15 +152,20 @@ int lc_sauth_load(void) {
         "' to your config file.");
   }
 
-  if (m_proxy_ini) {
+  /* ini_add() (during inis.conf parsing, before this module - and its
+   * callback - even exists) only opens the file and registers an async
+   * read notification; nothing actually calls io_poll() between that and
+   * here; the whole config/module load sequence is synchronous, so
+   * ini->sections is still empty at this point and the fd's real read
+   * hasn't happened yet. Don't call m_proxy_load() eagerly here: besides
+   * finding nothing yet, it unconditionally ends with ini_close(), which
+   * destroys that pending read registration (io_destroy(ini->fd)) before
+   * it ever fires - so the real, later read (which would populate
+   * ini->sections and invoke this callback for real) never happens, and
+   * m_proxy_list stays permanently empty. Just register the callback and
+   * let that one real read drive m_proxy_load() itself. */
+  if (m_proxy_ini)
     ini_callback(m_proxy_ini, m_proxy_callback);
-
-    /* proxy.ini was already read (by ini_add(), during inis.conf parsing)
-     * before this module - and its callback - even existed, so load
-     * whatever it already parsed now instead of waiting for a change
-     * notification that already happened. */
-    m_proxy_load();
-  }
 
   m_proxy_timer = timer_start(m_proxy_cleanup, M_PROXY_INTERVAL);
 
