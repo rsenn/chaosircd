@@ -222,3 +222,42 @@ install(
 add_subdirectory(src)
 
 add_subdirectory(modules)
+
+# ---------------------------------------------------------------------------
+# test targets: `make servauth-test` / `make tls-test`
+# ---------------------------------------------------------------------------
+find_program(BASH_EXECUTABLE bash)
+
+if(BASH_EXECUTABLE)
+  # servauth-test: self-contained, spawns its own servauth instance.
+  add_custom_target(
+    servauth-test
+    COMMAND ${CMAKE_COMMAND} -E env "SERVAUTH_BIN=$<TARGET_FILE:servauth>" ${BASH_EXECUTABLE}
+            "${CMAKE_SOURCE_DIR}/tests/servauth/test_roundtrip.sh"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests/servauth"
+    DEPENDS servauth
+    USES_TERMINAL
+    COMMENT "Running servauth dns forward/reverse + proxy scan round trip")
+
+  # tls-test: exercises a *running* ircd's SSL listener over the network,
+  # it does not start one itself - point it at an already-running instance
+  # (e.g. via the runit service in etc/service/chaosircd) with:
+  #   cmake -DIRCD_TEST_HOST=... -DIRCD_TEST_PORT=... .
+  set(IRCD_TEST_HOST
+      "127.0.0.1"
+      CACHE STRING "Host to connect to for `make tls-test`")
+  set(IRCD_TEST_PORT
+      "6697"
+      CACHE STRING "Port to connect to for `make tls-test`")
+
+  add_custom_target(
+    tls-test
+    COMMAND ${BASH_EXECUTABLE} "${CMAKE_SOURCE_DIR}/tests/ircd/test_ssl_listener.sh" "${IRCD_TEST_HOST}"
+            "${IRCD_TEST_PORT}"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests/ircd"
+    DEPENDS chaosircd
+    USES_TERMINAL
+    COMMENT "Testing chaosircd SSL listener at ${IRCD_TEST_HOST}:${IRCD_TEST_PORT} (must already be running)")
+else()
+  message(STATUS "bash not found - servauth-test/tls-test targets not available")
+endif()

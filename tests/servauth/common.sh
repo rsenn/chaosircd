@@ -82,6 +82,8 @@ sv_start() {
     return 1
   fi
 
+  sv_trace "# servauth started: $bin (pid $SV_PID)"
+
   return 0
 }
 
@@ -101,6 +103,16 @@ sv_stop() {
   unset SV_PID SV_IN SV_OUT
 }
 
+# Verbose raw-traffic tracing. On by default (that's the whole point of
+# this harness); set SV_VERBOSE=0 to silence it. Goes to stderr so it
+# never pollutes `reply=$(sv_expect ...)` command-substitution capture.
+SV_VERBOSE=${SV_VERBOSE:-1}
+
+sv_trace() {
+  [ "$SV_VERBOSE" = "1" ] || return 0
+  echo "$@" >&2
+}
+
 # sv_send <command line...>
 #
 # One line == one command, exactly as sent by ircd's sauth_* functions.
@@ -108,6 +120,7 @@ sv_stop() {
 # shuts itself down - keep commands well-formed (see servauth's
 # lib/servauth/commands.c for exact argument counts).
 sv_send() {
+  sv_trace ">> $*"
   echo "$*" >&"$SV_IN"
 }
 
@@ -115,7 +128,8 @@ sv_send() {
 #
 # Reads lines from servauth until one starts with <prefix> (space-anchored,
 # so "dns forward 1" won't match "dns forward 12"), or the timeout elapses.
-# Echoes the matching line on success, returns 1 on timeout/EOF.
+# Echoes the matching line on success, returns 1 on timeout/EOF. Every
+# line read (matching or not) is traced to stderr as it arrives.
 sv_expect() {
   local prefix="$1"
   local timeout="${2:-$SV_TIMEOUT}"
@@ -124,6 +138,7 @@ sv_expect() {
 
   while [ "$(date +%s)" -le "$deadline" ]; do
     if IFS= read -r -t "$timeout" -u "$SV_OUT" line; then
+      sv_trace "<< $line"
       case "$line" in
         "$prefix "*|"$prefix")
           echo "$line"
