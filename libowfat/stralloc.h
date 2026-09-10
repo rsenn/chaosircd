@@ -10,6 +10,7 @@ extern "C" {
 
 #ifndef __pure__
 #define __pure__
+#define __pure___undef_me
 #endif
 
 /* stralloc is the internal data structure all functions are working on.
@@ -171,6 +172,11 @@ void buffer_fromsa(buffer *b, stralloc *sa);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __pure___undef_me
+#undef __pure__
+#undef __pure___undef_me
 #endif
 
 #endif

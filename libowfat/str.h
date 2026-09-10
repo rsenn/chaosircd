@@ -10,6 +10,7 @@ extern "C" {
 
 #ifndef __pure__
 #define __pure__
+#define __pure___undef_me
 #endif
 
 /* str_copy copies leading bytes from in to out until \0.
@@ -55,6 +56,11 @@ int str_start(const char *a, const char *b) __pure__;
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __pure___undef_me
+#undef __pure__
+#undef __pure___undef_me
 #endif
 
 #endif

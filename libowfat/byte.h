@@ -11,6 +11,7 @@ extern "C" {
 
 #ifndef __pure__
 #define __pure__
+#define __pure___undef_me
 #endif
 
 /* byte_chr returns the smallest integer i between 0 and len-1
@@ -46,6 +47,11 @@ int byte_equal_notimingattack(const void *a, size_t len,
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __pure___undef_me
+#undef __pure__
+#undef __pure___undef_me
 #endif
 
 #endif

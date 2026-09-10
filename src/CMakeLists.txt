@@ -66,7 +66,7 @@ if(BUILD_LIBIRCD)
 
   add_executable(chaosircd main.c "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h" "${CMAKE_BINARY_DIR}/include/ircd/config.h"
                            "${CMAKE_SOURCE_DIR}/include/ircd/ircd.h")
-  set_target_properties(chaosircd PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  set_target_properties(chaosircd PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" ENABLE_EXPORTS ON)
 
   target_link_libraries(ircd chaos owfat ${SOCKET_LIBRARIES})
   target_link_libraries(chaosircd ircd)
@@ -75,6 +75,7 @@ if(BUILD_LIBIRCD)
 else()
   link_directories("${CMAKE_CURRENT_BINARY_DIR}/../lib")
   add_executable(chaosircd ${SOURCES} main.c)
+  set_target_properties(chaosircd PROPERTIES ENABLE_EXPORTS ON)
 
   target_link_libraries(chaosircd chaos owfat ${MYSQL_LIBS} ${OPENSSL_LIBS} ${SOCKET_LIBRARIES})
 endif()

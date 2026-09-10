@@ -15,6 +15,7 @@ extern "C" {
 
 #ifndef __pure__
 #define __pure__
+#define __pure___undef_me
 #endif
 
 /* interpret src as ASCII decimal number, write number to dest and
@@ -95,6 +96,11 @@ int scan_fromhex(unsigned char c);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __pure___undef_me
+#undef __pure__
+#undef __pure___undef_me
 #endif
 
 #endif
