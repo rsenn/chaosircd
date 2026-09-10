@@ -1,0 +1,20 @@
+#!/bin/sh
+# Enable with:
+#   ln -s @ws_irc_gateway_servicedir@ /etc/service/ws-irc-gateway
+#
+# WebSocket<->IRC bridge (tools/ws-irc-gateway.js) so browser IRC clients
+# (e.g. kiwiirc.com/nextclient, which can only open ws://+wss:// sockets)
+# can reach chaosircd - it has no native WebSocket support of its own.
+#
+# Reuses chaosircd's own TLS certificate (kept in sync by the same
+# SIGUSR1/ssl_update() rehash mechanism chaosircd uses - see lib/src/ssl.c -
+# except here the gateway process just needs restarting to pick up a
+# renewed cert, since lws reads it once at context creation).
+exec 2>&1
+exec env \
+  WS_PORT="${WS_IRC_GATEWAY_PORT:-7778}" \
+  IRCD_HOST="127.0.0.1" \
+  IRCD_PORT="6667" \
+  SSL_CERT="@sysconfdir@/ircd.crt" \
+  SSL_KEY="@sysconfdir@/ircd.key" \
+  qjsm @libexecdir@/ws-irc-gateway.js

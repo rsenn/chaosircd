@@ -238,6 +238,32 @@ install(
   DESTINATION "${runitservicedir}/log"
   PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
 
+# WebSocket<->IRC gateway (tools/ws-irc-gateway.js, a QuickJS script using
+# the 'lws' module - see that file for why) - lets browser IRC clients
+# (which can only open ws://+wss:// sockets, not raw TCP) reach chaosircd.
+# Not linked into a runsvdir automatically, same as chaosircd's own
+# service above:
+#   ln -s <ws_irc_gateway_servicedir> /etc/service/ws-irc-gateway
+set(ws_irc_gateway_servicedir
+    "${prefix}/etc/service/ws-irc-gateway"
+    CACHE PATH "installed ws-irc-gateway runit service directory")
+
+install(FILES tools/ws-irc-gateway.js DESTINATION "${libexecdir}")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/ws-irc-gateway/run.in
+               ${CMAKE_CURRENT_BINARY_DIR}/service/ws-irc-gateway/run @ONLY NEWLINE_STYLE UNIX)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/ws-irc-gateway/log/run.in
+               ${CMAKE_CURRENT_BINARY_DIR}/service/ws-irc-gateway/log/run @ONLY NEWLINE_STYLE UNIX)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/service/ws-irc-gateway/run
+  DESTINATION "${ws_irc_gateway_servicedir}"
+  PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/service/ws-irc-gateway/log/run
+  DESTINATION "${ws_irc_gateway_servicedir}/log"
+  PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
+
 add_subdirectory(src)
 
 add_subdirectory(modules)

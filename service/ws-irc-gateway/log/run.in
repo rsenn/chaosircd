@@ -1,0 +1,8 @@
+#!/bin/sh
+# svlogd logging script for the ws-irc-gateway runit service - installed by
+# cmake, see service/ws-irc-gateway/log/run.in
+#
+# Reads ws-irc-gateway's stdout/stderr (piped in by runsv from ../run) and
+# writes rotated logs into this directory (@ws_irc_gateway_servicedir@/log/).
+
+exec svlogd -tt .
