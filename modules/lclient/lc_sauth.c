@@ -71,8 +71,8 @@ struct lc_sauth {
 /* -------------------------------------------------------------------------- *
  * Prototypes                                                                 *
  * -------------------------------------------------------------------------- */
-static void lc_sauth_handshake(struct lclient *lcptr);
-static void lc_sauth_release(struct lclient *lcptr);
+static int lc_sauth_handshake(struct lclient *lcptr);
+static int lc_sauth_release(struct lclient *lcptr);
 static int lc_sauth_register(struct lclient *lcptr);
 
 static void lc_sauth_done(struct lc_sauth *arg);
@@ -188,7 +188,7 @@ void lc_sauth_unload(void) {
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void lc_sauth_handshake(struct lclient *lcptr) {
+static int lc_sauth_handshake(struct lclient *lcptr) {
   struct lc_sauth *arg;
 
   /* Keep track of the lclient if the module gets unloaded */
@@ -197,20 +197,38 @@ static void lc_sauth_handshake(struct lclient *lcptr) {
   arg->lclient = lclient_pop(lcptr);
   arg->done_dns = 0;
   arg->done_auth = 0;
+  arg->done_proxy = 0;
   arg->sauth_dns = NULL;
   arg->sauth_auth = NULL;
+  arg->timer_reg = NULL;
+  arg->timer_auth = NULL;
+  dlink_list_zero(&arg->sauth_proxy);
 
   dlink_add_tail(&lc_sauth_list, &arg->node, arg);
+
+  /* So lc_sauth_release()/lc_sauth_register() can find and clean this up
+   * (on disconnect, or once we call lclient_register() ourselves below). */
+  lcptr->plugdata[LCLIENT_PLUGDATA_SAUTH] = arg;
 
   lcptr->shut = 1;
 
   /* Start DNS lookup */
   lc_sauth_lookup_dns(arg);
+
+  /* Tell lclient_handshake() we're taking over registration - hook_cb_t
+   * callbacks must return int (0 = fall through to immediate
+   * lclient_register(), nonzero = deferred). This function used to be
+   * declared void, so its return value (garbage left in the ABI return
+   * register by a void function) was read as that int anyway - on 64-bit
+   * this sometimes came back as 0, letting NICK/USER registration
+   * complete (host still the raw IP) before DNS/auth/proxy checks had
+   * actually finished. */
+  return 1;
 }
 
 /* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
-static void lc_sauth_release(struct lclient *lcptr) {
+static int lc_sauth_release(struct lclient *lcptr) {
   struct lc_sauth *sauth;
 
   sauth = lcptr->plugdata[LCLIENT_PLUGDATA_SAUTH];
@@ -220,6 +238,8 @@ static void lc_sauth_release(struct lclient *lcptr) {
 
     lc_sauth_done(sauth);
   }
+
+  return 0;
 }
 
 /* -------------------------------------------------------------------------- *
