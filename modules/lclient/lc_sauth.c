@@ -88,6 +88,7 @@ static void mo_proxy(struct lclient *lcptr, struct client *cptr, int argc,
                      char **argv);
 static int m_proxy_cleanup(void);
 static int m_proxy_save(void);
+static int m_proxy_load(void);
 static void m_proxy_callback(struct ini *ini);
 
 /* -------------------------------------------------------------------------- *
@@ -151,8 +152,15 @@ int lc_sauth_load(void) {
         "' to your config file.");
   }
 
-  if (m_proxy_ini)
+  if (m_proxy_ini) {
     ini_callback(m_proxy_ini, m_proxy_callback);
+
+    /* proxy.ini was already read (by ini_add(), during inis.conf parsing)
+     * before this module - and its callback - even existed, so load
+     * whatever it already parsed now instead of waiting for a change
+     * notification that already happened. */
+    m_proxy_load();
+  }
 
   m_proxy_timer = timer_start(m_proxy_cleanup, M_PROXY_INTERVAL);
 

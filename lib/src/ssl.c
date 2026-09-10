@@ -295,6 +295,46 @@ int ssl_update(struct ssl_context *scptr, const char *name, int context,
   strlcpy(scptr->key, key, sizeof(scptr->key));
   strlcpy(scptr->ciphers, ciphers, sizeof(scptr->ciphers));
 
+#ifdef HAVE_SSL
+  /* Reload cert/key material into the *existing* SSL_CTX in place, so a
+   * REHASH (e.g. after an ACME renewal rewrites cert/key on disk) picks
+   * up the new certificate without dropping already-established TLS
+   * sessions - only handshakes started after this point see it. */
+  if (scptr->ctxt) {
+    SSL_CTX *ctxt = (SSL_CTX *)scptr->ctxt;
+
+    /* Certificate first, then key: SSL_CTX_use_PrivateKey_file() checks the
+     * new key against whatever certificate is *currently* loaded in the
+     * context, so loading the key first spuriously fails against the old
+     * (about-to-be-replaced) certificate. */
+    if (!SSL_CTX_use_certificate_file(ctxt, cert, SSL_FILETYPE_PEM)) {
+      log(ssl_log, L_warning,
+          "Error reloading x509 certificate %s for SSL context %s: %s", cert,
+          scptr->name, ERR_error_string(ERR_get_error(), NULL));
+      return -1;
+    }
+
+    if (!SSL_CTX_use_PrivateKey_file(ctxt, key, SSL_FILETYPE_PEM)) {
+      log(ssl_log, L_warning, "Error reloading private key %s for SSL context %s: %s",
+          key, scptr->name, ERR_error_string(ERR_get_error(), NULL));
+      return -1;
+    }
+
+    if (!SSL_CTX_check_private_key(ctxt)) {
+      log(ssl_log, L_warning,
+          "Certificate and private key do not match for SSL context %s",
+          scptr->name);
+      return -1;
+    }
+
+    if (!SSL_CTX_set_cipher_list(ctxt, ciphers)) {
+      log(ssl_log, L_warning, "Error setting cipher list %s for SSL context %s",
+          ciphers, scptr->name);
+      return -1;
+    }
+  }
+#endif
+
   log(ssl_log, L_status, "Updated SSL context: %s", scptr->name);
 
   return 0;

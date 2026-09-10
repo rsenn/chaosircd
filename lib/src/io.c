@@ -77,6 +77,8 @@
 #include <sys/poll.h>
 #endif
 
+#include <errno.h>
+
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -1172,7 +1174,11 @@ int io_select(int64_t *remain, int64_t *timeout) {
   io_wfds_r = io_wfds;
   io_efds_r = io_efds;
 
-  ret = syscall_select(io_top + 1, &io_rfds_r, &io_wfds_r, &io_efds_r, tp);
+  /* See io_poll()'s comment: retry on EINTR instead of letting ircd_loop()
+   * treat an interrupted select() as a fatal error and exit. */
+  do {
+    ret = syscall_select(io_top + 1, &io_rfds_r, &io_wfds_r, &io_efds_r, tp);
+  } while (ret == -1 && errno == EINTR);
 
   /* Update system time */
   timer_update();
@@ -1217,8 +1223,14 @@ int io_poll(int64_t *remain, int64_t *timeout) {
       deadline = timer_mtime + *timeout + 10;
     }
 
-  /* Do the actual poll() */
-  ret = syscall_poll(io_count ? io_pfds : NULL, io_count, to);
+  /* Do the actual poll(). A signal handler that just sets a flag (e.g.
+   * ircd_sigusr1() in src/main.c, for rehash-on-SIGUSR1) interrupts this
+   * with EINTR - treat that as "no fds ready yet" and retry, rather than
+   * propagating -1 up to ircd_loop(), whose `while (ret >= 0)` would
+   * otherwise mistake it for a fatal error and exit the whole process. */
+  do {
+    ret = syscall_poll(io_count ? io_pfds : NULL, io_count, to);
+  } while (ret == -1 && errno == EINTR);
 
   /* Update system time */
   timer_update();

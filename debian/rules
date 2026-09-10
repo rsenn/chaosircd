@@ -1,0 +1,42 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# One variable controls each conceptual location - see
+# CMakeModules/ConfigGNUVars.cmake for what derives from what.
+#
+# MySQL/userdb support (lib/servauth/userdb.c) is auto-detected by cmake
+# (UseMySQL.cmake) and silently skipped if no MySQL/MariaDB client dev
+# package is present at build time - it's not a hard Build-Depends here,
+# since the available provider differs across distros/releases (and can
+# conflict with whatever's already on a given build host).
+CMAKE_ARGS = \
+	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DSYSCONFDIR=/etc/chaosircd \
+	-Dinidir=/var/lib/chaosircd \
+	-Dlogdir=/var/log/chaosircd \
+	-Drunitservicedir=/etc/sv/chaosircd \
+	-DBUILD_LOADABLE_MODULES=ON \
+	-DCMAKE_SKIP_INSTALL_RPATH=ON
+
+%:
+	dh $@ --buildsystem=cmake
+
+# This is a cmake build; there's no configure.ac-driven autotools step to
+# reconf (the legacy configure.in/Makefile.in files in the tree predate
+# the cmake port and aren't used to build). Skip it - it otherwise md5sums
+# the whole source tree looking for autotools files, which chokes on any
+# unreadable file under it (e.g. root-owned leftovers from a stray local
+# `sudo make install`, harmless for the actual build).
+override_dh_autoreconf:
+
+override_dh_auto_configure:
+	dh_auto_configure --buildsystem=cmake -- $(CMAKE_ARGS)
+
+# The build tree is not chrooted/sandboxed for this package (no network
+# access, no disk space for a debootstrap chroot to test in) - so don't
+# run the servauth-test / tls-test cmake targets here. Verify manually
+# with `make servauth-test` / `make tls-test` in a real build tree, or
+# tests/servauth/test_roundtrip.sh and tests/ircd/test_ssl_listener.sh
+# directly.
+override_dh_auto_test:

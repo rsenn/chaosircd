@@ -50,6 +50,8 @@
 #include "libchaos/syscall.h"
 #include "libchaos/timer.h"
 
+#include <signal.h>
+
 /* -------------------------------------------------------------------------- *
  * Program headers                                                            *
  * -------------------------------------------------------------------------- */
@@ -408,12 +410,23 @@ void ircd_init(int argc, char **argv, char **envp) {
 /* -------------------------------------------------------------------------- *
  * Loop around some timer stuff and the i/o multiplexer.                      *
  * -------------------------------------------------------------------------- */
+/* Set (only) by the SIGUSR1 handler in src/main.c - checked once per loop
+ * iteration below rather than calling conf_rehash() directly from signal
+ * context, which isn't async-signal-safe (conf_rehash() touches the
+ * allocator, dlink lists, file I/O, ...). */
+volatile sig_atomic_t ircd_rehash_pending = 0;
+
 void ircd_loop(void) {
   int ret = 0;
   int64_t *timeout;
   int64_t remain = 0LL;
 
   while (ret >= 0) {
+    if (ircd_rehash_pending) {
+      ircd_rehash_pending = 0;
+      conf_rehash();
+    }
+
     /* Calculate timeout value */
     timeout = timer_timeout();
 

@@ -3,6 +3,6 @@
 # cmake, see service/chaosircd/log/run.in
 #
 # Reads chaosircd's stdout/stderr (piped in by runsv from ../run) and
-# writes rotated logs into this directory (@PREFIX@/etc/service/chaosircd/log/).
+# writes rotated logs into this directory (@runitservicedir@/log/).
 
 exec svlogd -tt .

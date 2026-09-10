@@ -1,0 +1,132 @@
+#!/bin/sh
+#
+# configure-server - final per-deployment configuration for chaosircd:
+# sets the server's FQDN in ircd.conf and provisions a TLS certificate.
+#
+# Usage:
+#   configure-server                          # localhost, self-signed
+#   configure-server --fqdn myhost.gotdns.ch  # real DNS name, ACME (Let's
+#                                              # Encrypt via acme.sh)
+#
+# By default (no --fqdn given) this sets up a self-signed certificate for
+# "localhost" - fine for local testing/loopback use, but browsers and IRC
+# clients doing real certificate validation will reject it. Give a real,
+# publicly-resolvable name (e.g. a <subdomain>.gotdns.ch dynamic-DNS host)
+# with --fqdn to get a trusted Let's Encrypt certificate instead.
+#
+# Let's Encrypt certificates are valid 90 days. This script installs the
+# renewed cert via `acme.sh --install-cert ... --reloadcmd`, which runs a
+# `REHASH` against the running ircd after each renewal - ssl_update() (see
+# lib/src/ssl.c) reloads the cert/key into the *existing* SSL_CTX, so the
+# TLS listener picks up the new certificate without restarting chaosircd.
+# acme.sh's own cron job (installed to your crontab/systemd timer when you
+# first installed acme.sh) handles checking for and performing renewal;
+# this script does not add a second one.
+
+set -eu
+
+sysconfdir="@sysconfdir@"
+sbindir="@sbindir@"
+
+FQDN="localhost"
+ACME_SH="${ACME_SH:-$HOME/.acme.sh/acme.sh}"
+PIDFILE="/var/run/chaosircd.pid"
+HTTPPORT=""
+
+usage() {
+  cat <<EOF
+Usage: $0 [--fqdn <name>] [--pidfile <path>] [--acme-sh <path>] [--httpport <port>]
+
+  --fqdn <name>        Server hostname (default: localhost - self-signed).
+                        Give a real, publicly-resolvable name (e.g. a
+                        gotdns.ch dynamic-DNS host) to get a Let's Encrypt
+                        certificate via acme.sh instead.
+  --pidfile <path>     Where to find chaosircd's pid, to send it SIGUSR1
+                        (rehash/reload-cert) after each ACME renewal
+                        (default: $PIDFILE, matches ircd.conf's pid = ...).
+  --acme-sh <path>      Path to acme.sh (default: \$HOME/.acme.sh/acme.sh,
+                        or \$ACME_SH).
+  --httpport <port>    Local unprivileged port for acme.sh's standalone
+                        HTTP-01 responder (default: 80, needs root). Use
+                        this when your router NATs external port 80 to a
+                        different internal port (e.g. 18080) instead of
+                        forwarding 80 straight through - acme.sh then binds
+                        that local port itself, no root and no separate
+                        webserver needed. The CA always connects to the
+                        domain's port 80 from the internet; your router's
+                        port forward is what maps that to this port.
+EOF
+  exit 1
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --fqdn) FQDN="$2"; shift 2 ;;
+    --pidfile) PIDFILE="$2"; shift 2 ;;
+    --acme-sh) ACME_SH="$2"; shift 2 ;;
+    --httpport) HTTPPORT="$2"; shift 2 ;;
+    -h|--help) usage ;;
+    *) echo "Unknown argument: $1" >&2; usage ;;
+  esac
+done
+
+CERT="$sysconfdir/ircd.crt"
+KEY="$sysconfdir/ircd.key"
+CONF="$sysconfdir/ircd.conf"
+
+if [ ! -f "$CONF" ]; then
+  echo "configure-server: $CONF not found - is chaosircd installed?" >&2
+  exit 1
+fi
+
+# --- 1. server name -----------------------------------------------------
+echo "Setting server name to '$FQDN' in $CONF"
+# Only touches the `name = "...";` line inside the global{} block (the
+# first such line in the file - ircd.conf's global{} block comes first).
+sed -i "0,/^\(\s*name\s*=\s*\)\"[^\"]*\"/s//\1\"$FQDN\"/" "$CONF"
+
+# --- 2. certificate -------------------------------------------------------
+case "$FQDN" in
+  localhost | 127.0.0.1 | ::1)
+    echo "Using a self-signed certificate for '$FQDN' (default - not for public use)."
+    if [ -f "$CERT" ] && [ -f "$KEY" ]; then
+      echo "Certificate and key already exist in $sysconfdir - leaving them alone."
+      echo "(remove $CERT and $KEY first to regenerate)"
+    else
+      "$sbindir/mkcrt"
+    fi
+    ;;
+
+  *)
+    if [ ! -x "$ACME_SH" ]; then
+      echo "configure-server: acme.sh not found at $ACME_SH" >&2
+      echo "Install it first: https://github.com/acmesh-official/acme.sh" >&2
+      exit 1
+    fi
+
+    reload_cmd="kill -USR1 \$(cat '$PIDFILE') 2>/dev/null || true"
+    # SIGUSR1 triggers a rehash (see src/main.c) - same effect as the
+    # oper REHASH command: re-reads ircd.conf and, for each ssl{} block
+    # whose name already exists, calls ssl_update() (lib/src/ssl.c),
+    # which now reloads the cert/key files into the live SSL_CTX in
+    # place - so the running chaosircd picks up the renewed certificate
+    # without a restart.
+
+    set -- --issue --standalone -d "$FQDN" --keylength ec-256 --server letsencrypt
+    if [ -n "$HTTPPORT" ]; then
+      set -- "$@" --httpport "$HTTPPORT"
+      echo "Requesting a Let's Encrypt certificate for '$FQDN' via acme.sh (standalone mode, listening on local port $HTTPPORT - make sure your router forwards the domain's public port 80 to it)..."
+    else
+      echo "Requesting a Let's Encrypt certificate for '$FQDN' via acme.sh (standalone mode, needs port 80 free)..."
+    fi
+    "$ACME_SH" "$@"
+
+    echo "Installing certificate to $sysconfdir, with REHASH-on-renew wired up..."
+    "$ACME_SH" --install-cert -d "$FQDN" --ecc \
+      --key-file "$KEY" \
+      --fullchain-file "$CERT" \
+      --reloadcmd "$reload_cmd"
+    ;;
+esac
+
+echo "Done. Send SIGUSR1 to the running chaosircd (kill -USR1 \$(cat $PIDFILE)) to pick up the server name/certificate change without restarting it."

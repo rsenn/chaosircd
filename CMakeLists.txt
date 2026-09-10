@@ -27,9 +27,12 @@ set(SYSCONFDIR
     ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME}
     CACHE PATH "configuration directory")
 set(relsysconfdir
-    ${CMAKE_INSTALL_PREFIX}/etc/${PROJECT_NAME}
-    CACHE PATH "sysconf dir")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    ${SYSCONFDIR}
+    CACHE PATH "sysconf dir (defaults to \${SYSCONFDIR} - override that instead unless you need them to differ)")
+# Pin a C standard predating C23's built-in true/false/bool keywords -
+# include/ircd/ircd.h defines its own `typedef enum { false, true } bool;`,
+# which is a hard error under -std=*c23 (the GNU default on newer GCC).
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -std=gnu17")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(LIBCHAOS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
@@ -135,16 +138,8 @@ set(CONFFILES
     conf/opers.conf
     conf/ssl.conf)
 
-set(TOOLS
-    tools/ircd-config
-    tools/mkca
-    tools/mkcrt
-    tools/mkkeys
-    tools/mkreq
-    tools/openssl.cnf
-    tools/sign)
 set(INSTALL_CONF_FILES)
-foreach(SUBSTFILE ${CONFFILES} ${TOOLS})
+foreach(SUBSTFILE ${CONFFILES})
   message(STATUS "Substituting ${SUBSTFILE}.in")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SUBSTFILE}.in ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
   list(APPEND INSTALL_CONF_FILES ${CMAKE_CURRENT_BINARY_DIR}/${SUBSTFILE})
@@ -170,9 +165,20 @@ set(CHAOSIRCD_HEADERS
     include/ircd/usermode.h)
 
 install(FILES ${CHAOSIRCD_HEADERS} DESTINATION include/ircd)
-install(FILES ${INSTALL_CONF_FILES} DESTINATION etc/${PROJECT_NAME})
+install(FILES ${INSTALL_CONF_FILES} DESTINATION "${sysconfdir}")
+
+# runtime directories referenced by the conf/*.conf templates (inidir,
+# logdir) - created empty so a fresh install doesn't need them hand-made,
+# and so ini/log paths don't fall back to "/" (see relinidir/rellogdir in
+# CMakeModules/ConfigGNUVars.cmake). ${inidir}/${logdir} are absolute
+# paths (CACHE PATH, default under CMAKE_INSTALL_PREFIX but overridable
+# to real FHS locations, e.g. by debian/rules), so install() uses them
+# as-is rather than as CMAKE_INSTALL_PREFIX-relative destinations.
+install(DIRECTORY DESTINATION "${inidir}")
+install(DIRECTORY DESTINATION "${logdir}")
 
 set(TOOLS
+    tools/configure-server
     tools/ircd-config
     tools/mkca
     tools/mkcrt
@@ -190,12 +196,25 @@ endforeach(SUBSTFILE)
 
 install(
   FILES ${INSTALL_SUBST_FILES}
-  DESTINATION sbin
-  PERMISSIONS WORLD_EXECUTE)
+  DESTINATION "${sbindir}"
+  PERMISSIONS
+    OWNER_READ
+    OWNER_WRITE
+    OWNER_EXECUTE
+    GROUP_READ
+    GROUP_EXECUTE
+    WORLD_READ
+    WORLD_EXECUTE)
 
-# runit service definition (see service/chaosircd/README, if you want one).
-# Not linked into /etc/service automatically - do that manually with:
-#   ln -s ${SYSCONFDIR's parent}/service/chaosircd /etc/service/chaosircd
+# runit service definition. Where it lands is overridable (e.g. Debian
+# packaging installs it at the runit-services convention /etc/sv/<name>
+# instead of under the runtime prefix) - it is NOT linked into a runsvdir
+# (e.g. /etc/service) automatically either way, do that manually with:
+#   ln -s <runitservicedir> /etc/service/chaosircd
+set(runitservicedir
+    "${prefix}/etc/service/${PROJECT_NAME}"
+    CACHE PATH "installed runit service directory")
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/chaosircd/run.in ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/run
                @ONLY NEWLINE_STYLE UNIX)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/chaosircd/log/run.in
@@ -212,11 +231,11 @@ set(SERVICE_EXEC_PERMISSIONS
 
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/run
-  DESTINATION etc/service/${PROJECT_NAME}
+  DESTINATION "${runitservicedir}"
   PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/log/run
-  DESTINATION etc/service/${PROJECT_NAME}/log
+  DESTINATION "${runitservicedir}/log"
   PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
 
 add_subdirectory(src)

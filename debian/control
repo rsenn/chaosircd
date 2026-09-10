@@ -1,0 +1,30 @@
+Source: chaosircd
+Section: net
+Priority: optional
+Maintainer: Roman Senn <roman.l.senn@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+               cmake,
+               bison,
+               flex,
+               pkg-config,
+               libssl-dev,
+               libfreetype-dev
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: chaosircd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: runit
+Description: modular IRC server with reverse-DNS/proxy-scan auth helper
+ chaosircd is a modular IRC daemon (loadable-module message handlers,
+ channel modes and usermodes). It ships with servauth, a helper process
+ the ircd talks to over a socketpair, which performs asynchronous
+ reverse/forward DNS resolution, ident (RFC1413) auth checks, and
+ open-proxy scanning (HTTP CONNECT, SOCKS4, SOCKS5, wingate, cisco) for
+ connecting clients.
+ .
+ This package installs the ircd and servauth binaries, loadable
+ modules, default configuration, and a runit service definition
+ (etc/service/chaosircd) - link it into your runit scandir (typically
+ /etc/service) to run it.

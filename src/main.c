@@ -45,6 +45,12 @@ char       **ircd_argv = NULL;
 char       **ircd_envp = NULL;
 char         ircd_path[PATHLEN];*/
 extern void ircd_stack_install(void);
+extern volatile sig_atomic_t ircd_rehash_pending;
+
+/* Just sets a flag - conf_rehash() itself runs from ircd_loop() (see
+ * src/ircd.c), not directly from signal context, since it touches the
+ * allocator/dlink lists/file I/O and isn't async-signal-safe. */
+static void ircd_sigusr1(int sig) { ircd_rehash_pending = 1; }
 /* -------------------------------------------------------------------------- *
  * Program entry.                                                             *
  * -------------------------------------------------------------------------- */
@@ -89,6 +95,12 @@ int main(int argc, char **argv, char **envp) {
   syscall_signal(SIGHUP, (void *)ircd_shutdown);
   syscall_signal(SIGTERM, (void *)ircd_shutdown);
   syscall_signal(SIGPIPE, (void *)1);
+  /* Same effect as the oper REHASH command, but reachable from outside
+   * (cron jobs, acme.sh --reloadcmd, etc.) without an IRC session - e.g.
+   * ssl_update() (lib/src/ssl.c) reloads cert/key files into the live
+   * SSL_CTX on rehash, so `kill -USR1` picks up a renewed certificate
+   * without restarting chaosircd. */
+  syscall_signal(SIGUSR1, (void *)ircd_sigusr1);
 #endif
 
   /* Always dump core! */

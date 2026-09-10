@@ -1,0 +1,13 @@
+chaosircd (2.2.1-1) unstable; urgency=medium
+
+  * Initial Debian packaging (debian/control, rules, changelog).
+  * Build with cmake + debhelper-compat 13, installing to FHS-correct
+    locations (/etc/chaosircd, /var/lib/chaosircd, /var/log/chaosircd,
+    /usr/libexec, /etc/sv/chaosircd for the runit service) via the newly
+    overridable inidir/logdir/sysconfdir/runitservicedir cmake cache
+    variables.
+  * Pin -std=gnu17 so the build doesn't break on toolchains that default
+    to C23 (where true/false/bool are keywords, colliding with this
+    codebase's own bool typedef).
+
+ -- Roman Senn <roman.l.senn@gmail.com>  Thu, 10 Sep 2026 19:47:57 +0200
