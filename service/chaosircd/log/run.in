@@ -1,0 +1,8 @@
+#!/bin/sh
+# svlogd logging script for the chaosircd runit service - installed by
+# cmake, see service/chaosircd/log/run.in
+#
+# Reads chaosircd's stdout/stderr (piped in by runsv from ../run) and
+# writes rotated logs into this directory (@PREFIX@/etc/service/chaosircd/log/).
+
+exec svlogd -tt .

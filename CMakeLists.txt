@@ -192,6 +192,33 @@ install(
   FILES ${INSTALL_SUBST_FILES}
   DESTINATION sbin
   PERMISSIONS WORLD_EXECUTE)
+
+# runit service definition (see service/chaosircd/README, if you want one).
+# Not linked into /etc/service automatically - do that manually with:
+#   ln -s ${SYSCONFDIR's parent}/service/chaosircd /etc/service/chaosircd
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/chaosircd/run.in ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/run
+               @ONLY NEWLINE_STYLE UNIX)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/chaosircd/log/run.in
+               ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/log/run @ONLY NEWLINE_STYLE UNIX)
+
+set(SERVICE_EXEC_PERMISSIONS
+    OWNER_READ
+    OWNER_WRITE
+    OWNER_EXECUTE
+    GROUP_READ
+    GROUP_EXECUTE
+    WORLD_READ
+    WORLD_EXECUTE)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/run
+  DESTINATION etc/service/${PROJECT_NAME}
+  PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/log/run
+  DESTINATION etc/service/${PROJECT_NAME}/log
+  PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
+
 add_subdirectory(src)
 
 add_subdirectory(modules)

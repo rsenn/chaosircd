@@ -1,0 +1,9 @@
+#!/bin/sh
+# runit service script for chaosircd - installed by cmake, see
+# service/chaosircd/run.in
+#
+# Enable with:
+#   ln -s @PREFIX@/etc/service/chaosircd /etc/service/chaosircd
+
+exec 2>&1
+exec @PREFIX@/bin/chaosircd -d -f @SYSCONFDIR@/ircd.conf
