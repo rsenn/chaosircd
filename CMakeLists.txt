@@ -209,10 +209,30 @@ install(
 # runit service definition. Where it lands is overridable (e.g. Debian
 # packaging installs it at the runit-services convention /etc/sv/<name>
 # instead of under the runtime prefix) - it is NOT linked into a runsvdir
-# (e.g. /etc/service) automatically either way, do that manually with:
-#   ln -s <runitservicedir> /etc/service/chaosircd
+# automatically either way, do that manually:
+#
+#   - Everywhere else: ln -s <runitservicedir> /etc/service/chaosircd
+#   - Termux (termux-services package): the service definition belongs
+#     under etc/sv, not etc/service - termux-services' runsvdir watches
+#     $PREFIX/var/service, and `sv-enable chaosircd` (or a manual
+#     `ln -s <runitservicedir> $PREFIX/var/service/chaosircd`) is what
+#     actually starts it. Detected here via $TERMUX_VERSION, which
+#     Termux's own shell environment always sets; override
+#     -Drunitservicedir=... directly if that heuristic ever misses.
+#
+# Either way this is CMAKE_INSTALL_PREFIX-relative (see ${prefix} above),
+# so building with -DCMAKE_INSTALL_PREFIX=$PREFIX (Termux's own, e.g.
+# /data/data/com.termux/files/usr - not /usr/local) is all that is needed
+# for the rest of the install (binaries, config, modules, ...) to land in
+# the right place too.
+if(DEFINED ENV{TERMUX_VERSION})
+  set(runitservicesdir_default "${prefix}/etc/sv")
+else()
+  set(runitservicesdir_default "${prefix}/etc/service")
+endif()
+
 set(runitservicedir
-    "${prefix}/etc/service/${PROJECT_NAME}"
+    "${runitservicesdir_default}/${PROJECT_NAME}"
     CACHE PATH "installed runit service directory")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/service/chaosircd/run.in ${CMAKE_CURRENT_BINARY_DIR}/service/chaosircd/run
@@ -242,10 +262,10 @@ install(
 # the 'lws' module - see that file for why) - lets browser IRC clients
 # (which can only open ws://+wss:// sockets, not raw TCP) reach chaosircd.
 # Not linked into a runsvdir automatically, same as chaosircd's own
-# service above:
+# service above (including the Termux etc/sv vs etc/service split):
 #   ln -s <ws_irc_gateway_servicedir> /etc/service/ws-irc-gateway
 set(ws_irc_gateway_servicedir
-    "${prefix}/etc/service/ws-irc-gateway"
+    "${runitservicesdir_default}/ws-irc-gateway"
     CACHE PATH "installed ws-irc-gateway runit service directory")
 
 install(FILES tools/ws-irc-gateway.js DESTINATION "${libexecdir}")
