@@ -49,6 +49,9 @@ set(inidir
 set(logdir
     "${prefix}/var/log/${PROJECT_NAME}"
     CACHE PATH "installed log directory")
+set(datadir
+    "${prefix}/share/${PROJECT_NAME}"
+    CACHE PATH "installed read-only data directory")
 set(pidfile
     "${prefix}/var/run/${PROJECT_NAME}.pid"
     CACHE FILEPATH "installed pid file path")

@@ -267,6 +267,13 @@ CHAOS_API(int io_push(int *fdptr))
 CHAOS_API(void io_destroy(int fd))
 
 /* ------------------------------------------------------------------------ *
+ * Stop tracking an fd - same bookkeeping as io_destroy(), but never          *
+ * syscall_close()s it: for handing an fd's lifecycle over to something       *
+ * outside libchaos's own I/O layer, which will close it on its own terms.    *
+ * ------------------------------------------------------------------------ */
+CHAOS_API(void io_forget(int fd))
+
+/* ------------------------------------------------------------------------ *
  * Write a description string.                                                *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void io_note(int fd, const char *format, ...))

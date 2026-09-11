@@ -264,6 +264,90 @@ install(
   DESTINATION "${ws_irc_gateway_servicedir}/log"
   PERMISSIONS ${SERVICE_EXEC_PERMISSIONS})
 
+# lc_lws (modules/lclient/lc_lws.c): in-process WebSocket<->IRC gateway
+# module. Off by default - it needs libwebsockets, which nothing else here
+# depends on and which chaosircd does not vendor - turning this on makes
+# CMake `git clone` upstream libwebsockets into 3rdparty/libwebsockets (if
+# not already there) and build it as a static lib via
+# CMakeModules/BuildLibwebsockets.cmake (adapted from qjs-lws's copy),
+# with -DLWS_WITH_EXTERNAL_POLL:BOOL=ON so lc_lws can drive it from
+# libchaos's own io_poll()/io_select() instead of lws running its own
+# event loop.
+option(BUILD_LC_LWS "Build lc_lws, the in-process WebSocket<->IRC gateway module (needs libwebsockets)" OFF)
+
+if(BUILD_LC_LWS)
+  set(LIBWEBSOCKETS_SOURCE_DIR
+      "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libwebsockets"
+      CACHE PATH "libwebsockets source directory")
+
+  if(NOT EXISTS "${LIBWEBSOCKETS_SOURCE_DIR}/CMakeLists.txt")
+    find_package(Git REQUIRED)
+
+    message(STATUS "Cloning libwebsockets into ${LIBWEBSOCKETS_SOURCE_DIR} ...")
+
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" clone --branch main --depth 1
+              https://github.com/warmcat/libwebsockets.git "${LIBWEBSOCKETS_SOURCE_DIR}"
+      RESULT_VARIABLE LIBWEBSOCKETS_CLONE_RESULT)
+
+    if(NOT LIBWEBSOCKETS_CLONE_RESULT EQUAL 0)
+      message(FATAL_ERROR "Failed to clone libwebsockets (git exit code ${LIBWEBSOCKETS_CLONE_RESULT})")
+    endif()
+  endif()
+
+  set(LIBWEBSOCKETS_C_FLAGS "${CMAKE_C_FLAGS}")
+
+  include("${CMAKE_SOURCE_DIR}/CMakeModules/BuildLibwebsockets.cmake")
+  build_libwebsockets()
+
+  # gamja (https://codeberg.org/emersion/gamja, AGPLv3) - tiny web IRC
+  # client, served directly by lc_lws via a libwebsockets HTTP mount at "/".
+  # Deliberately NOT an npm/yarn project as far as chaosircd's build is
+  # concerned (see CLAUDE.md's "No npm/yarn Projects" rule): gamja's
+  # index.html loads main.js as a plain native ES module - no bundler is
+  # required to run it, only to produce an optional minified build, which we
+  # don't do. Its only three dependencies are themselves pre-built,
+  # single-file ES modules; lib/index.js imports them by their exact
+  # unmodified relative "../node_modules/<pkg>/dist/..." paths, so rather
+  # than run `npm install` to populate node_modules/, those three files are
+  # fetched directly by pinned URL+hash below - vendoring the same bytes
+  # npm would have, without ever invoking npm.
+  set(GAMJA_SOURCE_DIR
+      "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/gamja"
+      CACHE PATH "gamja source directory")
+
+  if(NOT EXISTS "${GAMJA_SOURCE_DIR}/index.html")
+    find_package(Git REQUIRED)
+
+    message(STATUS "Cloning gamja into ${GAMJA_SOURCE_DIR} ...")
+
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" clone --depth 1
+              https://codeberg.org/emersion/gamja.git "${GAMJA_SOURCE_DIR}"
+      RESULT_VARIABLE GAMJA_CLONE_RESULT)
+
+    if(NOT GAMJA_CLONE_RESULT EQUAL 0)
+      message(FATAL_ERROR "Failed to clone gamja (git exit code ${GAMJA_CLONE_RESULT})")
+    endif()
+  endif()
+
+  # Pinned to the exact versions in gamja's own package-lock.json.
+  file(
+    DOWNLOAD https://cdn.jsdelivr.net/npm/preact@10.29.8/dist/preact.module.js
+    "${GAMJA_SOURCE_DIR}/node_modules/preact/dist/preact.module.js"
+    EXPECTED_HASH SHA256=c30e721ebfdc6e2ad4c18c14d2dfb82667829c8aec27de1207774e3fc16858a8)
+  file(
+    DOWNLOAD https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.module.js
+    "${GAMJA_SOURCE_DIR}/node_modules/htm/dist/htm.module.js"
+    EXPECTED_HASH SHA256=ab33dd3f38059b9be4d5f5350128eefb2356639c4e0bbe9d9e8b3ba75847e9e4)
+  file(
+    DOWNLOAD https://cdn.jsdelivr.net/npm/linkifyjs@4.3.3/dist/linkify.mjs
+    "${GAMJA_SOURCE_DIR}/node_modules/linkifyjs/dist/linkify.mjs"
+    EXPECTED_HASH SHA256=e282e302f91aac5ca726962dfe324e45cc0ef28330f1b505b04b95765abb2eb8)
+
+  install(DIRECTORY "${GAMJA_SOURCE_DIR}/" DESTINATION "${datadir}/gamja" PATTERN ".git" EXCLUDE)
+endif(BUILD_LC_LWS)
+
 add_subdirectory(src)
 
 add_subdirectory(modules)

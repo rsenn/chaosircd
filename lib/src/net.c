@@ -590,6 +590,29 @@ int net_getsockname(int fd, net_addr_t *addrptr, net_port_t *portptr) {
 }
 
 /* ------------------------------------------------------------------------ *
+ * Get remote (peer) socket address of an already-connected fd.               *
+ * ------------------------------------------------------------------------ */
+int net_getpeername(int fd, net_addr_t *addrptr, net_port_t *portptr) {
+  struct sockaddr_in addr;
+  int ret;
+  int addrlen = sizeof(struct sockaddr_in);
+
+  addrlen = sizeof(struct sockaddr_in);
+  ret = syscall_getpeername(fd, (struct sockaddr *)&addr,
+                            (unsigned int *)&addrlen);
+
+  if (ret == -1)
+    return -1;
+
+  if (addrptr)
+    *addrptr = addr.sin_addr.s_addr;
+  if (portptr)
+    *portptr = addr.sin_port;
+
+  return ret;
+}
+
+/* ------------------------------------------------------------------------ *
  * ------------------------------------------------------------------------ */
 void net_dump(struct protocol *nptr) {
   if (nptr == NULL) {

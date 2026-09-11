@@ -877,6 +877,28 @@ void io_destroy(int fd) {
 }
 
 /* ------------------------------------------------------------------------ *
+ * Stop tracking an fd without closing it.                                  *
+ * ------------------------------------------------------------------------ */
+void io_forget(int fd) {
+  if (io_list[fd].status.dead)
+    return;
+
+  if (fd < 0 || !io_list[fd].type)
+    return;
+
+  if (io_list[fd].recvq.size)
+    queue_destroy(&io_list[fd].recvq);
+
+  if (io_list[fd].sendq.size)
+    queue_destroy(&io_list[fd].sendq);
+
+  io_remove_fd(fd);
+  io_list[fd].index = -1;
+
+  memset(&io_list[fd], 0, sizeof(struct io));
+}
+
+/* ------------------------------------------------------------------------ *
  * Write a description string.                                              *
  * ------------------------------------------------------------------------ */
 void io_note(int fd, const char *format, ...) {

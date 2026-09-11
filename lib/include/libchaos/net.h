@@ -274,6 +274,11 @@ CHAOS_API(int net_accept(int fd, net_addr_t *addrptr, net_port_t *portptr))
 CHAOS_API(int net_getsockname(int fd, net_addr_t *addrptr, net_port_t *portptr))
 
 /* ------------------------------------------------------------------------ *
+ * Get remote (peer) socket address of an already-connected fd.               *
+ * ------------------------------------------------------------------------ */
+CHAOS_API(int net_getpeername(int fd, net_addr_t *addrptr, net_port_t *portptr))
+
+/* ------------------------------------------------------------------------ *
  * Dump protocol stack.                                                       *
  * ------------------------------------------------------------------------ */
 CHAOS_API(void net_dump(struct protocol *nptr))

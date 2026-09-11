@@ -1,0 +1,26 @@
+/3rdparty/
+
+# Out-of-tree CMake build directories
+/build/
+/inst/
+
+# In-tree autotools artifacts (a parallel/legacy build path some
+# environments still generate here - not produced by the CMake build)
+/aclocal.m4
+/config.guess
+/configure
+/lib/aclocal.m4
+/lib/config.h.in
+/lib/configure
+
+# Bison/flex output, when generated outside build/
+/ircd-parser.c
+/ircd-parser.h
+/ircd.tab.c
+/ircd.tab.h
+/src/y.tab.h
+
+# Ad-hoc run logs and scratch dumps
+*.log
+/chaosircd-*.diff
+/proxy.tar

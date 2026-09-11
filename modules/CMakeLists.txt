@@ -28,6 +28,14 @@ file(
   RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
   */??_*.c */?_*.c)
 
+# lc_lws.c is the only source file in the whole codebase allowed to touch
+# libwebsockets (see CMakeLists.txt's BUILD_LC_LWS option) - excluded from
+# the glob above by default so a plain build never needs libwebsockets at
+# all.
+if(NOT BUILD_LC_LWS)
+  list(REMOVE_ITEM ALL_MODULES "lclient/lc_lws.c")
+endif(NOT BUILD_LC_LWS)
+
 foreach(MODULE_SOURCE ${ALL_MODULES})
   message(STATUS "${MODULE_SOURCE}")
 
@@ -52,6 +60,14 @@ foreach(MODULE_SOURCE ${ALL_MODULES})
   else()
     add_library("${MODULE_NAME}" STATIC "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_SOURCE}")
   endif()
+
+  if(MODULE_NAME STREQUAL "lc_lws")
+    target_include_directories("${MODULE_NAME}" PRIVATE ${LIBWEBSOCKETS_INCLUDE_DIR})
+    target_link_directories("${MODULE_NAME}" PRIVATE ${LIBWEBSOCKETS_LIBRARY_DIR})
+    target_link_libraries("${MODULE_NAME}" ${LIBWEBSOCKETS_LIBRARIES})
+    add_dependencies("${MODULE_NAME}" libwebsockets)
+    target_compile_definitions("${MODULE_NAME}" PRIVATE LC_LWS_GAMJA_DIR="${datadir}/gamja")
+  endif(MODULE_NAME STREQUAL "lc_lws")
 
   install(
     TARGETS "${MODULE_NAME}"
