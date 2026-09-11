@@ -40,6 +40,27 @@
 #define LCLIENT_PLUGDATA_MFLOOD 2
 #define LCLIENT_PLUGDATA_CFLOOD 3
 #define LCLIENT_PLUGDATA_USERDB 4
+#define LCLIENT_PLUGDATA_LWS    5
+#define LCLIENT_PLUGDATA_LWS_SESSION 6
+
+/* Client-facing IRCv3 capabilities (CAP LS/REQ/ACK/LIST) - separate from
+ * the `caps' field above (server-to-server CAPAB link negotiation,
+ * ircd/server.h's CAP_* bits - different mechanism, different namespace).
+ * Stored directly as a bitmask in plugdata[LCLIENT_PLUGDATA_CLICAPS]
+ * (pointer-sized, so it fits without a separate allocation) rather than as
+ * a named struct field, to avoid an ABI break for every other already-built
+ * module: adding a field shifts every field declared after it, silently
+ * breaking any module not rebuilt in lockstep, whereas plugdata is already
+ * part of every module's existing view of the struct. Use
+ * lclient_clicaps()/lclient_set_clicaps() (lclient.h) rather than the slot
+ * directly. Lives on lclient, not client, because CAP negotiation (and
+ * real clients routinely do this) can happen before NICK/USER complete
+ * registration and struct client is even allocated - struct lclient,
+ * unlike struct client, exists from the moment the connection is
+ * accepted. */
+#define LCLIENT_PLUGDATA_CLICAPS 7
+
+#define CLICAP_ECHO_MESSAGE 0x0000000000000001ULL
 
 /* -------------------------------------------------------------------------- *
  * Types                                                                      *
@@ -122,6 +143,12 @@ IRCD_DATA(int) lclient_get_log(void);
 #define lclient_is_user(x)    (((struct lclient *)(x))->type == LCLIENT_USER)
 #define lclient_is_server(x)  (((struct lclient *)(x))->type == LCLIENT_SERVER)
 #define lclient_is_oper(x)    (((struct lclient *)(x))->type == LCLIENT_OPER)
+
+/* -------------------------------------------------------------------------- *
+ * Client-facing IRCv3 capabilities - see LCLIENT_PLUGDATA_CLICAPS above.    *
+ * -------------------------------------------------------------------------- */
+#define lclient_clicaps(x)          ((uint64_t)(uintptr_t)(x)->plugdata[LCLIENT_PLUGDATA_CLICAPS])
+#define lclient_set_clicaps(x, v)   ((x)->plugdata[LCLIENT_PLUGDATA_CLICAPS] = (void *)(uintptr_t)(v))
 
 /* -------------------------------------------------------------------------- *
  * Initialize lclient module                                                  *
@@ -270,6 +297,10 @@ IRCD_API(void)         lclient_update_sendb (struct lclient  *lcptr,
 /* -------------------------------------------------------------------------- *
  * Send a line to a local client                                              *
  * -------------------------------------------------------------------------- */
+IRCD_API(void)         lclient_send_raw     (struct lclient  *lcptr,
+                                             const void      *buf,
+                                             size_t           n);
+
 IRCD_API(void)         lclient_vsend        (struct lclient  *lcptr,
                                              const char      *format,
                                              va_list          args);

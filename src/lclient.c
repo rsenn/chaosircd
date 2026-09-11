@@ -988,6 +988,25 @@ void lclient_update_sendb(struct lclient *lcptr, size_t n) {
 }
 
 /* -------------------------------------------------------------------------- *
+ * Send an already-formatted, '\r\n'-terminated line to a local client. Goes  *
+ * through the same lclient_vsend hook (e.g. lc_lws's WS-framing) as a       *
+ * normal formatted send, for callers (like channel_vsend()'s multicast      *
+ * fast path) that build the line once and hand it to several recipients    *
+ * without re-formatting for each.                                          *
+ * -------------------------------------------------------------------------- */
+void lclient_send_raw(struct lclient *lcptr, const void *buf, size_t n) {
+  if (lcptr == NULL)
+    return;
+
+  client_source = lcptr;
+
+  if (!hooks_call(lclient_vsend, HOOK_DEFAULT, lcptr, buf, (void *)n))
+    io_write(lcptr->fds[1], buf, n);
+
+  lclient_update_sendb(lcptr, n);
+}
+
+/* -------------------------------------------------------------------------- *
  * Send a line to a local client                                              *
  * -------------------------------------------------------------------------- */
 void lclient_vsend(struct lclient *lcptr, const char *format, va_list args) {
@@ -996,8 +1015,6 @@ void lclient_vsend(struct lclient *lcptr, const char *format, va_list args) {
 
   if (lcptr == NULL)
     return;
-
-  client_source = lcptr;
 
   /* Formatted print */
   n = str_vsnprintf(buf, sizeof(buf) - 2, format, args);
@@ -1008,11 +1025,7 @@ void lclient_vsend(struct lclient *lcptr, const char *format, va_list args) {
   buf[n++] = '\r';
   buf[n++] = '\n';
 
-  /* Queue the data */
-  io_write(lcptr->fds[1], buf, n);
-
-  /* Update sendbytes */
-  lclient_update_sendb(lcptr, n);
+  lclient_send_raw(lcptr, buf, n);
 }
 
 void lclient_send(struct lclient *lcptr, const char *format, ...) {

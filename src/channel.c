@@ -337,6 +337,19 @@ void channel_vsend(struct lclient *lcptr, struct channel *chptr, uint64_t flag,
     if ((cuptr->flags & noflag) != 0)
       continue;
 
+    /* This fast path links the already-formatted buffer straight into the
+     * recipient's fd sendq (io_list[fd].sendq), bypassing lclient_vsend()
+     * entirely - fine for a plain stream socket, but a client a module has
+     * adopted onto a different transport (e.g. lc_lws, once it owns the fd
+     * for a WS connection) needs every outgoing line to go through its
+     * lclient_vsend hook (for WS framing) instead of a raw fd write, or the
+     * line is silently lost. Route those through lclient_send_raw() (same
+     * hook lclient_vsend() itself uses) instead of the multicast fast path. */
+    if (cuptr->client->lclient->plugdata[LCLIENT_PLUGDATA_LWS_SESSION]) {
+      lclient_send_raw(cuptr->client->lclient, buf, n);
+      continue;
+    }
+
     /* Link it to the local queue */
     io_multi_link(&multi, cuptr->client->lclient->fds[1]);
     lclient_update_sendb(cuptr->client->lclient, n);
@@ -412,6 +425,18 @@ void channel_message(struct lclient *lcptr, struct client *cptr,
   else
     channel_send(lcptr, chptr, CHFLG(NONE), CHFLG(NONE), ":%N %s %s :%s", cptr,
                  cmd, chptr->name, text);
+
+  /* channel_send() above deliberately excludes the sender (see
+   * channel_vsend()'s "the one we shouldn't send to" check) - a client with
+   * the echo-message CAP enabled (IRCv3) wants its own message echoed back
+   * to itself too, so send it that one copy directly. */
+  if (client_is_local(cptr) && (lclient_clicaps(cptr->lclient) & CLICAP_ECHO_MESSAGE)) {
+    if (client_is_user(cptr) || client_is_service(cptr))
+      client_send(cptr, ":%N!%U@%H %s %s :%s", cptr, cptr, cptr, cmd,
+                  chptr->name, text);
+    else
+      client_send(cptr, ":%N %s %s :%s", cptr, cmd, chptr->name, text);
+  }
 
   /*  debug(channel_log, "Message to channel %s from %s.", chptr->name,
    * lcptr->name);*/

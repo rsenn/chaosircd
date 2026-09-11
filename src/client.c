@@ -1092,6 +1092,19 @@ void client_message(struct lclient *lcptr, struct client *cptr,
     client_send(acptr, ":%C %s %C :%s", cptr, cmd, acptr, text);
   }
 
+  /* A client with the echo-message CAP enabled (IRCv3) wants its own
+   * outgoing message echoed back to itself - already implicit above when
+   * acptr == cptr (messaging yourself), so only handle the acptr != cptr
+   * case here. */
+  if (acptr != cptr && client_is_local(cptr) &&
+      (lclient_clicaps(cptr->lclient) & CLICAP_ECHO_MESSAGE)) {
+    if (client_is_user(cptr))
+      client_send(cptr, ":%N!%U@%H %s %N :%s", cptr, cptr, cptr, cmd, acptr,
+                  text);
+    else
+      client_send(cptr, ":%N %s %N :%s", cptr, cmd, acptr, text);
+  }
+
   if (acptr != cptr)
     cptr->lastmsg = timer_systime;
 }
