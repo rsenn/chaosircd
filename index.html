@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chaosircd — an IRC daemon with (re)loadable modules</title>
+<meta name="description" content="chaosircd — an IRC daemon with (re)loadable modules. Loadable command/chanmode/usermode modules, a dedicated DNS/ident/proxy-scan process, and an in-process WebSocket gateway for browser clients.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body class="landing">
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="mark">#</span> chaosircd</a>
+  <nav class="topnav">
+    <a href="getting-started.html">Get started</a>
+    <a href="docs/ircv3.html">IRCv3 plan</a>
+    <a href="https://github.com/rsenn/chaosircd" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <button class="themetoggle" type="button" aria-label="Toggle colour scheme">◐</button>
+</header>
+<section class="hero">
+  <h1>chaosircd</h1>
+  <p class="tagline">An IRC daemon built out of runtime-(re)loadable modules —
+     every command, channel mode, user mode and flood check is its own
+     <code>.so</code>, swapped in and out without a restart.</p>
+  <div class="cta">
+    <a class="btn primary" href="getting-started.html">Get started</a>
+    <a class="btn" href="docs/ircv3.html">IRCv3 migration plan</a>
+    <a class="btn ghost" href="https://github.com/rsenn/chaosircd" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <ul class="badges">
+    <li><b>~90</b> loadable modules</li>
+    <li><b>2003</b> — still running</li>
+    <li><b>1</b> child process for DNS + ident + proxy-scan</li>
+    <li><b>0</b> npm/yarn, ever</li>
+  </ul>
+</section>
+
+<section class="pitch">
+  <h2>Where chaosircd earns its complexity</h2>
+  <div class="cards">
+    <article class="card">
+      <h3>Loadable everything</h3>
+      <p>A client command, a channel mode, a user mode, a flood-control
+         check — each one is its own module, loaded per
+         <code>modules.conf</code> and reloadable without taking the
+         network down.</p>
+      <p>Started as patches to ircd-hybrid to link servers by hostname
+         instead of a static IP (for a network partly running behind a
+         cablemodem's dynamic address); everything past the borrowed
+         <code>dlink</code> linked-list code was written from scratch
+         from there.</p>
+      <a class="more" href="getting-started.html#why-it-exists">The story →</a>
+    </article>
+    <article class="card">
+      <h3>servauth</h3>
+      <p>DNS resolution, ident (RFC 1413), and open-proxy scanning for
+         every connecting client all run in one dedicated child process
+         — <code>lib/servauth/</code> — so the main event loop never
+         blocks on any of the three.</p>
+      <p>K-lines and G-lines don't stop at the application layer: a
+         banned address gets pushed onto a BPF socket filter on Linux,
+         refused before it costs the daemon a <code>read()</code>.</p>
+      <a class="more" href="getting-started.html#features">Features →</a>
+    </article>
+    <article class="card">
+      <h3>WebSocket gateway</h3>
+      <p><code>lc_lws</code> speaks IRC over <code>ws://</code>/<code>wss://</code>
+         on the same listener a normal client would use — no separate
+         bouncer process — and self-hosts
+         <a href="https://codeberg.org/emersion/gamja">gamja</a>, a small
+         web IRC client, straight off the wire.</p>
+      <p>Feeds directly into the <a href="docs/ircv3.html">IRCv3 migration</a>:
+         a browser client is the fastest way to notice what modern IRC
+         clients actually expect.</p>
+      <a class="more" href="docs/ircv3.html">IRCv3 plan →</a>
+    </article>
+  </div>
+</section>
+
+<section class="demo">
+  <h2>IRC over a WebSocket, same listener</h2>
+  <pre class="sample"><code><span class="t-comment">$</span> wscat --connect ws://localhost:6667/ \
+    -x <span class="t-string">'NICK roman'</span> -x <span class="t-string">'USER roman 0 * :Roman'</span> -x <span class="t-string">'JOIN #chaosircd'</span>
+&lt; :chaosircd.example 001 roman :welcome to the internet relay chat roman
+&lt; :roman!~roman@localhost JOIN #chaosircd</code></pre>
+  <p>No relay, no translation layer — <code>lc_lws</code> sniffs the
+     handshake on an ordinary client listener and adopts matching
+     connections directly into the same <code>lclient_parse()</code>/
+     <code>lclient_vsend()</code> path every other client goes through.
+     Point a browser at the same port and gamja loads from it too.</p>
+</section>
+
+<section class="start">
+  <h2>Build it</h2>
+  <pre class="sample"><code><span class="t-comment">$</span> git clone https://github.com/rsenn/chaosircd.git &amp;&amp; cd chaosircd
+<span class="t-comment">$</span> cmake -S . -B build
+<span class="t-comment">$</span> cmake --build build -j</code></pre>
+  <p>Add <code>-DBUILD_LC_LWS=ON</code> for the WebSocket gateway and
+     bundled gamja client — see
+     <a href="getting-started.html#the-websocket-gateway">the WebSocket gateway</a>
+     for what that pulls in.</p>
+</section>
+
+<section class="status">
+  <h2>Status: old, and honest about the gaps</h2>
+  <p>chaosircd has run real networks since 2003, in long bursts separated
+     by long quiet ones — this is a project that gets worked on when it's
+     running something for real, not on a release schedule. <code>CAP</code>
+     was a permanently-empty stub until the IRCv3 work started; most of
+     the capabilities a modern client expects (<code>message-tags</code>,
+     <code>server-time</code>, <code>batch</code>, SASL, ...) aren't there
+     yet.</p>
+  <p>The <a href="docs/ircv3.html">IRCv3 migration plan</a> is the honest
+     list of what's done and what isn't, ordered by what's worth doing
+     next rather than by spec number.</p>
+</section>
+
+<footer class="sitefoot">
+  <p>chaosircd — GPL v2 (LGPL v2 for the core library). Built from the repo's own markdown by
+     <a href="https://github.com/rsenn/chaosircd/blob/main/tools/site/build.js">tools/site/build.js</a>.</p>
+</footer>
+<script>
+document.querySelector('.themetoggle').addEventListener('click', function () {
+  var d = document.documentElement;
+  var dark = d.dataset.theme ? d.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  d.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('theme', d.dataset.theme); } catch (e) {}
+});
+</script>
+</body>
+</html>

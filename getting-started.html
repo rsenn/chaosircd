@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chaosircd — chaosircd</title>
+<meta name="description" content="chaosircd — an IRC daemon with (re)loadable modules. Loadable command/chanmode/usermode modules, a dedicated DNS/ident/proxy-scan process, and an in-process WebSocket gateway for browser clients.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body class="has-sidebar">
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="mark">#</span> chaosircd</a>
+  <nav class="topnav">
+    <a href="getting-started.html">Get started</a>
+    <a href="docs/ircv3.html">IRCv3 plan</a>
+    <a href="https://github.com/rsenn/chaosircd" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <button class="themetoggle" type="button" aria-label="Toggle colour scheme">◐</button>
+</header>
+<div class="layout">
+<aside class="sidebar"><div class="navgroup"><h3>Start here</h3><ul><li><a href="getting-started.html" class="here">Getting started</a></li></ul></div><div class="navgroup"><h3>Reference</h3><ul><li><a href="docs/ircv3.html">IRCv3 migration plan</a></li></ul></div></aside>
+<main class="doc">
+<article><h1 id="chaosircd"><a class="anchor" href="#chaosircd" aria-hidden="true">#</a>chaosircd</h1>
+<p><em>peace, love &amp; hippie edition</em></p>
+<p>chaosircd is an IRC daemon built around runtime-(re)loadable modules —
+every client command, channel mode, user mode, and flood-control check is
+its own <code>.so</code>, loaded and swapped without restarting the server. DNS,
+ident (RFC 1413), and proxy-scanning all run in a single dedicated child
+process, so a flood of connecting clients doesn't cost the main event loop
+a file descriptor or a blocked <code>gethostbyname()</code> each. Server links use
+timestamps for netsplit handling, in the same family as TS5/hybrid, and
+both server-server and client-server connections can run over OpenSSL.</p>
+<h2 id="why-it-exists"><a class="anchor" href="#why-it-exists" aria-hidden="true">#</a>Why it exists</h2>
+<p>chaosircd started as patches to <a href="https://ircd-hybrid.org/" target="_blank" rel="noopener">ircd-hybrid</a>,
+written to keep a couple of real networks running: the IRC services behind
+<code>irc.blah.ch</code> at freemails.ch, and a handful of servers on a home
+cablemodem with a dynamic IP behind a dynamic-DNS hostname. Hybrid's
+server-linking wanted static addresses; a cablemodem doesn't have one, so
+the first real feature was teaching server links to resolve a hostname at
+connect time instead of requiring a bare IP. <code>/SPOOF</code> came soon after, so
+clients on that link could hide their real address the same way the
+servers already did.</p>
+<p>From there the scope kept growing: a self-contained DNS resolver
+(<code>lib/servauth/dns.c</code>, in the classic djb two-file style), an open-proxy
+scanner, and an ident (port 113) client, all so a connecting client could
+be checked without trusting whatever it claimed about itself. K-lines and
+G-lines don't just refuse a banned client at the application layer —
+they hand the address to a BPF socket filter on Linux, so a client that's
+already been told to go away stops costing the daemon a <code>read()</code> at all.</p>
+<p>Implementation began by lifting the <code>dlink</code> doubly-linked-list code
+straight out of ircd-hybrid — you can still see the family resemblance in
+<code>lib/src/dlink.c</code> — but everything built on top of it from that point on
+was written from scratch, and grew into its own daemon rather than staying
+a patch set.</p>
+<p>That was 2003. The project has had long quiet stretches since — the git
+history jumps from an initial 2007 import to 2014 to 2026 — but each time
+it's come back to run something real, most recently a
+<a href="#the-websocket-gateway">WebSocket gateway</a> so a browser can join a
+chaosircd network with no separate bouncer process, and the start of an
+<a href="docs/ircv3.html">IRCv3 migration</a> so modern clients (gamja, Kiwi, weechat's
+relay protocol, and friends) work with it properly instead of just well
+enough.</p>
+<h2 id="features"><a class="anchor" href="#features" aria-hidden="true">#</a>Features</h2>
+<ul>
+<li><strong>Loadable modules for everything.</strong> Client commands, channel modes,
+user modes, and flood control (<code>modules/msg</code>, <code>modules/chanmode</code>,
+<code>modules/usermode</code>) are independent <code>.so</code> files — currently around 90 of
+them — loaded per <code>modules.conf</code> and swappable without a restart.</li>
+<li><strong>A dedicated servauth process.</strong> <code>lib/servauth/</code> runs DNS resolution,
+ident lookups, and proxy scanning for every connecting client in one
+child process (<code>dns.c</code>, <code>auth.c</code>, <code>proxy.c</code>), so the main daemon never
+blocks on any of the three.</li>
+<li><strong>Hostname-based server links</strong>, for servers that don't have a static
+address to link to in the first place.</li>
+<li><strong><code>/SPOOF</code></strong>, so a client's real address doesn't have to be their
+visible one.</li>
+<li><strong>Socket-filter-backed K/G-lines.</strong> Bans push a BPF program onto the
+listening socket on Linux (<code>lib/src/filter.c</code>), so a banned address is
+refused before it costs the daemon a read.</li>
+<li><strong>Timestamp-based netsplit handling</strong> for server-server links, in the
+same TS5/hybrid family, over plaintext or OpenSSL.</li>
+<li><strong>A WebSocket gateway (<code>lc_lws</code>)</strong>, self-hosting the
+<a href="https://codeberg.org/emersion/gamja" target="_blank" rel="noopener">gamja</a> web client — see below.</li>
+<li><strong>An <a href="docs/ircv3.html">IRCv3 migration</a> underway</strong> — real <code>CAP</code> negotiation
+and <code>echo-message</code> landed first; the rest is planned out phase by phase.</li>
+</ul>
+<h3 id="the-websocket-gateway"><a class="anchor" href="#the-websocket-gateway" aria-hidden="true">#</a>The WebSocket gateway</h3>
+<p><code>modules/lclient/lc_lws.c</code> is an in-process WebSocket↔IRC gateway: a
+browser can speak IRC directly over <code>ws://</code>/<code>wss://</code> to the same listener
+a normal client would use, no separate bouncer or relay process in
+between. It's built on <a href="https://libwebsockets.org/" target="_blank" rel="noopener">libwebsockets</a>,
+driven from chaosircd's own event loop rather than running a second one,
+and doubles as a static file server for a vendored, unmodified copy of
+<a href="https://codeberg.org/emersion/gamja" target="_blank" rel="noopener">gamja</a> — a small IRC web client
+that needs no build step (no npm/yarn touches this repository; see
+<a href="https://github.com/rsenn/chaosircd/blob/main/CLAUDE.md" target="_blank" rel="noopener"><code>CLAUDE.md</code></a>). It's off by default, since it pulls in
+libwebsockets as a dependency nothing else here needs:</p>
+<div class="codeblock" data-lang="sh"><pre><code class="language-sh"><span class="t-id">cmake</span> <span class="t-op">-S</span> . <span class="t-op">-B</span> <span class="t-id">build</span> <span class="t-op">-DBUILD_LC_LWS</span>=<span class="t-id">ON</span>
+<span class="t-id">cmake</span> <span class="t-op">--build</span> <span class="t-id">build</span></code></pre></div>
+<h2 id="building"><a class="anchor" href="#building" aria-hidden="true">#</a>Building</h2>
+<p>chaosircd builds with CMake:</p>
+<div class="codeblock" data-lang="sh"><pre><code class="language-sh"><span class="t-id">cmake</span> <span class="t-op">-S</span> . <span class="t-op">-B</span> <span class="t-id">build</span>
+<span class="t-id">cmake</span> <span class="t-op">--build</span> <span class="t-id">build</span> <span class="t-op">-j</span>$(<span class="t-id">nproc</span>)
+<span class="t-id">sudo</span> <span class="t-id">cmake</span> <span class="t-op">--install</span> <span class="t-id">build</span></code></pre></div>
+<p>See <a href="https://github.com/rsenn/chaosircd/blob/main/INSTALL" target="_blank" rel="noopener"><code>INSTALL</code></a> for OpenSSL certificate generation and the
+BPF/socket-filter prerequisites for K/G-lines. Building loadable modules
+requires per-module shared-library support, on by default everywhere but
+Windows/Cygwin (<code>BUILD_LIBIRCD</code>, <code>CMakeLists.txt</code>).</p>
+<h2 id="status"><a class="anchor" href="#status" aria-hidden="true">#</a>Status</h2>
+<p>Actively maintained, in long bursts separated by long quiet ones — this is
+primarily a project that gets worked on when it's running something for
+real. The <a href="docs/ircv3.html">IRCv3 migration plan</a> is the current roadmap; that
+document also doubles as a running list of the non-obvious lessons this
+codebase has taught back to whoever's touching it next.</p>
+<h2 id="license"><a class="anchor" href="#license" aria-hidden="true">#</a>License</h2>
+<p>The core library (<code>lib/</code>) is LGPL v2 or later; the daemon and its modules
+(<code>src/</code>, <code>modules/</code>) are GPL v2 or later — see the header of any given
+file for the exact terms, and <a href="https://github.com/rsenn/chaosircd/blob/main/COPYING" target="_blank" rel="noopener"><code>COPYING</code></a> /
+<a href="https://github.com/rsenn/chaosircd/blob/main/COPYING.LESSER" target="_blank" rel="noopener"><code>COPYING.LESSER</code></a> for the full license texts.</p></article>
+<p class="editlink"><a href="https://github.com/rsenn/chaosircd/blob/main/README.md">Edit this page on GitHub →</a></p>
+</main>
+<nav class="toc"><h3>On this page</h3><ul><li class="lvl2"><a href="#why-it-exists">Why it exists</a></li><li class="lvl2"><a href="#features">Features</a></li><li class="lvl3"><a href="#the-websocket-gateway">The WebSocket gateway</a></li><li class="lvl2"><a href="#building">Building</a></li><li class="lvl2"><a href="#status">Status</a></li><li class="lvl2"><a href="#license">License</a></li></ul></nav>
+</div>
+<footer class="sitefoot">
+  <p>chaosircd — GPL v2 (LGPL v2 for the core library). Built from the repo's own markdown by
+     <a href="https://github.com/rsenn/chaosircd/blob/main/tools/site/build.js">tools/site/build.js</a>.</p>
+</footer>
+<script>
+document.querySelector('.themetoggle').addEventListener('click', function () {
+  var d = document.documentElement;
+  var dark = d.dataset.theme ? d.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  d.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('theme', d.dataset.theme); } catch (e) {}
+});
+</script>
+</body>
+</html>

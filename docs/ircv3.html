@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chaosircd IRCv3 Migration Plan — chaosircd</title>
+<meta name="description" content="chaosircd — an IRC daemon with (re)loadable modules. Loadable command/chanmode/usermode modules, a dedicated DNS/ident/proxy-scan process, and an in-process WebSocket gateway for browser clients.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body class="has-sidebar">
+<header class="topbar">
+  <a class="brand" href="../index.html"><span class="mark">#</span> chaosircd</a>
+  <nav class="topnav">
+    <a href="../getting-started.html">Get started</a>
+    <a href="../docs/ircv3.html">IRCv3 plan</a>
+    <a href="https://github.com/rsenn/chaosircd" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <button class="themetoggle" type="button" aria-label="Toggle colour scheme">◐</button>
+</header>
+<div class="layout">
+<aside class="sidebar"><div class="navgroup"><h3>Start here</h3><ul><li><a href="../getting-started.html">Getting started</a></li></ul></div><div class="navgroup"><h3>Reference</h3><ul><li><a href="ircv3.html" class="here">IRCv3 migration plan</a></li></ul></div></aside>
+<main class="doc">
+<article><h1 id="chaosircd-ircv3-migration-plan"><a class="anchor" href="#chaosircd-ircv3-migration-plan" aria-hidden="true">#</a>chaosircd IRCv3 Migration Plan</h1>
+<p>chaosircd predates IRCv3 (its <code>CAP</code> handler was a permanently-empty stub:
+every <code>CAP LS</code> got back <code>CAP * LS :</code> regardless of subcommand, and nothing
+was ever tracked per-client). This document is the plan for bringing it up
+to a useful subset of IRCv3, in the order it should be done.</p>
+<h2 id="ground-rules-established-while-implementing-step-1"><a class="anchor" href="#ground-rules-established-while-implementing-step-1" aria-hidden="true">#</a>Ground rules established while implementing step 1</h2>
+<p>These aren't optional style points - they're bugs this migration already
+hit once each, so every later step should assume them:</p>
+<ul>
+<li><strong>Registration doesn't wait for <code>CAP END</code>.</strong> chaosircd completes
+registration as soon as <code>NICK</code>+<code>USER</code> are both in, regardless of whether
+the client ever sent <code>CAP</code> at all. This is a deliberate non-change (much
+bigger, riskier surgery to the registration state machine for little
+benefit) - it just means every <code>CAP</code> subcommand handler has to work
+correctly whether it fires before, after, or interleaved with
+<code>NICK</code>/<code>USER</code>, not assume a fixed order.</li>
+<li><strong><code>struct client *cptr</code> can be <code>NULL</code> in a <code>MFLG_UNREG</code> handler.</strong>
+<code>struct client</code> is only allocated once registration completes;
+<code>struct lclient</code> exists from the moment the connection is accepted. Any
+per-connection state a <code>CAP</code>-negotiated capability needs to track has to
+live on <code>struct lclient</code>, and must be reachable (and usable) before
+<code>cptr</code> exists - real clients routinely send <code>CAP REQ</code> before <code>NICK</code>/<code>USER</code>.
+(Caught this the hard way: <code>mr_cap()</code> dereferencing <code>cptr-&gt;name</code> for a
+pre-registration <code>CAP REQ</code> segfaulted the whole daemon.)</li>
+<li><strong>Never add a field in the middle of <code>struct client</code> or <code>struct lclient</code>.</strong>
+Both are shared, fixed-layout structs that every loadable module (<code>.so</code>)
+was compiled against independently. Inserting a field shifts the offset
+of everything declared after it - any module not rebuilt in lockstep
+silently reads/writes the wrong bytes at runtime (no compiler error, no
+link error, just corrupted state or a segfault under load). Both structs
+already have a <code>void *plugdata[32]</code> array at the very end for exactly
+this reason (see <code>lc_lws</code>'s use of <code>LCLIENT_PLUGDATA_LWS_SESSION</code> and
+this migration's <code>LCLIENT_PLUGDATA_CLICAPS</code>) - a new capability's state
+goes in a plugdata slot (or, if it doesn't fit in a pointer, a
+heap-allocated struct pointed to by one), never a new named field, unless
+every single loadable module is being rebuilt and reinstalled in the same
+step.</li>
+<li><strong>The channel broadcast fast path bypasses per-connection send hooks.</strong>
+<code>channel_vsend()</code>'s multicast path (<code>io_multi_link()</code>) links a
+pre-formatted buffer straight into a recipient's fd sendq, bypassing
+<code>lclient_vsend()</code> entirely for performance (see <code>lclient_send_raw()</code> and
+its one caller in <code>channel.c</code> for the escape hatch this migration added).
+Anything IRCv3-related that needs per-recipient framing or content (tag
+filtering per capability, for instance - see message-tags below) has to
+either go through <code>lclient_vsend()</code>/<code>lclient_send_raw()</code> instead of
+<code>channel_send()</code>, or <code>channel_vsend()</code> needs to grow real per-recipient
+variation instead of one shared buffer. Worth deciding explicitly in the
+message-tags step, not discovering by accident.</li>
+</ul>
+<h2 id="where-things-live"><a class="anchor" href="#where-things-live" aria-hidden="true">#</a>Where things live</h2>
+<ul>
+<li><code>modules/msg/m_cap.c</code> - the <code>CAP</code> command handler and the capability
+table (<code>m_cap_table[]</code>). Add a row here plus real behaviour elsewhere to
+support a new capability; the table is what answers <code>LS</code>/<code>REQ</code>/<code>LIST</code>.</li>
+<li><code>include/ircd/lclient.h</code> - <code>CLICAP_*</code> bit constants, the
+<code>LCLIENT_PLUGDATA_CLICAPS</code> slot, and the <code>lclient_clicaps()</code> /
+<code>lclient_set_clicaps()</code> accessors. Check a capability with
+<code>lclient_clicaps(lcptr) &amp; CLICAP_WHATEVER</code>.</li>
+<li>Message-sending core (<code>src/channel.c</code>, <code>src/client.c</code>, <code>src/lclient.c</code>)
+<ul>
+<li>where a capability actually changes server behaviour (echoing,</li>
+</ul>
+<p>tagging, batching, ...).</p></li>
+</ul>
+<h2 id="phased-plan"><a class="anchor" href="#phased-plan" aria-hidden="true">#</a>Phased plan</h2>
+<p>Ordered by (mostly) increasing effort/risk, not spec numbering. Do a phase
+fully - implementation, a rebuild+reinstall, and a wscat/gamja round-trip
+test - before starting the next; several later phases assume earlier ones
+are solid (message-tags in particular is load-bearing for most of the
+back half of this list).</p>
+<h3 id="phase-1---echo-message---done"><a class="anchor" href="#phase-1---echo-message---done" aria-hidden="true">#</a>Phase 1 - <code>echo-message</code> - <strong>DONE</strong></h3>
+<p>The server echoes a client's own <code>PRIVMSG</code>/<code>NOTICE</code> (channel or user
+target) back to the sending connection when this cap is enabled, instead
+of the client having to fake it locally. Implemented in
+<code>channel_message()</code> (<code>src/channel.c</code>) and <code>client_message()</code>
+(<code>src/client.c</code>), gated on <code>CLICAP_ECHO_MESSAGE</code>.</p>
+<p>Picked first because: it was the concrete bug in front of us (gamja
+double-displaying self-sent messages because chaosircd never granted this
+cap, so gamja fell back to unconditional local echo), it's genuinely
+simple (a handful of extra <code>client_send()</code> calls, no new wire concepts),
+and it forced building the <em>real</em> <code>CAP LS</code>/<code>REQ</code>/<code>ACK</code>/<code>NAK</code>/<code>LIST</code>
+negotiation machinery (<code>m_cap.c</code>) that every later phase reuses. Nothing
+after this needs a second implementation of CAP negotiation itself - just
+a new row in <code>m_cap_table[]</code> and a new <code>CLICAP_*</code> bit.</p>
+<h3 id="phase-2---cap-notify"><a class="anchor" href="#phase-2---cap-notify" aria-hidden="true">#</a>Phase 2 - <code>cap-notify</code></h3>
+<p>Tiny. When a capability an already-registered client didn't negotiate
+becomes available or unavailable at runtime (module load/unload is the
+only realistic trigger here - chaosircd doesn't have config reload of
+individual caps), send unsolicited <code>CAP &lt;nick&gt; NEW :&lt;caps&gt;</code> /
+<code>CAP &lt;nick&gt; DEL :&lt;caps&gt;</code> to clients that negotiated <code>cap-notify</code> itself.
+Given chaosircd's capability set is static per running process (nothing
+today changes <code>m_cap_table[]</code> at runtime), this is close to a no-op
+initially - implement the plumbing (a small hook other module load/unload
+paths can call) but it won't fire in practice until some future capability
+<em>is</em> conditional on e.g. a module being loaded. Cheap to do now while
+<code>m_cap.c</code> is fresh in mind; low value until something needs it.</p>
+<h3 id="phase-3---message-tags"><a class="anchor" href="#phase-3---message-tags" aria-hidden="true">#</a>Phase 3 - message-tags</h3>
+<p>The foundational one - <code>server-time</code>, <code>batch</code>, <code>labeled-response</code>,
+<code>account-tag</code>, <code>msgid</code>, and draft <code>chathistory</code> all sit on top of this.
+Scope:</p>
+<ul>
+<li>Parse an optional leading <code>@tag1=val;tag2 </code> block off incoming client
+lines before normal command parsing (the IRCv3 client-tags a server
+should ever accept from a client are few - mostly just <code>+draft/reply</code>
+and similar - reject/strip anything else per spec rather than trust
+arbitrary client-supplied tags).</li>
+<li>Emit tags on outgoing lines <em>conditionally per recipient</em> - a client that
+didn't negotiate <code>message-tags</code> must get the untagged line. This is
+exactly the per-recipient-variation problem flagged in "ground rules"
+above: <code>channel_send()</code>'s shared-buffer fast path can't vary its output
+per recipient, so tagged output has to bypass it (<code>lclient_send_raw()</code>
+per WS-adopted-client precedent, or a second parallel buffer keyed by
+whether the recipient negotiated <code>message-tags</code>).</li>
+<li><code>IRCD_LINELEN</code> is already 2048 (this server was never strictly
+512-byte-limited), but the <em>tag</em> budget in the spec is separately
+capped (4094 bytes club including the leading <code>@</code>, or 8191 for
+<code>message-tags</code> alone depending on spec revision) - decide and enforce a
+tag-section cap independent of the existing line cap.</li>
+</ul>
+<p>Bigger than phases 1-2, but every field/flag it needs (parser hook point,
+per-recipient send path) already exists somewhere in the codebase from
+this session's <code>lc_lws</code> work or phase 1 - this is integration, not new
+infrastructure from scratch.</p>
+<h3 id="phase-4---server-time"><a class="anchor" href="#phase-4---server-time" aria-hidden="true">#</a>Phase 4 - <code>server-time</code></h3>
+<p>Trivial once phase 3 lands: attach a <code>time=&lt;rfc3339&gt;</code> tag to every message
+a client with this cap negotiated receives. No new state, no new command.</p>
+<h3 id="phase-5---small-independent-caps-do-together-each-is-an-afternoon"><a class="anchor" href="#phase-5---small-independent-caps-do-together-each-is-an-afternoon" aria-hidden="true">#</a>Phase 5 - small independent caps (do together, each is an afternoon)</h3>
+<p>Each of these is a self-contained row in <code>m_cap_table[]</code> plus a couple of
+lines at one existing call site - no shared infrastructure work beyond
+phase 1, safe to batch:</p>
+<ul>
+<li><strong><code>away-notify</code></strong> - <code>modules/msg/m_away.c</code> already exists (<code>AWAY</code>
+command); just broadcast <code>AWAY</code>/un-<code>AWAY</code> to channel-mates who
+negotiated the cap, same shape as the JOIN-echo fix from this session.</li>
+<li><strong><code>extended-join</code></strong> - append account name (or <code>*</code>) and realname to the
+<code>JOIN</code> line for clients that negotiated it. Blocked on there being a
+concept of "account" at all - chaosircd's <code>m_userdb.c</code> is an
+auth/registration lookup via <code>sauth</code>, not a NickServ-style persistent
+account; decide what (if anything) populates the account field before
+implementing, or ship <code>*</code> (no account) unconditionally until accounts
+exist.</li>
+<li><strong><code>userhost-in-names</code></strong> - prefix each nick in <code>RPL_NAMREPLY</code> with
+<code>user@host</code> instead of just the nick, for negotiating clients. Small
+change to <code>modules/msg/m_names.c</code>.</li>
+<li><strong><code>invite-notify</code></strong> - broadcast an <code>INVITE</code> notice to channel ops who
+negotiated it, alongside the existing single-target <code>INVITE</code> in
+<code>modules/msg/m_invite.c</code>.</li>
+<li><strong><code>chghost</code></strong> - broadcast a <code>CHGHOST</code> line to negotiating clients
+whenever a client's displayed <code>user@host</code> changes. Check whether
+anything in chaosircd currently <em>can</em> change a live client's host/ident
+post-registration (vhost/spoof modules - <code>m_spoof.c</code> exists) before
+wiring this up; if nothing does yet, this one has no trigger to hook.</li>
+</ul>
+<h3 id="phase-6---multi-prefix"><a class="anchor" href="#phase-6---multi-prefix" aria-hidden="true">#</a>Phase 6 - <code>multi-prefix</code></h3>
+<p>Client asks to see <em>every</em> status prefix it holds in a channel (e.g.
+<code>@%+nick</code> for someone who's op+halfop+voice) instead of just the highest.
+chaosircd's <code>PREFIX=(hov)@%+</code> (seen in <code>RPL_ISUPPORT</code>) already models
+three prefix levels, so the data is there - <code>modules/msg/m_names.c</code> and
+<code>modules/msg/m_who.c</code> just need to emit all held prefixes instead of the
+first match, when negotiated.</p>
+<h3 id="phase-7---setname"><a class="anchor" href="#phase-7---setname" aria-hidden="true">#</a>Phase 7 - <code>setname</code></h3>
+<p>Lets a registered client change its realname (<code>info</code> field) without
+reconnecting, broadcast as a <code>SETNAME</code> line to anyone who can see it (same
+delivery shape as <code>NICK</code> changes). Needs a new client-issuable command
+plus the notify-on-change plumbing; check whether anything server-side
+(opers, stats) assumes <code>info</code> is immutable post-registration before
+allowing it to change live.</p>
+<h3 id="phase-8---batch"><a class="anchor" href="#phase-8---batch" aria-hidden="true">#</a>Phase 8 - <code>batch</code></h3>
+<p>Wraps a group of related lines (typically a channel's worth of
+<code>chathistory</code> playback, or a netsplit's worth of <code>QUIT</code>s) in
+<code>BATCH +ref &lt;type&gt; ...</code> / <code>BATCH -ref</code>, with each wrapped line tagged
+<code>@batch=ref</code>. Needs phase 3 (tags) done first. On its own this phase adds
+no new <em>content</em> - it's infrastructure for phase 10's <code>CHATHISTORY</code>, and
+is also usable later for large <code>KICK</code>/<code>QUIT</code> fan-out (netsplit batches).
+Low priority to build before something actually needs it; grouped here
+because it's a prerequisite, not because it's independently valuable yet.</p>
+<h3 id="phase-9---labeled-response"><a class="anchor" href="#phase-9---labeled-response" aria-hidden="true">#</a>Phase 9 - <code>labeled-response</code></h3>
+<p>Client tags an outgoing command with <code>@label=xyz</code>; the server tags every
+line generated in direct response the same way, wrapped in a <code>batch</code> if
+there's more than one, so the client can correlate replies without
+guessing from context. Needs phases 3 and 8. Medium effort: every message
+handler that currently just calls <code>client_send()</code>/<code>numeric_send()</code>
+in response to a command needs the active label (if any) threaded through
+and re-attached - a <code>struct client</code>/<code>lclient</code> "current label" slot set at
+dispatch time and consumed by the send path is the shape to aim for,
+similar to how <code>client_source</code> is set-then-consumed today
+(<code>src/client.c</code>).</p>
+<h3 id="phase-10---standard-replies-failwarnnote"><a class="anchor" href="#phase-10---standard-replies-failwarnnote" aria-hidden="true">#</a>Phase 10 - <code>standard-replies</code> (<code>FAIL</code>/<code>WARN</code>/<code>NOTE</code>)</h3>
+<p>Structured, machine-parseable alternative to numeric errors
+(<code>FAIL &lt;cmd&gt; &lt;code&gt; [context...] :&lt;description&gt;</code>). Worth doing once
+phases 3 and 9 exist since these replies are most useful labeled, but the
+command itself doesn't strictly require either - could move earlier if a
+specific error path wants it sooner. Mechanically: a new
+<code>numeric_send()</code>-shaped helper (<code>std_reply_send()</code> or similar) that
+command handlers opt into instead of <code>numeric_send()</code>, one at a time -
+this does <strong>not</strong> need to replace every existing numeric in one pass, and
+shouldn't (huge, low-value diff for no behavioural change on its own).</p>
+<h3 id="phase-11---sasl-plain-mechanism-first"><a class="anchor" href="#phase-11---sasl-plain-mechanism-first" aria-hidden="true">#</a>Phase 11 - SASL (<code>PLAIN</code> mechanism first)</h3>
+<p>The first phase that's a genuinely open design question, not just wiring:
+chaosircd has no persistent account system today (<code>m_userdb.c</code>/<code>sauth</code> is
+an auth/proxy-check lookup, not credential storage tied to a nick).
+<code>SASL PLAIN</code> needs <em>something</em> to check a submitted username/password
+against. Before writing any <code>AUTHENTICATE</code> handling, decide:</p>
+<ul>
+<li>What backs an "account" - a new flat file/INI table (<code>libchaos/ini.h</code> is
+already used elsewhere, e.g. class/oper config), or a new small database
+module - and whether it's chaosircd's job at all versus deferring to a
+services package (Atheme/Anope-style) talking a services protocol
+chaosircd doesn't currently implement (<code>m_nservice.c</code> exists but scope
+unclear - check before assuming either way).</li>
+<li>Whether SASL replaces or supplements the oper <code>PASS</code>/<code>m_pass.c</code> flow.</li>
+</ul>
+<p>This is the one phase in this plan that's a project of its own, not an
+afternoon - don't start it opportunistically the way phases 1-7 can be;
+scope it separately once everything before it is done and there's a real
+account backend to build on.</p>
+<h3 id="phase-12---chathistory-draft-gated-on-phase-8"><a class="anchor" href="#phase-12---chathistory-draft-gated-on-phase-8" aria-hidden="true">#</a>Phase 12 - <code>CHATHISTORY</code> (draft, gated on phase 8)</h3>
+<p>Bouncer-style playback of channel history on join/request. chaosircd has
+no message persistence today - this needs a storage layer (what, how much
+retained, per-channel or per-user) designed before the command itself is
+worth writing. Explicitly out of scope until something concrete asks for
+it; listed here only so it's not forgotten as the natural next step once
+<code>batch</code> exists.</p>
+<h3 id="adjacent-not-core-ircv3---worth-doing-alongside-this-plan"><a class="anchor" href="#adjacent-not-core-ircv3---worth-doing-alongside-this-plan" aria-hidden="true">#</a>Adjacent, not core IRCv3 - worth doing alongside this plan</h3>
+<ul>
+<li><strong><code>WEBIRC</code>-style real-client-IP passthrough for <code>lc_lws</code>.</strong> Every
+gamja/WS client currently appears to chaosircd as connecting from
+<code>127.0.0.1</code> (or wherever the gateway's listener is bound) - fine for a
+single-host setup, wrong the moment <code>lc_lws</code> and chaosircd aren't on the
+same box, and wrong for any host-based ban/class matching today. Not an
+IRCv3 capability (no client opts in - it's gateway-to-server trust, like
+real <code>WEBIRC</code> or <code>PROXY</code> protocol), but directly relevant to the work
+this session did on <code>lc_lws</code> and worth scoping whenever that module gets
+revisited.</li>
+<li><strong>STS (<code>draft/sts</code> / RFC: strict transport security).</strong> Tells a client
+"always use TLS to reach this server after this point". chaosircd
+already has SSL contexts and both a plaintext and SSL <code>listen{}</code> block
+configured (see <code>ircd.conf</code>) - mechanically small once <code>message-tags</code>
+or even just a CAP value with a policy string exists (STS is delivered
+as a CAP value, e.g. <code>CAP * LS :sts=port=6697,duration=2592000</code>, no tags
+needed). Could move much earlier in this list - low effort - but low
+urgency until TLS is actually the expected default transport.</li>
+</ul>
+<h2 id="testing-pattern-for-every-phase"><a class="anchor" href="#testing-pattern-for-every-phase" aria-hidden="true">#</a>Testing pattern for every phase</h2>
+<p>Every phase in this plan should be verified the same way phase 1 was,
+before moving on:</p>
+<ol>
+<li><code>wscat</code>/raw-socket round trip exercising the new behaviour directly
+(fastest feedback, no browser involved) - see the `script -qec
+'wscat --connect ws://127.0.0.1:7778/ -x "..." ...'` pattern used
+throughout this session for scripted multi-line sequences.</li>
+<li>A <strong>regression</strong> check with a plain client that negotiates nothing -
+confirm behaviour for clients that never send <code>CAP</code> at all is
+byte-for-byte unchanged.</li>
+<li>Only then, gamja in a real browser for the end-to-end/UX check.</li>
+</ol>
+<p>And after any change to <code>struct client</code>, <code>struct lclient</code>, or any other
+struct a loadable module might have its own compiled-in copy of the
+layout for: rebuild <strong>every</strong> currently-loaded module, not just the ones
+directly touched, or use a plugdata slot instead and rebuild only what
+actually changed (see "Ground rules" above - this is not optional, it's
+how the phase 1 implementation crashed the daemon the first time round).</p></article>
+<p class="editlink"><a href="https://github.com/rsenn/chaosircd/blob/main/IRCv3.md">Edit this page on GitHub →</a></p>
+</main>
+<nav class="toc"><h3>On this page</h3><ul><li class="lvl2"><a href="#ground-rules-established-while-implementing-step-1">Ground rules established while implementing step 1</a></li><li class="lvl2"><a href="#where-things-live">Where things live</a></li><li class="lvl2"><a href="#phased-plan">Phased plan</a></li><li class="lvl3"><a href="#phase-1---echo-message---done">Phase 1 - echo-message - DONE</a></li><li class="lvl3"><a href="#phase-2---cap-notify">Phase 2 - cap-notify</a></li><li class="lvl3"><a href="#phase-3---message-tags">Phase 3 - message-tags</a></li><li class="lvl3"><a href="#phase-4---server-time">Phase 4 - server-time</a></li><li class="lvl3"><a href="#phase-5---small-independent-caps-do-together-each-is-an-afternoon">Phase 5 - small independent caps (do together, each is an afternoon)</a></li><li class="lvl3"><a href="#phase-6---multi-prefix">Phase 6 - multi-prefix</a></li><li class="lvl3"><a href="#phase-7---setname">Phase 7 - setname</a></li><li class="lvl3"><a href="#phase-8---batch">Phase 8 - batch</a></li><li class="lvl3"><a href="#phase-9---labeled-response">Phase 9 - labeled-response</a></li><li class="lvl3"><a href="#phase-10---standard-replies-failwarnnote">Phase 10 - standard-replies (FAIL/WARN/NOTE)</a></li><li class="lvl3"><a href="#phase-11---sasl-plain-mechanism-first">Phase 11 - SASL (PLAIN mechanism first)</a></li><li class="lvl3"><a href="#phase-12---chathistory-draft-gated-on-phase-8">Phase 12 - CHATHISTORY (draft, gated on phase 8)</a></li><li class="lvl3"><a href="#adjacent-not-core-ircv3---worth-doing-alongside-this-plan">Adjacent, not core IRCv3 - worth doing alongside this plan</a></li><li class="lvl2"><a href="#testing-pattern-for-every-phase">Testing pattern for every phase</a></li></ul></nav>
+</div>
+<footer class="sitefoot">
+  <p>chaosircd — GPL v2 (LGPL v2 for the core library). Built from the repo's own markdown by
+     <a href="https://github.com/rsenn/chaosircd/blob/main/tools/site/build.js">tools/site/build.js</a>.</p>
+</footer>
+<script>
+document.querySelector('.themetoggle').addEventListener('click', function () {
+  var d = document.documentElement;
+  var dark = d.dataset.theme ? d.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  d.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('theme', d.dataset.theme); } catch (e) {}
+});
+</script>
+</body>
+</html>
