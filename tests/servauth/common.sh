@@ -1,20 +1,22 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
 # common.sh - shared helpers for servauth unit tests
 #
 # Provides:
-#   - sv_start / sv_stop        : launch/kill servauth as a coprocess and
-#                                  talk to it over its stdin/stdout control
-#                                  protocol (the same protocol ircd uses
-#                                  over the socketpair)
+#   - sv_start / sv_stop        : launch/kill servauth as a background process
+#                                  and talk to it over a pair of named pipes,
+#                                  using the same control protocol ircd uses
+#                                  over the socketpair
 #   - sv_send / sv_expect       : send a command line, wait for a reply
 #   - mock_proxy_*              : spawn netcat listeners that speak just
 #                                  enough of each proxy protocol to make
 #                                  servauth classify them as open/denied/etc
 #   - cleanup_mocks             : kill any netcat listeners started by a test
 #
-# Every test script should `source` this file, call sv_start once, run its
-# checks, then call sv_stop (trap on EXIT is recommended, see test_*.sh).
+# Every test script should `.` (source) this file, call sv_start once, run
+# its checks, then call sv_stop (trap on EXIT is recommended, see
+# test_*.sh). Written for plain POSIX sh - tested under dash and shish/ash,
+# not just bash.
 
 set -u
 
@@ -22,6 +24,9 @@ SV_TIMEOUT=${SV_TIMEOUT:-5}
 
 # ---------------------------------------------------------------------------
 # locate the servauth binary
+#
+# Assumes the caller has already `cd`ed into tests/servauth (test_*.sh does
+# this before sourcing common.sh), so paths below are relative to that.
 # ---------------------------------------------------------------------------
 sv_find_binary() {
   if [ -n "${SERVAUTH_BIN:-}" ] && [ -x "$SERVAUTH_BIN" ]; then
@@ -29,18 +34,13 @@ sv_find_binary() {
     return 0
   fi
 
-  local here
-  here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-  local candidates=(
-    "$here/../../build/x86_64-linux-debug/lib/servauth/servauth"
-    "$here/../../build/x86_64-linux-gnu/lib/servauth/servauth"
-    "$here/../../build/x86_64-linux-clang/lib/servauth/servauth"
-    "/usr/local/libexec/servauth"
-  )
-
   local c
-  for c in "${candidates[@]}"; do
+  for c in \
+    "../../build/x86_64-linux-debug/lib/servauth/servauth" \
+    "../../build/x86_64-linux-gnu/lib/servauth/servauth" \
+    "../../build/x86_64-linux-clang/lib/servauth/servauth" \
+    "/usr/local/libexec/servauth"
+  do
     if [ -x "$c" ]; then
       echo "$c"
       return 0
@@ -51,7 +51,8 @@ sv_find_binary() {
 }
 
 # ---------------------------------------------------------------------------
-# start/stop servauth as a coprocess.
+# start/stop servauth as a background process, connected via a pair of
+# named pipes.
 #
 # servauth defaults to fd 0 (read) / fd 1 (write) when launched with no
 # argv, exactly like `child.c` does for the "socketpair" case - so we can
@@ -65,14 +66,26 @@ sv_start() {
     return 1
   }
 
-  # `exec` inside the coproc body so bash's tracked PID is servauth's own
-  # pid (not a wrapper shell's) - otherwise `kill "$SV_PID"` in sv_stop
-  # misses the real process and leaks a busy-looping orphan.
-  coproc SV_PROC { exec "$bin"; }
+  SV_TMPDIR=$(mktemp -d)
+  mkfifo "$SV_TMPDIR/in" "$SV_TMPDIR/out"
 
-  SV_IN=${SV_PROC[1]}
-  SV_OUT=${SV_PROC[0]}
-  SV_PID=$SV_PROC_PID
+  # servauth opens its own fd for each fifo path (via the < and >
+  # redirections below), rather than inheriting a dup of a fd we already
+  # have open - servauth does its own fcntl(F_SETFL) on stdin/stdout for
+  # non-blocking I/O, and a dup would share that file *description* with
+  # our fds, silently making our reads/writes non-blocking too. Separate
+  # open() calls on the same fifo path get independent descriptions, so
+  # servauth's flag changes stay local to its own end.
+  #
+  # Opening a fifo for one direction blocks until a peer opens the other
+  # end, so the two sides must be opened in matching order: servauth's
+  # stdin/stdout opens happen as part of backgrounding it below, and the
+  # `exec` lines right after unblock each of those opens in turn.
+  "$bin" <"$SV_TMPDIR/in" >"$SV_TMPDIR/out" &
+  SV_PID=$!
+
+  exec 5>"$SV_TMPDIR/in"
+  exec 6<"$SV_TMPDIR/out"
 
   # give it a moment to finish servauth_init()
   sleep 0.2
@@ -84,14 +97,37 @@ sv_start() {
 
   sv_trace "# servauth started: $bin (pid $SV_PID)"
 
+  # sv_expect's read-with-timeout loop is farmed out to this helper script
+  # (see below). It must be written here, at top level, rather than from
+  # inside sv_expect itself - some ash-family shells (shish included) mis-
+  # handle a heredoc-fed redirect when it runs inside a function that is
+  # itself invoked through command substitution, and leak the heredoc body
+  # to stdout instead of the file.
+  SV_EXPECT_HELPER="$SV_TMPDIR/expect.sh"
+  cat >"$SV_EXPECT_HELPER" <<'EOF'
+#!/bin/sh
+prefix="$1"
+while IFS= read -r line; do
+  printf 'IN:%s\n' "$line"
+  case "$line" in
+    "$prefix"|"$prefix "*)
+      printf 'MATCH:%s\n' "$line"
+      exit 0
+      ;;
+  esac
+done
+exit 1
+EOF
+  chmod +x "$SV_EXPECT_HELPER"
+
   return 0
 }
 
 sv_stop() {
   [ -n "${SV_PID:-}" ] || return 0
 
-  # belt-and-suspenders: also reap any direct child (in case some bash
-  # build didn't exec(3) in place for the coproc as expected)
+  # belt-and-suspenders: also reap any direct child, in case servauth
+  # re-execs or forks internally
   local child
   child=$(pgrep -P "$SV_PID" 2>/dev/null)
 
@@ -100,7 +136,11 @@ sv_stop() {
 
   wait "$SV_PID" 2>/dev/null
 
-  unset SV_PID SV_IN SV_OUT
+  exec 5>&- 2>/dev/null
+  exec 6<&- 2>/dev/null
+  [ -n "${SV_TMPDIR:-}" ] && rm -rf "$SV_TMPDIR"
+
+  unset SV_PID SV_TMPDIR SV_EXPECT_HELPER
 }
 
 # Verbose raw-traffic tracing. On by default (that's the whole point of
@@ -121,7 +161,7 @@ sv_trace() {
 # lib/servauth/commands.c for exact argument counts).
 sv_send() {
   sv_trace ">> $*"
-  echo "$*" >&"$SV_IN"
+  echo "$*" >&5
 }
 
 # sv_expect <prefix> [timeout]
@@ -130,29 +170,28 @@ sv_send() {
 # so "dns forward 1" won't match "dns forward 12"), or the timeout elapses.
 # Echoes the matching line on success, returns 1 on timeout/EOF. Every
 # line read (matching or not) is traced to stderr as it arrives.
+#
+# POSIX `read` has no -t/-u options (dash/ash don't support them), so the
+# read loop is farmed out to a small helper script and bounded with the
+# external `timeout` command instead.
 sv_expect() {
   local prefix="$1"
   local timeout="${2:-$SV_TIMEOUT}"
-  local line
-  local deadline=$(( $(date +%s) + timeout ))
+  local output status outline
 
-  while [ "$(date +%s)" -le "$deadline" ]; do
-    if IFS= read -r -t "$timeout" -u "$SV_OUT" line; then
-      sv_trace "<< $line"
-      case "$line" in
-        "$prefix "*|"$prefix")
-          echo "$line"
-          return 0
-          ;;
-        *)
-          # not the reply we're waiting for (could be an unrelated/late
-          # reply from a previous query) - keep waiting
-          ;;
-      esac
-    else
-      return 1
-    fi
+  output=$(timeout "$timeout" "$SV_EXPECT_HELPER" "$prefix" <&6)
+  status=$?
+
+  echo "$output" | while IFS= read -r outline; do
+    case "$outline" in
+      IN:*) sv_trace "<< ${outline#IN:}" ;;
+    esac
   done
+
+  if [ "$status" -eq 0 ]; then
+    echo "$output" | sed -n 's/^MATCH://p' | tail -n1
+    return 0
+  fi
 
   return 1
 }
@@ -164,7 +203,7 @@ sv_expect() {
 # a protocol-specific probe, then classifies the reply. These helpers start
 # a one-shot netcat listener that plays the server side of that protocol.
 # ---------------------------------------------------------------------------
-declare -a MOCK_PIDS=()
+MOCK_PIDS=""
 
 # mock_raw_reply <port> <bytes-file>
 #
@@ -176,7 +215,7 @@ mock_raw_reply() {
   local file="$2"
 
   nc -l -p "$port" -q1 <"$file" >/dev/null 2>&1 &
-  MOCK_PIDS+=("$!")
+  MOCK_PIDS="$MOCK_PIDS $!"
 
   # give the listener a moment to bind before the caller connects
   sleep 0.2
@@ -249,10 +288,10 @@ mock_closed() { :; }
 
 cleanup_mocks() {
   local pid
-  for pid in "${MOCK_PIDS[@]:-}"; do
+  for pid in $MOCK_PIDS; do
     [ -n "$pid" ] && kill "$pid" 2>/dev/null
   done
-  MOCK_PIDS=()
+  MOCK_PIDS=""
 }
 
 # ---------------------------------------------------------------------------
