@@ -24,3 +24,7 @@
 *.log
 /chaosircd-*.diff
 /proxy.tar
+
+# tools/site/build.js output - published to the gh-pages branch by
+# tools/site/publish.sh, not tracked on main (see tools/site/build.js).
+/docs/
