@@ -186,7 +186,13 @@ void ssl_default(struct ssl_context *scptr) {
   strcpy(scptr->ciphers, "RSA+HIGH:RSA+MEDIUM");
 }
 
-int ssl_verify(int ok, X509_STORE_CTX *cert) {
+int ssl_verify(int ok,
+#ifdef HAVE_SSL
+               X509_STORE_CTX *cert
+#else
+               void *cert
+#endif
+) {
 
   if (!ok)
     return 0; // stop immediately
