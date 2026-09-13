@@ -410,3 +410,44 @@ if(BASH_EXECUTABLE)
 else()
   message(STATUS "bash not found - servauth-test/tls-test targets not available")
 endif()
+
+# ---------------------------------------------------------------------------
+# CPack: run `cpack` inside a configured build directory (e.g.
+# build/x86_64-linux-gnu, after `make install` would normally be run) to
+# package that build as a .deb and/or a plain .tar.gz, without going through
+# the debian/ dir's dpkg-buildpackage flow. `cpack -G DEB` / `cpack -G TGZ`
+# picks one generator; plain `cpack` builds both.
+# ---------------------------------------------------------------------------
+set(CPACK_PACKAGE_NAME "${PACKAGENAME}")
+set(CPACK_PACKAGE_VERSION "${PACKAGEVERSION}")
+set(CPACK_PACKAGE_CONTACT "Roman Senn <roman.l.senn@gmail.com>")
+set(CPACK_PACKAGE_VENDOR "Roman Senn")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "modular IRC server with reverse-DNS/proxy-scan auth helper")
+set(CPACK_GENERATOR "TGZ;DEB")
+
+# Distinguish musl builds (build/x86_64-linux-musl) from glibc ones in the
+# output filename, so packaging both doesn't produce two files with the
+# same name.
+set(CPACK_SYSTEM_NAME "Linux-x86_64")
+if(CMAKE_C_COMPILER MATCHES "musl")
+  set(CPACK_SYSTEM_NAME "${CPACK_SYSTEM_NAME}-musl")
+endif()
+set(CPACK_PACKAGE_FILE_NAME "${PACKAGENAME}-${PACKAGEVERSION}-${CPACK_SYSTEM_NAME}")
+
+# Both generators otherwise re-run the install step with their own default
+# packaging root ("/usr" for DEB, "/" for TGZ), which only the install()
+# calls using an already-absolute *dir cache var (sysconfdir, libexecdir,
+# sbindir, ...) survive - anything installed with a plain relative
+# DESTINATION (bin, lib, include/...) would silently move under /usr
+# instead of staying under CMAKE_INSTALL_PREFIX. Pin it to match.
+set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+
+# Mirrors debian/control - see that file if these two diverge.
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Roman Senn <roman.l.senn@gmail.com>")
+set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "runit")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+
+include(CPack)
