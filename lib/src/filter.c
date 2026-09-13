@@ -43,7 +43,6 @@
  * ------------------------------------------------------------------------ */
 #include "config.h"
 
-#include <linux/filter.h>
 #include <sys/socket.h>
 
 #if HAVE_SOCKET_FILTER
