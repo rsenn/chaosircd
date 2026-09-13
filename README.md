@@ -13,8 +13,8 @@ both server-server and client-server connections can run over OpenSSL.
 
 ## Why it exists
 
-chaosircd started as patches to [ircd-hybrid](https://ircd-hybrid.org/),
-written to keep a couple of real networks running: the IRC services behind
+chaosircd was conceived as a from-scratch IRC daemon, written to keep a
+couple of real networks running: the IRC services behind
 `irc.blah.ch` at freemails.ch, and a handful of servers on a home
 cablemodem with a dynamic IP behind a dynamic-DNS hostname. Hybrid's
 server-linking wanted static addresses; a cablemodem doesn't have one, so
@@ -31,11 +31,10 @@ G-lines don't just refuse a banned client at the application layer —
 they hand the address to a BPF socket filter on Linux, so a client that's
 already been told to go away stops costing the daemon a `read()` at all.
 
-Implementation began by lifting the `dlink` doubly-linked-list code
-straight out of ircd-hybrid — you can still see the family resemblance in
-`lib/src/dlink.c` — but everything built on top of it from that point on
-was written from scratch, and grew into its own daemon rather than staying
-a patch set.
+Implementation borrowed the `dlink` doubly-linked-list code from
+[ircd-hybrid](https://ircd-hybrid.org/) — you can still see the family
+resemblance in `lib/src/dlink.c` — but everything built on top of it was
+written from scratch as its own daemon from the start.
 
 That was 2003. The project has had long quiet stretches since — the git
 history jumps from an initial 2007 import to 2014 to 2026 — but each time
