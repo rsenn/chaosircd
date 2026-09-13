@@ -317,6 +317,23 @@ if(BUILD_LC_LWS)
 
   set(LIBWEBSOCKETS_C_FLAGS "${CMAKE_C_FLAGS}")
 
+  # musl-dev (Debian/Ubuntu) ships only libc headers, not the Linux uapi
+  # headers (linux/*.h, asm/*.h) that libwebsockets needs unconditionally on
+  # Linux (e.g. linux/if_packet.h) - those come from linux-libc-dev instead,
+  # installed under the regular (glibc) /usr/include. musl-gcc's specs use
+  # -nostdinc, so plain -I/usr/include would shadow musl's own libc headers
+  # with glibc's (breaking the build, as filter.c's musl fix worked around
+  # for chaosircd's own code) - -idirafter instead only falls back to
+  # /usr/include for headers musl's own tree doesn't have, i.e. exactly the
+  # kernel uapi ones.
+  if(CMAKE_C_COMPILER MATCHES "musl")
+    # linux/if_packet.h itself #includes <asm/byteorder.h>, which lives
+    # under the multiarch triplet dir (/usr/include/<triplet>/asm), not
+    # directly under /usr/include - add that too, same -idirafter
+    # (fallback-only) reasoning as above.
+    set(LIBWEBSOCKETS_C_FLAGS "${LIBWEBSOCKETS_C_FLAGS} -idirafter /usr/include -idirafter /usr/include/x86_64-linux-gnu")
+  endif()
+
   include("${CMAKE_SOURCE_DIR}/CMakeModules/BuildLibwebsockets.cmake")
   build_libwebsockets()
 

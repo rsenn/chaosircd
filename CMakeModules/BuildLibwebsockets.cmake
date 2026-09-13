@@ -47,12 +47,29 @@ macro(build_libwebsockets)
   endif(LIBCAP)
 
   set(LIBWEBSOCKETS_LIBRARIES "${LIBCAP_LIBRARY}")
-  if(OPENSSL_LIBRARIES)
+  if(USE_OPENSSL AND OPENSSL_LIBRARIES)
     set(LIBWEBSOCKETS_LIBRARIES "${OPENSSL_LIBRARIES};${LIBWEBSOCKETS_LIBRARIES}")
-  endif(OPENSSL_LIBRARIES)
+  endif(USE_OPENSSL AND OPENSSL_LIBRARIES)
+
+  # LWS_WITH_SSL tracks the outer project's own OpenSSL detection
+  # (UseOpenSSL.cmake's USE_OPENSSL/HAVE_OPENSSL) rather than being forced
+  # ON - e.g. under a musl cross-build with no musl-built OpenSSL on the
+  # host, FindOpenSSL finds only the host's glibc headers (OPENSSL_LIBRARIES
+  # stays NOTFOUND, so chaosircd itself already builds without SSL - see
+  # HAVE_SSL). Forcing LWS_WITH_SSL=ON there used to make the *libwebsockets*
+  # sub-build run its own find_package(OpenSSL), which (with no toolchain
+  # file restricting find_* to a musl sysroot) also resolved to
+  # /usr/include, and once forwarded that leaked host glibc headers into
+  # every libwebsockets translation unit (not just the SSL-related ones),
+  # breaking the musl compile on unrelated files.
+  if(USE_OPENSSL)
+    set(LIBWEBSOCKETS_WITH_SSL ON)
+  else()
+    set(LIBWEBSOCKETS_WITH_SSL OFF)
+  endif()
 
   set(LIBWEBSOCKETS_ARGS
-      -DLWS_WITH_SSL:BOOL=ON
+      -DLWS_WITH_SSL:BOOL=${LIBWEBSOCKETS_WITH_SSL}
       -DLWS_WITH_WOLFSSL:BOOL=OFF
       -DLWS_WITH_MBEDTLS:BOOL=OFF
       -DLWS_WITH_GNUTLS:BOOL=OFF)
@@ -62,16 +79,20 @@ macro(build_libwebsockets)
         -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE})
   endif(CMAKE_TOOLCHAIN_FILE)
 
-  if(OPENSSL_LIBRARIES)
+  # Only forward OpenSSL's location when the outer project actually has a
+  # usable (headers + libraries) OpenSSL - forwarding OPENSSL_INCLUDE_DIR
+  # alone, as found by a bare header-only FindOpenSSL hit, is what leaked
+  # glibc headers above.
+  if(USE_OPENSSL AND OPENSSL_LIBRARIES)
     set(LIBWEBSOCKETS_ARGS "${LIBWEBSOCKETS_ARGS}"
         -DLWS_OPENSSL_LIBRARIES:STRING=${OPENSSL_LIBRARIES}
         -DOPENSSL_LIBRARIES:STRING=${OPENSSL_LIBRARIES})
-  endif(OPENSSL_LIBRARIES)
-  if(OPENSSL_INCLUDE_DIR)
+  endif(USE_OPENSSL AND OPENSSL_LIBRARIES)
+  if(USE_OPENSSL AND OPENSSL_INCLUDE_DIR)
     set(LIBWEBSOCKETS_ARGS "${LIBWEBSOCKETS_ARGS}"
         -DLWS_OPENSSL_INCLUDE_DIRS:STRING=${OPENSSL_INCLUDE_DIR}
         -DOPENSSL_INCLUDE_DIR:STRING=${OPENSSL_INCLUDE_DIR})
-  endif(OPENSSL_INCLUDE_DIR)
+  endif(USE_OPENSSL AND OPENSSL_INCLUDE_DIR)
 
   # FORCE: build_libwebsockets() is a macro, so the plain set() calls above
   # leak LIBWEBSOCKETS_LIBRARIES into the caller's scope as an ordinary
