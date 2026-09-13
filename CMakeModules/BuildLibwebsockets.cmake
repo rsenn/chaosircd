@@ -73,8 +73,16 @@ macro(build_libwebsockets)
         -DOPENSSL_INCLUDE_DIR:STRING=${OPENSSL_INCLUDE_DIR})
   endif(OPENSSL_INCLUDE_DIR)
 
+  # FORCE: build_libwebsockets() is a macro, so the plain set() calls above
+  # leak LIBWEBSOCKETS_LIBRARIES into the caller's scope as an ordinary
+  # variable (missing the "websockets" entry). Without FORCE, this CACHE
+  # set() is a no-op on any reconfigure of an already-configured build dir
+  # (the cache entry already exists) - the ordinary variable then keeps
+  # shadowing it for the rest of that run, so ${LIBWEBSOCKETS_LIBRARIES}
+  # silently loses "websockets" (i.e. -lwebsockets) and every reconfigure
+  # after the first one links lc_lws.so with unresolved lws_* symbols.
   set(LIBWEBSOCKETS_LIBRARIES "websockets;${LIBWEBSOCKETS_LIBRARIES}"
-      CACHE STRING "libwebsockets libraries")
+      CACHE STRING "libwebsockets libraries" FORCE)
   set(LIBWEBSOCKETS_INCLUDE_DIR "${LIBWEBSOCKETS_INCLUDE_DIR}"
       CACHE PATH "libwebsockets include directory")
   set(LIBWEBSOCKETS_LIBRARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/libwebsockets/lib
