@@ -266,7 +266,7 @@ void conf_init(int argc, char **argv, char **envp) {
       usage(argv);
       break;
     case 'f':
-      strlcpy(conf_current.global.configfile, conf_optarg, PATHLEN);
+      strlcpy(conf_current.global.configfile, conf_optarg, sizeof(conf_current.global.configfile));
       break;
     case 'd':
       conf_new.global.nodetach = 1;
