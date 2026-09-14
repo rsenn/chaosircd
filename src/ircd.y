@@ -65,6 +65,7 @@ static char               conf_str_cipher[IRCD_CLASSLEN + 1];
 static char               conf_str_key[IRCD_PATHLEN + 1];
 static int                conf_int_cryptlink;
 static int                conf_int_ziplink;
+static int                conf_int_lws;
 static char               conf_str_protocol[IRCD_PROTOLEN + 1];
 static char               conf_str_name[IRCD_HOSTLEN + 1];
 %}
@@ -96,6 +97,7 @@ static char               conf_str_name[IRCD_HOSTLEN + 1];
 %token T_DEBUG
 %token T_DETACH
 %token T_DB
+%token T_DEFAULT_CHANNEL
 %token T_DIE
 %token T_ENCRYPTED
 %token T_ENFORCE
@@ -122,6 +124,7 @@ static char               conf_str_name[IRCD_HOSTLEN + 1];
 %token T_LISTEN
 %token T_LOAD
 %token T_LOG
+%token T_LWS
 %token T_MAILDIR
 %token T_MAX_CLIENTS
 %token T_MEM
@@ -185,6 +188,7 @@ conf_item:	  global_entry
 		| connect_entry
 		| oper_entry
                 | ssl_entry
+		| lws_entry
 		| error ';'
 		| error '}'
 	;
@@ -645,6 +649,7 @@ listen_entry:		T_LISTEN
           strcpy(conf_str_class, "default");
           strcpy(conf_str_password, "default");
           strcpy(conf_tmp_listen.context, "listen");
+          conf_int_lws = 1;
 	}
 			'{' listen_items '}'
         {
@@ -677,6 +682,7 @@ listen_entry:		T_LISTEN
             
             strcpy(conf_args_listen.password, conf_str_password);
             strcpy(conf_args_listen.class, conf_str_class);
+            conf_args_listen.lws = conf_int_lws;
 
             listen_pop(listen);
             
@@ -699,6 +705,7 @@ listen_item:		listen_name |
 			listen_context |
 			listen_protocol |
 			listen_class |
+			listen_lws |
 			error;
 
 listen_name:		T_NAME '=' QSTRING ';'
@@ -740,6 +747,14 @@ listen_context:		T_CONTEXT '=' QSTRING ';'
 listen_class:		T_CLASS '=' QSTRING ';'
 	{
           strlcpy(conf_str_class, yylval.string, sizeof(conf_str_class));
+	};
+listen_lws:		T_LWS '=' T_YES ';'
+	{
+          conf_int_lws = 1;
+	};
+listen_lws:		T_LWS '=' T_NO ';'
+	{
+          conf_int_lws = 0;
 	};
 
 /* -------------------------------------------------------------------------- *
@@ -1163,6 +1178,23 @@ ssl_key:		T_KEY '=' QSTRING ';'
 	};
 ssl_ciphers:		T_CIPHERS '=' QSTRING ';'
 	{
-          strlcpy(conf_tmp_ssl.ciphers, yylval.string, 
+          strlcpy(conf_tmp_ssl.ciphers, yylval.string,
                   sizeof(conf_tmp_ssl.ciphers));
+	};
+
+/* -------------------------------------------------------------------------- *
+ * section lws                                                                *
+ * -------------------------------------------------------------------------- */
+lws_entry:		T_LWS
+			'{' lws_items '}' ';';
+lws_items:		lws_items lws_item |
+			lws_item;
+
+lws_item:		lws_default_channel |
+			error;
+
+lws_default_channel:	T_DEFAULT_CHANNEL '=' QSTRING ';'
+	{
+          strlcpy(conf_new.lws.default_channel, yylval.string,
+                  sizeof(conf_new.lws.default_channel));
 	};

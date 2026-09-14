@@ -189,6 +189,7 @@ connect           { return T_CONNECT; }
 context           { return T_CONTEXT; }
 db                { return T_DB; }
 debug             { return T_DEBUG; }
+default_channel   { return T_DEFAULT_CHANNEL; }
 detach            { return T_DETACH; }
 die               { return T_DIE; }
 encrypted         { return T_ENCRYPTED; }
@@ -216,6 +217,7 @@ levels            { return T_LEVELS; }
 load              { return T_LOAD; }
 listen            { return T_LISTEN; }
 log               { return T_LOG; }
+lws               { return T_LWS; }
 max_clients       { return T_MAX_CLIENTS; }
 mem               { return T_MEM; }
 mfiles            { return T_MFILES; }

@@ -57,6 +57,7 @@ struct conf_global {
 struct conf_listen {
   char     password[IRCD_PASSWDLEN + 1];
   char     class[IRCD_CLASSLEN + 1];
+  int      lws;
 };
 
 struct conf_connect {
@@ -66,6 +67,10 @@ struct conf_connect {
   char     key[IRCD_PATHLEN + 1];
   int      cryptlink;
   int      ziplink;
+};
+
+struct conf_lws {
+  char     default_channel[IRCD_CHANNELLEN + 1];
 };
 
 /* -------------------------------------------------------------------------- *
@@ -83,6 +88,7 @@ struct config {
   struct list        children;
   struct list        opers;
   struct list        ssl;
+  struct conf_lws    lws;
 };
 
 /* -------------------------------------------------------------------------- *

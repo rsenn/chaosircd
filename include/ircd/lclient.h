@@ -220,6 +220,13 @@ IRCD_API(void)         lclient_accept       (int              fd,
                                              struct listen   *listen);
 
 /* -------------------------------------------------------------------------- *
+ * Whether the listen{} block <lcptr> was accepted through has "lws = yes;"   *
+ * set (the default). Returns 0 for a client with no listen{} block at all    *
+ * (e.g. one attached by lc_lws itself after a completed WS upgrade).         *
+ * -------------------------------------------------------------------------- */
+IRCD_API(int)          lclient_listen_has_lws(struct lclient  *lcptr);
+
+/* -------------------------------------------------------------------------- *
  * -------------------------------------------------------------------------- */
 IRCD_API(void)         lclient_connect      (int              fd,
                                              struct connect  *connect);

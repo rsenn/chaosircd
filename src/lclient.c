@@ -465,6 +465,20 @@ void lclient_accept(int fd, struct listen *listen) {
 }
 
 /* -------------------------------------------------------------------------- *
+ * Whether the listen{} block <lcptr> was accepted through wants lc_lws.      *
+ * -------------------------------------------------------------------------- */
+int lclient_listen_has_lws(struct lclient *lcptr) {
+  struct conf_listen *lconf;
+
+  if (!lcptr->listen || !lcptr->listen->args)
+    return 0;
+
+  lconf = lcptr->listen->args;
+
+  return lconf->lws;
+}
+
+/* -------------------------------------------------------------------------- *
  * Connected to a server                                                      *
  *                                                                            *
  * <fd>                     - filedescriptor of the new connection            *

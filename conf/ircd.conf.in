@@ -54,6 +54,11 @@ listen {
                                           # this defines how many incoming
                                           # connections can be buffered before
                                           # accept() is called.
+  #lws     = no;                          # Whether the lc_lws module (if built
+                                          # in, see BUILD_LC_LWS) may serve the
+                                          # gamja web client / IRC-over-WS on
+                                          # this port. Defaults to yes; set to
+                                          # no on ports where it isn't wanted.
 };
 
 # Listen for incoming connections on 127.0.0.1:9989
@@ -85,6 +90,15 @@ listen {
 #};
 
 # Connect to a remote server
+# Settings for the lc_lws module (if built in, see BUILD_LC_LWS) - the
+# in-process WebSocket<->IRC gateway that serves the vendored gamja web
+# client. Currently the only setting is default_channel, the channel gamja
+# auto-joins after connecting if the user didn't type one of their own.
+# Defaults to "#garbage" if this section (or the setting) is omitted.
+lws {
+  default_channel = "#garbage";
+};
+
 #connect {
 #  name      = "dev-20.devshed-net.ch";    # Name of the server
 #  address   = "dev-20.devshed-net.ch";    # Address of the peer

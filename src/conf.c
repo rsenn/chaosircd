@@ -257,6 +257,9 @@ void conf_init(int argc, char **argv, char **envp) {
   strcpy(conf_current.global.configfile, SYSCONFDIR "/ircd.conf");
   conf_new.global.nodetach = 0;
 
+  strcpy(conf_current.lws.default_channel, "#garbage");
+  strcpy(conf_new.lws.default_channel, "#garbage");
+
   while ((c = conf_getopt(argc, argv, "hdf:", longoptions)) > 0) {
     switch (c) {
     case 'h':

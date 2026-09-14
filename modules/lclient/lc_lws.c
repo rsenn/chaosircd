@@ -607,8 +607,9 @@ static void lc_lws_adopt(struct lclient *lcptr, const char *buf, size_t len) {
  * every raw, untokenized line before anything assumes it's IRC - the same
  * plug-in point lc_mflood.c uses. Returning 1 swallows the line (chaosircd's
  * own IRC parsing never sees it); once a client stops looking relevant here
- * (already past LCLIENT_UNKNOWN, or its first line wasn't an HTTP request
- * line) this returns 0 immediately and never touches it again.
+ * (already past LCLIENT_UNKNOWN, its first line wasn't an HTTP request line,
+ * or its listen{} block has "lws = no;") this returns 0 immediately and
+ * never touches it again.
  *
  * @param lcptr the client this line came from
  * @param s     NUL-terminated line, CRLF already stripped by io_gets()
@@ -634,6 +635,9 @@ static int lc_lws_parse_hook(struct lclient *lcptr, char *s) {
 
   if (!sniff) {
     if (!lclient_is_unknown(lcptr) || !lc_lws_looks_like_http(s))
+      return 0;
+
+    if (!lclient_listen_has_lws(lcptr))
       return 0;
 
     if (!(sniff = mem_static_alloc(&lc_lws_sniff_heap)))
