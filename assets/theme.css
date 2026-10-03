@@ -1,0 +1,32 @@
+/* chaosircd — an IRC daemon. Violet on ink, channel-style "#" headings,
+   a soft glow behind the title. */
+:root {
+  --bg:          light-dark(#fdfafa, #1b1112);
+  --bg-raised:   light-dark(#ffffff, #261819);
+  --bg-sunken:   light-dark(#f8eff0, #170d0e);
+  --bg-code:     light-dark(#faf1f2, #261819);
+  --fg:          light-dark(#221a1b, #f2e6e7);
+  --fg-muted:    light-dark(#705a5c, #bb9fa2);
+  --fg-faint:    light-dark(#a08789, #926f72);
+  --line:        light-dark(#eee0e1, #402527);
+  --line-strong: light-dark(#e0c8ca, #5c383b);
+  --accent:      light-dark(#c83240, #ffb3ba);
+  --accent-fg:   light-dark(#ffffff, #1b1112);
+  --accent-soft: light-dark(#f8e5e7, #452124);
+
+  --t-kw:  light-dark(#a03f48, #ffa3ab);
+  --t-fn:  light-dark(#1f6f8b, #7dd3fc);
+  --t-str: light-dark(#0a7d43, #86d9a4);
+
+  --radius: 6px;
+  --mark-bg: var(--accent);
+  --mark-fg: var(--accent-fg);
+  --mark-pad: 0.22em 0.5em;
+  --hero-bg: radial-gradient(50rem 18rem at 50% 0%, var(--accent-soft), transparent 70%);
+  --card-shadow: 0 8px 28px -18px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.doc h2::before, .landing h2::before { content: "#"; color: var(--accent); margin-right: 0.35em; font-family: var(--mono); }
+.doc h1::before { content: "#"; color: var(--accent); margin-right: 0.25em; font-family: var(--mono); }
+.hero-center h1 { color: var(--accent); }
+.card { border-top: 2px solid var(--accent); }

@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>chaosircd IRCv3 Migration Plan — chaosircd</title>
 <meta name="description" content="chaosircd — an IRC daemon with (re)loadable modules. Loadable command/chanmode/usermode modules, a dedicated DNS/ident/proxy-scan process, and an in-process WebSocket gateway for browser clients.">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/theme.css">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
-<body class="has-sidebar">
+<body class="has-sidebar" data-site="chaosircd" data-root="../">
 <header class="topbar">
-  <a class="brand" href="../index.html"><span class="mark">#</span> chaosircd</a>
+  <a class="brand" href="../index.html"><span class="mark">#</span> <span class="brand-name">chaosircd</span></a>
   <nav class="topnav">
     <a href="../getting-started.html">Get started</a>
     <a href="../docs/ircv3.html">IRCv3 plan</a>
@@ -290,7 +291,7 @@ how the phase 1 implementation crashed the daemon the first time round).</p></ar
 </div>
 <footer class="sitefoot">
   <p>chaosircd — GPL v2 (LGPL v2 for the core library). Built from the repo's own markdown by
-     <a href="https://github.com/rsenn/chaosircd/blob/main/tools/site/build.js">tools/site/build.js</a>.</p>
+     <a href="https://github.com/rsenn/rsenn/tree/main/tools/site">rsenn/rsenn tools/site</a>.</p>
 </footer>
 <script>
 document.querySelector('.themetoggle').addEventListener('click', function () {

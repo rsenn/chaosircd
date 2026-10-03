@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>chaosircd — chaosircd</title>
 <meta name="description" content="chaosircd — an IRC daemon with (re)loadable modules. Loadable command/chanmode/usermode modules, a dedicated DNS/ident/proxy-scan process, and an in-process WebSocket gateway for browser clients.">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/theme.css">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
-<body class="has-sidebar">
+<body class="has-sidebar" data-site="chaosircd" data-root="">
 <header class="topbar">
-  <a class="brand" href="index.html"><span class="mark">#</span> chaosircd</a>
+  <a class="brand" href="index.html"><span class="mark">#</span> <span class="brand-name">chaosircd</span></a>
   <nav class="topnav">
     <a href="getting-started.html">Get started</a>
     <a href="docs/ircv3.html">IRCv3 plan</a>
@@ -33,8 +34,8 @@ a file descriptor or a blocked <code>gethostbyname()</code> each. Server links u
 timestamps for netsplit handling, in the same family as TS5/hybrid, and
 both server-server and client-server connections can run over OpenSSL.</p>
 <h2 id="why-it-exists"><a class="anchor" href="#why-it-exists" aria-hidden="true">#</a>Why it exists</h2>
-<p>chaosircd started as patches to <a href="https://ircd-hybrid.org/" target="_blank" rel="noopener">ircd-hybrid</a>,
-written to keep a couple of real networks running: the IRC services behind
+<p>chaosircd was conceived as a from-scratch IRC daemon, written to keep a
+couple of real networks running: the IRC services behind
 <code>irc.blah.ch</code> at freemails.ch, and a handful of servers on a home
 cablemodem with a dynamic IP behind a dynamic-DNS hostname. Hybrid's
 server-linking wanted static addresses; a cablemodem doesn't have one, so
@@ -49,11 +50,10 @@ be checked without trusting whatever it claimed about itself. K-lines and
 G-lines don't just refuse a banned client at the application layer —
 they hand the address to a BPF socket filter on Linux, so a client that's
 already been told to go away stops costing the daemon a <code>read()</code> at all.</p>
-<p>Implementation began by lifting the <code>dlink</code> doubly-linked-list code
-straight out of ircd-hybrid — you can still see the family resemblance in
-<code>lib/src/dlink.c</code> — but everything built on top of it from that point on
-was written from scratch, and grew into its own daemon rather than staying
-a patch set.</p>
+<p>Implementation borrowed the <code>dlink</code> doubly-linked-list code from
+<a href="https://ircd-hybrid.org/" target="_blank" rel="noopener">ircd-hybrid</a> — you can still see the family
+resemblance in <code>lib/src/dlink.c</code> — but everything built on top of it was
+written from scratch as its own daemon from the start.</p>
 <p>That was 2003. The project has had long quiet stretches since — the git
 history jumps from an initial 2007 import to 2014 to 2026 — but each time
 it's come back to run something real, most recently a
@@ -125,7 +125,7 @@ file for the exact terms, and <a href="https://github.com/rsenn/chaosircd/blob/m
 </div>
 <footer class="sitefoot">
   <p>chaosircd — GPL v2 (LGPL v2 for the core library). Built from the repo's own markdown by
-     <a href="https://github.com/rsenn/chaosircd/blob/main/tools/site/build.js">tools/site/build.js</a>.</p>
+     <a href="https://github.com/rsenn/rsenn/tree/main/tools/site">rsenn/rsenn tools/site</a>.</p>
 </footer>
 <script>
 document.querySelector('.themetoggle').addEventListener('click', function () {
